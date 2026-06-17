@@ -1,21 +1,18 @@
-class CustomerService:
+from backend.repositories.customer_repository import create_customer
 
-    def create_customer(
 
-        self,
+def create_customer_request(
 
-        data
+        db,
 
-    ):
+        payload
 
-        return {
+):
 
-            "message":
+    return create_customer(
 
-            "Customer created",
+        db,
 
-            "data":
+        payload
 
-            data
-
-        }
+    )

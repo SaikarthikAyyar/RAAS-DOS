@@ -1,6 +1,15 @@
 from fastapi import APIRouter
 
+from fastapi import Depends
+
+from sqlalchemy.orm import Session
+
+from backend.database.connection import get_db
+
 from backend.schemas.customer_schema import CustomerRequestSchema
+
+from backend.services.customer_service import create_customer_request
+
 
 router = APIRouter()
 
@@ -11,16 +20,26 @@ router = APIRouter()
 
 )
 
-def create_customer(
+def customer_request(
 
-customer:CustomerRequestSchema
+payload: CustomerRequestSchema,
+
+db: Session = Depends(get_db)
 
 ):
 
- return {
+    customer = create_customer_request(
 
- "success":True,
+        db,
 
- "data":customer
+        payload
 
- }
+    )
+
+    return {
+
+        "id": customer.id,
+
+        "status": customer.status
+
+    }

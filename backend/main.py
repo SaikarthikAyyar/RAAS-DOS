@@ -2,11 +2,15 @@ from fastapi import FastAPI
 
 from backend.api.customer_api import router as customer_router
 
+from backend.database.init_db import create_tables
+
 app = FastAPI()
+
+create_tables()
 
 app.include_router(
 
- customer_router
+    customer_router
 
 )
 
@@ -15,10 +19,10 @@ app.include_router(
 
 def home():
 
- return {
+    return {
 
- "message":
+        "message":
 
- "RAAS DOS API"
+        "RAAS DOS API"
 
- }
+    }

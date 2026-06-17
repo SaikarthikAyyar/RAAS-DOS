@@ -1,6 +1,8 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy import Float
+from sqlalchemy import Boolean
 
 from backend.database.tables import Base
 
@@ -11,10 +13,15 @@ class CustomerRequest(Base):
 
     id = Column(
         Integer,
-        primary_key=True
+        primary_key=True,
+        index=True
     )
 
     company_name = Column(
+        String
+    )
+
+    plant_site_location = Column(
         String
     )
 
@@ -22,38 +29,51 @@ class CustomerRequest(Base):
         String
     )
 
-    contact_email = Column(
+    urgency = Column(
         String
     )
 
-    contact_phone = Column(
+    service_requirement_type = Column(
         String
     )
 
-    site_location = Column(
+    observed_material = Column(
         String
     )
 
-    project_start = Column(
+    approx_length_dia = Column(
+        Float
+    )
+
+    approx_width = Column(
+        Float
+    )
+
+    approx_depth = Column(
+        Float
+    )
+
+    access_opening_type = Column(
         String
     )
 
-    project_end = Column(
+    can_place_equipment_nearby = Column(
+        Boolean
+    )
+
+    quote_basis = Column(
         String
     )
 
-    service_required = Column(
+    pain_point = Column(
         String
     )
 
-    priority = Column(
-        String
-    )
-
-    description = Column(
+    attachments = Column(
         String
     )
 
     status = Column(
-        String
+        String,
+        default="REQUESTED"
     )
