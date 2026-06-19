@@ -1,10 +1,19 @@
+# ====================================
+# IMPORTS
+# ====================================
+
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 
 from backend.database.tables import Base
 
+
+# ====================================
+# SALES SURVEY TABLE
+# ====================================
 
 class SalesSurvey(Base):
 
@@ -16,39 +25,45 @@ class SalesSurvey(Base):
         index=True
     )
 
-    job_id = Column(
+    customer_request_id = Column(
         Integer,
-        ForeignKey("jobs.id")
+        ForeignKey(
+            "customer_requests.id"
+        )
     )
 
     job_type = Column(
-        String
+        String(100)
     )
 
     sludge_type = Column(
-        String
+        String(100)
     )
 
     volume = Column(
-        String
+        Float
     )
 
     output_target = Column(
-        String
+        String(100)
     )
 
     access_type = Column(
-        String
+        String(100)
     )
 
     vertical_lift = Column(
-        String
+        Float
     )
 
     hose_distance = Column(
+        Float
+    )
+
+    safety_notes = Column(
         String
     )
 
-    safety = Column(
-        String
+    status = Column(
+        String(50)
     )

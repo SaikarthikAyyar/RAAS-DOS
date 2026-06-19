@@ -1,48 +1,37 @@
-from sqlalchemy.orm import Session
+import logging
+
+logger = logging.getLogger(__name__)
 
 from backend.models.customer_requests import CustomerRequest
 
+from sqlalchemy import text
 
-def create_customer(
+def create_customer(db, payload):
 
-        db: Session,
+    logger.warning(f"PAYLOAD = {payload}")
 
-        payload
+    logger.warning(
+         f"DATABASE = {db.execute(text('SELECT current_database();')).scalar()}"
+    )
 
-):
-
+    logger.warning(
+         f"COLUMNS = {
+            db.execute(
+               text(
+                   '''
+                   SELECT column_name
+                   FROM information_schema.columns
+                   WHERE table_name='customer_requests'
+                   '''
+                )
+            ).fetchall()
+       }"
+    )
     customer = CustomerRequest(
-
         company_name=payload.company_name,
-
         plant_site_location=payload.plant_site_location,
-
-        contact_person=payload.contact_person,
-
-        urgency=payload.urgency,
-
-        service_requirement_type=payload.service_requirement_type,
-
-        observed_material=payload.observed_material,
-
-        approx_length_dia=payload.approx_length_dia,
-
-        approx_width=payload.approx_width,
-
-        approx_depth=payload.approx_depth,
-
-        access_opening_type=payload.access_opening_type,
-
-        can_place_equipment_nearby=payload.can_place_equipment_nearby,
-
-        quote_basis=payload.quote_basis,
-
-        pain_point=payload.pain_point,
-
-        attachments=payload.attachments,
-
+        
         status="REQUESTED"
-
     )
 
     db.add(customer)

@@ -18,27 +18,27 @@ class CustomerRequest(Base):
     )
 
     company_name = Column(
-        String
+        String(150)
     )
 
     plant_site_location = Column(
-        String
+        String(150)
     )
 
     contact_person = Column(
-        String
+        String(150)
     )
 
     urgency = Column(
-        String
+        String(50)
     )
 
     service_requirement_type = Column(
-        String
+        String(150)
     )
 
     observed_material = Column(
-        String
+        String(150)
     )
 
     approx_length_dia = Column(
@@ -54,7 +54,7 @@ class CustomerRequest(Base):
     )
 
     access_opening_type = Column(
-        String
+        String(100)
     )
 
     can_place_equipment_nearby = Column(
@@ -62,7 +62,7 @@ class CustomerRequest(Base):
     )
 
     quote_basis = Column(
-        String
+        String(150)
     )
 
     pain_point = Column(
@@ -74,6 +74,5 @@ class CustomerRequest(Base):
     )
 
     status = Column(
-        String,
-        default="REQUESTED"
+        String(50)
     )

@@ -1,211 +1,189 @@
-# RAAS DOS Build Tracker
+# RAAS DOS Project Verification Tracker
 
-# CHECKPOINT V1
+## Verification Rules
 
-## PHASE 1 : Environment Setup
+Every module must pass:
 
-[✓] React Installed
+[ ] PostgreSQL Verification
 
-[✓] Vite Running
+[ ] SQLAlchemy Verification
 
-[✓] PostgreSQL Installed
+[ ] Pydantic Schema Verification
 
-[✓] RAAS_DOS Database Created
+[ ] FastAPI Verification
 
--------------------------------------------------
-
-## PHASE 2 : Frontend Foundation
-
-[✓] React Router Installed
-
-[✓] MainLayout Created
-
-[✓] Sidebar Created
-
-[✓] Header Created
-
-[✓] Navigation Working
-
-[✓] Workspace Separation
-
-[✓] Placeholder Pages Created
+[ ] Frontend Integration Verification
 
 -------------------------------------------------
 
-## PHASE 3 : Backend Foundation
+# Workflow Modules
 
-[✓] FastAPI Installed
+## 1 Customer Request
 
-[✓] FastAPI Running
+PostgreSQL: ⏳
 
-[✓] Health Endpoint Created
+Model: ✅
 
-[✓] Config Structure Created
+Schema: ✅
 
-[✓] Database Structure Created
+API: ✅
 
-[✓] Environment Variables Configured
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 2 Sales Survey
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 3 Ops Selector
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 4 Dewatering Gate
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 5 Quote
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 6 Approval
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 7 Job Creation
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 8 Allocation
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 9 Execution
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 10 Customer Portal
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
+
+
+## 11 Analytics
+
+PostgreSQL: ⏳
+
+Model: ⏳
+
+Schema: ⏳
+
+API: ⏳
+
+Frontend: ⏳
+
+Verified: ⏳
 
 -------------------------------------------------
 
-## PHASE 4 : Login Module (Prototype)
+Overall Completion:
 
-[✓] Login UI Created
-
-[✓] Login State Management
-
-[✓] Login Validation
-
-[✓] Dashboard Redirection
-
--------------------------------------------------
-
-## PHASE 5 : Dashboard Module
-
-[✓] Dashboard UI Created
-
-[✓] KPI Cards Created
-
-[✓] Notifications Header
-
-[✓] User Summary
-
--------------------------------------------------
-
-
-
-# CHECKPOINT V2
-
-## PHASE 6 : Role Based Architecture
-
-[✓] Role Dropdown Added
-
-[✓] Role Based Login
-
-[✓] Role Permissions Utility
-
-[✓] Authentication Service
-
-[✓] Dynamic Sidebar
-
-[✓] Role Based Dashboard
-
-[✓] Role Persistence (localStorage)
-
--------------------------------------------------
-
-## PHASE 7 : Customer Request Module
-
-[✓] PostgreSQL Table Created
-
-[✓] Backend Router Created
-
-[✓] CustomerRequest.jsx Created
-
-[✓] Request ID Generator
-
-[✓] Controlled Form Inputs
-
-[✓] Form State Management
-
-[✓] Console Submission
-
-[ ] FastAPI Integration
-
-[ ] Database Integration
-
-[ ] Dashboard Integration
-
--------------------------------------------------
-
-## PHASE 8 : Sales Survey Module
-
-[ ] Database Table
-
-[ ] Backend Router
-
-[ ] React UI
-
-[ ] API Integration
-
--------------------------------------------------
-
-## PHASE 9 : Ops Selector Module
-
-[ ] Decision Engine
-
-[ ] Business Rules
-
-[ ] API
-
-[ ] Dashboard Integration
-
--------------------------------------------------
-
-## PHASE 10 : Dewatering Module
-
-[ ] Rule Engine
-
-[ ] API
-
-[ ] Dashboard Integration
-
--------------------------------------------------
-
-## PHASE 11 : Quote Module
-
-[ ] Quote Engine
-
-[ ] Cost Calculation
-
-[ ] API
-
--------------------------------------------------
-
-## PHASE 12 : Approval Module
-
-[ ] Workflow Engine
-
-[ ] API
-
--------------------------------------------------
-
-## PHASE 13 : Job Creation Module
-
-[ ] API
-
-[ ] Dashboard Integration
-
--------------------------------------------------
-
-## PHASE 14 : Allocation Module
-
-[ ] Resource Allocation Engine
-
-[ ] API
-
--------------------------------------------------
-
-## PHASE 15 : Execution Module
-
-[ ] Execution Tracking
-
-[ ] Dashboard Integration
-
--------------------------------------------------
-
-## PHASE 16 : Customer Portal
-
-[ ] Live Tracking
-
-[ ] Customer Dashboard
-
--------------------------------------------------
-
-## PHASE 17 : Full Integration
-
-[ ] React ↔ FastAPI
-
-[ ] FastAPI ↔ PostgreSQL
-
-[ ] End-to-End Workflow
+0 / 11 Modules Verified
