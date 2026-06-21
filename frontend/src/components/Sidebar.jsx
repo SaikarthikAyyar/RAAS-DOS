@@ -1,118 +1,236 @@
-import { Link } from "react-router-dom";
+// =========================================
+// IMPORTS
+// =========================================
 
-import { rolePermissions }
+import { NavLink } from "react-router-dom";
 
-from "../utils/rolePermissions";
+import {
 
-<Link to="/analytics">
+    Home,
 
- Analytics
+    FileText,
 
-</Link>
+    ClipboardCheck,
 
+    Settings,
 
-function Sidebar(){
+    Droplets,
 
- const role=
+    Calculator,
 
- localStorage.getItem(
+    CheckCircle,
 
-  "userRole"
+    Briefcase,
 
- )
+    Truck,
 
- const modules=
+    PlayCircle,
 
- rolePermissions[role]
+    UserCircle,
 
- ||[]
-
-
- function formatModuleName(module){
-
-  return module
-
-   .split("-")
-
-   .map(
-
-    word=>
-
-    word.charAt(0)
-
-    .toUpperCase()
-
-    +
-
-    word.slice(1)
-
-   )
-
-   .join(" ")
-
- }
-
-
- return(
-
-  <div style={{
-
-   width:"250px",
-
-   height:"100vh",
-
-   borderRight:"1px solid gray",
-
-   padding:"20px"
-
-  }}>
-
-   <h2>
-
-    RAAS DOS
-
-   </h2>
-
-   <hr/>
-
-   {
-
-    modules.map(
-
-     module=>(
-
-      <p key={module}>
-
-       <Link
-
-        to={"/"+module}
-
-       >
-
-        {
-
-         formatModuleName(
-
-          module
-
-         )
-
-        }
-
-       </Link>
-
-      </p>
-
-     )
-
-    )
-
-   }
-
-  </div>
-
- )
+    BarChart3
 
 }
 
-export default Sidebar
+from "lucide-react";
+
+
+// =========================================
+// MENU CONFIGURATION
+// =========================================
+
+const menuItems = [
+
+    {
+
+        title: "Dashboard",
+
+        path: "/dashboard",
+
+        icon: <Home size={20} />
+
+    },
+
+    {
+
+        title: "Customer Request",
+
+        path: "/customer-request",
+
+        icon: <FileText size={20} />
+
+    },
+
+    {
+
+        title: "Sales Survey",
+
+        path: "/sales-survey",
+
+        icon: <ClipboardCheck size={20} />
+
+    },
+
+    {
+
+        title: "Ops Selector",
+
+        path: "/ops-selector",
+
+        icon: <Settings size={20} />
+
+    },
+
+    {
+
+        title: "Dewatering Gate",
+
+        path: "/dewatering-gate",
+
+        icon: <Droplets size={20} />
+
+    },
+
+    {
+
+        title: "Quote",
+
+        path: "/quote",
+
+        icon: <Calculator size={20} />
+
+    },
+
+    {
+
+        title: "Approval",
+
+        path: "/approval",
+
+        icon: <CheckCircle size={20} />
+
+    },
+
+    {
+
+        title: "Job Creation",
+
+        path: "/job-creation",
+
+        icon: <Briefcase size={20} />
+
+    },
+
+    {
+
+        title: "Allocation",
+
+        path: "/allocation",
+
+        icon: <Truck size={20} />
+
+    },
+
+    {
+
+        title: "Execution",
+
+        path: "/execution",
+
+        icon: <PlayCircle size={20} />
+
+    },
+
+    {
+
+        title: "Customer Portal",
+
+        path: "/customer-portal",
+
+        icon: <UserCircle size={20} />
+
+    },
+
+    {
+
+        title: "Analytics",
+
+        path: "/analytics",
+
+        icon: <BarChart3 size={20} />
+
+    }
+
+];
+
+
+// =========================================
+// COMPONENT
+// =========================================
+
+export default function Sidebar() {
+
+    return (
+
+        <aside className="sidebar">
+
+            {/* ========================================= */}
+            {/* APPLICATION LOGO */}
+            {/* ========================================= */}
+
+            <div className="logo">
+
+                RAAS DOS V1
+
+            </div>
+
+
+            {/* ========================================= */}
+            {/* MENU ITEMS */}
+            {/* ========================================= */}
+
+            {
+
+                menuItems.map(
+
+                    item => (
+
+                        <NavLink
+
+                            key={item.path}
+
+                            to={item.path}
+
+                            className={({ isActive }) =>
+
+                                isActive
+
+                                    ? "menu-item active"
+
+                                    : "menu-item"
+
+                            }
+
+                        >
+
+                            {item.icon}
+
+                            <span>
+
+                                {item.title}
+
+                            </span>
+
+                        </NavLink>
+
+                    )
+
+                )
+
+            }
+
+        </aside>
+
+    );
+
+}

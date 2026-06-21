@@ -6,6 +6,8 @@ from fastapi import APIRouter
 
 from fastapi import Depends
 
+from sqlalchemy.orm import Session
+
 from backend.database.connection import get_db
 
 from backend.schemas.sales_survey_schema import SalesSurveySchema
@@ -23,43 +25,52 @@ router = APIRouter()
 
 
 # ====================================
+# HEALTH CHECK
+# ====================================
+
+@router.get(
+
+    "/sales-survey"
+
+)
+
+def sales_survey():
+
+    return {
+
+        "message":
+
+        "sales survey router active"
+
+    }
+
+
+# ====================================
 # CREATE SALES SURVEY
 # ====================================
 
-@router.post("/sales-survey")
+@router.post(
 
-def sales_survey(
+    "/sales-survey"
 
-        payload: SalesSurveySchema,
+)
 
-        db=Depends(get_db)
+def create_survey(
 
-):
+        payload:SalesSurveySchema,
 
-    try:
+        db:Session=Depends(
 
-        survey = create_sales_survey_request(
-
-            db,
-
-            payload
+            get_db
 
         )
 
-        return {
+):
 
-            "success": True,
+    return create_sales_survey_request(
 
-            "data": survey
+        db,
 
-        }
+        payload
 
-    except Exception as e:
-
-        print("\n\nERROR OCCURRED\n")
-
-        print(type(e))
-
-        print(e)
-
-        raise e
+    )

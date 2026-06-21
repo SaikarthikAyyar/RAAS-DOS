@@ -1,107 +1,178 @@
-body{
+/* ========================================= */
+/* GLOBAL RESET */
+/* ========================================= */
 
-margin:0;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-font-family:sans-serif;
+/* ========================================= */
+/* HTML + BODY */
+/* ========================================= */
 
-background:#f4f7fb;
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Inter, sans-serif;
+}
+
+/* ========================================= */
+/* APP LAYOUT */
+/* ========================================= */
+
+.app-container {
+
+  display: flex;
+
+  width: 100%;
+
+  height: 100vh;
+
+  background: #f4f6f9;
 
 }
 
-.app-container{
+/* ========================================= */
+/* SIDEBAR */
+/* ========================================= */
 
-display:flex;
+.sidebar {
 
-height:100vh;
+  width: 300px;
 
-}
+  min-width: 300px;
 
-.sidebar{
+  height: 100vh;
 
-width:260px;
+  background: #001632;
 
-background:#07111f;
+  display: flex;
 
-color:white;
+  flex-direction: column;
 
-padding:25px;
+  padding: 40px;
 
-display:flex;
-
-flex-direction:column;
-
-gap:18px;
+  gap: 14px;
 
 }
 
-.logo{
+/* ========================================= */
+/* LOGO */
+/* ========================================= */
 
-font-size:30px;
+.logo {
 
-font-weight:bold;
+  color: white;
 
-margin-bottom:20px;
+  font-size: 42px;
 
-}
+  font-weight: 800;
 
-.menu-item{
-
-display:flex;
-
-align-items:center;
-
-gap:12px;
-
-padding:12px;
-
-text-decoration:none;
-
-color:white;
-
-border-radius:10px;
+  margin-bottom: 30px;
 
 }
 
-.menu-item:hover{
+/* ========================================= */
+/* SIDEBAR MENU */
+/* ========================================= */
 
-background:#1b2d45;
+.menu-item {
 
-}
+  display: flex;
 
-.content-area{
+  align-items: center;
 
-flex:1;
+  gap: 14px;
 
-display:flex;
+  height: 55px;
 
-flex-direction:column;
+  padding: 0 16px;
 
-}
+  border-radius: 12px;
 
-.topbar{
+  color: white;
 
-height:70px;
+  text-decoration: none;
 
-display:flex;
+  font-size: 20px;
 
-justify-content:flex-end;
-
-align-items:center;
-
-gap:40px;
-
-padding:0 40px;
-
-background:white;
-
-box-shadow:0 1px 5px rgba(0,0,0,.1);
+  transition: 0.2s;
 
 }
 
-.page-container{
+/* ========================================= */
+/* HOVER */
+/* ========================================= */
 
-padding:40px;
+.menu-item:hover {
 
-overflow:auto;
+  background: #0c274d;
+
+}
+
+/* ========================================= */
+/* ACTIVE */
+/* ========================================= */
+
+.menu-item.active {
+
+  background: #123869;
+
+}
+
+/* ========================================= */
+/* CONTENT AREA */
+/* ========================================= */
+
+.content-area {
+
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow: hidden;
+
+}
+
+/* ========================================= */
+/* TOPBAR */
+/* ========================================= */
+
+.topbar {
+
+  height: 80px;
+
+  background: white;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  align-items: center;
+
+  gap: 50px;
+
+  padding: 0 50px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+}
+
+/* ========================================= */
+/* PAGE CONTAINER */
+/* ========================================= */
+
+.page-container {
+
+  flex: 1;
+
+  overflow-y: auto;
 
 }

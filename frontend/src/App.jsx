@@ -6,9 +6,9 @@ import Login from "./pages/Login";
 
 import Dashboard from "./pages/Dashboard";
 
-import CustomerRequest from "./pages/CustomerRequest";
+import CustomerRequest from "./pages/CustomerRequest/CustomerRequest";
 
-import SalesSurvey from "./pages/SalesSurvey";
+import SalesSurvey from "./pages/SalesSurvey/SalesSurvey";
 
 import OpsSelector from "./pages/OpsSelector";
 

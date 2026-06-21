@@ -1,0 +1,488 @@
+/* =================================== */
+/* PAGE */
+/* =================================== */
+
+.sales-survey-page{
+
+    width:100%;
+
+    min-height:100vh;
+
+    padding:20px;
+
+    background:#f4f6fa;
+
+}
+
+
+/* =================================== */
+/* SURVEY HEADER */
+/* =================================== */
+
+.survey-progress-container{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    margin-bottom:35px;
+
+    padding:10px 10px 30px;
+
+}
+
+
+.survey-progress-left{
+
+    max-width:850px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+
+.survey-sheet-title{
+
+    font-size:18px;
+
+    font-weight:800;
+
+    letter-spacing:3px;
+
+    color:#0a8077;
+
+    margin-bottom:14px;
+
+}
+
+
+/* =================================== */
+/* MAIN TITLE */
+/* =================================== */
+
+.survey-progress-left h1{
+
+    font-size:52px;
+
+    font-weight:800;
+
+    color:#10182f;
+
+    line-height:1.05;
+
+    margin:0 0 25px 0;
+
+}
+
+
+.survey-progress-left p{
+
+    font-size:18px;
+
+    line-height:1.7;
+
+    color:#62708b;
+
+    max-width:900px;
+
+    text-align:left;
+
+    margin-top:10px;
+
+}
+
+
+/* =================================== */
+/* COMPLETION CARD */
+/* =================================== */
+
+.survey-completion-card{
+
+    width:280px;
+
+    height:120px;
+
+    border-radius:60px;
+
+    border:2px solid #90efb5;
+
+    background:#eef8f0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    padding-left:55px;
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:#0b6760;
+
+}
+
+
+.survey-completion-card strong{
+
+    font-size:24px;
+
+}
+
+
+/* =================================== */
+/* SURVEY CARD */
+/* =================================== */
+
+.survey-card{
+
+    width:100%;
+
+    background:#ffffff;
+
+    border:1px solid #dfe4ec;
+
+    border-radius:28px;
+
+    padding:28px;
+
+    margin-bottom:22px;
+
+}
+
+
+/* =================================== */
+/* SECTION HEADER */
+/* =================================== */
+
+.survey-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+
+.survey-header h2{
+
+    font-size:24px;
+
+    font-weight:800;
+
+    color:#041f63;
+
+    margin:0;
+
+}
+
+
+.survey-header span{
+
+    font-size:18px;
+
+    color:#6c7b93;
+
+}
+
+
+/* =================================== */
+/* GRID */
+/* =================================== */
+
+.survey-grid,
+
+.survey-row{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:28px;
+
+}
+
+
+/* =================================== */
+/* FIELD */
+/* =================================== */
+
+.survey-field{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+/* =================================== */
+/* LABEL */
+/* =================================== */
+
+.survey-field label{
+
+    font-size:16px;
+
+    font-weight:700;
+
+    color:#314d76;
+
+    margin-bottom:10px;
+
+    text-align:center;
+
+}
+
+
+/* =================================== */
+/* INPUTS */
+/* =================================== */
+
+.survey-field input,
+
+.survey-field select{
+
+    width:100%;
+
+    height:64px;
+
+    border:2px solid #d7dfe9;
+
+    border-radius:22px;
+
+    padding:0 22px;
+
+    font-size:16px;
+
+    background:#fff;
+
+    outline:none;
+
+}
+
+
+.survey-field input:focus,
+
+.survey-field select:focus{
+
+    border-color:#00897b;
+
+}
+
+
+.survey-field select{
+
+    cursor:pointer;
+
+}
+
+
+.survey-field input{
+
+    cursor:text;
+
+}
+
+
+.survey-field input[readonly]{
+
+    background:#f5f7fb;
+
+    cursor:not-allowed;
+
+}
+
+
+/* =================================== */
+/* MEDIA UPLOAD */
+/* =================================== */
+
+.media-upload-box{
+
+    height:72px;
+
+    border:2px solid #c7d0db;
+
+    border-radius:24px;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:0 24px;
+
+    font-size:22px;
+
+    cursor:pointer;
+
+    background:white;
+
+    transition:0.2s;
+
+}
+
+
+.media-upload-box:hover{
+
+    border-color:#1d4ed8;
+
+}
+
+
+/* =================================== */
+/* ACTION BUTTONS */
+/* =================================== */
+
+.survey-actions{
+
+    display:flex;
+
+    justify-content:flex-start;
+
+    gap:22px;
+
+    padding:30px 0 60px;
+
+}
+
+
+.survey-btn{
+
+    border:none;
+
+    cursor:pointer;
+
+    height:90px;
+
+    padding:0 36px;
+
+    border-radius:30px;
+
+    font-size:22px;
+
+    font-weight:800;
+
+}
+
+
+.save-btn{
+
+    background:#117d77;
+
+    color:white;
+
+}
+
+
+.ops-btn{
+
+    background:#2f63e0;
+
+    color:white;
+
+}
+
+
+.info-btn{
+
+    background:#e9edf3;
+
+    color:#0d1730;
+
+}
+
+
+/* =================================== */
+/* RESPONSIVE */
+/* =================================== */
+
+@media(max-width:1200px){
+
+.survey-grid,
+
+.survey-row{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+
+.survey-progress-container{
+
+flex-direction:column;
+
+gap:30px;
+
+}
+
+
+.survey-progress-left h1{
+
+font-size:42px;
+
+}
+
+
+.survey-completion-card{
+
+width:100%;
+
+}
+
+
+.survey-actions{
+
+flex-direction:column;
+
+}
+
+}
+
+
+@media(max-width:768px){
+
+.survey-grid,
+
+.survey-row{
+
+grid-template-columns:1fr;
+
+}
+
+
+.survey-header{
+
+flex-direction:column;
+
+gap:12px;
+
+}
+
+
+.survey-header h2{
+
+font-size:22px;
+
+}
+
+
+.survey-progress-left h1{
+
+font-size:34px;
+
+}
+
+}

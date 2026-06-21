@@ -1,3 +1,7 @@
+// =========================================
+// IMPORTS
+// =========================================
+
 import { Outlet } from "react-router-dom";
 
 import Sidebar from "../components/layout/Sidebar";
@@ -6,28 +10,41 @@ import Topbar from "../components/layout/Topbar";
 
 import "../styles/main.css";
 
-export default function MainLayout(){
 
- return(
+// =========================================
+// COMPONENT
+// =========================================
 
- <div className="app-container">
+export default function MainLayout() {
 
- <Sidebar/>
+    return (
 
- <div className="content-area">
+        <div className="app-container">
 
- <Topbar/>
+            {/* Left Sidebar */}
 
- <div className="page-container">
+            <Sidebar />
 
- <Outlet/>
+            {/* Right Workspace */}
 
- </div>
+            <div className="content-area">
 
- </div>
+                {/* Top Header */}
 
- </div>
+                <Topbar />
 
- )
+                {/* Dynamic Pages */}
+
+                <div className="page-container">
+
+                    <Outlet />
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
 
 }
