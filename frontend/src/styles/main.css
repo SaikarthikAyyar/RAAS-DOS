@@ -1,39 +1,46 @@
 /* ========================================= */
-/* GLOBAL RESET */
+/* RESET */
 /* ========================================= */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+*{
+
+margin:0;
+
+padding:0;
+
+box-sizing:border-box;
+
 }
-
-/* ========================================= */
-/* HTML + BODY */
-/* ========================================= */
 
 html,
 body,
-#root {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  font-family: Inter, sans-serif;
+#root{
+
+width:100%;
+
+height:100%;
+
+font-family:Inter,sans-serif;
+
+overflow:hidden;
+
 }
 
 /* ========================================= */
-/* APP LAYOUT */
+/* APP */
 /* ========================================= */
 
-.app-container {
+.app-shell{
 
-  display: flex;
+display:flex;
 
-  width: 100%;
+width:100vw;
 
-  height: 100vh;
+height:100vh;
 
-  background: #f4f6f9;
+background:linear-gradient(135deg,#021631,#003d39,#062d66);
+
+overflow:hidden;
 
 }
 
@@ -41,23 +48,21 @@ body,
 /* SIDEBAR */
 /* ========================================= */
 
-.sidebar {
+.app-sidebar{
 
-  width: 300px;
+width:300px;
 
-  min-width: 300px;
+min-width:300px;
 
-  height: 100vh;
+height:100vh;
 
-  background: #001632;
+background:#001632;
 
-  display: flex;
+display:flex;
 
-  flex-direction: column;
+flex-direction:column;
 
-  padding: 40px;
-
-  gap: 14px;
+padding:30px;
 
 }
 
@@ -65,114 +70,130 @@ body,
 /* LOGO */
 /* ========================================= */
 
-.logo {
+.sidebar-logo{
 
-  color: white;
+display:flex;
 
-  font-size: 42px;
+justify-content:center;
 
-  font-weight: 800;
+align-items:center;
 
-  margin-bottom: 30px;
+margin-bottom:30px;
+
+}
+
+.sidebar-logo-text{
+
+font-size:40px;
+
+font-weight:800;
+
+color:white;
+
+line-height:1;
 
 }
 
 /* ========================================= */
-/* SIDEBAR MENU */
+/* NAVIGATION */
 /* ========================================= */
 
-.menu-item {
+.sidebar-nav{
 
-  display: flex;
+display:flex;
 
-  align-items: center;
+flex-direction:column;
 
-  gap: 14px;
+gap:14px;
 
-  height: 55px;
+}
 
-  padding: 0 16px;
+.sidebar-nav-item{
 
-  border-radius: 12px;
+display:flex;
 
-  color: white;
+align-items:center;
 
-  text-decoration: none;
+gap:14px;
 
-  font-size: 20px;
+height:55px;
 
-  transition: 0.2s;
+padding:0 18px;
+
+border-radius:12px;
+
+color:white;
+
+text-decoration:none;
+
+font-size:18px;
+
+transition:0.2s;
+
+}
+
+.sidebar-nav-item:hover{
+
+background:#0c274d;
+
+}
+
+.sidebar-nav-item.active{
+
+background:#123869;
 
 }
 
 /* ========================================= */
-/* HOVER */
+/* MAIN */
 /* ========================================= */
 
-.menu-item:hover {
+.app-main{
 
-  background: #0c274d;
+flex:1;
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
 
 }
 
 /* ========================================= */
-/* ACTIVE */
+/* TOP BAR */
 /* ========================================= */
 
-.menu-item.active {
+.app-topnav{
 
-  background: #123869;
+height:80px;
+
+display:flex;
+
+justify-content:flex-end;
+
+align-items:center;
+
+gap:40px;
+
+padding:0 40px;
+
+color:white;
 
 }
 
 /* ========================================= */
-/* CONTENT AREA */
+/* PAGE */
 /* ========================================= */
 
-.content-area {
+.app-content{
 
-  flex: 1;
+flex:1;
 
-  display: flex;
+overflow-y:auto;
 
-  flex-direction: column;
+width:100%;
 
-  overflow: hidden;
-
-}
-
-/* ========================================= */
-/* TOPBAR */
-/* ========================================= */
-
-.topbar {
-
-  height: 80px;
-
-  background: white;
-
-  display: flex;
-
-  justify-content: flex-end;
-
-  align-items: center;
-
-  gap: 50px;
-
-  padding: 0 50px;
-
-  border-bottom: 1px solid #e5e7eb;
-
-}
-
-/* ========================================= */
-/* PAGE CONTAINER */
-/* ========================================= */
-
-.page-container {
-
-  flex: 1;
-
-  overflow-y: auto;
+padding:20px;
 
 }
