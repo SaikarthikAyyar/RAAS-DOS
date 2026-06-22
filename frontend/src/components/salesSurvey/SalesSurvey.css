@@ -1,19 +1,19 @@
 /* =================================== */
-/* PAGE                                */
+/* APP SHELL — sidebar + main layout   */
 /* =================================== */
 
-.sales-survey-page {
-    width: 100%;
+.app-shell {
+    display: flex;
     min-height: 100vh;
-    padding: 32px 40px;
+    width: 100%;
     background: linear-gradient(160deg, #0b1a3d 0%, #0d3b38 55%, #0b1a3d 100%);
     background-attachment: fixed;
     position: relative;
     overflow-x: hidden;
 }
 
-.sales-survey-page::before,
-.sales-survey-page::after {
+.app-shell::before,
+.app-shell::after {
     content: '';
     position: fixed;
     border-radius: 50%;
@@ -22,15 +22,15 @@
     z-index: 0;
 }
 
-.sales-survey-page::before {
+.app-shell::before {
     width: 600px;
     height: 600px;
     background: rgba(6, 148, 130, 0.18);
     top: -160px;
-    left: -140px;
+    left: -40px;
 }
 
-.sales-survey-page::after {
+.app-shell::after {
     width: 500px;
     height: 500px;
     background: rgba(24, 70, 170, 0.18);
@@ -38,9 +38,155 @@
     right: -100px;
 }
 
-.sales-survey-page > * {
+
+/* =================================== */
+/* SIDEBAR                             */
+/* =================================== */
+
+.app-sidebar {
+    width: 240px;
+    min-width: 240px;
+    min-height: 100vh;
+    background: rgba(8, 18, 48, 0.70);
+    backdrop-filter: blur(24px) saturate(130%);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 32px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 10;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+/* Sidebar logo area */
+.sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    margin-bottom: 12px;
+}
+
+.sidebar-logo-text {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+/* Nav items */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 12px;
+    flex: 1;
+}
+
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(190, 210, 240, 0.60);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    text-decoration: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.sidebar-nav-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(220, 235, 255, 0.90);
+}
+
+.sidebar-nav-item.active {
+    background: rgba(14, 110, 100, 0.38);
+    border: 1px solid rgba(80, 210, 175, 0.22);
+    color: rgba(210, 252, 242, 0.95);
+    font-weight: 600;
+}
+
+.sidebar-nav-item i {
+    font-size: 17px;
+    flex-shrink: 0;
+    opacity: 0.85;
+}
+
+
+/* =================================== */
+/* TOP NAV BAR                         */
+/* =================================== */
+
+.app-topnav {
+    height: 56px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 32px;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 9;
+}
+
+.app-topnav a,
+.app-topnav span {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(190, 210, 240, 0.65);
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.2px;
+    transition: color 0.15s;
+}
+
+.app-topnav a:hover,
+.app-topnav span:hover {
+    color: rgba(220, 235, 255, 0.95);
+}
+
+
+/* =================================== */
+/* MAIN CONTENT AREA                   */
+/* =================================== */
+
+.app-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
     position: relative;
     z-index: 1;
+}
+
+.app-content {
+    flex: 1;
+    padding: 32px 36px 60px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+
+/* =================================== */
+/* PAGE — only styles the survey area  */
+/* =================================== */
+
+.sales-survey-page {
+    width: 100%;
 }
 
 
@@ -52,13 +198,13 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 40px;
-    padding: 12px 0 32px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .survey-progress-left {
-    max-width: 820px;
+    max-width: 680px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -70,30 +216,25 @@
     letter-spacing: 4px;
     text-transform: uppercase;
     color: rgba(90, 220, 190, 0.85);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
-
-/* =================================== */
-/* MAIN TITLE                          */
-/* =================================== */
-
 .survey-progress-left h1 {
-    font-size: 44px;
+    font-size: 38px;
     font-weight: 700;
     color: #ffffff;
     line-height: 1.1;
-    margin: 0 0 18px 0;
+    margin: 0 0 14px 0;
     letter-spacing: -0.5px;
 }
 
 .survey-progress-left p {
-    font-size: 15px;
-    line-height: 1.8;
-    color: rgba(190, 210, 240, 0.70);
-    max-width: 780px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: rgba(190, 210, 240, 0.65);
+    max-width: 600px;
     text-align: left;
-    margin-top: 8px;
+    margin-top: 6px;
     font-weight: 400;
 }
 
@@ -103,25 +244,26 @@
 /* =================================== */
 
 .survey-completion-card {
-    width: 220px;
-    min-height: 110px;
-    border-radius: 16px;
+    width: 190px;
+    min-height: 100px;
+    border-radius: 14px;
     background: rgba(255, 255, 255, 0.07);
     backdrop-filter: blur(20px) saturate(150%);
     -webkit-backdrop-filter: blur(20px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.13);
     box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.30),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        0 4px 24px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.11);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 20px 24px;
-    gap: 4px;
+    padding: 18px 22px;
+    gap: 3px;
+    flex-shrink: 0;
 }
 
 .survey-completion-card strong {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
     color: #ffffff;
     display: block;
@@ -130,27 +272,26 @@
 }
 
 .survey-completion-card span {
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(180, 210, 240, 0.60);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(180, 210, 240, 0.55);
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }
 
-/* Progress bar inside completion card */
 .survey-completion-card .progress-bar {
     width: 100%;
     height: 3px;
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.10);
     border-radius: 2px;
-    margin-top: 12px;
+    margin-top: 10px;
     overflow: hidden;
 }
 
 .survey-completion-card .progress-bar-fill {
     height: 100%;
     width: 68%;
-    background: rgba(90, 220, 190, 0.75);
+    background: rgba(90, 220, 190, 0.72);
     border-radius: 2px;
 }
 
@@ -164,14 +305,14 @@
     background: rgba(255, 255, 255, 0.055);
     backdrop-filter: blur(28px) saturate(140%);
     -webkit-backdrop-filter: blur(28px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.30),
-        inset 0 1px 0 rgba(255, 255, 255, 0.10);
-    border-radius: 20px;
-    padding: 28px 32px;
-    margin-bottom: 20px;
+        0 8px 32px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    border-radius: 18px;
+    padding: 24px 28px;
+    margin-bottom: 18px;
 }
 
 
@@ -183,24 +324,24 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 28px;
-    padding-bottom: 18px;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .survey-header h2 {
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 600;
-    color: rgba(230, 240, 255, 0.95);
+    color: rgba(225, 238, 255, 0.95);
     margin: 0;
     letter-spacing: 0.1px;
 }
 
 .survey-header span {
-    font-size: 12px;
+    font-size: 11px;
     color: rgba(180, 200, 240, 0.50);
     font-weight: 500;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.4px;
     text-transform: uppercase;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.10);
@@ -216,8 +357,8 @@
 .survey-grid,
 .survey-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
 }
 
 
@@ -228,18 +369,14 @@
 .survey-field {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
-
-
-/* =================================== */
-/* LABEL                               */
-/* =================================== */
 
 .survey-field label {
     font-size: 11px;
     font-weight: 600;
-    color: rgba(180, 205, 240, 0.65);
-    margin-bottom: 8px;
+    color: rgba(180, 205, 240, 0.60);
+    margin-bottom: 7px;
     text-align: left;
     letter-spacing: 0.8px;
     text-transform: uppercase;
@@ -253,24 +390,24 @@
 .survey-field input,
 .survey-field select {
     width: 100%;
-    height: 48px;
+    height: 44px;
     background: rgba(255, 255, 255, 0.07);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 12px;
-    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 0 14px;
     font-size: 14px;
     font-weight: 400;
     outline: none;
     color: rgba(225, 235, 255, 0.95);
     caret-color: rgba(90, 220, 190, 0.9);
-    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+    box-sizing: border-box;
 }
 
 .survey-field input::placeholder {
-    color: rgba(180, 200, 240, 0.30);
-    font-weight: 400;
+    color: rgba(180, 200, 240, 0.28);
     opacity: 1;
 }
 
@@ -291,10 +428,10 @@
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='rgba(180,205,240,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='rgba(180,205,240,0.45)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 40px;
+    background-position: right 13px center;
+    padding-right: 36px;
 }
 
 .survey-field select option {
@@ -302,14 +439,10 @@
     color: #e0eaff;
 }
 
-.survey-field input {
-    cursor: text;
-}
-
 .survey-field input[readonly] {
     background: rgba(255, 255, 255, 0.03);
     border-color: rgba(255, 255, 255, 0.07);
-    color: rgba(180, 200, 240, 0.38);
+    color: rgba(180, 200, 240, 0.35);
     cursor: not-allowed;
 }
 
@@ -319,25 +452,24 @@
 /* =================================== */
 
 .media-upload-box {
-    height: 48px;
-    border: 1px dashed rgba(255, 255, 255, 0.20);
-    border-radius: 12px;
+    height: 44px;
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
     display: flex;
     align-items: center;
-    padding: 0 18px;
-    font-size: 14px;
+    padding: 0 16px;
+    font-size: 13px;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.04);
-    color: rgba(180, 205, 240, 0.55);
+    color: rgba(180, 205, 240, 0.50);
     transition: border-color 0.18s, background 0.18s, color 0.18s;
-    gap: 10px;
-    font-weight: 400;
+    gap: 8px;
 }
 
 .media-upload-box:hover {
-    border-color: rgba(90, 200, 175, 0.45);
+    border-color: rgba(90, 200, 175, 0.40);
     background: rgba(255, 255, 255, 0.08);
-    color: rgba(220, 240, 255, 0.90);
+    color: rgba(220, 240, 255, 0.88);
 }
 
 
@@ -348,22 +480,24 @@
 .survey-actions {
     display: flex;
     justify-content: flex-start;
-    gap: 14px;
-    padding: 28px 0 56px;
+    gap: 12px;
+    padding: 24px 0 48px;
+    flex-wrap: wrap;
 }
 
 .survey-btn {
     border: none;
     cursor: pointer;
-    height: 48px;
-    padding: 0 28px;
-    border-radius: 12px;
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.2px;
-    transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    transition: transform 0.13s, box-shadow 0.13s, background 0.13s;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    white-space: nowrap;
 }
 
 .survey-btn:hover {
@@ -375,46 +509,39 @@
 }
 
 .save-btn {
-    background: rgba(14, 110, 100, 0.75);
-    border: 1px solid rgba(80, 210, 180, 0.30);
-    color: rgba(210, 255, 245, 0.95);
-    box-shadow:
-        0 4px 20px rgba(0, 130, 110, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    background: rgba(14, 110, 100, 0.78);
+    border: 1px solid rgba(80, 210, 175, 0.28);
+    color: rgba(210, 252, 242, 0.95);
+    box-shadow: 0 4px 18px rgba(0, 128, 108, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.13);
 }
 
 .save-btn:hover {
-    background: rgba(14, 120, 110, 0.90);
-    box-shadow: 0 6px 24px rgba(0, 130, 110, 0.50);
+    background: rgba(14, 120, 108, 0.92);
+    box-shadow: 0 6px 22px rgba(0, 128, 108, 0.52);
 }
 
 .ops-btn {
-    background: rgba(28, 72, 195, 0.70);
-    border: 1px solid rgba(110, 155, 255, 0.28);
-    color: rgba(215, 228, 255, 0.95);
-    box-shadow:
-        0 4px 20px rgba(20, 60, 180, 0.38),
-        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    background: rgba(28, 72, 195, 0.72);
+    border: 1px solid rgba(110, 155, 255, 0.26);
+    color: rgba(215, 226, 255, 0.95);
+    box-shadow: 0 4px 18px rgba(20, 58, 180, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.13);
 }
 
 .ops-btn:hover {
-    background: rgba(28, 80, 210, 0.88);
-    box-shadow: 0 6px 24px rgba(20, 60, 180, 0.55);
+    background: rgba(28, 80, 210, 0.90);
+    box-shadow: 0 6px 22px rgba(20, 58, 180, 0.55);
 }
 
 .info-btn {
     background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    color: rgba(200, 218, 255, 0.80);
-    box-shadow:
-        0 4px 16px rgba(0, 0, 0, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(200, 218, 255, 0.78);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.11);
 }
 
 .info-btn:hover {
     background: rgba(255, 255, 255, 0.13);
     color: rgba(225, 238, 255, 0.95);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
 }
 
 
@@ -422,38 +549,84 @@
 /* RESPONSIVE                          */
 /* =================================== */
 
-@media (max-width: 1200px) {
-    .sales-survey-page {
-        padding: 24px 28px;
+/* Collapsed sidebar at medium screens */
+@media (max-width: 1100px) {
+    .app-sidebar {
+        width: 200px;
+        min-width: 200px;
+    }
+
+    .app-content {
+        padding: 24px 24px 48px;
     }
 
     .survey-grid,
     .survey-row {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .survey-progress-left h1 {
+        font-size: 32px;
+    }
+
+    .survey-completion-card {
+        width: 170px;
+    }
+}
+
+/* Icon-only sidebar at tablet */
+@media (max-width: 900px) {
+    .app-sidebar {
+        width: 64px;
+        min-width: 64px;
+        padding: 0 0 24px;
+    }
+
+    .sidebar-logo-text {
+        display: none;
+    }
+
+    .sidebar-nav-item span {
+        display: none;
+    }
+
+    .sidebar-nav-item {
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .app-content {
+        padding: 20px 18px 40px;
     }
 
     .survey-progress-container {
         flex-direction: column;
-        gap: 28px;
-    }
-
-    .survey-progress-left h1 {
-        font-size: 36px;
+        gap: 20px;
     }
 
     .survey-completion-card {
         width: 100%;
-        max-width: 360px;
+        max-width: 320px;
+        flex-direction: row;
+        align-items: center;
+        min-height: auto;
+        padding: 14px 20px;
+        gap: 16px;
     }
 
-    .survey-actions {
-        flex-wrap: wrap;
+    .survey-completion-card .progress-bar {
+        display: none;
     }
 }
 
-@media (max-width: 768px) {
-    .sales-survey-page {
-        padding: 20px 16px;
+/* Full mobile */
+@media (max-width: 640px) {
+    .app-sidebar {
+        display: none;
+    }
+
+    .app-content {
+        padding: 16px 14px 36px;
     }
 
     .survey-grid,
@@ -464,20 +637,16 @@
     .survey-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 10px;
-    }
-
-    .survey-header h2 {
-        font-size: 16px;
+        gap: 8px;
     }
 
     .survey-progress-left h1 {
-        font-size: 30px;
+        font-size: 26px;
     }
 
     .survey-card {
-        padding: 20px;
-        border-radius: 16px;
+        padding: 18px;
+        border-radius: 14px;
     }
 
     .survey-actions {
@@ -486,6 +655,5 @@
 
     .survey-btn {
         width: 100%;
-        justify-content: center;
     }
 }
