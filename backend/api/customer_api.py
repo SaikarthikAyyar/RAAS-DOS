@@ -20,6 +20,14 @@ from backend.services.customer_service import (
 
 )
 
+from backend.services.customer_service import (
+
+    get_sales_prefill,
+
+    get_customers_service
+
+)
+
 from backend.services.customer_service import create_customer_request
 
 from backend.models.customer_requests import CustomerRequest
@@ -294,6 +302,32 @@ def customers(
 ):
 
     return get_all_customers(
+
+        db
+
+    )
+
+# ====================================
+# GET ALL CUSTOMERS
+# ====================================
+
+@router.get(
+
+    "/customers"
+
+)
+
+def customers(
+
+        db:Session=Depends(
+
+            get_db
+
+        )
+
+):
+
+    return get_customers_service(
 
         db
 

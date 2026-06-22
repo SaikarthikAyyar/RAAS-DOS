@@ -126,3 +126,19 @@ def create_customer(
 
 
     return customer
+
+# ====================================
+# GET CUSTOMERS
+# ====================================
+
+def get_customers(
+
+        db
+
+):
+
+    return db.query(
+
+        CustomerRequest
+
+    ).all()

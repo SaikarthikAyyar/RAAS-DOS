@@ -239,6 +239,14 @@ ehs_restriction:
 
 surveyData.safety?.ehs_restriction,
 
+// ====================================
+// SECTION E
+// ====================================
+
+discharge_pit_dimension:
+
+surveyData.pump?.discharge_pit_dimension,
+
 
 // ====================================
 // SECTION G

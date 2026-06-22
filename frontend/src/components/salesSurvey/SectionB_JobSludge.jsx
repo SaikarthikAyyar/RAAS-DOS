@@ -122,22 +122,7 @@ updateSection={updateSection}
 />
 
 
-<FieldInput
-label="Tank/Pit Length"
-value={job.tank_length}
-section="job"
-field="tank_length"
-updateSection={updateSection}
-/>
 
-
-<FieldInput
-label="Tank/Pit Width"
-value={job.tank_width}
-section="job"
-field="tank_width"
-updateSection={updateSection}
-/>
 
 
 <FieldInput

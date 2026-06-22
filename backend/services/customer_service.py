@@ -4,7 +4,8 @@
 
 from backend.repositories.customer_repository import (
 
-    create_customer
+    create_customer,
+    get_customers
 
 )
 
@@ -261,3 +262,19 @@ def get_all_customers(
         for customer in customers
 
     ]
+
+# ====================================
+# GET CUSTOMERS
+# ====================================
+
+def get_customers_service(
+
+        db
+
+):
+
+    return get_customers(
+
+        db
+
+    )

@@ -214,29 +214,7 @@ updateSection={updateSection}
 />
 
 
-<FieldSelect
 
-label="Quote Basis"
-
-value={requirement.quote_basis}
-
-section="requirement"
-
-field="quote_basis"
-
-options={[
-
-"One-time cleaning",
-
-"AMC",
-
-"Survey first"
-
-]}
-
-updateSection={updateSection}
-
-/>
 
 
 <div

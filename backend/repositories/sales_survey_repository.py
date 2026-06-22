@@ -170,6 +170,14 @@ def create_sales_survey(
 
         payload.ehs_restriction,
 
+        # ====================================
+        # SECTION E
+        # ====================================        
+
+        discharge_pit_dimension=
+
+        payload.discharge_pit_dimension,
+
 
         # ====================================
         # SECTION G

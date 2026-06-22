@@ -240,6 +240,12 @@ class SalesSurvey(Base):
         Date
     )
 
+    discharge_pit_dimension = Column(
+
+        String(100)
+
+    )
+
 
     # ====================================
     # WORKFLOW

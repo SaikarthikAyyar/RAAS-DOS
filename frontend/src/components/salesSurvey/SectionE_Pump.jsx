@@ -27,6 +27,10 @@ updateSection
 
 }){
 
+const pump =
+
+surveyData.pump || {};
+
 return(
 
 <div className="survey-card">
@@ -227,11 +231,104 @@ key={item}
 
 </div>
 
+<FieldInput
+
+label="Discharge Pit Dimension"
+
+value={
+
+pump.discharge_pit_dimension
+
+|| ""
+
+}
+
+section="pump"
+
+field="discharge_pit_dimension"
+
+unit="m"
+
+updateSection={updateSection}
+
+/>
+
 
 </div>
 
 </div>
 
 );
+
+}
+
+
+// ====================================
+// INPUT
+// ====================================
+
+function FieldInput({
+
+label,
+
+value,
+
+section,
+
+field,
+
+unit,
+
+updateSection
+
+}){
+
+return(
+
+<div className="survey-field">
+
+<label>
+
+{label}
+
+</label>
+
+<input
+
+value={value || ""}
+
+onChange={(e)=>
+
+updateSection(
+
+section,
+
+field,
+
+e.target.value
+
+)
+
+}
+
+/>
+
+{
+
+unit && (
+
+<div>
+
+{unit}
+
+</div>
+
+)
+
+}
+
+</div>
+
+)
 
 }

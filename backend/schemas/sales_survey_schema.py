@@ -86,6 +86,12 @@ class SalesSurveySchema(BaseModel):
 
     power_distance:Optional[float]=None
 
+    # ====================================
+    # SECTION E
+    # ====================================
+
+    discharge_pit_dimension: Optional[str] = None
+
 
     # ====================================
     # SECTION G
