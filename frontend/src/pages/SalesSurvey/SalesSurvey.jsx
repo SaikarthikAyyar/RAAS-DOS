@@ -4,42 +4,68 @@
 
 import { useEffect } from "react";
 
+import { useState } from "react";
+
 import "../../components/salesSurvey/SalesSurvey.css";
 
 import useSalesSurvey from "../../hooks/useSalesSurvey";
 
 import {
 
-getSalesPrefill
+getSalesPrefill,
+
+getCustomers
 
 }
 
 from "../../services/salesSurveyService";
 
-import SurveyProgress from "../../components/salesSurvey/SurveyProgress";
+import SurveySummary
 
-import SurveyActions from "../../components/salesSurvey/SurveyActions";
+from "../../components/salesSurvey/SurveySummary";
 
-import SectionA_Customer from "../../components/salesSurvey/SectionA_Customer";
+import SurveyProgress
 
-import SectionB_JobSludge from "../../components/salesSurvey/SectionB_JobSludge";
+from "../../components/salesSurvey/SurveyProgress";
 
-import SectionC_Geometry from "../../components/salesSurvey/SectionC_Geometry";
+import SurveyActions
 
-import SectionD_Safety from "../../components/salesSurvey/SectionD_Safety";
+from "../../components/salesSurvey/SurveyActions";
 
-import SectionE_Pump from "../../components/salesSurvey/SectionE_Pump";
+import SectionA_Customer
 
-import SectionF_Dewatering from "../../components/salesSurvey/SectionF_Dewatering";
+from "../../components/salesSurvey/SectionA_Customer";
 
-import SectionG_Insights from "../../components/salesSurvey/SectionG_Insights";
+import SectionB_JobSludge
+
+from "../../components/salesSurvey/SectionB_JobSludge";
+
+import SectionC_Geometry
+
+from "../../components/salesSurvey/SectionC_Geometry";
+
+import SectionD_Safety
+
+from "../../components/salesSurvey/SectionD_Safety";
+
+import SectionE_Pump
+
+from "../../components/salesSurvey/SectionE_Pump";
+
+import SectionF_Dewatering
+
+from "../../components/salesSurvey/SectionF_Dewatering";
+
+import SectionG_Insights
+
+from "../../components/salesSurvey/SectionG_Insights";
 
 
 // ====================================
 // COMPONENT
 // ====================================
 
-export default function SalesSurvey() {
+export default function SalesSurvey(){
 
 
 const {
@@ -54,29 +80,87 @@ metrics
 
 }
 
-= useSalesSurvey();
+=
+
+useSalesSurvey();
+
+
+const [
+
+customers,
+
+setCustomers
+
+]
+
+=
+
+useState(
+
+[]
+
+);
+
+
+const [
+
+selectedCustomer,
+
+setSelectedCustomer
+
+]
+
+=
+
+useState(
+
+""
+
+);
 
 
 // ====================================
-// LOAD CUSTOMER PREFILL
+// LOAD CUSTOMER LIST
 // ====================================
 
 useEffect(
 
 ()=>{
 
-async function loadPrefill(){
+async function loadCustomers(){
 
-const customerId = localStorage.getItem(
+const data=
 
-"customerRequestId"
+await getCustomers();
+
+setCustomers(
+
+data
+
+);
+
+}
+
+loadCustomers();
+
+},
+
+[]
 
 );
 
 
+// ====================================
+// LOAD PREFILL
+// ====================================
+
+useEffect(
+
+()=>{
+
 if(
 
-!customerId
+!selectedCustomer
 
 ){
 
@@ -85,9 +169,13 @@ return;
 }
 
 
-const prefill = await getSalesPrefill(
+async function loadPrefill(){
 
-customerId
+const prefill=
+
+await getSalesPrefill(
+
+selectedCustomer
 
 );
 
@@ -105,21 +193,25 @@ loadPrefill();
 
 },
 
-[]
+[
+
+selectedCustomer
+
+]
 
 );
 
+
+// ====================================
+// UI
+// ====================================
 
 return(
 
 <div className="sales-survey-page">
 
 
-<SurveyProgress
-
-metrics={metrics}
-
-/>
+<SurveyProgress/>
 
 
 <SectionA_Customer
@@ -127,6 +219,12 @@ metrics={metrics}
 surveyData={surveyData}
 
 updateSection={updateSection}
+
+customers={customers}
+
+selectedCustomer={selectedCustomer}
+
+setSelectedCustomer={setSelectedCustomer}
 
 />
 
@@ -187,15 +285,26 @@ updateSection={updateSection}
 />
 
 
+<SurveySummary
+
+metrics={metrics}
+
+completion={metrics.completion}
+
+/>
+
+
 <SurveyActions
 
 surveyData={surveyData}
+
+metrics={metrics}
 
 />
 
 
 </div>
 
-);
+)
 
 }

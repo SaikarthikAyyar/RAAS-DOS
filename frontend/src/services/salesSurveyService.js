@@ -87,3 +87,17 @@ const response = await fetch(
 return response.json();
 
 }
+
+export async function getCustomers(){
+
+const response=
+
+await fetch(
+
+`${API}/customers`
+
+);
+
+return response.json();
+
+}

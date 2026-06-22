@@ -13,7 +13,13 @@ export default function SectionA_Customer({
 
 surveyData,
 
-updateSection
+updateSection,
+
+customers,
+
+selectedCustomer,
+
+setSelectedCustomer
 
 }){
 
@@ -54,13 +60,63 @@ Customer
 
 </label>
 
-<input
+<div className="survey-field">
 
-value={customer.company_name || ""}
+<label>
 
-readOnly
+Customer Name
 
-/>
+</label>
+
+<select
+
+value={selectedCustomer}
+
+onChange={(e)=>
+
+setSelectedCustomer(
+
+e.target.value
+
+)
+
+}
+
+>
+
+<option value="">
+
+Select Customer
+
+</option>
+
+{
+
+customers.map(
+
+customer=>(
+
+<option
+
+key={customer.id}
+
+value={customer.id}
+
+>
+
+{customer.company_name}
+
+</option>
+
+)
+
+)
+
+}
+
+</select>
+
+</div>
 
 </div>
 

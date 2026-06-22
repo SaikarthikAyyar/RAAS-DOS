@@ -40,7 +40,7 @@ insights:{}
 
 
 // ====================================
-// UPDATE SECTION
+// UPDATE
 // ====================================
 
 const updateSection=(
@@ -98,6 +98,64 @@ surveyData.safety || {};
 
 
 // ====================================
+// SAFE NUMBERS
+// ====================================
+
+const length=
+
+Number(
+
+geometry.length_dia
+
+) || 0;
+
+
+const width=
+
+Number(
+
+geometry.width
+
+) || 0;
+
+
+const depth=
+
+Number(
+
+geometry.sludge_depth
+
+) || 0;
+
+
+const setupDistance=
+
+Number(
+
+geometry.setup_distance
+
+) || 0;
+
+
+const verticalLift=
+
+Number(
+
+geometry.vertical_lift
+
+) || 0;
+
+
+const hoseDistance=
+
+Number(
+
+geometry.hose_distance
+
+) || 0;
+
+
+// ====================================
 // ESTIMATED VOLUME
 // ====================================
 
@@ -116,21 +174,13 @@ Math.PI*
 
 Math.pow(
 
-Number(
-
-geometry.length_dia
-
-)/2,
+length/2,
 
 2
 
 )*
 
-Number(
-
-geometry.sludge_depth
-
-);
+depth;
 
 }
 
@@ -138,23 +188,11 @@ else{
 
 estimatedVolume=
 
-Number(
+length*
 
-geometry.length_dia
+width*
 
-)*
-
-Number(
-
-geometry.width
-
-)*
-
-Number(
-
-geometry.sludge_depth
-
-);
+depth;
 
 }
 
@@ -173,7 +211,7 @@ estimatedVolume.toFixed(
 
 
 // ====================================
-// AVERAGE OUTPUT
+// OUTPUT
 // ====================================
 
 const averageOutput=
@@ -184,14 +222,18 @@ geometry.average_output
 
 )
 
-|| 15;
+||15;
 
 
 // ====================================
-// TOTAL DURATION
+// DURATION
 // ====================================
 
 const totalDuration=
+
+estimatedVolume>0
+
+&&
 
 averageOutput>0
 
@@ -220,33 +262,11 @@ averageOutput
 
 const equipmentReach=
 
-(
+setupDistance+
 
-Number(
+verticalLift+
 
-geometry.setup_distance
-
-)
-
-+
-
-Number(
-
-geometry.vertical_lift
-
-)
-
-+
-
-Number(
-
-geometry.hose_distance
-
-)
-
-)
-
-||0;
+hoseDistance;
 
 
 // ====================================
@@ -406,6 +426,96 @@ packageName=
 
 
 // ====================================
+// COMPLETENESS
+// ====================================
+
+const allValues=[
+
+...Object.values(
+
+surveyData.customer || {}
+
+),
+
+...Object.values(
+
+surveyData.job || {}
+
+),
+
+...Object.values(
+
+surveyData.geometry || {}
+
+),
+
+...Object.values(
+
+surveyData.safety || {}
+
+),
+
+...Object.values(
+
+surveyData.pump || {}
+
+),
+
+...Object.values(
+
+surveyData.dewatering || {}
+
+),
+
+...Object.values(
+
+surveyData.insights || {}
+
+)
+
+];
+
+
+const filledFields=
+
+allValues.filter(
+
+value=>
+
+value!==null
+
+&&
+
+value!==undefined
+
+&&
+
+value!==""
+
+).length;
+
+
+const totalFields=
+
+45;
+
+
+const completion=
+
+Math.round(
+
+(
+
+filledFields/
+
+totalFields
+
+)*100
+
+);
+
+
+// ====================================
 // METRICS
 // ====================================
 
@@ -425,7 +535,9 @@ pumpability,
 
 risk,
 
-packageName
+packageName,
+
+completion
 
 };
 

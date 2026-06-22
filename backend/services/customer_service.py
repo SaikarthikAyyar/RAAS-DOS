@@ -221,3 +221,43 @@ def get_sales_prefill(
         }
 
     }
+
+# ====================================
+# GET ALL CUSTOMERS
+# ====================================
+
+def get_all_customers(
+
+        db
+
+):
+
+    customers = db.query(
+
+        CustomerRequest
+
+    ).order_by(
+
+        CustomerRequest.id.desc()
+
+    ).all()
+
+
+    return [
+
+        {
+
+            "id":
+
+            customer.id,
+
+
+            "company_name":
+
+            customer.company_name
+
+        }
+
+        for customer in customers
+
+    ]

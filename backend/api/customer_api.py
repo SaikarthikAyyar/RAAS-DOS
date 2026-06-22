@@ -14,6 +14,12 @@ from backend.database.connection import get_db
 
 from backend.schemas.customer_schema import CustomerRequestSchema
 
+from backend.services.customer_service import (
+
+    get_all_customers
+
+)
+
 from backend.services.customer_service import create_customer_request
 
 from backend.models.customer_requests import CustomerRequest
@@ -264,5 +270,31 @@ def sales_prefill(
         db,
 
         customer_request_id
+
+    )
+
+# ====================================
+# CUSTOMER LIST
+# ====================================
+
+@router.get(
+
+    "/customers"
+
+)
+
+def customers(
+
+        db:Session=Depends(
+
+            get_db
+
+        )
+
+):
+
+    return get_all_customers(
+
+        db
 
     )

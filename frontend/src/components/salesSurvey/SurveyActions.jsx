@@ -17,7 +17,9 @@ from "../../services/salesSurveyService";
 
 export default function SurveyActions({
 
-surveyData
+surveyData,
+
+metrics
 
 }){
 
@@ -27,7 +29,7 @@ async function submitSurvey(){
 try{
 
 
-const customerRequestId =
+const customerRequestId=
 
 localStorage.getItem(
 
@@ -36,7 +38,8 @@ localStorage.getItem(
 );
 
 
-const payload = {
+const payload={
+
 
 customer_request_id:
 
@@ -62,6 +65,10 @@ new Date()
 ),
 
 
+// ====================================
+// SECTION B
+// ====================================
+
 material_category:
 
 surveyData.job?.material_category,
@@ -78,7 +85,9 @@ Number(
 
 surveyData.job?.bulk_density
 
-) || null,
+)
+
+|| null,
 
 
 hazard_level:
@@ -86,14 +95,18 @@ hazard_level:
 surveyData.job?.hazard_level,
 
 
+// ====================================
+// COMPUTED
+// ====================================
+
 estimated_volume:
 
-Number(
+metrics.estimatedVolume,
 
-surveyData.geometry?.estimated_volume
 
-) || null,
-
+// ====================================
+// SECTION C
+// ====================================
 
 opening_length:
 
@@ -101,7 +114,9 @@ Number(
 
 surveyData.geometry?.opening_length
 
-) || null,
+)
+
+|| null,
 
 
 opening_width:
@@ -110,7 +125,9 @@ Number(
 
 surveyData.geometry?.opening_width
 
-) || null,
+)
+
+|| null,
 
 
 height_from_ground:
@@ -119,7 +136,9 @@ Number(
 
 surveyData.geometry?.height_from_ground
 
-) || null,
+)
+
+|| null,
 
 
 drop_to_floor:
@@ -128,7 +147,9 @@ Number(
 
 surveyData.geometry?.drop_to_floor
 
-) || null,
+)
+
+|| null,
 
 
 setup_distance:
@@ -137,7 +158,9 @@ Number(
 
 surveyData.geometry?.setup_distance
 
-) || null,
+)
+
+|| null,
 
 
 vertical_lift:
@@ -146,7 +169,9 @@ Number(
 
 surveyData.geometry?.vertical_lift
 
-) || null,
+)
+
+|| null,
 
 
 hose_distance:
@@ -155,7 +180,9 @@ Number(
 
 surveyData.geometry?.hose_distance
 
-) || null,
+)
+
+|| null,
 
 
 access_path_width:
@@ -164,7 +191,9 @@ Number(
 
 surveyData.geometry?.access_path_width
 
-) || null,
+)
+
+|| null,
 
 
 scaffolding_needed:
@@ -176,6 +205,10 @@ crane_available:
 
 surveyData.geometry?.crane_available,
 
+
+// ====================================
+// SECTION D
+// ====================================
 
 power_available:
 
@@ -207,14 +240,9 @@ ehs_restriction:
 surveyData.safety?.ehs_restriction,
 
 
-power_distance:
-
-Number(
-
-surveyData.safety?.power_distance
-
-) || null,
-
+// ====================================
+// SECTION G
+// ====================================
 
 customer_pain_point:
 
@@ -255,7 +283,10 @@ return(
 
 <div className="survey-actions">
 
+
 <button
+
+className="survey-btn save-btn"
 
 onClick={submitSurvey}
 
@@ -265,8 +296,9 @@ Save Survey
 
 </button>
 
+
 </div>
 
-)
+);
 
 }
