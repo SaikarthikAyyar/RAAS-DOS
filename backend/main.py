@@ -28,7 +28,7 @@ app.add_middleware(
 
     allow_origins=[
 
-        "https://raas-dos.vercel.app"
+        "https://raas-dos.onrender.com"
 
     ],
 
