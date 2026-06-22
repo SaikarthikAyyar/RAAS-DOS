@@ -328,12 +328,27 @@ font-size:16px;
 
 background:rgba(255,255,255,0.08);
 
-color:#ffffff;
+color:#eef7ff;
 
 outline:none;
 
 }
 
+.survey-field select option{
+
+background:#ffffff;
+
+color:#0d1730;
+
+}
+
+.survey-field input::placeholder{
+
+color:#a8b5c2;
+
+opacity:1;
+
+}
 
 .survey-field input:focus,
 
