@@ -1,19 +1,17 @@
 import React from "react";
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
 
+import { createRoot } from "react-dom/client";
 
-import './components/salesSurvey/SalesSurvey.css'  // ← add this
+import "./index.css";
 
+import "./styles/sales-survey-glass.css";
 
+import App from "./App.jsx";
 
-import { WorkflowProvider }
+import { WorkflowProvider } from "./contexts/WorkflowContext";
 
-from "./contexts/WorkflowContext";
+createRoot(document.getElementById("root")).render(
 
-createRoot(document.getElementById('root')).render(
 <React.StrictMode>
 
 <WorkflowProvider>
@@ -22,5 +20,6 @@ createRoot(document.getElementById('root')).render(
 
 </WorkflowProvider>
 
-</React.StrictMode>,
-)
+</React.StrictMode>
+
+);
