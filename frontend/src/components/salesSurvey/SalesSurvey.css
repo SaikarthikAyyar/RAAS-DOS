@@ -2,16 +2,51 @@
 /* PAGE */
 /* =================================== */
 
-.sales-survey-page{
+.sales-survey-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
 
-    width:100%;
+    /* Glassmorphism gradient background */
+    background: linear-gradient(135deg, #0f2057 0%, #0a6b62 50%, #0d3a6b 100%);
+    background-attachment: fixed;
 
-    min-height:100vh;
+    /* Ambient blobs for depth */
+    position: relative;
+    overflow-x: hidden;
+}
 
-    padding:20px;
+/* Decorative ambient light orbs */
+.sales-survey-page::before,
+.sales-survey-page::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+}
 
-    background:#f4f6fa;
+.sales-survey-page::before {
+    width: 520px;
+    height: 520px;
+    background: rgba(0, 200, 170, 0.25);
+    top: -120px;
+    left: -100px;
+}
 
+.sales-survey-page::after {
+    width: 480px;
+    height: 480px;
+    background: rgba(30, 90, 210, 0.25);
+    bottom: -100px;
+    right: -80px;
+}
+
+/* Keep all page children above the pseudo-elements */
+.sales-survey-page > * {
+    position: relative;
+    z-index: 1;
 }
 
 
@@ -19,46 +54,28 @@
 /* SURVEY HEADER */
 /* =================================== */
 
-.survey-progress-container{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:flex-start;
-
-    margin-bottom:35px;
-
-    padding:10px 10px 30px;
-
+.survey-progress-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 35px;
+    padding: 10px 10px 30px;
 }
 
-
-.survey-progress-left{
-
-    max-width:850px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:flex-start;
-
+.survey-progress-left {
+    max-width: 850px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-
-.survey-sheet-title{
-
-    font-size:18px;
-
-    font-weight:800;
-
-    letter-spacing:3px;
-
-    color:#0a8077;
-
-    margin-bottom:14px;
-
+.survey-sheet-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: #7fffdf;
+    margin-bottom: 14px;
 }
 
 
@@ -66,96 +83,81 @@
 /* MAIN TITLE */
 /* =================================== */
 
-.survey-progress-left h1{
-
-    font-size:52px;
-
-    font-weight:800;
-
-    color:#10182f;
-
-    line-height:1.05;
-
-    margin:0 0 25px 0;
-
+.survey-progress-left h1 {
+    font-size: 52px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.08;
+    margin: 0 0 20px 0;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
 }
 
-
-.survey-progress-left p{
-
-    font-size:18px;
-
-    line-height:1.7;
-
-    color:#62708b;
-
-    max-width:900px;
-
-    text-align:left;
-
-    margin-top:10px;
-
+.survey-progress-left p {
+    font-size: 16px;
+    line-height: 1.75;
+    color: rgba(220, 235, 255, 0.80);
+    max-width: 860px;
+    text-align: left;
+    margin-top: 10px;
 }
 
 
 /* =================================== */
-/* COMPLETION CARD */
+/* COMPLETION CARD — glass pill */
 /* =================================== */
 
-.survey-completion-card{
+.survey-completion-card {
+    width: 280px;
+    height: 120px;
+    border-radius: 60px;
 
-    width:280px;
+    /* Glass */
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.30);
 
-    height:120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 44px;
 
-    border-radius:60px;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(220, 255, 240, 0.85);
+}
 
-    border:2px solid #90efb5;
-
-    background:#eef8f0;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    padding-left:55px;
-
-    font-size:24px;
-
-    font-weight:700;
-
-    color:#0b6760;
-
+.survey-completion-card strong {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    display: block;
+    margin-bottom: 2px;
 }
 
 
-.survey-completion-card strong{
-
-    font-size:24px;
-
-}
-
-
 /* =================================== */
-/* SURVEY CARD */
+/* SURVEY CARD — frosted glass */
 /* =================================== */
 
-.survey-card{
+.survey-card {
+    width: 100%;
 
-    width:100%;
+    /* Glass surface */
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
-    background:#ffffff;
-
-    border:1px solid #dfe4ec;
-
-    border-radius:28px;
-
-    padding:28px;
-
-    margin-bottom:22px;
-
+    border-radius: 28px;
+    padding: 28px;
+    margin-bottom: 22px;
 }
 
 
@@ -163,38 +165,25 @@
 /* SECTION HEADER */
 /* =================================== */
 
-.survey-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:30px;
-
+.survey-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
 }
 
-
-.survey-header h2{
-
-    font-size:24px;
-
-    font-weight:800;
-
-    color:#041f63;
-
-    margin:0;
-
+.survey-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.2px;
 }
 
-
-.survey-header span{
-
-    font-size:18px;
-
-    color:#6c7b93;
-
+.survey-header span {
+    font-size: 14px;
+    color: rgba(200, 220, 255, 0.65);
+    font-weight: 500;
 }
 
 
@@ -203,15 +192,10 @@
 /* =================================== */
 
 .survey-grid,
-
-.survey-row{
-
-    display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
-    gap:28px;
-
+.survey-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
 }
 
 
@@ -219,12 +203,9 @@
 /* FIELD */
 /* =================================== */
 
-.survey-field{
-
-    display:flex;
-
-    flex-direction:column;
-
+.survey-field {
+    display: flex;
+    flex-direction: column;
 }
 
 
@@ -232,127 +213,109 @@
 /* LABEL */
 /* =================================== */
 
-.survey-field label{
-
-    font-size:16px;
-
-    font-weight:700;
-
-    color:#314d76;
-
-    margin-bottom:10px;
-
-    text-align:center;
-
+.survey-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(200, 220, 255, 0.80);
+    margin-bottom: 10px;
+    text-align: center;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
 }
 
 
 /* =================================== */
-/* INPUTS */
+/* INPUTS — glass fields */
 /* =================================== */
 
 .survey-field input,
+.survey-field select {
+    width: 100%;
+    height: 56px;
 
-.survey-field select{
+    /* Glass input */
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
-    width:100%;
-
-    height:64px;
-
-    border:2px solid #d7dfe9;
-
-    border-radius:22px;
-
-    padding:0 22px;
-
-    font-size:16px;
-
-    background:#fff;
-
-    outline:none;
-
-    /* ADD THESE */
-
-    color:#111827;
-
-    caret-color:#111827;
-
+    border-radius: 18px;
+    padding: 0 20px;
+    font-size: 15px;
+    outline: none;
+    color: #ffffff;
+    caret-color: #7fffdf;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
+.survey-field input::placeholder {
+    color: rgba(200, 220, 255, 0.45);
+    opacity: 1;
+}
 
 .survey-field input:focus,
-
-.survey-field select:focus{
-
-    border-color:#00897b;
-
+.survey-field select:focus {
+    border-color: rgba(100, 230, 200, 0.65);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 0 0 3px rgba(0, 200, 170, 0.20);
 }
 
-.survey-field input::placeholder{
-
-color:#6b7280;
-
-opacity:1;
-
+/* Select arrow tint for dark glass */
+.survey-field select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(200,220,255,0.6)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    padding-right: 44px;
 }
 
-
-.survey-field select{
-
-    cursor:pointer;
-
+/* Select option contrast (browser-native dropdown) */
+.survey-field select option {
+    background: #0f2057;
+    color: #ffffff;
 }
 
-
-.survey-field input{
-
-    cursor:text;
-
+.survey-field input {
+    cursor: text;
 }
 
-
-.survey-field input[readonly]{
-
-    background:#f5f7fb;
-
-    cursor:not-allowed;
-
+.survey-field input[readonly] {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: rgba(200, 220, 255, 0.50);
+    cursor: not-allowed;
 }
 
 
 /* =================================== */
-/* MEDIA UPLOAD */
+/* MEDIA UPLOAD — glass upload box */
 /* =================================== */
 
-.media-upload-box{
-
-    height:72px;
-
-    border:2px solid #c7d0db;
-
-    border-radius:24px;
-
-    display:flex;
-
-    align-items:center;
-
-    padding:0 24px;
-
-    font-size:22px;
-
-    cursor:pointer;
-
-    background:white;
-
-    transition:0.2s;
-
+.media-upload-box {
+    height: 64px;
+    border: 1.5px dashed rgba(255, 255, 255, 0.30);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+    font-size: 18px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(200, 220, 255, 0.70);
+    transition: border-color 0.2s, background 0.2s;
 }
 
-
-.media-upload-box:hover{
-
-    border-color:#1d4ed8;
-
+.media-upload-box:hover {
+    border-color: rgba(100, 200, 255, 0.60);
+    background: rgba(255, 255, 255, 0.13);
+    color: #ffffff;
 }
 
 
@@ -360,62 +323,77 @@ opacity:1;
 /* ACTION BUTTONS */
 /* =================================== */
 
-.survey-actions{
-
-    display:flex;
-
-    justify-content:flex-start;
-
-    gap:22px;
-
-    padding:30px 0 60px;
-
+.survey-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 18px;
+    padding: 30px 0 60px;
 }
 
+.survey-btn {
+    border: none;
+    cursor: pointer;
+    height: 64px;
+    padding: 0 32px;
+    border-radius: 22px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
 
-.survey-btn{
-
-    border:none;
-
-    cursor:pointer;
-
-    height:90px;
-
-    padding:0 36px;
-
-    border-radius:30px;
-
-    font-size:22px;
-
-    font-weight:800;
-
+    /* Shared glass layer */
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
-
-.save-btn{
-
-    background:#117d77;
-
-    color:white;
-
+.survey-btn:hover {
+    transform: translateY(-2px);
 }
 
-
-.ops-btn{
-
-    background:#2f63e0;
-
-    color:white;
-
+.survey-btn:active {
+    transform: translateY(0px);
 }
 
+.save-btn {
+    background: rgba(17, 125, 119, 0.72);
+    border: 1.5px solid rgba(100, 255, 220, 0.35);
+    color: #ffffff;
+    box-shadow:
+        0 8px 24px rgba(0, 150, 130, 0.40),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
 
-.info-btn{
+.save-btn:hover {
+    background: rgba(17, 125, 119, 0.90);
+    box-shadow: 0 12px 32px rgba(0, 150, 130, 0.55);
+}
 
-    background:#e9edf3;
+.ops-btn {
+    background: rgba(47, 99, 224, 0.68);
+    border: 1.5px solid rgba(120, 170, 255, 0.35);
+    color: #ffffff;
+    box-shadow:
+        0 8px 24px rgba(30, 80, 200, 0.40),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
 
-    color:#0d1730;
+.ops-btn:hover {
+    background: rgba(47, 99, 224, 0.88);
+    box-shadow: 0 12px 32px rgba(30, 80, 200, 0.55);
+}
 
+.info-btn {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.info-btn:hover {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
 }
 
 
@@ -423,80 +401,52 @@ opacity:1;
 /* RESPONSIVE */
 /* =================================== */
 
-@media(max-width:1200px){
+@media (max-width: 1200px) {
+    .survey-grid,
+    .survey-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
-.survey-grid,
+    .survey-progress-container {
+        flex-direction: column;
+        gap: 30px;
+    }
 
-.survey-row{
+    .survey-progress-left h1 {
+        font-size: 42px;
+    }
 
-grid-template-columns:repeat(2,1fr);
+    .survey-completion-card {
+        width: 100%;
+    }
 
+    .survey-actions {
+        flex-direction: column;
+    }
 }
 
+@media (max-width: 768px) {
+    .survey-grid,
+    .survey-row {
+        grid-template-columns: 1fr;
+    }
 
-.survey-progress-container{
+    .survey-header {
+        flex-direction: column;
+        gap: 12px;
+    }
 
-flex-direction:column;
+    .survey-header h2 {
+        font-size: 18px;
+    }
 
-gap:30px;
+    .survey-progress-left h1 {
+        font-size: 34px;
+    }
 
-}
-
-
-.survey-progress-left h1{
-
-font-size:42px;
-
-}
-
-
-.survey-completion-card{
-
-width:100%;
-
-}
-
-
-.survey-actions{
-
-flex-direction:column;
-
-}
-
-}
-
-
-@media(max-width:768px){
-
-.survey-grid,
-
-.survey-row{
-
-grid-template-columns:1fr;
-
-}
-
-
-.survey-header{
-
-flex-direction:column;
-
-gap:12px;
-
-}
-
-
-.survey-header h2{
-
-font-size:22px;
-
-}
-
-
-.survey-progress-left h1{
-
-font-size:34px;
-
-}
-
+    .survey-completion-card {
+        height: auto;
+        padding: 24px 28px;
+        border-radius: 28px;
+    }
 }
