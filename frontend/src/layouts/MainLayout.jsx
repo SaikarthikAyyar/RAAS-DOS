@@ -1,7 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 // no separate CSS import needed — it's in main.jsx
 
-import { Outlet, NavLink } from "react-router-dom";
 
 import {
 
