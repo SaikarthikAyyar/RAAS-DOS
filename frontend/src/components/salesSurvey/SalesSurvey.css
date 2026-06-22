@@ -271,6 +271,12 @@
 
     outline:none;
 
+    /* ADD THESE */
+
+    color:#111827;
+
+    caret-color:#111827;
+
 }
 
 
@@ -279,6 +285,14 @@
 .survey-field select:focus{
 
     border-color:#00897b;
+
+}
+
+.survey-field input::placeholder{
+
+color:#6b7280;
+
+opacity:1;
 
 }
 
