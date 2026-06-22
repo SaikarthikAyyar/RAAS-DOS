@@ -5,7 +5,7 @@ import './index.css'
 import App from './App.jsx'
 
 
-import './styles/sales-survey-glass.css'  // ← add this
+import './components/salesSurvey/SalesSurvey.css'  // ← add this
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
