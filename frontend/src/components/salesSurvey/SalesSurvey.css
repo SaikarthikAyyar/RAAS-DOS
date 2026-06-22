@@ -88,7 +88,7 @@ font-weight:800;
 
 letter-spacing:3px;
 
-color:#0a8077;
+color:#39d3c6;
 
 margin-bottom:14px;
 
@@ -105,7 +105,7 @@ font-size:52px;
 
 font-weight:800;
 
-color:#10182f;
+color:#eef7ff;
 
 line-height:1.05;
 
@@ -120,7 +120,7 @@ font-size:18px;
 
 line-height:1.7;
 
-color:#62708b;
+color:#91a5b7;
 
 max-width:none;
 
@@ -143,9 +143,9 @@ height:120px;
 
 border-radius:60px;
 
-border:2px solid #90efb5;
+border:1px solid rgba(255,255,255,0.12);
 
-background:#eef8f0;
+background:rgba(255,255,255,0.08);
 
 display:flex;
 
@@ -159,7 +159,7 @@ font-size:24px;
 
 font-weight:700;
 
-color:#0b6760;
+color:#eef7ff;
 
 flex-shrink:0;
 
@@ -181,15 +181,23 @@ font-size:24px;
 
 width:100%;
 
-background:#ffffff;
+background:
+linear-gradient(
+135deg,
+rgba(20,72,78,0.92),
+rgba(13,83,76,0.92) 45%,
+rgba(18,51,88,0.92)
+);
 
-border:1px solid #dfe4ec;
+border:1px solid rgba(255,255,255,0.10);
 
 border-radius:28px;
 
 padding:28px;
 
 margin-bottom:22px;
+
+box-shadow:0 12px 35px rgba(0,0,0,0.25);
 
 }
 
@@ -217,7 +225,7 @@ font-size:24px;
 
 font-weight:800;
 
-color:#041f63;
+color:#eef7ff;
 
 margin:0;
 
@@ -228,7 +236,7 @@ margin:0;
 
 font-size:18px;
 
-color:#6c7b93;
+color:#8ca8ba;
 
 }
 
@@ -279,7 +287,7 @@ font-size:16px;
 
 font-weight:700;
 
-color:#314d76;
+color:#8ca8ba;
 
 margin-bottom:10px;
 
@@ -300,7 +308,7 @@ width:100%;
 
 height:64px;
 
-border:2px solid #d7dfe9;
+border:1px solid rgba(255,255,255,0.12);
 
 border-radius:22px;
 
@@ -308,7 +316,9 @@ padding:0 22px;
 
 font-size:16px;
 
-background:#fff;
+background:rgba(255,255,255,0.08);
+
+color:#eef7ff;
 
 outline:none;
 
@@ -319,7 +329,7 @@ outline:none;
 
 .survey-field select:focus{
 
-border-color:#00897b;
+border-color:#39d3c6;
 
 }
 
@@ -340,7 +350,7 @@ cursor:text;
 
 .survey-field input[readonly]{
 
-background:#f5f7fb;
+background:rgba(255,255,255,0.05);
 
 cursor:not-allowed;
 
@@ -355,7 +365,7 @@ cursor:not-allowed;
 
 height:72px;
 
-border:2px solid #c7d0db;
+border:1px solid rgba(255,255,255,0.12);
 
 border-radius:24px;
 
@@ -369,16 +379,18 @@ font-size:22px;
 
 cursor:pointer;
 
-background:white;
+background:rgba(255,255,255,0.08);
 
 transition:0.2s;
+
+color:#eef7ff;
 
 }
 
 
 .media-upload-box:hover{
 
-border-color:#1d4ed8;
+border-color:#39d3c6;
 
 }
 
