@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
-import "../styles/SalesSurvey.css";
+import "./salesSurvey/SalesSurvey.css";
 import {
   LayoutDashboard, FileText, ClipboardList, Settings2,
   Droplets, Receipt, CheckCircle, Briefcase,
