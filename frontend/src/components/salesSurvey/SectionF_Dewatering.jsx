@@ -18,12 +18,18 @@ import {
 
 from "../../data/salesSurveyOptions";
 
+import { useState } from "react";
+
 
 // ====================================
 // COMPONENT
 // ====================================
 
 export default function SectionF_Dewatering() {
+
+    const [dewateringRequired, setDewateringRequired] = useState("Yes");
+
+    const disabled = dewateringRequired === "No";
 
     return (
 
@@ -53,13 +59,13 @@ export default function SectionF_Dewatering() {
 
                     <label>Dewatering Required?</label>
 
-                    <select>
+                    <select value={dewateringRequired} onChange={e => setDewateringRequired(e.target.value)}>
 
                         {
 
                             yesNoOptions.map(item=>(
 
-                                <option key={item}>
+                                <option key={item} value={item}>
 
                                     {item}
 
@@ -74,38 +80,38 @@ export default function SectionF_Dewatering() {
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Dewatering Volume</label>
 
-                    <input />
+                    <input disabled={disabled} />
 
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Inlet Moisture %</label>
 
-                    <input />
+                    <input disabled={disabled} />
 
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Target Final Moisture %</label>
 
-                    <input />
+                    <input disabled={disabled} />
 
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Expected Final Form</label>
 
-                    <select>
+                    <select disabled={disabled}>
 
                         {
 
@@ -126,11 +132,11 @@ export default function SectionF_Dewatering() {
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Visible Free Water?</label>
 
-                    <select>
+                    <select disabled={disabled}>
 
                         {
 
@@ -151,11 +157,11 @@ export default function SectionF_Dewatering() {
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Natural Settling Ability</label>
 
-                    <select>
+                    <select disabled={disabled}>
 
                         {
 
@@ -176,7 +182,7 @@ export default function SectionF_Dewatering() {
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Oily / Emulsified?</label>
 
@@ -201,11 +207,11 @@ export default function SectionF_Dewatering() {
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Space for Bags / Holding?</label>
 
-                    <select>
+                    <select disabled={disabled}>
 
                         {
 
@@ -226,11 +232,11 @@ export default function SectionF_Dewatering() {
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Filtrate Route Available?</label>
 
-                    <select>
+                    <select disabled={disabled}>
 
                         {
 
@@ -251,11 +257,11 @@ export default function SectionF_Dewatering() {
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Customer Demands Final Moisture Guarantee?</label>
 
-                    <select>
+                    <select disabled={disabled}>
 
                         {
 
@@ -276,11 +282,11 @@ export default function SectionF_Dewatering() {
                 </div>
 
 
-                <div className="survey-field">
+                <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
                     <label>Cake Handling Scope</label>
 
-                    <select>
+                    <select disabled={disabled}>
 
                         {
 

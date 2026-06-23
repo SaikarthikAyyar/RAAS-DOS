@@ -1,3 +1,5 @@
+import logo from "../assets/JTLOGO.jpeg";
+
 function Header(){
 
  return(
@@ -10,11 +12,13 @@ function Header(){
 
       padding:"20px",
 
-      borderBottom:"1px solid gray"
+      borderBottom:"1px solid gray",
+
+      alignItems: "center"
 
    }}>
 
-     <h2>RAAS DOS</h2>
+     <img src={logo} alt="JT Logo" style={{ height: 40 }} />
 
      <div>
 

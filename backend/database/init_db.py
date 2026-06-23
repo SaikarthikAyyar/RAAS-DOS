@@ -6,6 +6,8 @@ from backend.database.tables import Base
 
 from backend.models.customer_requests import CustomerRequest
 
+from backend.models.customer_media import CustomerMedia
+
 from backend.models.jobs import Job
 
 from backend.models.sales_survey import SalesSurvey

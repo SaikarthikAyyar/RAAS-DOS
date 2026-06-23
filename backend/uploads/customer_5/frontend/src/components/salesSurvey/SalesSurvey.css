@@ -1,0 +1,597 @@
+/* ===================================
+   GLOBAL APP LAYOUT FIX
+=================================== */
+
+html,
+body,
+#root{
+
+width:100%;
+
+height:100%;
+
+margin:0;
+
+padding:0;
+
+overflow:hidden;
+
+}
+
+*{
+
+box-sizing:border-box;
+
+}
+
+
+/* ===================================
+   PAGE
+=================================== */
+
+.sales-survey-page{
+
+width:100%;
+
+min-height:100vh;
+
+padding:20px 40px;
+
+/* GREEN BACKGROUND */
+
+background:
+linear-gradient(
+135deg,
+#002f38,
+#004d4d 50%,
+#003f55
+);
+
+overflow-y:auto;
+
+}
+
+
+/* ===================================
+   SURVEY HEADER
+=================================== */
+
+.survey-progress-container{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:flex-start;
+
+margin-bottom:35px;
+
+padding:10px 10px 30px;
+
+width:100%;
+
+}
+
+
+.survey-progress-left{
+
+width:100%;
+
+max-width:none;
+
+display:flex;
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+
+
+.survey-sheet-title{
+
+font-size:18px;
+
+font-weight:800;
+
+letter-spacing:3px;
+
+color:#3ce0d3;
+
+margin-bottom:14px;
+
+}
+
+
+/* ===================================
+   MAIN TITLE
+=================================== */
+
+.survey-progress-left h1{
+
+font-size:52px;
+
+font-weight:800;
+
+/* FIX TITLE */
+
+color:#ffffff;
+
+line-height:1.05;
+
+margin:0 0 25px 0;
+
+}
+
+
+.survey-progress-left p{
+
+font-size:18px;
+
+line-height:1.7;
+
+color:#9bb5c6;
+
+max-width:none;
+
+text-align:left;
+
+margin-top:10px;
+
+}
+
+
+/* ===================================
+   COMPLETION CARD
+=================================== */
+
+.survey-completion-card{
+
+width:320px;
+
+height:80px;
+
+border-radius:60px;
+
+border:2px solid rgba(255,255,255,0.15);
+
+background:rgba(255,255,255,0.08);
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:0 30px;
+
+font-size:18px;
+
+font-weight:700;
+
+color:#ffffff;
+
+flex-shrink:0;
+
+position:fixed;
+
+top: 100px;
+
+right: 30px;
+
+z-index:999;
+
+}
+
+.survey-completion-card span {
+
+font-size: 18px;
+
+}
+
+.survey-completion-card strong{
+
+font-size:24px;
+
+}
+
+
+.survey-completion-card strong{
+
+font-size:24px;
+
+}
+
+
+/* ===================================
+   SURVEY CARD
+=================================== */
+
+.survey-card{
+
+width:100%;
+
+background:
+linear-gradient(
+135deg,
+rgba(20,72,78,0.92),
+rgba(14,84,77,0.92) 45%,
+rgba(18,52,88,0.92)
+);
+
+border:1px solid rgba(255,255,255,0.10);
+
+border-radius:28px;
+
+padding:28px;
+
+margin-bottom:22px;
+
+box-shadow:0 12px 35px rgba(0,0,0,0.25);
+
+}
+
+
+/* ===================================
+   SECTION HEADER
+=================================== */
+
+.survey-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:30px;
+
+}
+
+
+.survey-header h2{
+
+font-size:24px;
+
+font-weight:800;
+
+color:#eef7ff;
+
+margin:0;
+
+}
+
+
+.survey-header span{
+
+font-size:18px;
+
+color:#9fb4c4;
+
+}
+
+
+/* ===================================
+   GRID
+=================================== */
+
+.survey-grid,
+
+.survey-row{
+
+display:grid;
+
+grid-template-columns:repeat(3,minmax(0,1fr));
+
+gap:28px;
+
+width:100%;
+
+}
+
+
+/* ===================================
+   FIELD
+=================================== */
+
+.survey-field{
+
+display:flex;
+
+flex-direction:column;
+
+width:100%;
+
+min-width:0;
+
+}
+
+
+/* ===================================
+   LABEL
+=================================== */
+
+.survey-field label{
+
+font-size:16px;
+
+font-weight:700;
+
+color:#8fa8b8;
+
+margin-bottom:10px;
+
+text-align:center;
+
+}
+
+
+/* ===================================
+   INPUTS
+=================================== */
+
+.survey-field input,
+
+.survey-field select{
+
+width:100%;
+
+height:64px;
+
+border:1px solid rgba(255,255,255,0.12);
+
+border-radius:22px;
+
+padding:0 22px;
+
+font-size:16px;
+
+background:rgba(255,255,255,0.08);
+
+color:#eef7ff;
+
+outline:none;
+
+}
+
+.survey-field select option{
+
+background:#ffffff;
+
+color:#0d1730;
+
+}
+
+.survey-field input::placeholder{
+
+color:#a8b5c2;
+
+opacity:1;
+
+}
+
+.survey-field input:focus,
+
+.survey-field select:focus{
+
+border-color:#3ce0d3;
+
+}
+
+
+.survey-field select{
+
+cursor:pointer;
+
+}
+
+
+.survey-field input{
+
+cursor:text;
+
+}
+
+
+.survey-field input[readonly]{
+
+background:rgba(255,255,255,0.05);
+
+cursor:not-allowed;
+
+}
+
+.survey-field.disabled {
+
+    opacity: 0.55;
+
+}
+
+.survey-field.disabled input,
+
+.survey-field.disabled select {
+
+    background: rgba(255,255,255,0.05);
+
+    cursor: not-allowed;
+
+}
+
+
+/* ===================================
+   MEDIA UPLOAD
+=================================== */
+
+.media-upload-box{
+
+height:72px;
+
+border:1px solid rgba(255,255,255,0.12);
+
+border-radius:24px;
+
+display:flex;
+
+align-items:center;
+
+padding:0 24px;
+
+font-size:22px;
+
+cursor:pointer;
+
+background:rgba(255,255,255,0.08);
+
+transition:0.2s;
+
+color:#ffffff;
+
+}
+
+
+.media-upload-box:hover{
+
+border-color:#3ce0d3;
+
+}
+
+
+/* ===================================
+   ACTION BUTTONS
+=================================== */
+
+.survey-actions{
+
+display:flex;
+
+justify-content:flex-start;
+
+gap:22px;
+
+padding:30px 0 60px;
+
+flex-wrap:wrap;
+
+}
+
+
+.survey-btn{
+
+border:none;
+
+cursor:pointer;
+
+height:90px;
+
+padding:0 36px;
+
+border-radius:30px;
+
+font-size:22px;
+
+font-weight:800;
+
+}
+
+
+.save-btn{
+
+background:#117d77;
+
+color:white;
+
+}
+
+
+.ops-btn{
+
+background:#2f63e0;
+
+color:white;
+
+}
+
+
+.info-btn{
+
+background:#e9edf3;
+
+color:#0d1730;
+
+}
+
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media(max-width:1200px){
+
+.survey-grid,
+
+.survey-row{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.survey-progress-container{
+
+flex-direction:column;
+
+gap:30px;
+
+}
+
+.survey-progress-left h1{
+
+font-size:42px;
+
+}
+
+.survey-completion-card{
+
+width:100%;
+
+}
+
+.survey-actions{
+
+flex-direction:column;
+
+}
+
+}
+
+
+@media(max-width:768px){
+
+.survey-grid,
+
+.survey-row{
+
+grid-template-columns:1fr;
+
+}
+
+.survey-header{
+
+flex-direction:column;
+
+gap:12px;
+
+}
+
+.survey-header h2{
+
+font-size:22px;
+
+}
+
+.survey-progress-left h1{
+
+font-size:34px;
+
+}
+
+}

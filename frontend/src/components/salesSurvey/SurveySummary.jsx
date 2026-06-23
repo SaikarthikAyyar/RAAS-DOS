@@ -136,20 +136,9 @@ value={packageName}
 
 <div className="survey-completion-card">
 
+    <span>Progress:</span>
 
-<div>
-
-Completeness:
-
-</div>
-
-
-<strong>
-
-{completion}%
-
-</strong>
-
+    <strong>{completion}%</strong>
 
 </div>
 

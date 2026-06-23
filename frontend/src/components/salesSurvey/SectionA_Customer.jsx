@@ -54,11 +54,7 @@ Auto filled from Customer Request
 
 <div className="survey-field">
 
-<label>
 
-Customer
-
-</label>
 
 <div className="survey-field">
 

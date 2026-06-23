@@ -18,19 +18,19 @@ from "../../services/customerService";
 
 import Section1_CustomerSite
 
-from "../../components/CustomerRequest/Section1_CustomerSite";
+from "../../components/customerRequest/Section1_CustomerSite";
 
 import Section2_RequirementBasics
 
-from "../../components/CustomerRequest/Section2_RequirementBasics";
+from "../../components/customerRequest/Section2_RequirementBasics";
 
 import Section3_Uploads
 
-from "../../components/CustomerRequest/Section3_Uploads";
+from "../../components/customerRequest/Section3_Uploads";
 
 import CustomerActions
 
-from "../../components/CustomerRequest/CustomerActions";
+from "../../components/customerRequest/CustomerActions";
 
 
 // ====================================

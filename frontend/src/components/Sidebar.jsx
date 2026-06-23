@@ -3,6 +3,7 @@
 // =========================================
 
 import { NavLink } from "react-router-dom";
+import logo from "../assets/JTLOGO.jpeg";
 
 import {
 
@@ -180,7 +181,7 @@ export default function Sidebar() {
 
             <div className="logo">
 
-                RAAS DOS V1
+                <img src={logo} alt="JT Logo" style={{ maxWidth: "160px", height: "auto" }} />
 
             </div>
 

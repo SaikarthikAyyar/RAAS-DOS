@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api.customer_api import router as customer_router
 
+from backend.api.customer_media_api import router as customer_media_router
+
 from backend.api.sales_survey_api import router as sales_survey_router
 
 from backend.api.ops_selector_api import router as ops_selector_router
@@ -14,9 +16,24 @@ from backend.api.quote_api import router as quote_router
 
 from backend.database.init_db import create_tables
 
+from fastapi.staticfiles import StaticFiles
+
 
 app = FastAPI()
 
+app.mount(
+
+"/uploads",
+
+StaticFiles(
+
+directory="backend/uploads"
+
+),
+
+name="uploads"
+
+)
 
 # ====================================
 # CORS
@@ -47,6 +64,12 @@ create_tables()
 app.include_router(
 
     customer_router
+
+)
+
+app.include_router(
+
+customer_media_router
 
 )
 
