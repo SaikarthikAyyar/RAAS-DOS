@@ -60,6 +60,10 @@ import SectionG_Insights
 
 from "../../components/salesSurvey/SectionG_Insights";
 
+import SectionH_Media
+
+from "../../components/salesSurvey/SectionH_Media";
+
 
 // ====================================
 // COMPONENT
@@ -129,6 +133,8 @@ useEffect(
 
 async function loadCustomers(){
 
+try{
+
 const data=
 
 await getCustomers();
@@ -141,6 +147,19 @@ data
 
 }
 
+catch(error){
+
+console.log(
+
+error
+
+);
+
+}
+
+}
+
+
 loadCustomers();
 
 },
@@ -151,12 +170,13 @@ loadCustomers();
 
 
 // ====================================
-// LOAD PREFILL
+// LOAD SALES PREFILL
 // ====================================
 
 useEffect(
 
 ()=>{
+
 
 if(
 
@@ -170,6 +190,9 @@ return;
 
 
 async function loadPrefill(){
+
+try{
+
 
 const prefill=
 
@@ -185,6 +208,18 @@ setSurveyData(
 prefill
 
 );
+
+}
+
+catch(error){
+
+console.log(
+
+error
+
+);
+
+}
 
 }
 
@@ -281,6 +316,13 @@ updateSection={updateSection}
 surveyData={surveyData}
 
 updateSection={updateSection}
+
+/>
+
+
+<SectionH_Media
+
+customerRequestId={selectedCustomer}
 
 />
 

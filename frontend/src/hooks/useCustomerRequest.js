@@ -68,12 +68,44 @@ files
 
 )=>{
 
-
 setCustomerData(
 
-previous=>(
+previous=>{
 
-{
+const existing=
+
+previous.uploads[type] || [];
+
+
+const combined=[
+
+...existing,
+
+...files
+
+];
+
+
+const unique=combined.filter(
+
+(file,index,self)=>
+
+index===self.findIndex(
+
+f=>
+
+f.name===file.name
+
+&&
+
+f.size===file.size
+
+)
+
+);
+
+
+return{
 
 ...previous,
 
@@ -81,18 +113,17 @@ uploads:{
 
 ...previous.uploads,
 
-[type]:files
+[type]:unique
 
 }
 
-}
+};
 
-)
+}
 
 );
 
 };
-
 
 const counts={
 

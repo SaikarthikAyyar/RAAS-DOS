@@ -172,13 +172,7 @@ updateSection={updateSection}
 />
 
 
-<FieldInput
-label="Photos / Videos"
-value={job.photos}
-section="job"
-field="photos"
-updateSection={updateSection}
-/>
+
 
 
 </div>

@@ -16,6 +16,14 @@ createCustomerRequest
 
 from "../../services/customerService";
 
+import {
+
+uploadMedia
+
+}
+
+from "../../services/customerMediaService";
+
 import Section1_CustomerSite
 
 from "../../components/customerRequest/Section1_CustomerSite";
@@ -39,11 +47,9 @@ from "../../components/customerRequest/CustomerActions";
 
 export default function CustomerRequest(){
 
-
 const navigate=
 
 useNavigate();
-
 
 const{
 
@@ -66,81 +72,58 @@ useCustomerRequest();
 
 async function submit(){
 
+try{
 
 const customer=
 
 customerData.customer || {};
 
-
 const requirement=
 
 customerData.requirement || {};
-
 
 const uploads=
 
 customerData.uploads || {};
 
 
-// ====================================
-// PAYLOAD
-// ====================================
-
 const payload={
-
-
-// ====================================
-// CUSTOMER
-// ====================================
 
 company_name:
 
 customer.company_name,
 
-
 plant_site_location:
 
 customer.plant_site_location,
-
 
 contact_person:
 
 customer.contact_person,
 
-
 contact_number:
 
 customer.contact_number,
-
 
 nearest_city_hub:
 
 customer.nearest_city_hub,
 
-
 urgency:
 
 customer.urgency,
-
-
-// ====================================
-// REQUIREMENTS
-// ====================================
 
 service_requirement_type:
 
 requirement.service_requirement_type,
 
-
 observed_material:
 
 requirement.observed_material,
 
-
 estimated_quantity_known:
 
 requirement.estimated_quantity_known,
-
 
 approx_length_dia:
 
@@ -148,8 +131,7 @@ Number(
 
 requirement.approx_length_dia
 
-) || null,
-
+)||null,
 
 approx_width:
 
@@ -157,8 +139,7 @@ Number(
 
 requirement.approx_width
 
-) || null,
-
+)||null,
 
 approx_depth:
 
@@ -166,13 +147,11 @@ Number(
 
 requirement.approx_depth
 
-) || null,
-
+)||null,
 
 access_opening_type:
 
 requirement.access_opening_type,
-
 
 can_place_equipment_nearby:
 
@@ -182,30 +161,21 @@ requirement.can_place_equipment_nearby?.includes(
 
 ),
 
-
 quote_basis:
 
 requirement.quote_basis,
-
 
 pain_point:
 
 requirement.pain_point,
 
-
-// ====================================
-// MEDIA
-// ====================================
-
 photo_count:
 
 uploads.photos?.length || 0,
 
-
 video_count:
 
 uploads.videos?.length || 0,
-
 
 layout_count:
 
@@ -214,11 +184,11 @@ uploads.layouts?.length || 0
 };
 
 
-// ====================================
-// SAVE
-// ====================================
+console.log(
 
-try{
+payload
+
+);
 
 
 const response=
@@ -230,11 +200,25 @@ payload
 );
 
 
+const customerId=
+
+response.id;
+
+
 localStorage.setItem(
 
 "customerRequestId",
 
-response.id
+customerId
+
+);
+
+
+await uploadMedia(
+
+customerId,
+
+uploads
 
 );
 
@@ -268,7 +252,6 @@ return(
 
 <div className="sales-survey-page">
 
-
 <Section1_CustomerSite
 
 customerData={customerData}
@@ -276,7 +259,6 @@ customerData={customerData}
 updateSection={updateSection}
 
 />
-
 
 <Section2_RequirementBasics
 
@@ -286,7 +268,6 @@ updateSection={updateSection}
 
 />
 
-
 <Section3_Uploads
 
 customerData={customerData}
@@ -295,13 +276,11 @@ updateMedia={updateMedia}
 
 />
 
-
 <CustomerActions
 
 submit={submit}
 
 />
-
 
 </div>
 

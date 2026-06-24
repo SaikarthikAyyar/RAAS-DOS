@@ -84,6 +84,30 @@ layouts
 
     )
 
+    print(
+
+        "photos:",
+
+        len(photos)
+
+        )
+
+    print(
+
+        "videos:",
+
+        len(videos)
+
+    )
+
+    print(
+
+    "layouts:",
+
+    len(layouts)
+
+    )
+
 
     db.commit()
 
@@ -166,6 +190,27 @@ folder
         db.add(
 
             media
+
+        )
+        for file in files:
+
+            print(
+
+                media_type,
+
+                file.filename
+
+        )
+
+        filepath=(
+
+            f"{folder}/{file.filename}"
+
+        )
+
+        print(
+
+            filepath
 
         )
 

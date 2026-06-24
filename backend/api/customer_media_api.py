@@ -23,6 +23,7 @@ router=APIRouter()
 
 async def upload_media(
 
+
 customer_id:int,
 photos: List[UploadFile] = File(default=[]),
 
@@ -33,6 +34,12 @@ layouts: List[UploadFile] = File(default=[]),
 db:Session=Depends(get_db)
 
 ):
+    
+    print(
+
+        "MEDIA API CALLED"
+
+    )
 
 
     return await save_media(

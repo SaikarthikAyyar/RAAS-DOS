@@ -105,21 +105,33 @@ display:"none"
 
 }}
 
-onChange={(e)=>
+onChange={(e)=>{
 
-updateMedia(
-
-type,
+const files=
 
 Array.from(
 
 e.target.files
 
-)
+);
 
-)
+console.log(
 
-}
+type,
+
+files
+
+);
+
+updateMedia(
+
+type,
+
+files
+
+);
+
+}}
 
 />
 

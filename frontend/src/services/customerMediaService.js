@@ -1,9 +1,11 @@
-const API="http://127.0.0.1:8000";
+import {
 
+API
 
-// ====================================
-// UPLOAD MEDIA
-// ====================================
+}
+
+from "../config/api";
+
 
 export async function uploadMedia(
 
@@ -12,20 +14,19 @@ customerId,
 uploads
 
 ){
-console.log(customerId);
-
-console.log(uploads);
 
 const formData=
 
 new FormData();
 
 
-// ====================================
-// PHOTOS
-// ====================================
+(
 
-(uploads.photos || []).forEach(
+uploads.photos || []
+
+)
+
+.forEach(
 
 file=>{
 
@@ -42,11 +43,13 @@ file
 );
 
 
-// ====================================
-// VIDEOS
-// ====================================
+(
 
-(uploads.videos || []).forEach(
+uploads.videos || []
+
+)
+
+.forEach(
 
 file=>{
 
@@ -63,11 +66,13 @@ file
 );
 
 
-// ====================================
-// LAYOUTS
-// ====================================
+(
 
-(uploads.layouts || []).forEach(
+uploads.layouts || []
+
+)
+
+.forEach(
 
 file=>{
 
@@ -106,15 +111,7 @@ return response.json();
 }
 
 
-// ====================================
-// GET MEDIA
-// ====================================
-
-export async function getCustomerMedia(
-
-customerId
-
-){
+export async function getMedia(customerId){
 
 const response=
 
@@ -122,8 +119,8 @@ await fetch(
 
 `${API}/customer-request/${customerId}/media`
 
-);
+)
 
-return response.json();
+return response.json()
 
 }

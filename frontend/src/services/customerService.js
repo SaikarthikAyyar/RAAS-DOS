@@ -1,41 +1,49 @@
-const API = "https://raas-dos.onrender.com";
+import {
 
+API
 
-// ====================================
-// CREATE CUSTOMER REQUEST
-// ====================================
+}
+
+from "../config/api";
+
 
 export async function createCustomerRequest(
 
-    payload
+payload
 
 ){
 
-    const response = await fetch(
+const response=
 
-        `${API}/customer-request`,
+await fetch(
 
-        {
+`${API}/customer-request`,
 
-            method:"POST",
+{
 
-            headers:{
+method:"POST",
 
-                "Content-Type":"application/json"
+headers:{
 
-            },
+"Content-Type":
 
-            body:JSON.stringify(
+"application/json"
 
-                payload
+},
 
-            )
+body:
 
-        }
+JSON.stringify(
 
-    );
+payload
+
+)
+
+}
+
+);
 
 
-    return response.json();
+return response.json();
 
 }
