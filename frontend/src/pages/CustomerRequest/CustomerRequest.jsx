@@ -72,123 +72,143 @@ useCustomerRequest();
 
 async function submit(){
 
-try{
+ try{
 
-const customer=
+  const customer=
+  customerData.customer || {};
 
-customerData.customer || {};
+  const requirement=
+  customerData.requirement || {};
 
-const requirement=
+  const uploads=
+  customerData.uploads || {};
 
-customerData.requirement || {};
+  const payload={
 
-const uploads=
+   company_name:
+   customer.company_name,
 
-customerData.uploads || {};
+   plant_site_location:
+   customer.plant_site_location,
 
+   contact_person:
+   customer.contact_person,
 
-const payload={
+   contact_number:
+   customer.contact_number,
 
-company_name:
+   nearest_city_hub:
+   customer.nearest_city_hub,
 
-customer.company_name,
+   urgency:
+   customer.urgency,
 
-plant_site_location:
+   service_requirement_type:
+   requirement.service_requirement_type,
 
-customer.plant_site_location,
+   observed_material:
+   requirement.observed_material,
 
-contact_person:
+   estimated_quantity_known:
+   requirement.estimated_quantity_known,
 
-customer.contact_person,
+   tank_type:
+   requirement.tank_type,
 
-contact_number:
+   approx_length_dia:
+   Number(
+    requirement.approx_length_dia
+   ) || null,
 
-customer.contact_number,
+   approx_width:
+   Number(
+    requirement.approx_width
+   ) || null,
 
-nearest_city_hub:
+   approx_depth:
+   Number(
+    requirement.approx_depth
+   ) || null,
 
-customer.nearest_city_hub,
+   access_opening_type:
+   requirement.access_opening_type,
 
-urgency:
+   can_place_equipment_nearby:
+   requirement.can_place_equipment_nearby?.includes(
+    "Yes"
+   ),
 
-customer.urgency,
+   quote_basis:
+   requirement.quote_basis,
 
-service_requirement_type:
+   pain_point:
+   requirement.pain_point,
 
-requirement.service_requirement_type,
+   photo_count:
+   uploads.photos?.length || 0,
 
-observed_material:
+   video_count:
+   uploads.videos?.length || 0,
 
-requirement.observed_material,
+   layout_count:
+   uploads.layouts?.length || 0
 
-estimated_quantity_known:
-
-requirement.estimated_quantity_known,
-
-approx_length_dia:
-
-Number(
-
-requirement.approx_length_dia
-
-)||null,
-
-approx_width:
-
-Number(
-
-requirement.approx_width
-
-)||null,
-
-approx_depth:
-
-Number(
-
-requirement.approx_depth
-
-)||null,
-
-access_opening_type:
-
-requirement.access_opening_type,
-
-can_place_equipment_nearby:
-
-requirement.can_place_equipment_nearby?.includes(
-
-"Yes"
-
-),
-
-quote_basis:
-
-requirement.quote_basis,
-
-pain_point:
-
-requirement.pain_point,
-
-photo_count:
-
-uploads.photos?.length || 0,
-
-video_count:
-
-uploads.videos?.length || 0,
-
-layout_count:
-
-uploads.layouts?.length || 0
-
-};
+  };
 
 
-console.log(
+  console.log("PAYLOAD",payload);
 
-payload
 
-);
+  const response=
+  await createCustomerRequest(
+   payload
+  );
+
+
+  console.log("API RESPONSE",response);
+
+
+  if(
+   !response.id
+  ){
+
+   alert(
+    "Customer request creation failed"
+   );
+
+   return;
+  }
+
+
+  const customerId=
+  response.id;
+
+
+  localStorage.setItem(
+   "customerRequestId",
+   customerId
+  );
+
+
+  await uploadMedia(
+   customerId,
+   uploads
+  );
+
+
+  navigate(
+   "/sales-survey"
+  );
+
+ }
+
+ catch(error){
+
+  console.log(error);
+
+ }
+
+}
 
 
 const response=
