@@ -107,3 +107,15 @@ def home():
         "message":"RAAS DOS API"
 
     }
+
+
+@app.get("/db-test")
+def db_test():
+
+    from backend.database.connection import engine
+
+    return {
+
+        "database": str(engine.url)
+
+    }
