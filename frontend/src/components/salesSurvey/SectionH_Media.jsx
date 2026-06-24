@@ -298,7 +298,7 @@ selected.media_type==="photo"
 
 src={
 
-`http://127.0.0.1:8000${selected.url}`
+`https://raas-dos.onrender.com${selected.url}`
 
 }
 
@@ -341,7 +341,7 @@ className="preview-video"
 
 src={
 
-`http://127.0.0.1:8000${encodeURI(selected.url)}`
+`https://raas-dos.onrender.com${encodeURI(selected.url)}`
 
 }
 
