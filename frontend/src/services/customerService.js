@@ -13,6 +13,14 @@ payload
 
 ){
 
+console.log("CUSTOMER", customer)
+
+console.log("REQUIREMENT", requirement)
+
+console.log("UPLOADS", uploads)
+
+console.log("FINAL PAYLOAD", payload)
+
 const response=
 
 await fetch(
