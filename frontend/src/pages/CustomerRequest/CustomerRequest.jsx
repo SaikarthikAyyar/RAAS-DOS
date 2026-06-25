@@ -9,35 +9,23 @@ import { useNavigate } from "react-router-dom";
 import useCustomerRequest from "../../hooks/useCustomerRequest";
 
 import {
-
-createCustomerRequest
-
-}
-
-from "../../services/customerService";
+  createCustomerRequest
+} from "../../services/customerService";
 
 import {
-
-uploadMedia
-
-}
-
-from "../../services/customerMediaService";
+  uploadMedia
+} from "../../services/customerMediaService";
 
 import Section1_CustomerSite
-
 from "../../components/customerRequest/Section1_CustomerSite";
 
 import Section2_RequirementBasics
-
 from "../../components/customerRequest/Section2_RequirementBasics";
 
 import Section3_Uploads
-
 from "../../components/customerRequest/Section3_Uploads";
 
 import CustomerActions
-
 from "../../components/customerRequest/CustomerActions";
 
 
@@ -47,263 +35,181 @@ from "../../components/customerRequest/CustomerActions";
 
 export default function CustomerRequest(){
 
-const navigate=
+  const navigate = useNavigate();
 
-useNavigate();
+  const {
 
-const{
+    customerData,
 
-customerData,
+    updateSection,
 
-updateSection,
+    updateMedia
 
-updateMedia
-
-}
-
-=
-
-useCustomerRequest();
+  } = useCustomerRequest();
 
 
-// ====================================
-// SUBMIT
-// ====================================
+  // ====================================
+  // SUBMIT
+  // ====================================
 
-async function submit(){
+  async function submit(){
 
- try{
+    try{
 
-  const customer=
-  customerData.customer || {};
+      const customer =
+        customerData.customer || {};
 
-  const requirement=
-  customerData.requirement || {};
+      const requirement =
+        customerData.requirement || {};
 
-  const uploads=
-  customerData.uploads || {};
+      const uploads =
+        customerData.uploads || {};
 
-  const payload={
+      const payload = {
 
-   company_name:
-   customer.company_name,
+        // ====================================
+        // CUSTOMER
+        // ====================================
 
-   plant_site_location:
-   customer.plant_site_location,
+        company_name:
+          customer.company_name,
 
-   contact_person:
-   customer.contact_person,
+        plant_site_location:
+          customer.plant_site_location,
 
-   contact_number:
-   customer.contact_number,
+        contact_person:
+          customer.contact_person,
 
-   nearest_city_hub:
-   customer.nearest_city_hub,
+        contact_number:
+          customer.contact_number,
 
-   urgency:
-   customer.urgency,
+        nearest_city_hub:
+          customer.nearest_city_hub,
 
-   service_requirement_type:
-   requirement.service_requirement_type,
+        urgency:
+          customer.urgency,
 
-   observed_material:
-   requirement.observed_material,
+        // ====================================
+        // REQUIREMENT
+        // ====================================
 
-   estimated_quantity_known:
-   requirement.estimated_quantity_known,
+        service_requirement_type:
+          requirement.service_requirement_type,
 
-   tank_type:
-   requirement.tank_type,
+        observed_material:
+          requirement.observed_material,
 
-   approx_length_dia:
-   Number(
-    requirement.approx_length_dia
-   ) || null,
+        estimated_quantity_known:
+          requirement.estimated_quantity_known,
 
-   approx_width:
-   Number(
-    requirement.approx_width
-   ) || null,
+        tank_type:
+          requirement.tank_type,
 
-   approx_depth:
-   Number(
-    requirement.approx_depth
-   ) || null,
+        approx_length_dia:
+          Number(requirement.approx_length_dia) || null,
 
-   access_opening_type:
-   requirement.access_opening_type,
+        approx_width:
+          Number(requirement.approx_width) || null,
 
-   can_place_equipment_nearby:
-   requirement.can_place_equipment_nearby?.includes(
-    "Yes"
-   ),
+        approx_depth:
+          Number(requirement.approx_depth) || null,
 
-   quote_basis:
-   requirement.quote_basis,
+        access_opening_type:
+          requirement.access_opening_type,
 
-   pain_point:
-   requirement.pain_point,
+        can_place_equipment_nearby:
+          requirement.can_place_equipment_nearby?.includes("Yes"),
 
-   photo_count:
-   uploads.photos?.length || 0,
+        quote_basis:
+          requirement.quote_basis,
 
-   video_count:
-   uploads.videos?.length || 0,
+        pain_point:
+          requirement.pain_point,
 
-   layout_count:
-   uploads.layouts?.length || 0
+        // ====================================
+        // MEDIA COUNTS
+        // ====================================
 
-  };
+        photo_count:
+          uploads.photos?.length || 0,
 
+        video_count:
+          uploads.videos?.length || 0,
 
-  console.log("PAYLOAD",payload);
+        layout_count:
+          uploads.layouts?.length || 0
 
+      };
 
-  const response=
-  await createCustomerRequest(
-   payload
-  );
+      console.log("PAYLOAD", payload);
 
+      const response =
+        await createCustomerRequest(payload);
 
-  console.log("API RESPONSE",response);
+      console.log("API RESPONSE", response);
 
+      if(!response?.id){
 
-  if(
-   !response.id
-  ){
+        alert("Customer Request creation failed.");
 
-   alert(
-    "Customer request creation failed"
-   );
+        return;
 
-   return;
+      }
+
+      const customerId = response.id;
+
+      localStorage.setItem(
+        "customerRequestId",
+        customerId
+      );
+
+      await uploadMedia(
+        customerId,
+        uploads
+      );
+
+      navigate("/sales-survey");
+
+    }
+
+    catch(error){
+
+      console.error(error);
+
+    }
+
   }
 
 
-  const customerId=
-  response.id;
+  // ====================================
+  // UI
+  // ====================================
 
+  return(
 
-  localStorage.setItem(
-   "customerRequestId",
-   customerId
+    <div className="sales-survey-page">
+
+      <Section1_CustomerSite
+        customerData={customerData}
+        updateSection={updateSection}
+      />
+
+      <Section2_RequirementBasics
+        customerData={customerData}
+        updateSection={updateSection}
+      />
+
+      <Section3_Uploads
+        customerData={customerData}
+        updateMedia={updateMedia}
+      />
+
+      <CustomerActions
+        submit={submit}
+      />
+
+    </div>
+
   );
-
-
-  await uploadMedia(
-   customerId,
-   uploads
-  );
-
-
-  navigate(
-   "/sales-survey"
-  );
-
- }
-
- catch(error){
-
-  console.log(error);
-
- }
-
-}
-
-
-const response=
-
-await createCustomerRequest(
-
-payload
-
-);
-
-
-const customerId=
-
-response.id;
-
-
-localStorage.setItem(
-
-"customerRequestId",
-
-customerId
-
-);
-
-
-await uploadMedia(
-
-customerId,
-
-uploads
-
-);
-
-
-navigate(
-
-"/sales-survey"
-
-);
-
-}
-
-catch(error){
-
-console.log(
-
-error
-
-);
-
-}
-
-}
-
-
-// ====================================
-// UI
-// ====================================
-
-return(
-
-<div className="sales-survey-page">
-
-<Section1_CustomerSite
-
-customerData={customerData}
-
-updateSection={updateSection}
-
-/>
-
-<Section2_RequirementBasics
-
-customerData={customerData}
-
-updateSection={updateSection}
-
-/>
-
-<Section3_Uploads
-
-customerData={customerData}
-
-updateMedia={updateMedia}
-
-/>
-
-<CustomerActions
-
-submit={submit}
-
-/>
-
-</div>
-
-);
 
 }
