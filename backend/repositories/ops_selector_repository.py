@@ -30,15 +30,15 @@ def create_ops_selection(
     # Calculate total duration
     # --------------------------------
 
-    total_job_days = (
+    total_job_days=(
 
-        payload.mobilisation_days +
+    (payload.mobilisation_days or 0)+
 
-        payload.setup_days +
+    (payload.setup_days or 0)+
 
-        payload.execution_days +
+    (payload.execution_days or 0)+
 
-        payload.demob_days
+    (payload.demob_days or 0)
 
     )
 
@@ -55,13 +55,13 @@ def create_ops_selection(
 
         service_configuration=payload.service_configuration,
 
+        ops_engine_version=payload.ops_engine_version,
+
         recommended_machine=payload.recommended_machine,
 
         pump_hose_package=payload.pump_hose_package,
 
         accessories=payload.accessories,
-
-        recommended_package=payload.recommended_package,
 
         mobilisation_days=payload.mobilisation_days,
 
@@ -77,7 +77,11 @@ def create_ops_selection(
 
         approval_gate=payload.approval_gate,
 
-        internal_next_action=payload.internal_next_action
+        internal_next_action=payload.internal_next_action,
+
+        selection_reason=
+
+        payload.selection_reason,
 
     )
 
@@ -101,3 +105,29 @@ def create_ops_selection(
     )
 
     return ops
+
+def get_ops_selection_by_survey(
+
+        db,
+
+        sales_survey_id
+
+):
+
+    return (
+
+        db.query(
+
+            OpsSelection
+
+        )
+
+        .filter(
+
+            OpsSelection.sales_survey_id == sales_survey_id
+
+        )
+
+        .first()
+
+    )

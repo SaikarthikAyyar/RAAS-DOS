@@ -213,6 +213,22 @@ updateSection={updateSection}
 
 />
 
+<FieldInput
+    label="Cleaning Date"
+    type="datetime-local"
+    value={requirement.cleaning_date}
+    section="requirement"
+    field="cleaning_date"
+    updateSection={updateSection}
+/>
+
+<FieldInput
+    label="Cleaning Frequency"
+    value={requirement.cleaning_frequency}
+    section="requirement"
+    field="cleaning_frequency"
+    updateSection={updateSection}
+/>
 
 
 
@@ -279,6 +295,7 @@ function FieldInput({
 label,
 
 value,
+type,
 
 section,
 
@@ -299,6 +316,7 @@ return(
 </label>
 
 <input
+    type={type || "text"}
 
 value={value || ""}
 

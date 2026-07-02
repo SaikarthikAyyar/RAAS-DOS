@@ -42,11 +42,7 @@ D. Support, Safety & Utilities
 
 </h2>
 
-<span>
 
-Quote / readiness inputs
-
-</span>
 
 </div>
 
@@ -99,6 +95,15 @@ options={yesNoUnknown}
 
 updateSection={updateSection}
 
+/>
+
+<FieldSelect
+    label="Air Supply Available"
+    value={safety.air_supply_available}
+    section="safety"
+    field="air_supply_available"
+    options={yesNoUnknown}
+    updateSection={updateSection}
 />
 
 

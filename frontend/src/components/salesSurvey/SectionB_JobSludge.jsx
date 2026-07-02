@@ -4,13 +4,17 @@ jobTypes,
 
 materialCategories,
 
-consistencyOptions,
+sludge_hardnessOptions,
 
 debrisLevels,
 
 hazardLevels,
 
-yesNoUnknown
+yesNoUnknown,
+
+waterVisibilityOptions,
+temperatureRangeOptions,
+sampleAvailabilityOptions
 
 }
 
@@ -42,11 +46,6 @@ B. Job / Material Details
 
 </h2>
 
-<span>
-
-Workbook Fields
-
-</span>
 
 </div>
 
@@ -73,24 +72,34 @@ options={materialCategories}
 updateSection={updateSection}
 />
 
+<FieldInput
+label="Cleaning Date"
+type="date"
+value={job.cleaning_date}
+section="job"
+field="cleaning_date"
+updateSection={updateSection}
+/>
+
+<FieldInput
+label="Cleaning Frequency"
+value={job.cleaning_frequency}
+section="job"
+field="cleaning_frequency"
+updateSection={updateSection}
+/>
+
 
 <FieldSelect
 label="Sludge Hardness"
-value={job.consistency}
+value={job.sludge_hardness}
 section="job"
-field="consistency"
-options={consistencyOptions}
+field="sludge_hardness"
+options={sludge_hardnessOptions}
 updateSection={updateSection}
 />
 
 
-<FieldInput
-label="Sludge Depth"
-value={job.sludge_depth}
-section="job"
-field="sludge_depth"
-updateSection={updateSection}
-/>
 
 
 <FieldSelect
@@ -102,9 +111,18 @@ options={debrisLevels}
 updateSection={updateSection}
 />
 
+<FieldSelect
+label="Water Visibility"
+value={job.water_visibility}
+section="job"
+field="water_visibility"
+options={waterVisibilityOptions}
+updateSection={updateSection}
+/>
+
 
 <FieldInput
-label="Fluid Density"
+label="Fluid Density (kg/m³)"
 value={job.bulk_density}
 section="job"
 field="bulk_density"
@@ -171,6 +189,23 @@ options={yesNoUnknown}
 updateSection={updateSection}
 />
 
+<FieldSelect
+label="Temperature Range"
+value={job.temperature_range}
+section="job"
+field="temperature_range"
+options={temperatureRangeOptions}
+updateSection={updateSection}
+/>
+
+<FieldSelect
+label="Sample Available"
+value={job.sample_available}
+section="job"
+field="sample_available"
+options={sampleAvailabilityOptions}
+updateSection={updateSection}
+/>
 
 
 
@@ -187,6 +222,8 @@ updateSection={updateSection}
 function FieldInput({
 
 label,
+
+type,
 
 value,
 
@@ -209,6 +246,8 @@ return(
 </label>
 
 <input
+
+type={type || "text"}
 
 value={value || ""}
 

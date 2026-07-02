@@ -23,14 +23,11 @@ setSelectedCustomer
 
 }){
 
-
 const customer = surveyData.customer || {};
-
 
 return(
 
 <div className="survey-card">
-
 
 <div className="survey-header">
 
@@ -40,31 +37,34 @@ A. Customer / Opportunity
 
 </h2>
 
-<span>
+<div className="survey-id">
 
-Auto filled from Customer Request
+Survey ID :
 
-</span>
+{surveyData.id ? `SS-${surveyData.id}` : "Pending"}
 
 </div>
 
 
+</div>
+
 <div className="survey-grid">
 
-
-<div className="survey-field">
-
-
+{/* ==================================== */}
+{/* CUSTOMER REQUEST */}
+{/* ==================================== */}
 
 <div className="survey-field">
 
 <label>
 
-Customer Name
+Customer Request
 
 </label>
 
 <select
+
+className="customer-select"
 
 value={selectedCustomer}
 
@@ -82,7 +82,7 @@ e.target.value
 
 <option value="">
 
-Select Customer
+Select Customer Request
 
 </option>
 
@@ -100,7 +100,7 @@ value={customer.id}
 
 >
 
-{customer.company_name}
+{`CR-${customer.id} | ${customer.company_name}`}
 
 </option>
 
@@ -114,8 +114,31 @@ value={customer.id}
 
 </div>
 
+{/* ==================================== */}
+{/* COMPANY NAME */}
+{/* ==================================== */}
+
+<div className="survey-field">
+
+<label>
+
+Company Name
+
+</label>
+
+<input
+
+value={customer.company_name || ""}
+
+readOnly
+
+/>
+
 </div>
 
+{/* ==================================== */}
+{/* SITE */}
+{/* ==================================== */}
 
 <div className="survey-field">
 
@@ -125,52 +148,19 @@ Site / Plant
 
 </label>
 
-<select
+<input
 
-value={customer.site_address || ""}
+value={customer.plant_site_location || ""}
 
-onChange={(e)=>
+readOnly
 
-updateSection(
-
-"customer",
-
-"site_address",
-
-e.target.value
-
-)
-
-}
-
->
-
-{
-
-nearestHubs.map(
-
-item=>(
-
-<option
-
-key={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
+/>
 
 </div>
 
+{/* ==================================== */}
+{/* CONTACT PERSON */}
+{/* ==================================== */}
 
 <div className="survey-field">
 
@@ -184,24 +174,15 @@ Person Of Contact
 
 value={customer.contact_person || ""}
 
-onChange={(e)=>
-
-updateSection(
-
-"customer",
-
-"contact_person",
-
-e.target.value
-
-)
-
-}
+readOnly
 
 />
 
 </div>
 
+{/* ==================================== */}
+{/* CONTACT NUMBER */}
+{/* ==================================== */}
 
 <div className="survey-field">
 
@@ -213,32 +194,17 @@ Contact Number
 
 <input
 
-maxLength={10}
-
 value={customer.contact_number || ""}
 
-onChange={(e)=>{
-
-const value=e.target.value.replace(/\D/g,"");
-
-updateSection(
-
-"customer",
-
-"contact_number",
-
-value
-
-);
-
-}}
-
-placeholder="10 digits"
+readOnly
 
 />
 
 </div>
 
+{/* ==================================== */}
+{/* NEAREST HUB */}
+{/* ==================================== */}
 
 <div className="survey-field">
 
@@ -268,6 +234,12 @@ e.target.value
 
 >
 
+<option value="">
+
+Select
+
+</option>
+
 {
 
 nearestHubs.map(
@@ -277,6 +249,8 @@ item=>(
 <option
 
 key={item}
+
+value={item}
 
 >
 
@@ -294,6 +268,9 @@ key={item}
 
 </div>
 
+{/* ==================================== */}
+{/* URGENCY */}
+{/* ==================================== */}
 
 <div className="survey-field">
 
@@ -323,6 +300,12 @@ e.target.value
 
 >
 
+<option value="">
+
+Select
+
+</option>
+
 {
 
 urgencyOptions.map(
@@ -332,6 +315,8 @@ item=>(
 <option
 
 key={item}
+
+value={item}
 
 >
 
@@ -349,6 +334,9 @@ key={item}
 
 </div>
 
+{/* ==================================== */}
+{/* SURVEY DATE */}
+{/* ==================================== */}
 
 <div className="survey-field">
 
@@ -382,11 +370,10 @@ e.target.value
 
 </div>
 
-
 </div>
 
 </div>
 
-)
+);
 
 }

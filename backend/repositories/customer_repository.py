@@ -100,10 +100,16 @@ def create_customer(
 
         payload.layout_count,
 
+        cleaning_date=payload.cleaning_date,
+
+        cleaning_frequency=payload.cleaning_frequency,
+
 
         status=
 
         payload.status
+
+        
 
     )
 

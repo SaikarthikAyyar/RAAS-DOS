@@ -42,7 +42,7 @@ material_category
 
 sludge_type
 
-sludge_consistency
+sludge_hardness
 
 hazard_level
 

@@ -2,9 +2,13 @@ from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.staticfiles import StaticFiles
+
 from backend.api.customer_api import router as customer_router
 
 from backend.api.customer_media_api import router as customer_media_router
+
+from backend.api.report_api import router as report_router
 
 from backend.api.sales_survey_api import router as sales_survey_router
 
@@ -78,6 +82,8 @@ app.include_router(
     sales_survey_router
 
 )
+
+app.include_router(report_router)
 
 app.include_router(
 

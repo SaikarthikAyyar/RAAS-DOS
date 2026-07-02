@@ -17,7 +17,9 @@ useState({
 
 customer:{},
 
-requirement:{},
+requirement:{cleaning_date: "",
+
+cleaning_frequency: ""},
 
 uploads:{}
 

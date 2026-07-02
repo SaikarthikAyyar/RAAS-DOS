@@ -80,7 +80,9 @@ setSurveyData,
 
 updateSection,
 
-metrics
+metrics,
+
+canSubmit
 
 }
 
@@ -341,6 +343,10 @@ completion={metrics.completion}
 surveyData={surveyData}
 
 metrics={metrics}
+
+canSubmit={canSubmit}
+
+customerRequestId={selectedCustomer}
 
 />
 

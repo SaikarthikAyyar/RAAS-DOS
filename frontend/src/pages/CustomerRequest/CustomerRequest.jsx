@@ -4,6 +4,10 @@
 
 import "../../components/salesSurvey/SalesSurvey.css";
 
+import { useState } from "react";
+
+import { searchCustomer } from "../../services/customerService";
+
 import { useNavigate } from "react-router-dom";
 
 import useCustomerRequest from "../../hooks/useCustomerRequest";
@@ -51,6 +55,10 @@ const navigate=
 
 useNavigate();
 
+const [duplicateCustomer, setDuplicateCustomer] = useState(null);
+
+const [checking, setChecking] = useState(false);
+
 const{
 
 customerData,
@@ -65,12 +73,67 @@ updateMedia
 
 useCustomerRequest();
 
+async function checkExistingCustomer(companyName){
+
+if(
+
+!companyName ||
+
+companyName.trim()===""
+
+){
+
+setDuplicateCustomer(null);
+
+return;
+
+}
+
+try{
+
+setChecking(true);
+
+const result = await searchCustomer(companyName);
+
+setDuplicateCustomer(result);
+
+}
+
+catch{
+
+setDuplicateCustomer(null);
+
+}
+
+finally{
+
+setChecking(false);
+
+}
+
+}
+
 
 // ====================================
 // SUBMIT
 // ====================================
 
 async function submit(){
+if(duplicateCustomer){
+
+alert(
+
+`Customer already exists.
+
+Request ID : ${duplicateCustomer.customer_request_id}
+
+Status : ${duplicateCustomer.status}`
+
+);
+
+return;
+
+}
 
 try{
 
@@ -165,6 +228,12 @@ quote_basis:
 
 requirement.quote_basis,
 
+cleaning_date:
+    requirement.cleaning_date,
+
+cleaning_frequency:
+    requirement.cleaning_frequency,
+
 pain_point:
 
 requirement.pain_point,
@@ -257,6 +326,12 @@ return(
 customerData={customerData}
 
 updateSection={updateSection}
+
+checkExistingCustomer={checkExistingCustomer}
+
+duplicateCustomer={duplicateCustomer}
+
+checking={checking}
 
 />
 

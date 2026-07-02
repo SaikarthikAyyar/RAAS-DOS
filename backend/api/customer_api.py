@@ -44,6 +44,10 @@ from backend.services.customer_service import (
 
 )
 
+from backend.services.customer_service import (
+    search_customer
+)
+
 
 # ====================================
 # ROUTER
@@ -330,6 +334,32 @@ def customers(
     return get_customers_service(
 
         db
+
+    )
+
+# ====================================
+# SEARCH CUSTOMER
+# ====================================
+
+@router.get(
+
+    "/customer-search"
+
+)
+
+def customer_search(
+
+        company_name: str,
+
+        db: Session = Depends(get_db)
+
+):
+
+    return search_customer(
+
+        db,
+
+        company_name
 
     )
 

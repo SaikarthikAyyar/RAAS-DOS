@@ -43,11 +43,6 @@ export default function SectionF_Dewatering() {
 
                 </h2>
 
-                <span>
-
-                    Sales/customer observation
-
-                </span>
 
             </div>
 
@@ -82,7 +77,7 @@ export default function SectionF_Dewatering() {
 
                 <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
-                    <label>Dewatering Volume</label>
+                    <label>Dewatering Volume (m³)</label>
 
                     <input disabled={disabled} />
 

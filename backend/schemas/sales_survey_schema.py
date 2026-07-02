@@ -27,6 +27,8 @@ class SalesSurveySchema(BaseModel):
 
     survey_date:Optional[str]=None
 
+    plant_site_location: str
+
 
     # ====================================
     # SECTION B
@@ -34,11 +36,36 @@ class SalesSurveySchema(BaseModel):
 
     material_category:Optional[str]=None
 
-    consistency:Optional[str]=None
+    job_type: Optional[str] = None
+
+
 
     bulk_density:Optional[float]=None
 
     hazard_level:Optional[str]=None
+
+    cleaning_date: Optional[str] = None
+
+    cleaning_frequency: Optional[str] = None
+
+    sludge_hardness: Optional[str] = None
+
+    debris_level: Optional[str] = None
+
+    water_visibility: Optional[str] = None
+
+    pumpable: Optional[str] = None
+
+    average_output: Optional[float] = None
+
+    large_object_type: Optional[str] = None
+    ph_min: Optional[float] = None
+    ph_max: Optional[float] = None
+    flow_after_agitation: Optional[str] = None
+
+    temperature_range: Optional[str] = None
+
+    sample_available: Optional[str] = None
 
 
     # ====================================
@@ -46,6 +73,15 @@ class SalesSurveySchema(BaseModel):
     # ====================================
 
     estimated_volume:Optional[float]=None
+
+    tank_type: Optional[str] = None
+
+    tank_length: Optional[float] = None
+
+    tank_width: Optional[float] = None
+
+    tank_depth: Optional[float] = None
+
 
     opening_length:Optional[float]=None
 
@@ -67,6 +103,12 @@ class SalesSurveySchema(BaseModel):
 
     crane_available:Optional[str]=None
 
+    opening_height: Optional[float] = None
+
+    access_support: Optional[str] = None
+
+    customer_support: Optional[str] = None
+
 
     # ====================================
     # SECTION D
@@ -75,6 +117,8 @@ class SalesSurveySchema(BaseModel):
     power_available:Optional[str]=None
 
     water_available:Optional[str]=None
+
+    air_supply_available: Optional[str] = None
 
     confined_space:Optional[str]=None
 
@@ -91,6 +135,16 @@ class SalesSurveySchema(BaseModel):
     # ====================================
 
     discharge_pit_dimension: Optional[str] = None
+
+    discharge_medium: Optional[str] = None
+
+    disposal_route: Optional[str] = None
+
+    disposal_responsibility: Optional[str] = None
+
+    discharge_point_distance: Optional[float] = None
+
+    hose_route_bends: Optional[int] = None
 
 
     # ====================================

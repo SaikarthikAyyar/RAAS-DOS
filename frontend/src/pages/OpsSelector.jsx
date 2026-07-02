@@ -1,247 +1,165 @@
-import { useWorkflow } from "../contexts/WorkflowContext";
+// ====================================
+// IMPORTS
+// ====================================
 
-import { useState } from "react";
+import "../components/operations/Operations.css";
 
-export default function OpsSelector() {
+import useOpsSelector
 
-  const { jobs, updateJob } = useWorkflow();
+from "../hooks/useOpsSelector";
 
-  const [selectedJob, setSelectedJob] = useState("");
+import OpsInputs
 
-  const [ops, setOps] = useState({
+from "../components/operations/OpsInputs";
 
-    machine: "",
+import OpsDecision
 
-    serviceConfig: "",
+from "../components/operations/OpsDecision";
 
-    pump: "",
+import OpsDaysManpower
 
-    manpower: "",
+from "../components/operations/OpsDaysManpower";
 
-    days: ""
+import OpsActions
 
-  });
+from "../components/operations/OpsActions";
 
-  function saveOps() {
 
-    if (!selectedJob) {
+// ====================================
+// COMPONENT
+// ====================================
 
-      alert("Select a customer");
+export default function OpsSelector(){
 
-      return;
+const{
 
-    }
+surveys,
 
-    updateJob(
+selectedSurvey,
 
-      Number(selectedJob),
+setSelectedSurvey,
 
-      {
+opsData,
 
-        ops: {
+saveOps
 
-          ...ops
+}=
 
-        }
+useOpsSelector();
 
-      }
+return(
 
-    );
+<div className="ops-selector-page">
 
-    alert("Ops selected");
+<div className="ops-page-header">
 
-    setSelectedJob("");
+<h1>
 
-    setOps({
+Ops Selector
 
-      machine: "",
+</h1>
 
-      serviceConfig: "",
+<p>
 
-      pump: "",
+This screen pulls survey inputs and gives machine,
+pump, accessories, manpower, days and approval gate
+in one place.
 
-      manpower: "",
+</p>
 
-      days: ""
+</div>
 
-    });
 
-  }
+<div className="ops-selector-bar">
 
-  return (
+<select
 
-    <div>
+value={selectedSurvey}
 
-      <h1>Ops Selector</h1>
+onChange={(e)=>
 
-      <select
+setSelectedSurvey(
 
-        value={selectedJob}
+e.target.value
 
-        onChange={e => setSelectedJob(e.target.value)}
+)
 
-      >
+}
 
-        <option value="">
+className="ops-survey-select"
 
-          Select Customer
+>
 
-        </option>
+<option value="">
 
-        {
+Select Sales Survey
 
-          jobs
+</option>
 
-          .filter(
+{
 
-            job => job.survey.jobType
+surveys.map(
 
-          )
+survey=>(
 
-          .map(job => (
+<option
 
-            <option
+key={survey.id}
 
-              key={job.id}
+value={survey.id}
 
-              value={job.id}
+>
 
-            >
+{survey.label}
 
-              {job.customer}
+</option>
 
-            </option>
+)
 
-          ))
+)
 
-        }
+}
 
-      </select>
+</select>
 
-      <br /><br />
+</div>
 
-      <input
 
-        value={ops.machine}
+<div className="ops-grid">
 
-        placeholder="Machine"
+<OpsInputs
 
-        onChange={e =>
+inputs={opsData.inputs}
 
-          setOps({
+/>
 
-            ...ops,
+<OpsDecision
 
-            machine: e.target.value
+opsData={opsData}
 
-          })
+/>
 
-        }
+</div>
 
-      />
 
-      <br />
+<div className="ops-grid">
 
-      <input
+<OpsDaysManpower
 
-        value={ops.serviceConfig}
+opsData={opsData}
 
-        placeholder="Service Config"
+/>
 
-        onChange={e =>
+<OpsActions
 
-          setOps({
+saveOps={saveOps}
 
-            ...ops,
+/>
 
-            serviceConfig: e.target.value
+</div>
 
-          })
+</div>
 
-        }
-
-      />
-
-      <br />
-
-      <input
-
-        value={ops.pump}
-
-        placeholder="Pump"
-
-        onChange={e =>
-
-          setOps({
-
-            ...ops,
-
-            pump: e.target.value
-
-          })
-
-        }
-
-      />
-
-      <br />
-
-      <input
-
-        value={ops.manpower}
-
-        placeholder="Manpower"
-
-        onChange={e =>
-
-          setOps({
-
-            ...ops,
-
-            manpower: e.target.value
-
-          })
-
-        }
-
-      />
-
-      <br />
-
-      <input
-
-        value={ops.days}
-
-        placeholder="Days"
-
-        onChange={e =>
-
-          setOps({
-
-            ...ops,
-
-            days: e.target.value
-
-          })
-
-        }
-
-      />
-
-      <br /><br />
-
-      <button
-
-        onClick={saveOps}
-
-      >
-
-        Save Ops
-
-      </button>
-
-    </div>
-
-  );
+);
 
 }

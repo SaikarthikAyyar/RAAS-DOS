@@ -15,10 +15,14 @@ from backend.models.customer_requests import (
 
 )
 
+from fastapi import HTTPException
+
 
 # ====================================
 # CREATE CUSTOMER REQUEST
 # ====================================
+
+status="REQUEST_CREATED"
 
 def create_customer_request(
 
@@ -27,6 +31,42 @@ def create_customer_request(
         payload
 
 ):
+
+    existing = (
+
+        db.query(
+
+            CustomerRequest
+
+        ).filter(
+
+            CustomerRequest.company_name == payload.company_name,
+
+            CustomerRequest.status != "COMPLETED"
+
+        ).first()
+
+    )
+
+    if existing:
+
+        raise HTTPException(
+
+            status_code=409,
+
+            detail={
+
+                "message": "An active Customer Request already exists.",
+
+                "customer_request_id": existing.id,
+
+                "company_name": existing.company_name,
+
+                "status": existing.status
+
+            }
+
+        )
 
     return create_customer(
 
@@ -102,7 +142,7 @@ def get_sales_prefill(
             customer.company_name,
 
 
-            "site_address":
+            "plant_site_location":
 
             customer.plant_site_location,
 
@@ -142,7 +182,15 @@ def get_sales_prefill(
 
             "material_category":
 
-            customer.observed_material
+            customer.observed_material,
+
+            "cleaning_date":
+
+            customer.cleaning_date,
+
+            "cleaning_frequency":
+
+            customer.cleaning_frequency
 
         },
 
@@ -262,6 +310,46 @@ def get_all_customers(
         for customer in customers
 
     ]
+
+# ====================================
+# SEARCH CUSTOMER
+# ====================================
+
+def search_customer(
+
+        db,
+
+        company_name
+
+):
+
+    customer = (
+
+        db.query(
+
+            CustomerRequest
+
+        ).filter(
+
+            CustomerRequest.company_name.ilike(company_name)
+
+        ).first()
+
+    )
+
+    if not customer:
+
+        return None
+
+    return {
+
+        "customer_request_id": customer.id,
+
+        "company_name": customer.company_name,
+
+        "status": customer.status
+
+    }
 
 # ====================================
 # GET CUSTOMERS

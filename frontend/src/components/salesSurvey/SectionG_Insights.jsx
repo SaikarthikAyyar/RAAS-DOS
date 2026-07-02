@@ -79,11 +79,7 @@ export default function SectionG_Insights({
 
                 </h2>
 
-                <span>
 
-                    Context for quote wording
-
-                </span>
 
             </div>
 

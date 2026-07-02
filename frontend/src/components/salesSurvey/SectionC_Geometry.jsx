@@ -6,7 +6,9 @@ import {
 
 accessTypeOptions,
 
-tankTypeOptions
+tankTypeOptions,
+accessSupportOptions,
+customerSupportOptions
 
 }
 
@@ -67,11 +69,6 @@ C. Geometry, Access & Setup
 
 </h2>
 
-<span>
-
-Machine + method feasibility
-
-</span>
 
 </div>
 
@@ -100,7 +97,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Length / Dia"
+label="Length / Dia (m)"
 
 value={geometry.length_dia}
 
@@ -117,7 +114,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Width"
+label="Width (m)"
 
 value={geometry.width}
 
@@ -134,7 +131,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Sludge Depth"
+label="Sludge Depth (m)"
 
 value={geometry.sludge_depth}
 
@@ -170,7 +167,7 @@ updateSection={updateSection}
 
 <FieldReadOnly
 
-label="Estimated Volume"
+label="Estimated Volume (m³)"
 
 value={estimatedVolume}
 
@@ -181,7 +178,7 @@ unit="m³"
 
 <FieldInput
 
-label="Average Output"
+label="Average Output (m³/hr)"
 
 value={geometry.average_output}
 
@@ -200,7 +197,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Opening Length/Dia"
+label="Opening Length/Dia (mm)"
 
 value={geometry.opening_length}
 
@@ -217,7 +214,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Opening Width"
+label="Opening Width (mm)"
 
 value={geometry.opening_width}
 
@@ -234,7 +231,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Height from Ground"
+label="Height from Ground (m)"
 
 value={geometry.height_from_ground}
 
@@ -253,7 +250,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Drop to Floor / Sludge"
+label="Drop to Floor / Sludge (m)"
 
 value={geometry.drop_to_floor}
 
@@ -270,7 +267,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Setup Distance"
+label="Setup Distance (m)"
 
 value={geometry.setup_distance}
 
@@ -287,7 +284,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Vertical Lift"
+label="Vertical Lift (m)"
 
 value={geometry.vertical_lift}
 
@@ -306,7 +303,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Hose Distance"
+label="Hose Distance (m)"
 
 value={geometry.hose_distance}
 
@@ -323,7 +320,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Access Path Width"
+label="Access Path Width (m)"
 
 value={geometry.access_path_width}
 
@@ -370,50 +367,22 @@ updateSection={updateSection}
 {/* ROW 6 */}
 
 <FieldSelect
-
-label="Scaffolding Needed?"
-
-value={geometry.scaffolding_needed}
-
+label="Access Support"
+value={geometry.access_support}
 section="geometry"
-
-field="scaffolding_needed"
-
-options={[
-
-"Yes",
-
-"No"
-
-]}
-
+field="access_support"
+options={accessSupportOptions}
 updateSection={updateSection}
-
 />
 
 
 <FieldSelect
-
-label="Crane/Hydra Available?"
-
-value={geometry.crane_available}
-
+label="Customer Support Equipment"
+value={geometry.customer_support}
 section="geometry"
-
-field="crane_available"
-
-options={[
-
-"Yes",
-
-"No",
-
-"Unknown"
-
-]}
-
+field="customer_support"
+options={customerSupportOptions}
 updateSection={updateSection}
-
 />
 
 
@@ -421,7 +390,7 @@ updateSection={updateSection}
 
 <FieldReadOnly
 
-label="Equipment Reach"
+label="Equipment Reach (m)"
 
 value={equipmentReach}
 
@@ -432,7 +401,7 @@ unit="m"
 
 <FieldReadOnly
 
-label="Total Duration"
+label="Total Duration (hrs)"
 
 value={totalDuration}
 

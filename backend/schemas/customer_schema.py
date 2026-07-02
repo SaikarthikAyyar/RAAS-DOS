@@ -6,6 +6,8 @@ from pydantic import BaseModel
 
 from typing import Optional
 
+from datetime import datetime
+
 
 # ====================================
 # CUSTOMER REQUEST SCHEMA
@@ -89,3 +91,7 @@ class CustomerRequestSchema(BaseModel):
     # ====================================
 
     status: Optional[str] = "REQUESTED"
+
+    cleaning_date: datetime
+
+    cleaning_frequency: str

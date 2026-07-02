@@ -280,11 +280,11 @@ let pumpability=
 
 if(
 
-job.consistency==="Sticky"
+job.sludge_hardness==="Sticky"
 
 ||
 
-job.consistency==="Hard settled"
+job.sludge_hardness==="Hard settled"
 
 ){
 
@@ -297,11 +297,11 @@ pumpability=
 
 if(
 
-job.consistency==="Abrasive"
+job.sludge_hardness==="Abrasive"
 
 ||
 
-job.consistency==="Fibrous"
+job.sludge_hardness==="Fibrous"
 
 ){
 
@@ -426,92 +426,224 @@ packageName=
 
 
 // ====================================
+// SURVEY STRUCTURE
+// ====================================
+
+const SURVEY_STRUCTURE = {
+
+    customer: [
+
+        "company_name",
+        "plant_site_location",
+        "contact_person",
+        "contact_number",
+        "nearest_hub",
+        "urgency",
+        "survey_date"
+
+    ],
+
+    job: [
+
+        "job_type",
+        "material_category",
+        "cleaning_date",
+        "cleaning_frequency",
+        "sludge_hardness",
+        "debris_level",
+        "water_visibility",
+        "bulk_density",
+        "pumpable",
+        "large_object_type",
+        "hazard_level",
+        "ph_min",
+        "ph_max",
+        "flow_after_agitation",
+        "temperature_range",
+        "sample_available"
+
+    ],
+
+    geometry: [
+
+        "tank_type",
+        "length_dia",
+        "width",
+        "sludge_depth",
+        "estimated_volume",
+        "average_output",
+        "opening_length",
+        "opening_width",
+        "height_from_ground",
+        "drop_to_floor",
+        "setup_distance",
+        "vertical_lift",
+        "hose_distance",
+        "access_path_width",
+        "access_support",
+        "customer_support"
+
+    ],
+
+    safety: [
+
+        "power_available",
+        "water_available",
+        "air_supply_available",
+        "confined_space",
+        "ventilation_required",
+        "gas_testing_required",
+        "ehs_restriction",
+        "power_distance"
+
+    ],
+
+    pump: [
+
+        "target_flow",
+        "suction_depth",
+        "discharge_distance",
+        "discharge_height",
+        "debris_present",
+        "ph_condition",
+        "pump_power_source",
+        "discharge_pit_dimension",
+        "discharge_medium",
+        "disposal_route",
+        "disposal_responsibility",
+        "discharge_point_distance",
+        "hose_route_bends"
+
+    ],
+
+    dewatering: [
+
+        "dewatering_required",
+        "dewatering_volume",
+        "inlet_moisture",
+        "target_final_moisture",
+        "expected_final_form",
+        "visible_free_water",
+        "natural_settling",
+        "oily_emulsified",
+        "space_available",
+        "filtrate_route",
+        "moisture_guarantee",
+        "cake_handling_scope"
+
+    ],
+
+    insights: [
+
+        "customer_pain",
+        "shutdown_window",
+        "completion_deadline",
+        "photos"
+
+    ]
+
+};
+
+
+// ====================================
 // COMPLETENESS
 // ====================================
 
-const allValues=[
+const totalFields = Object.values(
 
-...Object.values(
-
-surveyData.customer || {}
-
-),
-
-...Object.values(
-
-surveyData.job || {}
-
-),
-
-...Object.values(
-
-surveyData.geometry || {}
-
-),
-
-...Object.values(
-
-surveyData.safety || {}
-
-),
-
-...Object.values(
-
-surveyData.pump || {}
-
-),
-
-...Object.values(
-
-surveyData.dewatering || {}
-
-),
-
-...Object.values(
-
-surveyData.insights || {}
+    SURVEY_STRUCTURE
 
 )
 
+.flat()
+
+.length;
+
+
+let filledFields = 0;
+
+
+Object.entries(
+
+    SURVEY_STRUCTURE
+
+).forEach(
+
+    ([section, fields]) => {
+
+        fields.forEach(field => {
+
+            const value = surveyData[section]?.[field];
+
+            if (
+
+                value !== null &&
+
+                value !== undefined &&
+
+                value !== ""
+
+            ) {
+
+                filledFields++;
+
+            }
+
+        });
+
+    }
+
+);
+
+
+
+
+
+
+
+
+
+
+
+const requiredFields = [
+
+    // Section A
+    surveyData.customer?.company_name,
+    surveyData.customer?.plant_site_location,
+    surveyData.customer?.contact_person,
+    surveyData.customer?.contact_number,
+    surveyData.customer?.nearest_hub,
+    surveyData.customer?.urgency,
+    surveyData.customer?.survey_date,
+
+    // Section B
+    surveyData.job?.job_type,
+    surveyData.job?.material_category,
+    surveyData.job?.sludge_hardness,
+    surveyData.job?.debris_level,
+    surveyData.job?.cleaning_date,
+    surveyData.job?.cleaning_frequency,
+
+    // Section C
+    surveyData.geometry?.tank_type,
+    surveyData.geometry?.length_dia,
+    surveyData.geometry?.width,
+    surveyData.geometry?.sludge_depth,
+
+
 ];
 
+const canSubmit = requiredFields.every(value =>
+    value !== null &&
+    value !== undefined &&
+    value !== ""
+);
 
-const filledFields=
-
-allValues.filter(
-
-value=>
-
-value!==null
-
-&&
-
-value!==undefined
-
-&&
-
-value!==""
-
-).length;
-
-
-const totalFields=
-
-45;
-
-
-const completion=
-
-Math.round(
-
-(
-
-filledFields/
-
-totalFields
-
-)*100
-
+const completion = Math.min(
+    100,
+    Math.round(
+        (filledFields / totalFields) * 100
+    )
 );
 
 
@@ -554,7 +686,9 @@ setSurveyData,
 
 updateSection,
 
-metrics
+metrics,
+
+canSubmit
 
 };
 

@@ -116,7 +116,7 @@ def map_customer_to_sales(
             customer.company_name,
 
 
-            "site_address":
+            "plant_site_location":
 
             customer.plant_site_location,
 

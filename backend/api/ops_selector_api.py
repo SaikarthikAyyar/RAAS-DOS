@@ -21,6 +21,17 @@ from backend.services.ops_selector_service import (
 
 )
 
+from backend.services.sales_survey_service import (
+
+    list_sales_surveys_request
+
+)
+
+from backend.services.ops_selector_service import (
+
+    get_ops_selection_preview
+
+)
 
 # ====================================
 # ROUTER
@@ -74,3 +85,72 @@ def ops_selector(
         print(e)
 
         raise e
+
+
+# ====================================
+# LIST SALES SURVEYS
+# ====================================
+
+@router.get(
+    "/ops-selector/surveys"
+)
+def list_ops_surveys(
+        db=Depends(get_db)
+):
+
+    surveys = list_sales_surveys_request(db)
+
+    return [
+
+        {
+
+            "id":
+
+                survey["id"],
+
+            "label":
+
+                f"CR-{survey['customer_request_id']}"
+
+                f" | "
+
+                f"SS-{survey['id']}"
+
+                f" | "
+
+                f"{survey['plant_site_location']}"
+
+        }
+
+        for survey in surveys
+
+    ]
+
+
+# ====================================
+# OPS PREVIEW
+# ====================================
+
+@router.get(
+
+    "/ops-selector/prefill/{sales_survey_id}"
+
+)
+
+def get_ops_preview(
+
+        sales_survey_id: int,
+
+        db=Depends(get_db)
+
+):
+
+    return get_ops_selection_preview(
+
+        db,
+
+        sales_survey_id
+
+    )
+    
+

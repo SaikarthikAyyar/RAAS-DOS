@@ -54,10 +54,36 @@ class SalesSurvey(Base):
         Date
     )
 
+    plant_site_location = Column(
+
+        String(150)
+
+    )
+
 
     # ====================================
     # SECTION B
     # ====================================
+
+    tank_type = Column(
+        String(100)
+    )
+
+    tank_length = Column(
+        Float
+    )
+
+    tank_width = Column(
+        Float
+    )
+
+    tank_depth = Column(
+        Float
+    )
+
+    job_type = Column(
+        String(100)
+    )
 
     material_category = Column(
         String(100)
@@ -67,15 +93,13 @@ class SalesSurvey(Base):
         String(100)
     )
 
-    consistency = Column(
-        String(100)
-    )
+
 
     estimated_volume = Column(
         Float
     )
 
-    average_output_target = Column(
+    average_output = Column(
         Float
     )
 
@@ -90,6 +114,52 @@ class SalesSurvey(Base):
     hazard_level = Column(
         String(100)
     )
+
+    temperature_range = Column(
+        String(100)
+    )
+
+    sample_available = Column(
+        String(100)
+    )
+
+    # ====================================
+    # CLEANING HISTORY
+    # ====================================
+
+    cleaning_date = Column(
+        Date
+    )
+
+    cleaning_frequency = Column(
+        String(100)
+    )
+
+    # ====================================
+    # SITE CONDITION
+    # ====================================
+
+    sludge_hardness = Column(
+        String(100)
+    )
+
+    debris_level = Column(
+        String(100)
+    )
+
+    water_visibility = Column(
+        String(100)
+    )
+
+    pumpable = Column(String(100))
+
+    large_object_type = Column(String(100))
+
+    ph_min = Column(Float)
+
+    ph_max = Column(Float)
+
+    flow_after_agitation = Column(String(100))
 
 
     # ====================================
@@ -137,6 +207,15 @@ class SalesSurvey(Base):
     )
 
 
+    access_support = Column(
+        String(100)
+    )
+
+    customer_support = Column(
+        String(100)
+    )
+
+
     # ====================================
     # SECTION D
     # ====================================
@@ -165,6 +244,8 @@ class SalesSurvey(Base):
         String(100)
     )
 
+    air_supply_available = Column(String(100))
+
 
     # ====================================
     # SECTION E
@@ -184,6 +265,24 @@ class SalesSurvey(Base):
 
     pump_power_source = Column(
         String(100)
+    )
+
+    discharge_medium = Column(String(100))
+
+    disposal_route = Column(
+        String(100)
+    )
+
+    disposal_responsibility = Column(
+        String(100)
+    )
+
+    discharge_point_distance = Column(
+        Float
+    )
+
+    hose_route_bends = Column(
+        Integer
     )
 
 

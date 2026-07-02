@@ -20,7 +20,7 @@ class OpsSelection(Base):
 
 
     # --------------------------------
-    # Primary key
+    # Primary Key
     # --------------------------------
 
     id = Column(
@@ -31,13 +31,12 @@ class OpsSelection(Base):
 
 
     # --------------------------------
-    # Workflow connection
+    # Workflow Connection
     # Sales Survey -> Ops Selector
     # --------------------------------
 
     sales_survey_id = Column(
         Integer,
-
         ForeignKey(
             "sales_surveys.id"
         )
@@ -45,7 +44,16 @@ class OpsSelection(Base):
 
 
     # --------------------------------
-    # Operational feasibility
+    # Engine Version
+    # --------------------------------
+
+    ops_engine_version = Column(
+        String(20)
+    )
+
+
+    # --------------------------------
+    # Operational Feasibility
     # --------------------------------
 
     doability = Column(
@@ -54,22 +62,25 @@ class OpsSelection(Base):
 
 
     # --------------------------------
-    # Service recommendation
+    # Engineering Recommendation
     # --------------------------------
 
     service_configuration = Column(
-        String
+        String(100)
     )
 
 
     recommended_machine = Column(
-        String(150)
+        String(50)
     )
 
 
     pump_hose_package = Column(
         String(150)
     )
+
+
+
 
 
     accessories = Column(
@@ -83,7 +94,7 @@ class OpsSelection(Base):
 
 
     # --------------------------------
-    # Duration planning
+    # Duration Planning
     # --------------------------------
 
     mobilisation_days = Column(
@@ -112,7 +123,7 @@ class OpsSelection(Base):
 
 
     # --------------------------------
-    # Resource planning
+    # Resource Planning
     # --------------------------------
 
     manpower_required = Column(
@@ -121,7 +132,7 @@ class OpsSelection(Base):
 
 
     # --------------------------------
-    # Internal workflow
+    # Internal Workflow
     # --------------------------------
 
     approval_gate = Column(
@@ -131,4 +142,9 @@ class OpsSelection(Base):
 
     internal_next_action = Column(
         String(200)
+    )
+
+
+    selection_reason = Column(
+        String(500)
     )

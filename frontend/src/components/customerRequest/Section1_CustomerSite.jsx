@@ -13,7 +13,13 @@ export default function Section1_CustomerSite({
 
 customerData,
 
-updateSection
+updateSection,
+
+checkExistingCustomer,
+
+duplicateCustomer,
+
+checking
 
 }){
 
@@ -58,6 +64,12 @@ section="customer"
 field="company_name"
 
 updateSection={updateSection}
+
+checkExistingCustomer={checkExistingCustomer}
+
+duplicateCustomer={duplicateCustomer}
+
+checking={checking}
 
 />
 
@@ -164,9 +176,17 @@ section,
 
 field,
 
-updateSection
+updateSection,
+
+checkExistingCustomer,
+
+duplicateCustomer,
+
+checking
 
 }){
+
+const isCompanyField = field==="company_name";
 
 return(
 
@@ -182,7 +202,7 @@ return(
 
 value={value || ""}
 
-onChange={(e)=>
+onChange={(e)=>{
 
 updateSection(
 
@@ -192,15 +212,117 @@ field,
 
 e.target.value
 
-)
+);
+
+if(isCompanyField){
+
+checkExistingCustomer(
+
+e.target.value
+
+);
 
 }
 
+}}
+
 />
+
+{
+
+isCompanyField && checking && (
+
+<div
+
+style={{
+
+fontSize:"12px",
+
+color:"#666",
+
+marginTop:"5px"
+
+}}
+
+>
+
+Checking customer...
 
 </div>
 
 )
+
+}
+
+{
+
+isCompanyField && duplicateCustomer && (
+
+<div
+
+style={{
+
+marginTop:"8px",
+
+padding:"10px",
+
+background:"#fff4e5",
+
+border:"1px solid #ff9800",
+
+borderRadius:"6px",
+
+fontSize:"13px"
+
+}}
+
+>
+
+<div>
+
+<strong>
+
+Customer already exists
+
+</strong>
+
+</div>
+
+<div>
+
+Request ID :
+
+{" "}
+
+{duplicateCustomer.customer_request_id}
+
+</div>
+
+<div>
+
+Status :
+
+{" "}
+
+{duplicateCustomer.status}
+
+</div>
+
+<div>
+
+Submission is disabled until this request is completed.
+
+</div>
+
+</div>
+
+)
+
+}
+
+</div>
+
+);
 
 }
 

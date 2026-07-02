@@ -16,6 +16,14 @@ from backend.services.sales_survey_service import (
     create_sales_survey_request
 )
 
+from backend.services.sales_survey_service import (
+
+    get_sales_survey_request,
+
+    list_sales_surveys_request
+
+)
+
 
 # ====================================
 # ROUTER
@@ -74,3 +82,66 @@ def create_survey(
         payload
 
     )
+
+
+# ====================================
+# LIST SALES SURVEYS
+# ====================================
+
+@router.get(
+
+    "/sales-surveys/list"
+
+)
+
+def list_sales_surveys(
+
+        db=Depends(
+
+            get_db
+
+        )
+
+):
+
+    return list_sales_surveys_request(
+
+        db
+
+    )
+
+
+# ====================================
+# GET SALES SURVEY
+# ====================================
+
+@router.get(
+
+    "/sales-surveys/{sales_survey_id}"
+
+)
+
+def get_sales_survey(
+
+        sales_survey_id: int,
+
+        db=Depends(
+
+            get_db
+
+        )
+
+):
+
+    return get_sales_survey_request(
+
+        db,
+
+        sales_survey_id
+
+    )
+
+
+
+
+

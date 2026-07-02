@@ -19,7 +19,12 @@ export default function SurveyActions({
 
 surveyData,
 
-metrics
+metrics,
+
+canSubmit,
+
+customerRequestId
+
 
 }){
 
@@ -29,13 +34,7 @@ async function submitSurvey(){
 try{
 
 
-const customerRequestId=
 
-localStorage.getItem(
-
-"customerRequestId"
-
-);
 
 
 const payload={
@@ -64,6 +63,10 @@ new Date()
 
 ),
 
+plant_site_location:
+
+surveyData.customer?.plant_site_location,
+
 
 // ====================================
 // SECTION B
@@ -74,9 +77,7 @@ material_category:
 surveyData.job?.material_category,
 
 
-consistency:
 
-surveyData.job?.consistency,
 
 
 bulk_density:
@@ -93,6 +94,36 @@ surveyData.job?.bulk_density
 hazard_level:
 
 surveyData.job?.hazard_level,
+
+sludge_hardness:
+surveyData.job?.sludge_hardness,
+
+debris_level:
+surveyData.job?.debris_level,
+
+water_visibility:
+surveyData.job?.water_visibility,
+
+pumpable:
+surveyData.job?.pumpable,
+
+large_object_type:
+surveyData.job?.large_object_type,
+
+ph_min:
+Number(surveyData.job?.ph_min) || null,
+
+ph_max:
+Number(surveyData.job?.ph_max) || null,
+
+flow_after_agitation:
+surveyData.job?.flow_after_agitation,
+
+temperature_range:
+surveyData.job?.temperature_range,
+
+sample_available:
+surveyData.job?.sample_available,
 
 
 // ====================================
@@ -196,14 +227,12 @@ surveyData.geometry?.access_path_width
 || null,
 
 
-scaffolding_needed:
 
-surveyData.geometry?.scaffolding_needed,
+access_support:
+surveyData.geometry?.access_support,
 
-
-crane_available:
-
-surveyData.geometry?.crane_available,
+customer_support:
+surveyData.geometry?.customer_support,
 
 
 // ====================================
@@ -239,6 +268,9 @@ ehs_restriction:
 
 surveyData.safety?.ehs_restriction,
 
+air_supply_available:
+surveyData.safety?.air_supply_available,
+
 // ====================================
 // SECTION E
 // ====================================
@@ -246,6 +278,25 @@ surveyData.safety?.ehs_restriction,
 discharge_pit_dimension:
 
 surveyData.pump?.discharge_pit_dimension,
+
+discharge_medium:
+surveyData.pump?.discharge_medium,
+
+disposal_route:
+surveyData.pump?.disposal_route,
+
+disposal_responsibility:
+surveyData.pump?.disposal_responsibility,
+
+discharge_point_distance:
+Number(
+    surveyData.pump?.discharge_point_distance
+) || null,
+
+hose_route_bends:
+Number(
+    surveyData.pump?.hose_route_bends
+) || null,
 
 
 // ====================================
@@ -296,11 +347,13 @@ return(
 
 className="survey-btn save-btn"
 
+disabled={!canSubmit}
+
 onClick={submitSurvey}
 
 >
 
-Save Survey
+Submit Survey
 
 </button>
 

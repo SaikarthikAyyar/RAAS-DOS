@@ -12,6 +12,8 @@ from sqlalchemy import Float
 
 from sqlalchemy import Boolean
 
+from sqlalchemy import DateTime
+
 from backend.database.tables import Base
 
 
@@ -219,5 +221,17 @@ class CustomerRequest(Base):
         String(50),
 
         default="REQUESTED"
+
+    )
+
+    cleaning_date = Column(
+
+        DateTime
+
+    )
+
+    cleaning_frequency = Column(
+
+        String(100)
 
     )

@@ -705,4 +705,38 @@ height:320px;
 
 }
 
+.customer-select{
+
+    height:42px;
+
+}
+
+.survey-header{
+
+    position:relative;
+
+}
+
+.survey-id{
+
+    position:absolute;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    font-weight:600;
+
+    font-size:15px;
+
+    color:#0056b3;
+
+}
+
+.survey-btn:disabled{
+
+    opacity:0.5;
+    cursor:not-allowed;
+
+}
 

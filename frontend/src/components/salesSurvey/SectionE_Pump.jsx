@@ -8,7 +8,11 @@ debrisOptions,
 
 phOptions,
 
-pumpPowerOptions
+pumpPowerOptions,
+dischargeMediumOptions,
+
+disposalRouteOptions,
+disposalResponsibilityOptions
 
 }
 
@@ -44,11 +48,6 @@ E. Pump Selection Inputs
 
 </h2>
 
-<span>
-
-Needed to reduce pump discussions
-
-</span>
 
 </div>
 
@@ -253,6 +252,50 @@ updateSection={updateSection}
 
 />
 
+<FieldSelect
+    label="Discharge Medium"
+    value={pump.discharge_medium}
+    section="pump"
+    field="discharge_medium"
+    options={dischargeMediumOptions}
+    updateSection={updateSection}
+/>
+
+<FieldSelect
+label="Disposal Route"
+value={pump.disposal_route}
+section="pump"
+field="disposal_route"
+options={disposalRouteOptions}
+updateSection={updateSection}
+/>
+
+<FieldSelect
+label="Disposal Responsibility"
+value={pump.disposal_responsibility}
+section="pump"
+field="disposal_responsibility"
+options={disposalResponsibilityOptions}
+updateSection={updateSection}
+/>
+
+<FieldInput
+label="Discharge Point Distance"
+value={pump.discharge_point_distance}
+section="pump"
+field="discharge_point_distance"
+unit="m"
+updateSection={updateSection}
+/>
+
+<FieldInput
+label="Hose Route Bends"
+value={pump.hose_route_bends}
+section="pump"
+field="hose_route_bends"
+updateSection={updateSection}
+/>
+
 
 </div>
 
@@ -330,5 +373,59 @@ unit && (
 </div>
 
 )
+
+}
+
+function FieldSelect({
+
+    label,
+
+    value,
+
+    section,
+
+    field,
+
+    options,
+
+    updateSection
+
+}){
+
+    return(
+
+        <div className="survey-field">
+
+            <label>{label}</label>
+
+            <select
+                value={value || ""}
+                onChange={(e)=>
+                    updateSection(
+                        section,
+                        field,
+                        e.target.value
+                    )
+                }
+            >
+
+                <option value="">
+                    Select
+                </option>
+
+                {options.map(item=>(
+                    <option
+                        key={item}
+                        value={item}
+                    >
+                        {item}
+                    </option>
+                ))}
+
+            </select>
+
+        </div>
+
+    )
 
 }

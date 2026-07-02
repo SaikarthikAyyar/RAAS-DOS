@@ -12,16 +12,11 @@ export const nearestHubs=[
 
 ];
 
-export const urgencyOptions=[
-
-"Immediate / breakdown",
-
-"Within 24 hrs",
-
-"Within 3 days",
-
-"Within 1 week"
-
+export const urgencyOptions = [
+    "Immediate",
+    "1 Week",
+    "15 Days",
+    "1 Month"
 ];
 
 
@@ -85,7 +80,7 @@ export const materialCategories=[
 ];
 
 
-export const consistencyOptions=[
+export const sludge_hardnessOptions=[
 
 "Free flowing",
 
@@ -169,6 +164,14 @@ export const yesNoUnknown=[
 
 "Unknown"
 
+];
+
+export const waterVisibilityOptions = [
+    "Clear",
+    "Slightly Turbid",
+    "Moderately Turbid",
+    "Highly Turbid",
+    "Opaque"
 ];
 
 
@@ -342,5 +345,126 @@ export const equipmentNearbyOptions=[
 "No",
 
 "Unknown"
+
+];
+
+export const dischargeMediumOptions = [
+
+    "Drain",
+
+    "ETP",
+
+    "STP",
+
+    "Tanker",
+
+    "Container",
+
+    "Dewatering Bags",
+
+    "Filter Press",
+
+    "Customer Designated Area",
+
+    "Others"
+
+];
+
+// ====================================
+// TEMPERATURE RANGE
+// ====================================
+
+export const temperatureRangeOptions = [
+
+    "Ambient",
+
+    "Hot (40°C - 70°C)",
+
+    "Very Hot (>70°C)",
+
+    "Cold (<10°C)"
+
+];
+
+
+// ====================================
+// SAMPLE AVAILABLE
+// ====================================
+
+export const sampleAvailabilityOptions = [
+
+    "Yes",
+
+    "No"
+
+];
+
+
+// ====================================
+// ACCESS SUPPORT
+// ====================================
+
+export const accessSupportOptions = [
+
+    "None",
+
+    "Scaffolding",
+
+    "Working Platform",
+
+    "Customer Provided"
+
+];
+
+
+// ====================================
+// CUSTOMER SUPPORT
+// ====================================
+
+export const customerSupportOptions = [
+
+    "None",
+
+    "Crane",
+
+    "Hydra",
+
+    "Forklift"
+
+];
+
+
+// ====================================
+// DISPOSAL ROUTE
+// ====================================
+
+export const disposalRouteOptions = [
+
+    "ETP",
+
+    "STP",
+
+    "Drain",
+
+    "Tanker",
+
+    "Filter Press",
+
+    "Customer Designated Area",
+
+    "Others"
+
+];
+
+
+// ====================================
+// DISPOSAL RESPONSIBILITY
+// ====================================
+
+export const disposalResponsibilityOptions = [
+
+    "RAAS",
+
+    "Customer"
 
 ];

@@ -2,6 +2,8 @@
 # IMPORTS
 # ====================================
 
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -13,28 +15,34 @@ class OpsSelectorSchema(BaseModel):
 
     sales_survey_id: int
 
-    doability: str
+    ops_engine_version: Optional[str] = None
 
-    service_configuration: str
+    doability: Optional[str] = None
 
-    recommended_machine: str
+    service_configuration: Optional[str] = None
 
-    pump_hose_package: str
+    recommended_machine: Optional[str] = None
 
-    accessories: str
+    pump_hose_package: Optional[str] = None
 
-    recommended_package: str
+    accessories: Optional[str] = None
 
-    mobilisation_days: int
+    recommended_package: Optional[str] = None
 
-    setup_days: int
+    mobilisation_days: Optional[int] = None
 
-    execution_days: int
+    setup_days: Optional[int] = None
 
-    demob_days: int
+    execution_days: Optional[int] = None
 
-    manpower_required: int
+    demob_days: Optional[int] = None
 
-    approval_gate: str
+    total_job_days: Optional[int] = None
 
-    internal_next_action: str
+    manpower_required: Optional[int] = None
+
+    approval_gate: Optional[str] = None
+
+    internal_next_action: Optional[str] = None
+
+    selection_reason: Optional[str] = None

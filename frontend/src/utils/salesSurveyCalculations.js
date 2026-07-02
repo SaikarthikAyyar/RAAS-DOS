@@ -113,7 +113,7 @@ function calculatePumpability(
 
     const hardness =
 
-    job.consistency || "";
+    job.sludge_hardness || "";
 
 
     const debris =
