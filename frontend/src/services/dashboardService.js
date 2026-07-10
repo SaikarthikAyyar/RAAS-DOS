@@ -43,7 +43,7 @@ export async function getDashboard(
 
     const params = new URLSearchParams({
 
-        start_customer_id: 19
+        start_customer_id: startCustomerId
 
     });
 
