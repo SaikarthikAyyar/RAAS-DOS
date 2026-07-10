@@ -58,7 +58,7 @@ Survey ID :
 
 <label>
 
-Customer Request
+Customer Request*
 
 </label>
 
@@ -122,7 +122,7 @@ value={customer.id}
 
 <label>
 
-Company Name
+Company Name*
 
 </label>
 
@@ -144,7 +144,7 @@ readOnly
 
 <label>
 
-Site / Plant
+Site / Plant*
 
 </label>
 
@@ -166,7 +166,7 @@ readOnly
 
 <label>
 
-Person Of Contact
+Person Of Contact*
 
 </label>
 
@@ -188,7 +188,7 @@ readOnly
 
 <label>
 
-Contact Number
+Contact Number*
 
 </label>
 
@@ -210,7 +210,7 @@ readOnly
 
 <label>
 
-Nearest Hub
+Nearest Hub*
 
 </label>
 
@@ -276,7 +276,7 @@ value={item}
 
 <label>
 
-Urgency
+Urgency*
 
 </label>
 
@@ -342,7 +342,7 @@ value={item}
 
 <label>
 
-Survey Date
+Survey Date*
 
 </label>
 
