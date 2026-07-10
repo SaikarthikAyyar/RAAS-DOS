@@ -13,35 +13,23 @@ import { useNavigate } from "react-router-dom";
 import useCustomerRequest from "../../hooks/useCustomerRequest";
 
 import {
-
-createCustomerRequest
-
-}
-
-from "../../services/customerService";
+  createCustomerRequest
+} from "../../services/customerService";
 
 import {
-
-uploadMedia
-
-}
-
-from "../../services/customerMediaService";
+  uploadMedia
+} from "../../services/customerMediaService";
 
 import Section1_CustomerSite
-
 from "../../components/customerRequest/Section1_CustomerSite";
 
 import Section2_RequirementBasics
-
 from "../../components/customerRequest/Section2_RequirementBasics";
 
 import Section3_Uploads
-
 from "../../components/customerRequest/Section3_Uploads";
 
 import CustomerActions
-
 from "../../components/customerRequest/CustomerActions";
 
 
@@ -51,21 +39,17 @@ from "../../components/customerRequest/CustomerActions";
 
 export default function CustomerRequest(){
 
-const navigate=
+  const navigate = useNavigate();
 
 useNavigate();
 
-const [duplicateCustomer, setDuplicateCustomer] = useState(null);
-
-const [checking, setChecking] = useState(false);
-
 const{
 
-customerData,
+    customerData,
 
-updateSection,
+    updateSection,
 
-updateMedia
+    updateMedia
 
 }
 
@@ -73,253 +57,148 @@ updateMedia
 
 useCustomerRequest();
 
-async function checkExistingCustomer(companyName){
 
-if(
-
-!companyName ||
-
-companyName.trim()===""
-
-){
-
-setDuplicateCustomer(null);
-
-return;
-
-}
-
-try{
-
-setChecking(true);
-
-const result = await searchCustomer(companyName);
-
-setDuplicateCustomer(result);
-
-}
-
-catch{
-
-setDuplicateCustomer(null);
-
-}
-
-finally{
-
-setChecking(false);
-
-}
-
-}
-
-
-// ====================================
-// SUBMIT
-// ====================================
+  // ====================================
+  // SUBMIT
+  // ====================================
 
 async function submit(){
-if(duplicateCustomer){
 
-alert(
+    try{
 
-`Customer already exists.
+      const customer =
+        customerData.customer || {};
 
-Request ID : ${duplicateCustomer.customer_request_id}
+      const requirement =
+        customerData.requirement || {};
 
-Status : ${duplicateCustomer.status}`
+      const uploads =
+        customerData.uploads || {};
 
-);
+      const payload = {
 
-return;
+        // ====================================
+        // CUSTOMER
+        // ====================================
 
-}
+        company_name:
+          customer.company_name,
 
-try{
+        plant_site_location:
+          customer.plant_site_location,
 
-const customer=
+        contact_person:
+          customer.contact_person,
 
-customerData.customer || {};
+        contact_number:
+          customer.contact_number,
 
-const requirement=
+        nearest_city_hub:
+          customer.nearest_city_hub,
 
-customerData.requirement || {};
+        urgency:
+          customer.urgency,
 
-const uploads=
+        // ====================================
+        // REQUIREMENT
+        // ====================================
 
-customerData.uploads || {};
+        service_requirement_type:
+          requirement.service_requirement_type,
 
+        observed_material:
+          requirement.observed_material,
 
-const payload={
+        estimated_quantity_known:
+          requirement.estimated_quantity_known,
 
-company_name:
+        tank_type:
+          requirement.tank_type,
 
-customer.company_name,
+        approx_length_dia:
+          Number(requirement.approx_length_dia) || null,
 
-plant_site_location:
+        approx_width:
+          Number(requirement.approx_width) || null,
 
-customer.plant_site_location,
+        approx_depth:
+          Number(requirement.approx_depth) || null,
 
-contact_person:
+        access_opening_type:
+          requirement.access_opening_type,
 
-customer.contact_person,
+        can_place_equipment_nearby:
+          requirement.can_place_equipment_nearby?.includes("Yes"),
 
-contact_number:
-
-customer.contact_number,
-
-nearest_city_hub:
-
-customer.nearest_city_hub,
-
-urgency:
-
-customer.urgency,
-
-service_requirement_type:
-
-requirement.service_requirement_type,
-
-observed_material:
-
-requirement.observed_material,
-
-estimated_quantity_known:
-
-requirement.estimated_quantity_known,
-
-approx_length_dia:
-
-Number(
-
-requirement.approx_length_dia
-
-)||null,
-
-approx_width:
-
-Number(
-
-requirement.approx_width
-
-)||null,
-
-approx_depth:
-
-Number(
-
-requirement.approx_depth
-
-)||null,
-
-access_opening_type:
-
-requirement.access_opening_type,
-
-can_place_equipment_nearby:
-
-requirement.can_place_equipment_nearby?.includes(
-
-"Yes"
-
-),
-
-quote_basis:
-
-requirement.quote_basis,
-
-cleaning_date:
-    requirement.cleaning_date,
-
-cleaning_frequency:
-    requirement.cleaning_frequency,
+        quote_basis:
+          requirement.quote_basis,
 
 pain_point:
 
 requirement.pain_point,
 
-photo_count:
+        // ====================================
+        // MEDIA COUNTS
+        // ====================================
 
-uploads.photos?.length || 0,
+        photo_count:
+          uploads.photos?.length || 0,
 
-video_count:
+        video_count:
+          uploads.videos?.length || 0,
 
-uploads.videos?.length || 0,
+        layout_count:
+          uploads.layouts?.length || 0
 
-layout_count:
+      };
 
-uploads.layouts?.length || 0
+      console.log("PAYLOAD", payload);
 
-};
+      const response =
+        await createCustomerRequest(payload);
 
+      console.log("API RESPONSE", response);
 
-console.log(
+      if(!response?.id){
 
-payload
+        alert("Customer Request creation failed.");
 
-);
+        return;
 
+      }
 
-const response=
+      const customerId = response.id;
 
-await createCustomerRequest(
+      localStorage.setItem(
+        "customerRequestId",
+        customerId
+      );
 
-payload
+      await uploadMedia(
+        customerId,
+        uploads
+      );
 
-);
+      navigate("/sales-survey");
 
+    }
 
-const customerId=
+    catch(error){
 
-response.id;
+      console.error(error);
 
+    }
 
-localStorage.setItem(
-
-"customerRequestId",
-
-customerId
-
-);
-
-
-await uploadMedia(
-
-customerId,
-
-uploads
-
-);
-
-
-navigate(
-
-"/sales-survey"
-
-);
-
-}
-
-catch(error){
-
-console.log(
-
-error
-
-);
-
-}
-
-}
+  }
 
 
-// ====================================
-// UI
-// ====================================
+  // ====================================
+  // UI
+  // ====================================
 
-return(
+  return(
 
-<div className="sales-survey-page">
+    <div className="sales-survey-page">
 
 <Section1_CustomerSite
 
@@ -327,38 +206,24 @@ customerData={customerData}
 
 updateSection={updateSection}
 
-checkExistingCustomer={checkExistingCustomer}
-
-duplicateCustomer={duplicateCustomer}
-
-checking={checking}
-
 />
 
-<Section2_RequirementBasics
+      <Section2_RequirementBasics
+        customerData={customerData}
+        updateSection={updateSection}
+      />
 
-customerData={customerData}
+      <Section3_Uploads
+        customerData={customerData}
+        updateMedia={updateMedia}
+      />
 
-updateSection={updateSection}
+      <CustomerActions
+        submit={submit}
+      />
 
-/>
+    </div>
 
-<Section3_Uploads
-
-customerData={customerData}
-
-updateMedia={updateMedia}
-
-/>
-
-<CustomerActions
-
-submit={submit}
-
-/>
-
-</div>
-
-);
+  );
 
 }

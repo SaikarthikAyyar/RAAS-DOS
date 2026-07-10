@@ -60,22 +60,18 @@ router = APIRouter()
 # CREATE CUSTOMER REQUEST
 # ====================================
 
+# ====================================
+# CREATE CUSTOMER REQUEST
+# ====================================
+
 @router.post("/customer-request")
-
 def customer_request(
-
         payload: CustomerRequestSchema,
-
         db: Session = Depends(get_db)
-
 ):
-
     customer = create_customer_request(
-
         db,
-
         payload
-
     )
 
     return customer
