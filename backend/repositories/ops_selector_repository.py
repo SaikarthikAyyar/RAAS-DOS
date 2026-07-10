@@ -49,6 +49,9 @@ def create_ops_selection(
 
     ops = OpsSelection(
 
+        customer_request_id=
+        payload.customer_request_id,
+
         sales_survey_id=payload.sales_survey_id,
 
         doability=payload.doability,
@@ -82,6 +85,8 @@ def create_ops_selection(
         selection_reason=
 
         payload.selection_reason,
+
+        workflow_status=payload.workflow_status
 
     )
 

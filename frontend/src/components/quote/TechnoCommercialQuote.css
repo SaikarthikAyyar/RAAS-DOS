@@ -1,0 +1,404 @@
+/* ====================================
+   PAGE
+==================================== */
+
+.quote-page{
+
+width:100%;
+
+min-height:100vh;
+
+padding:20px 40px;
+
+background:
+linear-gradient(
+135deg,
+#002f38,
+#004d4d 50%,
+#003f55
+);
+
+overflow-y:auto;
+
+}
+
+
+/* ====================================
+   PAGE HEADER
+==================================== */
+
+.quote-page-header{
+
+text-align:center;
+
+margin-bottom:35px;
+
+}
+
+.quote-page-header h1{
+
+margin:0 0 10px 0;
+
+font-size:56px;
+
+font-weight:700;
+
+color:#eef7ff;
+
+}
+
+.quote-page-header p{
+
+margin:0;
+
+font-size:19px;
+
+color:#d5e2ea;
+
+}
+
+
+/* ====================================
+   GRID
+==================================== */
+
+.quote-grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:28px;
+
+align-items:start;
+
+margin-bottom:30px;
+
+}
+
+
+/* ====================================
+   CARD
+==================================== */
+
+.quote-card{
+
+width:100%;
+
+min-height:520px;
+
+display:flex;
+
+flex-direction:column;
+
+background:
+linear-gradient(
+135deg,
+rgba(20,72,78,0.92),
+rgba(14,84,77,0.92) 45%,
+rgba(18,52,88,0.92)
+);
+
+border:1px solid rgba(255,255,255,0.10);
+
+border-radius:28px;
+
+padding:28px;
+
+box-shadow:0 12px 35px rgba(0,0,0,0.25);
+
+}
+
+
+/* ====================================
+   CARD HEADER
+==================================== */
+
+.quote-card-header{
+
+margin-bottom:24px;
+
+}
+
+.quote-card-header h2{
+
+margin:0;
+
+font-size:28px;
+
+font-weight:800;
+
+color:#eef7ff;
+
+}
+
+
+/* ====================================
+   TABLE
+==================================== */
+
+.quote-table{
+
+display:flex;
+
+flex-direction:column;
+
+gap:16px;
+
+}
+
+
+/* ====================================
+   TABLE HEADER
+==================================== */
+
+.quote-table-header{
+
+display:grid;
+
+grid-template-columns:
+
+1.4fr
+
+2fr;
+
+padding:0 22px;
+
+font-size:17px;
+
+font-weight:700;
+
+color:#9fb4c4;
+
+}
+
+
+/* ====================================
+   TABLE ROW
+==================================== */
+
+.quote-table-row{
+
+display:grid;
+
+grid-template-columns:
+
+1.4fr
+
+2fr;
+
+align-items:center;
+
+min-height:74px;
+
+padding:0 22px;
+
+border-radius:22px;
+
+background:rgba(255,255,255,0.05);
+
+border:1px solid rgba(255,255,255,0.10);
+
+}
+
+
+/* ====================================
+   TEXT
+==================================== */
+
+.quote-label{
+
+font-size:18px;
+
+font-weight:600;
+
+color:#eef7ff;
+
+}
+
+.quote-value{
+
+font-size:18px;
+
+font-weight:600;
+
+color:#ffffff;
+
+text-align:right;
+
+word-break:break-word;
+
+}
+
+
+/* ====================================
+   TOTAL VALUE
+==================================== */
+
+.quote-commercial-total{
+
+font-size:32px;
+
+font-weight:800;
+
+color:#ffffff;
+
+text-align:right;
+
+}
+
+
+/* ====================================
+   ACTIONS
+==================================== */
+
+.quote-actions{
+
+display:flex;
+
+justify-content:center;
+
+margin-top:10px;
+
+}
+
+.quote-primary-btn{
+
+width:360px;
+
+height:72px;
+
+border:none;
+
+border-radius:20px;
+
+background:#117d77;
+
+color:#ffffff;
+
+font-size:24px;
+
+font-weight:800;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.quote-primary-btn:hover{
+
+transform:translateY(-2px);
+
+}
+
+.quote-primary-btn:disabled{
+
+opacity:.5;
+
+cursor:not-allowed;
+
+}
+
+
+/* ====================================
+   RESPONSIVE
+==================================== */
+
+@media(max-width:1100px){
+
+.quote-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.quote-card{
+
+min-height:auto;
+
+}
+
+}
+
+
+@media(max-width:768px){
+
+.quote-page{
+
+padding:20px;
+
+}
+
+.quote-page-header h1{
+
+font-size:38px;
+
+}
+
+.quote-page-header p{
+
+font-size:16px;
+
+}
+
+.quote-table-header{
+
+display:none;
+
+}
+
+.quote-table-row{
+
+grid-template-columns:1fr;
+
+gap:10px;
+
+padding:18px;
+
+}
+
+.quote-value{
+
+text-align:left;
+
+}
+
+.quote-primary-btn{
+
+width:100%;
+
+}
+
+}
+
+
+/* ====================================
+   OPS SELECTOR
+==================================== */
+
+.quote-selector-bar{
+
+display:flex;
+
+justify-content:center;
+
+margin-bottom:35px;
+
+}
+
+.quote-ops-select{
+
+width:420px;
+
+padding:12px 18px;
+
+font-size:16px;
+
+border-radius:10px;
+
+border:1px solid #d7dce5;
+
+background:white;
+
+}

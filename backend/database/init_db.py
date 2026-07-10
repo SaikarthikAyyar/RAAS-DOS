@@ -16,6 +16,8 @@ from backend.models.dewatering_assessment import DewateringAssessment
 
 from backend.models.approval_board import ApprovalBoard
 
+from backend.models.techno_commercial_quote import Quote
+
 
 def create_tables():
 

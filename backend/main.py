@@ -14,9 +14,11 @@ from backend.api.sales_survey_api import router as sales_survey_router
 
 from backend.api.ops_selector_api import router as ops_selector_router
 
+from backend.api.dashboard_api import router as dashboard_router
+
 from backend.api.dewatering_api import router as dewatering_router
 
-from backend.api.quote_api import router as quote_router
+from backend.api.techno_commercial_quote_api import router as quote_router
 
 from backend.database.init_db import create_tables
 
@@ -88,6 +90,12 @@ app.include_router(report_router)
 app.include_router(
 
     ops_selector_router
+
+)
+
+app.include_router(
+
+    dashboard_router
 
 )
 

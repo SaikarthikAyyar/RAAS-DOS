@@ -29,6 +29,14 @@ class OpsSelection(Base):
         index=True
     )
 
+    customer_request_id = Column(
+        Integer,
+
+        ForeignKey(
+            "customer_requests.id"
+        )
+    )
+
 
     # --------------------------------
     # Workflow Connection
@@ -147,4 +155,12 @@ class OpsSelection(Base):
 
     selection_reason = Column(
         String(500)
+    )
+
+    workflow_status = Column(
+
+        String(50),
+
+        default="DRAFT"
+
     )

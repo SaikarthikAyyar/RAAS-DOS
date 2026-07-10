@@ -63,6 +63,9 @@ def create_ops_selection_request(
 
         )
     
+
+    
+    
     # ====================================
     # CHECK EXISTING OPS SELECTION
     # ====================================
@@ -108,6 +111,10 @@ def create_ops_selection_request(
     # ====================================
     # POPULATE PAYLOAD
     # ====================================
+
+    payload.customer_request_id = (
+        sales_survey.customer_request_id
+    )
 
     payload.doability = (
 
@@ -192,6 +199,10 @@ def create_ops_selection_request(
         ops_output["selection_reason"]
 
     )
+
+    payload.workflow_status = "COMPLETED"
+
+
 
     # ====================================
     # SAVE
@@ -301,3 +312,14 @@ def get_ops_selection_preview(
         **ops_output
 
     }
+
+
+    update_customer_request_status(
+
+        db,
+
+        ops.customer_request_id,
+
+        "OPS_COMPLETED"
+
+    )

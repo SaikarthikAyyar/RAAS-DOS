@@ -1,173 +1,270 @@
-import { useWorkflow } from "../contexts/WorkflowContext";
+// ====================================
+// IMPORTS
+// ====================================
+
+// ====================================
+// IMPORTS
+// ====================================
+
+import { useEffect } from "react";
 
 import { useState } from "react";
 
-export default function TechnoCommercialQuote(){
+import "../components/quote/TechnoCommercialQuote.css";
 
- const { jobs, updateJob } = useWorkflow();
+import TechnicalSummaryCard
+from "../components/quote/TechnicalSummaryCard";
 
- const [selectedJob,setSelectedJob]=useState("");
+import CommercialEstimateCard
+from "../components/quote/CommercialEstimateCard";
 
- const [quote,setQuote]=useState({
+import {
 
-  cleaningCost:0,
+getQuoteOps,
 
-  dewateringCost:0
+getQuote
 
- });
+}
 
- function saveQuote(){
+from "../services/technoCommercialQuoteService";
 
-  if(!selectedJob) return;
 
-  const total=
+// ====================================
+// TECHNO COMMERCIAL QUOTE
+// ====================================
 
-  Number(quote.cleaningCost)+
+export default function TechnoCommercialQuote() {
 
-  Number(quote.dewateringCost);
+    // ====================================
+    // STATE DECLARATIONS
+    // ====================================
 
-  updateJob(
+    const [opsList,setOpsList]=useState([]);
 
-   Number(selectedJob),
+    const [selectedOps,setSelectedOps]=useState("");
 
-   {
+    const [quote,setQuote]=useState(null);
 
-    quote:{
+    // ====================================
+    // LOAD OPS LIST
+    // ====================================
 
-     ...quote,
+    useEffect(()=>{
 
-     total
+    loadOpsList();
+
+    },[]);
+
+
+    async function loadOpsList(){
+
+    const data=
+
+    await getQuoteOps();
+
+    setOpsList(
+
+    data
+
+    );
 
     }
 
-   }
 
-  );
+    // ====================================
+    // LOAD QUOTE
+    // ====================================
 
-  alert("Quote generated");
+    async function loadQuote(
 
- }
+    opsSelectionId
 
- return(
+    ){
 
- <div>
+    if(
 
-  <h1>
+    !opsSelectionId
 
-   Techno Commercial Quote
+    ){
 
-  </h1>
+    setQuote(
 
-  <select
+    null
 
-   value={selectedJob}
+    );
 
-   onChange={
+    return;
 
-    e=>setSelectedJob(
+    }
 
-    e.target.value
+    const data=
 
-   )
+    await getQuote(
 
-   }
+    opsSelectionId
 
-  >
+    );
 
-   <option value="">
+    setQuote(
 
-    Select Customer
+    data
 
-   </option>
+    );
 
-   {
+    }
 
-    jobs
 
-    .filter(
 
-      job=>job.dewatering.decision
 
-    )
 
-    .map(job=>(
 
-      <option
 
-       key={job.id}
+    // ====================================
+    // SUBMIT APPROVAL
+    // ====================================
 
-       value={job.id}
+    function handleSubmitApproval(){
 
-      >
+        console.log(
 
-       {job.customer}
+            "Submit Approval"
 
-      </option>
+        );
 
-    ))
+    }
 
-   }
 
-  </select>
+    // ====================================
+    // UI
+    // ====================================
 
-  <br/><br/>
+    return(
 
-  <input
+        <div className="quote-page">
 
-   type="number"
+            <div className="quote-header">
 
-   placeholder="Cleaning Cost"
+                <h1>
 
-   onChange={
+                    Techno-Commercial Quote
 
-    e=>setQuote({
+                </h1>
 
-    ...quote,
+                <p>
 
-    cleaningCost:e.target.value
+                    Machine, pump, method and commercial estimate
+                    generated from the OPS Selection.
 
-   })
+                </p>
 
-   }
+            </div>
 
-  />
+            <div className="quote-selector-bar">
 
-  <br/>
+            <select
 
-  <input
+            className="quote-ops-select"
 
-   type="number"
+            value={selectedOps}
 
-   placeholder="Dewatering Cost"
+            onChange={
 
-   onChange={
+            async(e)=>{
 
-    e=>setQuote({
+            const id=
 
-    ...quote,
+            e.target.value;
 
-    dewateringCost:e.target.value
+            setSelectedOps(
 
-   })
+            id
 
-   }
+            );
 
-  />
+            await loadQuote(
 
-  <br/><br/>
+            id
 
-  <button
+            );
 
-   onClick={saveQuote}
+            }
 
-  >
+            }
 
-   Generate Quote
+            >
 
-  </button>
+            <option value="">
 
- </div>
+            Select OPS Selection
 
- )
+            </option>
+
+            {
+
+            opsList.map(
+
+            ops=>(
+
+            <option
+
+            key={ops.id}
+
+            value={ops.id}
+
+            >
+
+            {ops.label}
+
+            </option>
+
+            )
+
+            )
+
+            }
+
+            </select>
+
+            </div>
+
+
+            <div className="quote-grid">
+
+                {
+
+                quote &&
+
+                <>
+
+                <TechnicalSummaryCard
+
+                quote={quote}
+
+                />
+
+                <CommercialEstimateCard
+
+                quote={quote}
+
+                onSubmitApproval={
+
+                handleSubmitApproval
+
+                }
+
+                />
+
+                </>
+
+                }
+
+            </div>
+
+
+            
+
+        </div>
+
+    );
 
 }

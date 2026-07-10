@@ -1,198 +1,288 @@
-import { useWorkflow }
+// ====================================
+// IMPORTS
+// ====================================
 
-from "../contexts/WorkflowContext";
+import useDashboard from "../hooks/useDashboard";
 
-import JobTable
+import {
 
-from "../components/tables/JobTable";
+    useState
 
-function Dashboard(){
+} from "react";
 
-const { jobs, getStage } = useWorkflow();
+import "../components/dashboard/Dashboard.css";
 
- const role=
+import DashboardStats from "../components/dashboard/DashboardStats";
 
- localStorage.getItem(
+import CustomerBrowser from "../components/dashboard/CustomerBrowser";
 
-  "userRole"
+import CustomerSummary from "../components/dashboard/CustomerSummary";
 
- )
+import SurveyBrowser from "../components/dashboard/SurveyBrowser";
 
+import SalesSummary from "../components/dashboard/SalesSummary";
 
-const surveyPending =
+import OpsSummary from "../components/dashboard/OpsSummary";
 
-jobs.filter(
+// ====================================
+// PAGE
+// ====================================
 
-job=>!job.survey.jobType
+export default function Dashboard(){
 
-).length;
+    const {
 
-const quoteReady =
+        dashboard,
 
-jobs.filter(
+        startCustomerId,
 
-job=>job.dewatering.decision
+        setStartCustomerId,
 
-).length;
+        selectedCustomerId,
 
+        setSelectedCustomerId,
 
+        startSurveyId,
+        
+        setStartSurveyId,
 
-const approvalPending=
+        selectedSurveyId,
 
-jobs.filter(
+        setSelectedSurveyId,
 
- job=>job.quote.total
+        
 
-).length
+        reloadDashboard
 
-const allocated=
+    } = useDashboard();
 
-jobs.filter(
+    return(
 
- job=>job.allocation.machineAssigned
+        <div className="dashboard-page">
 
-).length;
+            {/* ==================================== */}
+            {/* PAGE TITLE */}
+            {/* ==================================== */}
 
-const executing=
+            <div className="dashboard-header">
 
-jobs.filter(
+                <h1>
 
- job=>
+                    RAAS Dashboard
 
- job.execution.progress>0
+                </h1>
 
-).length
+                <p>
 
- return(
+                    Workflow Monitoring & Consolidated Project Summary
 
-  <div>
+                </p>
 
-   <h1>
+            </div>
 
-    Dashboard
 
-   </h1>
+            {/* ==================================== */}
+            {/* STATISTICS */}
+            {/* ==================================== */}
 
+            <div className="dashboard-section">
 
-   <h3>
+                <h2>
 
-    Logged in as:
+                    Statistics
 
-    {role}
+                </h2>
 
-   </h3>
+                <DashboardStats
 
+                    stats={dashboard?.stats}
 
-   <br/>
+                />
 
+            </div>
 
-   <div style={{
 
-    display:"flex",
+            {/* ==================================== */}
+            {/* CUSTOMER REQUESTS */}
+            {/* ==================================== */}
 
-    gap:"30px"
+            <div className="dashboard-section">
 
-   }}>
+                <h2>
 
-    <div>
+                    Customer Requests
 
-      <h3>
+                </h2>
 
-       Customer Requests
+                <CustomerBrowser
 
-      </h3>
+                    customers={dashboard?.customers}
 
-      <h2>
+                    selectedCustomerId={selectedCustomerId}
 
-       {jobs.length}
+                    setSelectedCustomerId={setSelectedCustomerId}
 
-      </h2>
+                    startCustomerId={startCustomerId}
 
-    </div>
+                    setStartCustomerId={setStartCustomerId}
 
+                />
 
-    <div>
+            </div>
 
-      <h3>
 
-       Survey Pending
+            {/* ==================================== */}
+            {/* CUSTOMER INFORMATION */}
+            {/* ==================================== */}
 
-      </h3>
+            <div className="dashboard-section">
 
-      <h2>
+                <h2>
 
-       {surveyPending}
+                    Customer Information
 
-      </h2>
+                </h2>
 
-    </div>
+                <CustomerSummary
 
+                    summary={
 
-    <div>
+                        dashboard?.customer_summary
 
-      <h3>
+                    }
 
-       Quote Ready
+                />
 
-      </h3>
+            </div>
 
-      <h2>
 
-       {quoteReady}
+            {/* ==================================== */}
+            {/* SALES SURVEY */}
+            {/* ==================================== */}
 
-      </h2>
+            <div className="dashboard-section">
 
-    </div>
+                <h2>
 
-    <div>
+                    Sales Surveys
 
-        <h3>
+                </h2>
 
-            Allocated
+                <SurveyBrowser
 
-        </h3>
+                    surveys={
 
-    <h2>
+                        dashboard?.visible_surveys
 
-        {allocated}
+                    }
 
-    </h2>
+                    surveyNavigator={
 
-    </div>
+                        dashboard?.survey_navigator
 
-    <div>
+                    }
 
-      <h3>
+                    selectedSurveyId={
 
-       Executing
+                        selectedSurveyId
 
-      </h3>
+                    }
 
-      <h2>
+                    setSelectedSurveyId={
 
-       {executing}
+                        setSelectedSurveyId
 
-      </h2>
+                    }
 
-    </div>
+                    startSurveyId={
 
+                        startSurveyId
 
+                    }
 
-   </div>
-<h2>
+                    setStartSurveyId={
 
-Workflow Jobs
+                        setStartSurveyId
 
-</h2>
+                    }
 
+                />
 
-<JobTable jobs={jobs}/>
+            </div>
 
-  </div>
 
- )
+            {/* ==================================== */}
+            {/* SALES SUMMARY */}
+            {/* ==================================== */}
+
+            <div className="dashboard-section">
+
+                <h2>
+
+                    Sales Survey Summary
+
+                </h2>
+
+                <SalesSummary
+
+                    summary={
+
+                        dashboard?.selected_summary
+
+                    }
+
+                />
+
+            </div>
+
+
+            {/* ==================================== */}
+            {/* OPS SUMMARY */}
+            {/* ==================================== */}
+
+            <div className="dashboard-section">
+
+                <h2>
+
+                    Ops Selector Summary
+
+                </h2>
+
+                <OpsSummary
+
+                    summary={
+
+                        dashboard?.ops_summary
+
+                    }
+
+                />
+
+            </div>
+
+
+            {/* ==================================== */}
+            {/* FUTURE MODULES */}
+            {/* ==================================== */}
+
+            <div className="dashboard-section">
+
+                <h2>
+
+                    Future Workflow
+
+                </h2>
+
+                <div className="dashboard-placeholder">
+
+                    Quote, Approval, Job Sheet and Execution summaries will appear here.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
 
 }
-
-
-export default Dashboard

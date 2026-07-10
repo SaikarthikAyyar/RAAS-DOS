@@ -14,9 +14,9 @@ export const nearestHubs=[
 
 export const urgencyOptions = [
     "Immediate",
-    "1 Week",
-    "15 Days",
-    "1 Month"
+    "1 Month",
+    "2 Months",
+    "3 Months"
 ];
 
 
