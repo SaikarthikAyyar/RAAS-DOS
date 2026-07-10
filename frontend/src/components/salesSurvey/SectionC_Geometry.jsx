@@ -80,7 +80,7 @@ C. Geometry, Access & Setup
 
 <FieldSelect
 
-label="Tank Type"
+label="Tank Type*"
 
 value={geometry.tank_type}
 
@@ -97,7 +97,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Length / Dia (m)"
+label="Length / Dia (m)*"
 
 value={geometry.length_dia}
 
@@ -114,7 +114,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Width (m)"
+label="Width (m)*"
 
 value={geometry.width}
 
@@ -131,7 +131,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Sludge Depth (m)"
+label="Sludge Depth (m)*"
 
 value={geometry.sludge_depth}
 
