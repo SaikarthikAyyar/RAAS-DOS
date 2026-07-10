@@ -54,7 +54,7 @@ B. Job / Material Details
 
 
 <FieldSelect
-label="Job Type"
+label="Job Type*"
 value={job.job_type}
 section="job"
 field="job_type"
@@ -64,7 +64,7 @@ updateSection={updateSection}
 
 
 <FieldSelect
-label="Material Category"
+label="Material Category*"
 value={job.material_category}
 section="job"
 field="material_category"
@@ -73,7 +73,7 @@ updateSection={updateSection}
 />
 
 <FieldInput
-label="Cleaning Date"
+label="Cleaning Date*"
 type="date"
 value={job.cleaning_date}
 section="job"
@@ -82,7 +82,7 @@ updateSection={updateSection}
 />
 
 <FieldInput
-label="Cleaning Frequency"
+label="Cleaning Frequency*"
 value={job.cleaning_frequency}
 section="job"
 field="cleaning_frequency"
@@ -91,7 +91,7 @@ updateSection={updateSection}
 
 
 <FieldSelect
-label="Sludge Hardness"
+label="Sludge Hardness*"
 value={job.sludge_hardness}
 section="job"
 field="sludge_hardness"
@@ -103,7 +103,7 @@ updateSection={updateSection}
 
 
 <FieldSelect
-label="Debris Level"
+label="Debris Level*"
 value={job.debris_level}
 section="job"
 field="debris_level"
