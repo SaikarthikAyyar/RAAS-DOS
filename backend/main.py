@@ -20,6 +20,10 @@ from backend.api.dewatering_api import router as dewatering_router
 
 from backend.api.techno_commercial_quote_api import router as quote_router
 
+from backend.api.approval_board_api import (
+    router as approval_board_router
+)
+
 from backend.database.init_db import create_tables
 
 from fastapi.staticfiles import StaticFiles
@@ -108,6 +112,12 @@ app.include_router(
 app.include_router(
 
     quote_router
+
+)
+
+app.include_router(
+
+    approval_board_router
 
 )
 

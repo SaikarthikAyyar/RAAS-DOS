@@ -765,7 +765,7 @@ def get_dashboard_surveys(
 
 ):
 
-    surveys = (
+    query = (
 
         db.query(
 
@@ -781,13 +781,21 @@ def get_dashboard_surveys(
 
         )
 
-        .filter(
+    )
+
+    if start_survey_id is not None:
+
+        query = query.filter(
 
             SalesSurvey.id >=
 
             start_survey_id
 
         )
+
+    surveys = (
+
+        query
 
         .order_by(
 
@@ -816,6 +824,14 @@ def get_dashboard_surveys(
         "Customer:",
 
         customer_request_id
+
+    )
+
+    print(
+
+        "Start Survey:",
+
+        start_survey_id
 
     )
 

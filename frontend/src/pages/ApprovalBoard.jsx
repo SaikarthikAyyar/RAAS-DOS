@@ -1,141 +1,211 @@
-import { useWorkflow } from "../contexts/WorkflowContext";
+// ====================================
+// IMPORTS
+// ====================================
 
+import { useEffect } from "react";
 import { useState } from "react";
 
-export default function Approval(){
+import "../components/approval/ApprovalBoard.css";
 
- const { jobs, updateJob } = useWorkflow();
+import ApprovalCard
+from "../components/approval/ApprovalCard";
 
- const [selectedJob,setSelectedJob]=useState("");
+import {
 
- const [approvedBy,setApprovedBy]=useState("");
+    getApprovalBoard
 
- function approve(){
+}
+from "../services/approvalBoardService";
 
-  if(!selectedJob){
 
-   return;
+// ====================================
+// PAGE
+// ====================================
 
-  }
+export default function ApprovalBoard(){
 
-  updateJob(
+    // ====================================
+    // STATE
+    // ====================================
 
-   Number(selectedJob),
+    const [
 
-   {
+        approvals,
 
-    approval:{
+        setApprovals
 
-     approved:true,
+    ] = useState(
 
-     approvedBy
+        []
+
+    );
+
+
+
+    // ====================================
+    // LOAD
+    // ====================================
+
+    useEffect(()=>{
+
+        loadApprovalBoard();
+
+    },[]);
+
+
+
+    async function loadApprovalBoard(){
+
+        console.log(
+
+            "\n========== APPROVAL BOARD =========="
+
+        );
+
+        console.log(
+
+            "Loading Approval Queue..."
+
+        );
+
+        try{
+
+            const data =
+
+                await getApprovalBoard();
+
+            console.log(
+
+                "Approval Records:",
+
+                data
+
+            );
+
+            console.log(
+
+                "Total Quotes:",
+
+                data.length
+
+            );
+
+            setApprovals(
+
+                data
+
+            );
+
+        }
+
+        catch(error){
+
+            console.error(
+
+                "Approval Board Load Failed:",
+
+                error
+
+            );
+
+        }
+
+        console.log(
+
+            "====================================\n"
+
+        );
 
     }
 
-   }
 
-  );
 
-  alert("Approved");
+    // ====================================
+    // APPROVAL PLACEHOLDER
+    // ====================================
 
- }
+    function handleApprove(
 
- return(
+        quoteId
 
- <div>
+    ){
 
-  <h1>
+        console.log(
 
-   Approval
+            "Approve Clicked:",
 
-  </h1>
+            quoteId
 
-  <select
+        );
 
-   value={selectedJob}
+    }
 
-   onChange={
 
-    e=>setSelectedJob(
 
-     e.target.value
+    // ====================================
+    // UI
+    // ====================================
 
-    )
+    return(
 
-   }
+        <div className="approval-page">
 
-  >
+            <div className="approval-header">
 
-   <option value="">
+                <h1>
 
-    Select Customer
+                    Approval Board
 
-   </option>
+                </h1>
 
-   {
+                <p>
 
-    jobs
+                    Review and approve completed techno-commercial quotations.
 
-    .filter(
+                </p>
 
-     job=>job.quote.total
+            </div>
 
-    )
+            <div className="approval-list">
 
-    .map(job=>(
+                {
 
-     <option
+                    approvals.map(
 
-      key={job.id}
+                        approval=>(
 
-      value={job.id}
+                            <ApprovalCard
 
-     >
+                                key={
 
-      {job.customer}
+                                    approval.quote_id
 
-     </option>
+                                }
 
-    ))
+                                approval={
 
-   }
+                                    approval
 
-  </select>
+                                }
 
-  <br/><br/>
+                                onApprove={
 
-  <input
+                                    handleApprove
 
-   placeholder="Approved By"
+                                }
 
-   value={approvedBy}
+                            />
 
-   onChange={
+                        )
 
-    e=>setApprovedBy(
+                    )
 
-     e.target.value
+                }
 
-    )
+            </div>
 
-   }
+        </div>
 
-  />
-
-  <br/><br/>
-
-  <button
-
-   onClick={approve}
-
-  >
-
-   Approve Quote
-
-  </button>
-
- </div>
-
- )
+    );
 
 }

@@ -10,6 +10,9 @@ from sqlalchemy import String
 
 from sqlalchemy import ForeignKey
 
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
+
 from backend.database.tables import Base
 
 
@@ -79,11 +82,9 @@ class ApprovalBoard(
 
     approval_date = Column(
 
-        String(
+        DateTime,
 
-            50
-
-        )
+        server_default=func.now()
 
     )
 

@@ -15,7 +15,8 @@ from backend.schemas.techno_commercial_quote_schema import (
 )
 
 from backend.services.techno_commercial_quote_service import (
-    create_quote_request
+    create_quote_request,
+    get_quote_preview_request
 )
 
 from backend.services.techno_commercial_quote_service import (
@@ -164,3 +165,12 @@ def list_quote_ops(
         db
 
     )
+
+
+
+@router.get("/quote/preview/{ops_selection_id}")
+def preview_quote(
+    ops_selection_id: int,
+    db: Session = Depends(get_db)
+):
+    return get_quote_preview_request(db, ops_selection_id)

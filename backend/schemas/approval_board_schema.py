@@ -6,20 +6,26 @@ from pydantic import BaseModel
 
 
 # ====================================
-# APPROVAL SCHEMA
+# APPROVAL CARD
 # ====================================
 
-class ApprovalSchema(
+class ApprovalCardSchema(
 
     BaseModel
 
 ):
 
-
     quote_id: int
 
+    customer: str
 
-    approval_decision: bool
+    summary: str
+
+    quote_value: float
+
+    flag: str
 
 
-    approved_by: str
+    class Config:
+
+        from_attributes = True

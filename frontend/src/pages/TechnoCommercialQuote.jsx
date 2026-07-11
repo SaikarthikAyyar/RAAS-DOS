@@ -22,7 +22,9 @@ import {
 
 getQuoteOps,
 
-getQuote
+getQuotePreview,
+
+saveQuote
 
 }
 
@@ -77,39 +79,39 @@ export default function TechnoCommercialQuote() {
 
     async function loadQuote(
 
-    opsSelectionId
+        opsSelectionId
 
     ){
 
-    if(
+        if(
 
-    !opsSelectionId
+            !opsSelectionId
 
-    ){
+        ){
 
-    setQuote(
+            setQuote(
 
-    null
+                null
 
-    );
+            );
 
-    return;
+            return;
 
-    }
+        }
 
-    const data=
+        const data =
 
-    await getQuote(
+            await getQuotePreview(
 
-    opsSelectionId
+                opsSelectionId
 
-    );
+            );
 
-    setQuote(
+        setQuote(
 
-    data
+            data
 
-    );
+        );
 
     }
 
@@ -244,13 +246,15 @@ export default function TechnoCommercialQuote() {
 
                 <CommercialEstimateCard
 
-                quote={quote}
+                    quote={quote}
 
-                onSubmitApproval={
+                    selectedOps={selectedOps}
 
-                handleSubmitApproval
+                    onSubmitApproval={
 
-                }
+                        handleSubmitApproval
+
+                    }
 
                 />
 

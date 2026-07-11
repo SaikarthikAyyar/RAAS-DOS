@@ -1,13 +1,85 @@
-// ====================================
-// COMMERCIAL ESTIMATE
-// ====================================
+import {
+
+    saveQuote
+
+} from "../../services/technoCommercialQuoteService";
 
 export default function CommercialEstimateCard({
 
-quote,
-onSubmitApproval
+    quote,
+
+    selectedOps,
+
+    onSubmitApproval
 
 }){
+
+
+async function handleSave(){
+
+    if(
+
+        !selectedOps
+
+    ){
+
+        alert(
+
+            "Select an OPS Selection."
+
+        );
+
+        return;
+
+    }
+
+    try{
+
+        const savedQuote =
+
+            await saveQuote({
+
+                ops_selection_id:Number(
+
+                    selectedOps
+
+                )
+
+            });
+
+        console.log(
+
+            "Quote Saved",
+
+            savedQuote
+
+        );
+
+        alert(
+
+            "Quote saved successfully."
+
+        );
+
+    }
+
+    catch(error){
+
+        console.error(
+
+            error
+
+        );
+
+        alert(
+
+            "Unable to save quote."
+
+        );
+
+    }
+
+}
 
 return(
 
@@ -101,15 +173,11 @@ Combined Budgetary Value
 
 className="quote-primary-btn"
 
-onClick={
-
-onSubmitApproval
-
-}
+onClick={handleSave}
 
 >
 
-Submit for Approval
+Save Quote
 
 </button>
 

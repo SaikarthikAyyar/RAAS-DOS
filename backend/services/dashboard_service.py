@@ -44,6 +44,10 @@ def get_dashboard_data(
 
         start_customer_id
 
+    )          # only 5
+
+    customer_navigator = get_dashboard_customer_list(
+            db
     )
 
     stats = get_dashboard_statistics(

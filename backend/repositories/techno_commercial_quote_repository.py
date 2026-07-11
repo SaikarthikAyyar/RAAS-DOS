@@ -174,6 +174,13 @@ def create_quote(
         )
 
     
+    quote.customer_request_id = (
+
+        payload["customer_request_id"]
+
+    )
+
+    
 
     quote.revision_number = (
 
@@ -383,26 +390,32 @@ def get_quote_by_ops_selection(
 # LIST OPS SELECTIONS
 # ====================================
 
-def list_ops_selections(
-
-    db
-
-):
+def list_ops_selections(db):
 
     return (
 
         db.query(
 
-            Quote
+            OpsSelection
 
         )
 
         .order_by(
 
-            Quote.ops_selection_id
+            OpsSelection.id
 
         )
 
         .all()
 
     )
+
+
+    def get_quote_preview(db, ops_selection_id):
+
+        ops = get_ops_selection(db, ops_selection_id)
+
+        if ops is None:
+            return None
+
+        return build_quote(ops)

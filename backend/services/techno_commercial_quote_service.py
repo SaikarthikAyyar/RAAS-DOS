@@ -27,6 +27,7 @@ from backend.repositories.techno_commercial_quote_repository import (
     get_quote_by_ops_selection
 
 )
+from backend.services.status_service import update_customer_request_status
 
 
 def create_quote_request(
@@ -100,6 +101,17 @@ def create_quote_request(
 
     }
 
+
+    update_customer_request_status(
+
+        db,
+
+        ops.customer_request_id,
+
+        "QUOTE_CREATED"
+
+    )
+
     # ====================================
     # SAVE
     # ====================================
@@ -112,15 +124,7 @@ def create_quote_request(
 
     )
 
-    update_customer_request_status(
 
-        db,
-
-        quote.customer_request_id,
-
-        "QUOTE_CREATED"
-
-    )
 
 
 # ====================================
@@ -171,26 +175,28 @@ def list_quote_ops_request(
 
 ):
 
-    quotes = list_ops_selections(
-
-        db
-
-    )
+    ops = list_ops_selections(db)
 
     return [
 
         {
 
-            "id":
+            "id": row.id,
 
-                quote.ops_selection_id,
-
-            "label":
-
-                f"OPS-{quote.ops_selection_id}"
+            "label": f"OPS-{row.id}"
 
         }
 
-        for quote in quotes
+        for row in ops
 
     ]
+
+
+def get_quote_preview_request(db, ops_selection_id):
+
+    ops = get_ops_selection(db, ops_selection_id)
+
+    if ops is None:
+        raise ValueError("OPS Selection not found.")
+
+    return build_quote(ops)

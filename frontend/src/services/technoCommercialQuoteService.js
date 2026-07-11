@@ -119,3 +119,26 @@ await fetch(
 return response.json();
 
 }
+
+
+// ====================================
+// GET QUOTE PREVIEW
+// ====================================
+
+export async function getQuotePreview(
+
+    opsSelectionId
+
+){
+
+    const response =
+
+    await fetch(
+
+        `${API}/quote/preview/${opsSelectionId}`
+
+    );
+
+    return response.json();
+
+}

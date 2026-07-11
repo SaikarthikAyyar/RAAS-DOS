@@ -4,25 +4,15 @@
 
 import useDashboard from "../hooks/useDashboard";
 
-import {
-
-    useState
-
-} from "react";
-
 import "../components/dashboard/Dashboard.css";
 
 import DashboardStats from "../components/dashboard/DashboardStats";
-
 import CustomerBrowser from "../components/dashboard/CustomerBrowser";
-
 import CustomerSummary from "../components/dashboard/CustomerSummary";
-
 import SurveyBrowser from "../components/dashboard/SurveyBrowser";
-
 import SalesSummary from "../components/dashboard/SalesSummary";
-
 import OpsSummary from "../components/dashboard/OpsSummary";
+
 
 // ====================================
 // PAGE
@@ -34,23 +24,19 @@ export default function Dashboard(){
 
         dashboard,
 
-        startCustomerId,
+        customerNavigator,
 
+        startCustomerId,
         setStartCustomerId,
 
         selectedCustomerId,
-
         setSelectedCustomerId,
 
         startSurveyId,
-        
         setStartSurveyId,
 
         selectedSurveyId,
-
         setSelectedSurveyId,
-
-        
 
         reloadDashboard
 
@@ -118,6 +104,8 @@ export default function Dashboard(){
 
                     customers={dashboard?.customers}
 
+                    customerNavigator={dashboard?.customer_navigator}
+
                     selectedCustomerId={selectedCustomerId}
 
                     setSelectedCustomerId={setSelectedCustomerId}
@@ -157,7 +145,7 @@ export default function Dashboard(){
 
 
             {/* ==================================== */}
-            {/* SALES SURVEY */}
+            {/* SALES SURVEYS */}
             {/* ==================================== */}
 
             <div className="dashboard-section">

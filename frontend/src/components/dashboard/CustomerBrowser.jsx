@@ -21,6 +21,8 @@ export default function CustomerBrowser({
 
     customers,
 
+    customerNavigator,
+
     selectedCustomerId,
 
     setSelectedCustomerId,
@@ -41,7 +43,7 @@ export default function CustomerBrowser({
 
         "Visible Customers:",
 
-        customers?.map(
+        customerNavigator?.map(
 
             customer=>customer.id
 
