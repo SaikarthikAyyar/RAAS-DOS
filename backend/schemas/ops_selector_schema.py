@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 class OpsSelectorSchema(BaseModel):
 
-    customer_request_id: int
+
 
     sales_survey_id: int
 
