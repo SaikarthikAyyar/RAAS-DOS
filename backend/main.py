@@ -24,6 +24,8 @@ from backend.api.approval_board_api import (
     router as approval_board_router
 )
 
+from backend.api.job_creation_api import router as job_creation_router
+
 from backend.database.init_db import create_tables
 
 from fastapi.staticfiles import StaticFiles
@@ -118,6 +120,12 @@ app.include_router(
 app.include_router(
 
     approval_board_router
+
+)
+
+app.include_router(
+
+    job_creation_router
 
 )
 

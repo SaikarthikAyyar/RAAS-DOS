@@ -10,6 +10,14 @@ from backend.repositories.approval_board_repository import (
     approve_quote
 )
 
+from backend.repositories.approval_board_repository import (
+
+    get_approval
+
+)
+
+
+
 # ====================================
 # GET APPROVAL BOARD
 # ====================================
@@ -99,6 +107,55 @@ def approve_quote_request(
     print(
 
         "Approval Completed"
+
+    )
+
+    print(
+
+        "======================================\n"
+
+    )
+
+    return approval
+
+
+# ====================================
+# GET APPROVAL
+# ====================================
+
+def get_approval_request(
+
+    db,
+
+    approval_board_id
+
+):
+
+    print(
+
+        "\n========== APPROVAL SERVICE =========="
+
+    )
+
+    print(
+
+        "Approval:",
+
+        approval_board_id
+
+    )
+
+    approval = get_approval(
+
+        db,
+
+        approval_board_id
+
+    )
+
+    print(
+
+        approval
 
     )
 

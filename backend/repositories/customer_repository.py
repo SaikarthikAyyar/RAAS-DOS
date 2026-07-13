@@ -148,3 +148,36 @@ def get_customers(
         CustomerRequest
 
     ).all()
+
+
+# ====================================
+# GET CUSTOMER
+# ====================================
+
+def get_customer(
+
+        db,
+
+        customer_request_id
+
+):
+
+    return (
+
+        db.query(
+
+            CustomerRequest
+
+        )
+
+        .filter(
+
+            CustomerRequest.id ==
+
+            customer_request_id
+
+        )
+
+        .first()
+
+    )

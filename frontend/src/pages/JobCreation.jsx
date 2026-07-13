@@ -1,167 +1,186 @@
-import { useWorkflow } from "../contexts/WorkflowContext";
+// ====================================
+// IMPORTS
+// ====================================
 
-import { useState } from "react";
+import "../components/jobCreation/JobCreation.css";
+
+import useJobCreation from "../hooks/useJobCreation";
+
+import JobHeaderCard from "../components/jobCreation/JobHeaderCard";
+
+import AllocationCard from "../components/jobCreation/AllocationCard";
+
+import ManpowerCard from "../components/jobCreation/ManpowerCard";
+
+import ReadinessChecklist from "../components/jobCreation/ReadinessChecklist";
+
+
+// ====================================
+// PAGE
+// ====================================
 
 export default function JobCreation(){
 
- const { jobs, updateJob } = useWorkflow();
+    const{
 
- const [selectedJob,setSelectedJob]=useState("");
+        jobData,
 
- const [jobData,setJobData]=useState({
+        loading,
 
-  jobNumber:"",
+        error,
 
-  startDate:""
+        approvedQuotes,
 
- });
+        selectedQuote,
 
- function createJob(){
+        handleQuoteChange
 
-  if(!selectedJob){
+    } = useJobCreation();
 
-   return;
+    // ====================================
+    // VERIFICATION
+    // ====================================
 
-  }
+    console.log(
 
-  updateJob(
+        "\n========== JOB CREATION PAGE =========="
 
-   Number(selectedJob),
+    );
 
-   {
+    console.log(
 
-    jobCreation:{
+        "Loading:",
 
-     ...jobData,
+        loading
 
-     created:true
+    );
+
+    console.log(
+
+        "Error:",
+
+        error
+
+    );
+
+    console.log(
+
+        "Job Data:",
+
+        jobData
+
+    );
+
+    console.log(
+
+        "=======================================\n"
+
+    );
+
+    if(
+
+        loading
+
+    ){
+
+        return(
+
+            <div>
+
+                Loading Job Creation...
+
+            </div>
+
+        );
 
     }
 
-   }
+    if(
 
-  );
+        error
 
-  alert("Job created");
+    ){
 
- }
+        return(
 
- return(
+            <div>
 
- <div>
+                Failed to load Job Creation.
 
-  <h1>
+            </div>
 
-   Job Creation
+        );
 
-  </h1>
+    }
 
-  <select
+    return(
 
-   value={selectedJob}
+        <div className="jobCreationPage">
 
-   onChange={
+            <JobHeaderCard
 
-    e=>setSelectedJob(
+                header={
 
-     e.target.value
+                    jobData.header
 
-    )
+                }
 
-   }
+                quotes={
 
-  >
+                    approvedQuotes
 
-   <option value="">
+                }
 
-    Select Customer
+                selectedQuote={
 
-   </option>
+                    selectedQuote
 
-   {
+                }
 
-    jobs
+                handleQuoteChange={
 
-    .filter(
+                    handleQuoteChange
 
-      job=>job.approval.approved
+                }
 
-    )
+            />
 
-    .map(job=>(
+            <AllocationCard
 
-      <option
+                allocation={
 
-       key={job.id}
+                    jobData.recommended
 
-       value={job.id}
+                }
 
-      >
+            />
 
-       {job.customer}
+            <div className="jobCreationBottom">
 
-      </option>
+                <ManpowerCard
 
-    ))
+                    manpower={
 
-   }
+                        jobData.manpower
 
-  </select>
+                    }
 
-  <br/><br/>
+                />
 
-  <input
+                <ReadinessChecklist
 
-   placeholder="Job Number"
+                    checklist={
 
-   onChange={
+                        jobData.readiness
 
-    e=>setJobData({
+                    }
 
-    ...jobData,
+                />
 
-    jobNumber:e.target.value
+            </div>
 
-   })
+        </div>
 
-   }
-
-  />
-
-  <br/>
-
-  <input
-
-   type="date"
-
-   onChange={
-
-    e=>setJobData({
-
-    ...jobData,
-
-    startDate:e.target.value
-
-   })
-
-   }
-
-  />
-
-  <br/><br/>
-
-  <button
-
-   onClick={createJob}
-
-  >
-
-   Create Job
-
-  </button>
-
- </div>
-
- )
+    );
 
 }

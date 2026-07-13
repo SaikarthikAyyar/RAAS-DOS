@@ -10,9 +10,11 @@ import "../components/approval/ApprovalBoard.css";
 import ApprovalCard
 from "../components/approval/ApprovalCard";
 
-import {
+import{
 
-    getApprovalBoard
+    getApprovalBoard,
+
+    approveQuote
 
 }
 from "../services/approvalBoardService";
@@ -124,19 +126,63 @@ export default function ApprovalBoard(){
     // APPROVAL PLACEHOLDER
     // ====================================
 
-    function handleApprove(
+    async function handleApprove(
 
         quoteId
 
     ){
 
-        console.log(
+        try{
 
-            "Approve Clicked:",
+            console.log(
 
-            quoteId
+                "\n========== APPROVAL =========="
 
-        );
+            );
+
+            console.log(
+
+                "Approving:",
+
+                quoteId
+
+            );
+
+            await approveQuote(
+
+                quoteId
+
+            );
+
+            console.log(
+
+                "Reloading Approval Board..."
+
+            );
+
+            await loadApprovalBoard();
+
+            console.log(
+
+                "==============================\n"
+
+            );
+
+        }
+
+        catch(
+
+            exception
+
+        ){
+
+            console.log(
+
+                exception
+
+            );
+
+        }
 
     }
 

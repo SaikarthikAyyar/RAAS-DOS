@@ -275,3 +275,36 @@ def approve_quote(
     )
 
     return approval
+
+
+# ====================================
+# GET APPROVAL
+# ====================================
+
+def get_approval(
+
+    db,
+
+    approval_board_id
+
+):
+
+    return (
+
+        db.query(
+
+            ApprovalBoard
+
+        )
+
+        .filter(
+
+            ApprovalBoard.id ==
+
+            approval_board_id
+
+        )
+
+        .first()
+
+    )

@@ -2,7 +2,7 @@
 // API
 // ====================================
 
-const API = "http://127.0.0.1:8000";
+const API = import.meta.env.VITE_API_URL;
 
 
 // ====================================
@@ -50,6 +50,71 @@ export async function getApprovalBoard(){
     console.log(
 
         "======================================\n"
+
+    );
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// APPROVE QUOTE
+// ====================================
+
+export async function approveQuote(
+
+    quoteId
+
+){
+
+    console.log(
+
+        "\n========== APPROVE QUOTE =========="
+
+    );
+
+    console.log(
+
+        "Quote:",
+
+        quoteId
+
+    );
+
+    const response = await fetch(
+
+        `${API}/approval-board/approve/${quoteId}`,
+
+        {
+
+            method:"POST"
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    console.log(
+
+        data
+
+    );
+
+    console.log(
+
+        "===================================\n"
 
     );
 

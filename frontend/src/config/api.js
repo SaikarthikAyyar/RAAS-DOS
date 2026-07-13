@@ -1,3 +1,3 @@
 export const API=
 
-"https://raas-dos.onrender.com";
+import.meta.env.VITE_API_URL;

@@ -112,95 +112,63 @@ def create_ops_selection_request(
     # POPULATE PAYLOAD
     # ====================================
 
-    payload.customer_request_id = (
-        sales_survey.customer_request_id
-    )
+    ops_payload = {
 
-    payload.doability = (
+    "sales_survey_id":
+        payload.sales_survey_id,
 
-        ops_output["doability"]
+    "customer_request_id":
+        sales_survey.customer_request_id,
 
-    )
+    "doability":
+        ops_output["doability"],
 
-    payload.service_configuration = (
+    "service_configuration":
+        ops_output["service_configuration"],
 
-        ops_output["service_configuration"]
+    "recommended_machine":
+        ops_output["recommended_machine"],
 
-    )
+    "pump_hose_package":
+        ops_output["pump_hose_package"],
 
-    payload.recommended_machine = (
+    "accessories":
+        ops_output["accessories"],
 
-        ops_output["recommended_machine"]
+    "mobilisation_days":
+        ops_output["mobilisation_days"],
 
-    )
+    "setup_days":
+        ops_output["setup_days"],
 
-    payload.pump_hose_package = (
+    "execution_days":
+        ops_output["execution_days"],
 
-        ops_output["pump_hose_package"]
+    "ops_engine_version":
+        ops_output.get("ops_engine_version"),
 
-    )
+    "demob_days":
+        ops_output["demob_days"],
 
-    payload.accessories = (
+    "total_job_days":
+        ops_output["total_job_days"],
 
-        ops_output["accessories"]
+    "manpower_required":
+        ops_output["manpower_required"],
 
-    )
+    "approval_gate":
+        ops_output["approval_gate"],
 
-    payload.mobilisation_days = (
+    "internal_next_action":
+        ops_output["internal_next_action"],
 
-        ops_output["mobilisation_days"]
+    "selection_reason":
+        ops_output["selection_reason"],
 
-    )
+    "workflow_status":
+        "COMPLETED"
 
-    payload.setup_days = (
-
-        ops_output["setup_days"]
-
-    )
-
-    payload.execution_days = (
-
-        ops_output["execution_days"]
-
-    )
-
-    payload.demob_days = (
-
-        ops_output["demob_days"]
-
-    )
-
-    payload.total_job_days = (
-
-        ops_output["total_job_days"]
-
-    )
-
-    payload.manpower_required = (
-
-        ops_output["manpower_required"]
-
-    )
-
-    payload.approval_gate = (
-
-        ops_output["approval_gate"]
-
-    )
-
-    payload.internal_next_action = (
-
-        ops_output["internal_next_action"]
-
-    )
-
-    payload.selection_reason = (
-
-        ops_output["selection_reason"]
-
-    )
-
-    payload.workflow_status = "COMPLETED"
+}
 
 
 
@@ -212,7 +180,7 @@ def create_ops_selection_request(
 
             db,
 
-            payload
+            ops_payload
 
         )
 

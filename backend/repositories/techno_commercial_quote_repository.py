@@ -45,6 +45,38 @@ def get_ops_selection(
 
     )
 
+# ====================================
+# GET QUOTE
+# ====================================
+
+def get_quote(
+
+        db,
+
+        quote_id
+
+):
+
+    return (
+
+        db.query(
+
+            Quote
+
+        )
+
+        .filter(
+
+            Quote.id ==
+
+            quote_id
+
+        )
+
+        .first()
+
+    )
+
 
 # ====================================
 # GET LATEST QUOTE
