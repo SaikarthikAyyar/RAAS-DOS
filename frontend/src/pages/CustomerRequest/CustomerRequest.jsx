@@ -77,78 +77,37 @@ async function submit(){
 
       const payload = {
 
-        // ====================================
-        // CUSTOMER
-        // ====================================
+          company_name: customer.company_name,
+          plant_site_location: customer.plant_site_location,
+          contact_person: customer.contact_person,
+          contact_number: customer.contact_number,
+          nearest_city_hub: customer.nearest_city_hub,
+          urgency: customer.urgency,
 
-        company_name:
-          customer.company_name,
+          service_requirement_type: requirement.service_requirement_type,
+          observed_material: requirement.observed_material,
+          estimated_quantity_known: requirement.estimated_quantity_known,
+          tank_type: requirement.tank_type,
 
-        plant_site_location:
-          customer.plant_site_location,
+          approx_length_dia: Number(requirement.approx_length_dia) || null,
+          approx_width: Number(requirement.approx_width) || null,
+          approx_depth: Number(requirement.approx_depth) || null,
 
-        contact_person:
-          customer.contact_person,
+          access_opening_type: requirement.access_opening_type,
+          can_place_equipment_nearby:
+              requirement.can_place_equipment_nearby?.includes("Yes"),
 
-        contact_number:
-          customer.contact_number,
+          quote_basis: requirement.quote_basis,
 
-        nearest_city_hub:
-          customer.nearest_city_hub,
+          // ADD THESE
+          cleaning_date: requirement.cleaning_date,
+          cleaning_frequency: requirement.cleaning_frequency,
 
-        urgency:
-          customer.urgency,
+          pain_point: requirement.pain_point,
 
-        // ====================================
-        // REQUIREMENT
-        // ====================================
-
-        service_requirement_type:
-          requirement.service_requirement_type,
-
-        observed_material:
-          requirement.observed_material,
-
-        estimated_quantity_known:
-          requirement.estimated_quantity_known,
-
-        tank_type:
-          requirement.tank_type,
-
-        approx_length_dia:
-          Number(requirement.approx_length_dia) || null,
-
-        approx_width:
-          Number(requirement.approx_width) || null,
-
-        approx_depth:
-          Number(requirement.approx_depth) || null,
-
-        access_opening_type:
-          requirement.access_opening_type,
-
-        can_place_equipment_nearby:
-          requirement.can_place_equipment_nearby?.includes("Yes"),
-
-        quote_basis:
-          requirement.quote_basis,
-
-pain_point:
-
-requirement.pain_point,
-
-        // ====================================
-        // MEDIA COUNTS
-        // ====================================
-
-        photo_count:
-          uploads.photos?.length || 0,
-
-        video_count:
-          uploads.videos?.length || 0,
-
-        layout_count:
-          uploads.layouts?.length || 0
+          photo_count: uploads.photos?.length || 0,
+          video_count: uploads.videos?.length || 0,
+          layout_count: uploads.layouts?.length || 0
 
       };
 
@@ -161,7 +120,8 @@ requirement.pain_point,
 
       if(!response?.id){
 
-        alert("Customer Request creation failed.");
+        console.log(response.id);
+        console.log("Customer Request Creation Failed");
 
         return;
 
@@ -174,12 +134,14 @@ requirement.pain_point,
         customerId
       );
 
+      alert("Customer request has been created");
+
       await uploadMedia(
         customerId,
         uploads
       );
 
-      navigate("/sales-survey");
+      navigate("/dashboard");
 
     }
 

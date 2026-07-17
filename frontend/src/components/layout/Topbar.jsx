@@ -1,23 +1,51 @@
+import { Bell, UserCircle } from "lucide-react";
+
+import { useAuth } from "../../contexts/AuthContext";
+
 export default function Topbar(){
 
- return(
+    const { user } = useAuth();
 
- <div className="topbar">
+    return(
 
- <div>
+        <div className="topbar">
 
- Notifications
+            <div className="topbar-left">
 
- </div>
+                <Bell size={20}/>
 
- <div>
+                <span>
 
- Admin
+                    Notifications
 
- </div>
+                </span>
 
- </div>
+            </div>
 
- )
+            <div className="topbar-right">
+
+                <div className="user-chip">
+
+                    <UserCircle size={20}/>
+
+                    <span>
+
+                        {user?.name}
+
+                    </span>
+
+                </div>
+
+                <div className="user-chip">
+
+                    {user?.role}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
 
 }

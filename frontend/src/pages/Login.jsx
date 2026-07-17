@@ -1,173 +1,329 @@
+// ====================================
+// IMPORTS
+// ====================================
+
 import { useState } from "react";
 
-import {loginUser}
+import { useNavigate } from "react-router-dom";
 
-from "../services/authService"
+import { useAuth } from "../contexts/AuthContext";
 
-function Login() {
 
-const [email,setEmail] = useState("");
+// ====================================
+// DEVELOPMENT USERS
+// ====================================
 
-const [password,setPassword] = useState("");
+const developmentUsers = {
 
-const [role,setRole]=useState("")
+    admin:{
 
-function handleLogin(){
+        email:"admin@raasdos.com",
 
-const user=
+        password:"admin123"
 
-loginUser(
+    },
 
-email,
+    management:{
 
-password,
+        email:"manager@raasdos.com",
 
-role
+        password:"manager123"
 
-)
+    },
 
-if(user){
+    sales:{
 
-localStorage.setItem(
+        email:"sales@raasdos.com",
 
-"userRole",
+        password:"sales123"
 
-role
+    },
 
-)
+    ops:{
 
-window.location.href=
+        email:"ops@raasdos.com",
 
-"/dashboard"
+        password:"ops123"
+
+    },
+
+    customer:{
+
+        email:"customer@raasdos.com",
+
+        password:"cust123"
+
+    }
+
+};
+
+
+// ====================================
+// COMPONENT
+// ====================================
+
+function Login(){
+
+    const {
+
+        login
+
+    } = useAuth();
+
+    const navigate = useNavigate();
+
+
+    const [
+
+        role,
+
+        setRole
+
+    ] = useState("");
+
+
+
+    const [
+
+        email,
+
+        setEmail
+
+    ] = useState("");
+
+
+
+    const [
+
+        password,
+
+        setPassword
+
+    ] = useState("");
+
+
+
+    function handleRoleChange(
+
+        selectedRole
+
+    ){
+
+        setRole(
+
+            selectedRole
+
+        );
+
+        if(
+
+            developmentUsers[selectedRole]
+
+        ){
+
+            setEmail(
+
+                developmentUsers[selectedRole].email
+
+            );
+
+            setPassword(
+
+                developmentUsers[selectedRole].password
+
+            );
+
+        }
+
+        else{
+
+            setEmail("");
+
+            setPassword("");
+
+        }
+
+    }
+
+
+
+    async function handleLogin(){
+
+        try{
+
+            const user = await login(
+
+                email,
+
+                password
+
+            );
+
+            console.log(
+
+                "[Login] Logged in as:",
+
+                user.role
+
+            );
+
+            navigate(
+
+                "/dashboard"
+
+            );
+
+        }
+
+        catch(error){
+
+            alert(
+
+                error.message
+
+            );
+
+        }
+
+    }
+
+
+
+    return(
+
+    <div className="login-page">
+
+    <div className="login-card">
+
+    <h1 className="login-title">
+
+    RAAS-DOS
+
+    </h1>
+
+    <p className="login-subtitle">
+
+    Role Based Workflow Management
+
+    </p>
+
+    <div className="login-form">
+
+    <select
+
+    value={role}
+
+    onChange={(e)=>
+
+    handleRoleChange(
+
+    e.target.value
+
+    )
+
+    }
+
+    >
+
+    <option value="">
+
+    Select Development Role
+
+    </option>
+
+    <option value="admin">
+
+    Admin
+
+    </option>
+
+    <option value="management">
+
+    Management
+
+    </option>
+
+    <option value="sales">
+
+    Sales
+
+    </option>
+
+    <option value="ops">
+
+    Operations
+
+    </option>
+
+    <option value="customer">
+
+    Customer
+
+    </option>
+
+    </select>
+
+    <input
+
+    type="email"
+
+    placeholder="Email"
+
+    value={email}
+
+    onChange={(e)=>
+
+    setEmail(
+
+    e.target.value
+
+    )
+
+    }
+
+    />
+
+    <input
+
+    type="password"
+
+    placeholder="Password"
+
+    value={password}
+
+    onChange={(e)=>
+
+    setPassword(
+
+    e.target.value
+
+    )
+
+    }
+
+    />
+
+    <button
+
+    className="primary-button"
+
+    onClick={handleLogin}
+
+    >
+
+    Login
+
+    </button>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    );
 
 }
 
-else{
-
-alert(
-
-"Invalid credentials"
-
-)
-
-}
-
-}
-
-return (
-
-<div>
-
-<h1>Login</h1>
-
-<br/>
-
-<input
-
-type="email"
-
-placeholder="Email"
-
-value={email}
-
-onChange={(e)=>
-
-setEmail(
-
-e.target.value
-
-)}
-
- />
-
-<br/><br/>
-
-<input
-
-type="password"
-
-placeholder="Password"
-
-value={password}
-
-onChange={(e)=>
-
-setPassword(
-
-e.target.value
-
-)}
-
- />
-
-<br/><br/>
-
-<select
-
-value={role}
-
-onChange={(e)=>
-
-setRole(
-
-e.target.value
-
-)}
-
->
-
-<option value="">
-
-Select Role
-
-</option>
-
-<option>
-
-Admin
-
-</option>
-
-<option>
-
-Sales
-
-</option>
-
-<option>
-
-Operations
-
-</option>
-
-<option>
-
-Customer
-
-</option>
-
-<option>
-
-Management
-
-</option>
-
-</select>
-
-<button
-
-onClick={handleLogin}
-
->
-
-Login
-
-</button>
-
-</div>
-
-)
-
-}
 
 export default Login;

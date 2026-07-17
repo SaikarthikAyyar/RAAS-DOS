@@ -15,6 +15,8 @@ from backend.models.customer_requests import (
 
 )
 
+from backend.services.enquiry_service import EnquiryService
+
 from fastapi import HTTPException
 
 
@@ -68,13 +70,52 @@ def create_customer_request(
 
         )
 
-    return create_customer(
+    customer_request = create_customer(
 
         db,
 
         payload
 
     )
+
+    enquiry_payload = {
+
+        "customer_request_id": customer_request.id,
+
+        "company_name": customer_request.company_name,
+
+        "contact_person": customer_request.contact_person,
+
+        "cleaning_date": (
+            customer_request.cleaning_date.isoformat()
+            if customer_request.cleaning_date
+            else None
+        ),
+
+        "plant_site_location": customer_request.plant_site_location,
+
+        "status": customer_request.status
+
+    }
+
+    print("\n========== ENQUIRY ==========")
+    print("Creating Customer Request enquiry")
+    print(enquiry_payload)
+
+    EnquiryService.create_customer_request_enquiry(
+
+        db=db,
+
+        customer_request_id=customer_request.id,
+
+        payload=enquiry_payload
+
+    )
+
+    print("Customer Request enquiry created")
+    print("=============================\n")
+
+    return customer_request
 
 
 # ====================================

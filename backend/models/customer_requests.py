@@ -12,7 +12,7 @@ from sqlalchemy import Float
 
 from sqlalchemy import Boolean
 
-from sqlalchemy import DateTime
+from sqlalchemy import Date
 
 from backend.database.tables import Base
 
@@ -226,7 +226,7 @@ class CustomerRequest(Base):
 
     cleaning_date = Column(
 
-        DateTime
+        Date
 
     )
 

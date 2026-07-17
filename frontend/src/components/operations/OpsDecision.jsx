@@ -4,71 +4,104 @@
 
 export default function OpsDecision({
 
-opsData
+    opsData,
+
+    updateField
 
 }){
 
-return(
+    const approvalOptions = [
 
-<div className="ops-card">
+        "Proceed",
 
-<div className="ops-header">
+        "Ops Review",
 
-<h2>
+        "EHS Review",
 
-Selection Output
+        "Ops+EHs Review",
 
-</h2>
+        "Engineering Review"
 
-</div>
 
-<div className="ops-table">
 
-<div className="ops-table-header">
+    ];
 
-<div>Decision</div>
+    return(
 
-<div>Recommendation</div>
+        <div className="ops-card">
 
-<div>Approval</div>
+            <div className="ops-header">
 
-</div>
+                <h2>
 
-<Row
-label="Doability"
-value={opsData?.doability || "-"}
-approval={opsData?.approval_gate || "-"}
-/>
+                    Selection Output
 
-<Row
-label="Service Configuration"
-value={opsData?.service_configuration || "-"}
-approval="-"
-/>
+                </h2>
 
-<Row
-label="Machine"
-value={opsData?.recommended_machine || "-"}
-approval="-"
-/>
+            </div>
 
-<Row
-label="Pump / Hose"
-value={opsData?.pump_hose_package || "-"}
-approval="-"
-/>
+            <div className="ops-table">
 
-<Row
-label="Accessories"
-value={opsData?.accessories || "-"}
-approval="-"
-/>
+                <div className="ops-table-header">
 
-</div>
+                    <div>Decision</div>
 
-</div>
+                    <div>Recommendation</div>
 
-);
+                    <div>Approval</div>
+
+                </div>
+
+                <Row
+                    label="Doability"
+                    field="doability"
+                    approvalField="approval_gate"
+                    opsData={opsData}
+                    updateField={updateField}
+                    options={approvalOptions}
+                />
+
+                <Row
+                    label="Service Configuration"
+                    field="service_configuration"
+                    approvalField="service_configuration_approval"
+                    opsData={opsData}
+                    updateField={updateField}
+                    options={approvalOptions}
+                />
+
+                <Row
+                    label="Recommended Machine"
+                    field="recommended_machine"
+                    approvalField="machine_approval"
+                    opsData={opsData}
+                    updateField={updateField}
+                    options={approvalOptions}
+                />
+
+                <Row
+                    label="Pump / Hose Package"
+                    field="pump_hose_package"
+                    approvalField="pump_hose_approval"
+                    opsData={opsData}
+                    updateField={updateField}
+                    options={approvalOptions}
+                />
+
+                <Row
+                    label="Accessories"
+                    field="accessories"
+                    approvalField="accessories_approval"
+                    opsData={opsData}
+                    updateField={updateField}
+                    options={approvalOptions}
+                />
+
+            </div>
+
+        </div>
+
+    );
 
 }
 
@@ -79,38 +112,108 @@ approval="-"
 
 function Row({
 
-label,
+    label,
 
-value,
+    field,
 
-approval
+    approvalField,
+
+    opsData,
+
+    updateField,
+
+    options
 
 }){
 
-return(
+    return(
 
-<div className="ops-table-row">
+        <div className="ops-table-row">
 
-<div className="ops-label">
+            <div className="ops-label">
 
-{label}
+                {label}
 
-</div>
+            </div>
 
-<div className="ops-value">
+            <div className="ops-value">
 
-{value}
+                <input
 
-</div>
+                    className="ops-input"
 
-<div className="ops-unit">
+                    value={opsData[field] ?? ""}
 
-{approval}
+                    onChange={(e)=>
 
-</div>
+                        updateField(
 
-</div>
+                            field,
 
-);
+                            e.target.value
+
+                        )
+
+                    }
+
+                />
+
+            </div>
+
+            <div className="ops-unit">
+
+                <select
+
+                    className="ops-select"
+
+                    value={opsData[approvalField] ?? ""}
+
+                    onChange={(e)=>
+
+                        updateField(
+
+                            approvalField,
+
+                            e.target.value
+
+                        )
+
+                    }
+
+                >
+
+                    <option value="">
+
+                        Select
+
+                    </option>
+
+                    {
+
+                        options.map(option=>(
+
+                            <option
+
+                                key={option}
+
+                                value={option}
+
+                            >
+
+                                {option}
+
+                            </option>
+
+                        ))
+
+                    }
+
+                </select>
+
+            </div>
+
+        </div>
+
+    );
 
 }

@@ -1,276 +1,46 @@
-// ====================================
-// IMPORTS
-// ====================================
+import CustomerDashboard from "./dashboards/CustomerDashboard";
+import SalesDashboard from "./dashboards/SalesDashboard";
+import OperationsDashboard from "./dashboards/OperationsDashboard";
+import ManagerDashboard from "./dashboards/ManagerDashboard";
+import AdminDashboard from "./dashboards/AdminDashboard";
 
-import useDashboard from "../hooks/useDashboard";
+export default function Dashboard() {
 
-import "../components/dashboard/Dashboard.css";
+    const ROLE_MAP = {
 
-import DashboardStats from "../components/dashboard/DashboardStats";
-import CustomerBrowser from "../components/dashboard/CustomerBrowser";
-import CustomerSummary from "../components/dashboard/CustomerSummary";
-import SurveyBrowser from "../components/dashboard/SurveyBrowser";
-import SalesSummary from "../components/dashboard/SalesSummary";
-import OpsSummary from "../components/dashboard/OpsSummary";
+        ops: "OPERATIONS",
 
+        sales: "SALES",
 
-// ====================================
-// PAGE
-// ====================================
+        customer: "CUSTOMER",
 
-export default function Dashboard(){
+        manager: "MANAGER",
 
-    const {
+        admin: "ADMIN"
 
-        dashboard,
+    };
 
-        customerNavigator,
+    const role =
+    ROLE_MAP[
+        (localStorage.getItem("userRole") || "").toLowerCase()
+    ] || "";
 
-        startCustomerId,
-        setStartCustomerId,
+    switch(role){
 
-        selectedCustomerId,
-        setSelectedCustomerId,
+        case "CUSTOMER":
+        case "CUSTOMER_SERVICE":
+            return <CustomerDashboard />;
 
-        startSurveyId,
-        setStartSurveyId,
+        case "SALES":
+            return <SalesDashboard />;
 
-        selectedSurveyId,
-        setSelectedSurveyId,
+        case "OPERATIONS":
+            return <OperationsDashboard />;
 
-        reloadDashboard
+        case "MANAGER":
+            return <ManagerDashboard />;
 
-    } = useDashboard();
-
-    return(
-
-        <div className="dashboard-page">
-
-            {/* ==================================== */}
-            {/* PAGE TITLE */}
-            {/* ==================================== */}
-
-            <div className="dashboard-header">
-
-                <h1>
-
-                    RAAS Dashboard
-
-                </h1>
-
-                <p>
-
-                    Workflow Monitoring & Consolidated Project Summary
-
-                </p>
-
-            </div>
-
-
-            {/* ==================================== */}
-            {/* STATISTICS */}
-            {/* ==================================== */}
-
-            <div className="dashboard-section">
-
-                <h2>
-
-                    Statistics
-
-                </h2>
-
-                <DashboardStats
-
-                    stats={dashboard?.stats}
-
-                />
-
-            </div>
-
-
-            {/* ==================================== */}
-            {/* CUSTOMER REQUESTS */}
-            {/* ==================================== */}
-
-            <div className="dashboard-section">
-
-                <h2>
-
-                    Customer Requests
-
-                </h2>
-
-                <CustomerBrowser
-
-                    customers={dashboard?.customers}
-
-                    customerNavigator={dashboard?.customer_navigator}
-
-                    selectedCustomerId={selectedCustomerId}
-
-                    setSelectedCustomerId={setSelectedCustomerId}
-
-                    startCustomerId={startCustomerId}
-
-                    setStartCustomerId={setStartCustomerId}
-
-                />
-
-            </div>
-
-
-            {/* ==================================== */}
-            {/* CUSTOMER INFORMATION */}
-            {/* ==================================== */}
-
-            <div className="dashboard-section">
-
-                <h2>
-
-                    Customer Information
-
-                </h2>
-
-                <CustomerSummary
-
-                    summary={
-
-                        dashboard?.customer_summary
-
-                    }
-
-                />
-
-            </div>
-
-
-            {/* ==================================== */}
-            {/* SALES SURVEYS */}
-            {/* ==================================== */}
-
-            <div className="dashboard-section">
-
-                <h2>
-
-                    Sales Surveys
-
-                </h2>
-
-                <SurveyBrowser
-
-                    surveys={
-
-                        dashboard?.visible_surveys
-
-                    }
-
-                    surveyNavigator={
-
-                        dashboard?.survey_navigator
-
-                    }
-
-                    selectedSurveyId={
-
-                        selectedSurveyId
-
-                    }
-
-                    setSelectedSurveyId={
-
-                        setSelectedSurveyId
-
-                    }
-
-                    startSurveyId={
-
-                        startSurveyId
-
-                    }
-
-                    setStartSurveyId={
-
-                        setStartSurveyId
-
-                    }
-
-                />
-
-            </div>
-
-
-            {/* ==================================== */}
-            {/* SALES SUMMARY */}
-            {/* ==================================== */}
-
-            <div className="dashboard-section">
-
-                <h2>
-
-                    Sales Survey Summary
-
-                </h2>
-
-                <SalesSummary
-
-                    summary={
-
-                        dashboard?.selected_summary
-
-                    }
-
-                />
-
-            </div>
-
-
-            {/* ==================================== */}
-            {/* OPS SUMMARY */}
-            {/* ==================================== */}
-
-            <div className="dashboard-section">
-
-                <h2>
-
-                    Ops Selector Summary
-
-                </h2>
-
-                <OpsSummary
-
-                    summary={
-
-                        dashboard?.ops_summary
-
-                    }
-
-                />
-
-            </div>
-
-
-            {/* ==================================== */}
-            {/* FUTURE MODULES */}
-            {/* ==================================== */}
-
-            <div className="dashboard-section">
-
-                <h2>
-
-                    Future Workflow
-
-                </h2>
-
-                <div className="dashboard-placeholder">
-
-                    Quote, Approval, Job Sheet and Execution summaries will appear here.
-
-                </div>
-
-            </div>
-
-        </div>
-
-    );
-
+        default:
+            return <AdminDashboard />;
+    }
 }

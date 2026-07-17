@@ -2,16 +2,7 @@
 // IMPORTS
 // ====================================
 
-
-
-import {
-
-    useState
-
-} from "react";
-
 import "./Dashboard.css";
-
 
 // ====================================
 // COMPONENT
@@ -19,119 +10,31 @@ import "./Dashboard.css";
 
 export default function CustomerBrowser({
 
-    customers,
+    enquiries = [],
 
-    customerNavigator,
+    customers = [],
 
     selectedCustomerId,
 
-    setSelectedCustomerId,
-
-    startCustomerId,
-
-    setStartCustomerId
+    setSelectedCustomerId
 
 }){
 
-    console.log(
+    const items = enquiries.length > 0
 
-        "\n========== CUSTOMER BROWSER =========="
+        ? enquiries
 
-    );
+        : customers;
 
-    console.log(
+    if(items.length === 0){
 
-        "Visible Customers:",
+        return(
 
-        customerNavigator?.map(
+            <div className="dashboard-placeholder">
 
-            customer=>customer.id
+                No pending work.
 
-        )
-
-    );
-
-    console.log(
-
-        "Selected Customer:",
-
-        selectedCustomerId
-
-    );
-
-    console.log(
-
-        "======================================\n"
-
-    );
-
-    const [
-
-        dropdownOpen,
-
-        setDropdownOpen
-
-    ] = useState(
-
-        false
-
-    );
-
-    if(
-
-        !customers
-
-    ){
-
-        return null;
-
-    }
-
-
-
-    function previous(){
-
-        if(
-
-            startCustomerId>1
-
-        ){
-
-            const nextCustomer =
-
-                startCustomerId-1;
-
-            setStartCustomerId(
-
-                nextCustomer
-
-            );
-
-            setSelectedCustomerId(
-
-                nextCustomer
-
-            );
-
-        }
-
-    }
-
-    function next(){
-
-        const nextCustomer =
-
-            startCustomerId+1;
-
-        setStartCustomerId(
-
-            nextCustomer
-
-        );
-
-        setSelectedCustomerId(
-
-            nextCustomer
+            </div>
 
         );
 
@@ -139,207 +42,117 @@ export default function CustomerBrowser({
 
     return(
 
-        <div className="dashboard-browser">
+        <div className="dashboard-workqueue">
 
-            <div className="dashboard-browser-top">
+            {
 
-                <button
+                items.map((item)=>{
 
-                    className="dashboard-nav-button"
+                    const id =
 
-                    onClick={previous}
+                        item.enquiry_id ??
 
-                >
+                        item.id;
 
-                    ◀
+                    const title =
 
-                </button>
+                        item.company_name ??
 
-                <div className="dashboard-customer-strip">
+                        `Customer Request ${id}`;
 
-                    {
+                    const status =
 
-                        customers.map(
+                        item.workflow_status ??
 
-                            customer=>(
+                        item.status ??
 
-                                <button
+                        "-";
 
-                                    key={customer.id}
+                    const task =
 
-                                    className={
+                        item.requested_task ??
 
-                                        customer.id===selectedCustomerId
+                        "Customer Request";
 
-                                        ?
+                    return(
 
-                                        "dashboard-customer active"
+                        <div
 
-                                        :
+                            key={id}
 
-                                        "dashboard-customer"
+                            className={
 
-                                    }
+                                id===selectedCustomerId
 
-                                    onClick={()=>{
+                                ?
 
-                                        console.log(
+                                "dashboard-work-item active"
 
-                                            "Customer Selected:",
+                                :
 
-                                            customer.id
-
-                                        );
-
-                                        setSelectedCustomerId(
-
-                                            customer.id
-
-                                        );
-
-                                        setStartCustomerId(
-
-                                            customer.id
-
-                                        );
-
-                                    }}
-
-                                >
-
-                                    CR-{customer.id}
-
-                                </button>
-
-                            )
-
-                        )
-
-                    }
-
-                </div>
-
-                <button
-
-                    className="dashboard-nav-button"
-
-                    onClick={next}
-
-                >
-
-                    ▶
-
-                </button>
-
-            </div>
-
-            <div className="dashboard-browser-bottom">
-
-                <button
-
-                    className="dashboard-dropdown-button"
-
-                    onClick={()=>{
-
-                        setDropdownOpen(
-
-                            !dropdownOpen
-
-                        );
-
-                    }}
-
-                >
-
-                    Customer Request {selectedCustomerId}
-
-                    <span>
-
-                        {dropdownOpen ? "▲" : "▼"}
-
-                    </span>
-
-                </button>
-
-                {
-
-                    dropdownOpen && (
-
-                        <div className="dashboard-dropdown-list">
-
-                            {
-
-                                customers.map(
-
-                                    customer=>(
-
-                                        <div
-
-                                            key={customer.id}
-
-                                            className={
-
-                                                customer.id===selectedCustomerId
-
-                                                ?
-
-                                                "dashboard-dropdown-item active"
-
-                                                :
-
-                                                "dashboard-dropdown-item"
-
-                                            }
-
-                                            onClick={()=>{
-
-                                                console.log(
-
-                                                    "Dropdown Customer:",
-
-                                                    customer.id
-
-                                                );
-
-                                                setSelectedCustomerId(
-
-                                                    customer.id
-
-                                                );
-
-                                                setStartCustomerId(
-
-                                                    customer.id
-
-                                                );
-
-                                                setDropdownOpen(
-
-                                                    false
-
-                                                );
-
-                                            }}
-
-                                        >
-
-                                            Customer Request {customer.id}
-
-                                        </div>
-
-                                    )
-
-                                )
+                                "dashboard-work-item"
 
                             }
 
+                            onClick={()=>{
+
+                                setSelectedCustomerId(id);
+
+                            }}
+
+                        >
+
+                            <div className="dashboard-work-header">
+
+                                <strong>
+
+                                    {
+
+                                        item.enquiry_id
+
+                                        ?
+
+                                        `ENQ-${id}`
+
+                                        :
+
+                                        `CR-${id}`
+
+                                    }
+
+                                </strong>
+
+                            </div>
+
+                            <div className="dashboard-work-body">
+
+                                <div>
+
+                                    {title}
+
+                                </div>
+
+                                <div>
+
+                                    {task}
+
+                                </div>
+
+                            </div>
+
+                            <div className="dashboard-work-footer">
+
+                                {status}
+
+                            </div>
+
                         </div>
 
-                    )
+                    );
 
-                }
+                })
 
-            </div>
+            }
 
         </div>
 

@@ -103,3 +103,82 @@ await fetch(
 return response.json();
 
 }
+
+// ====================================
+// GET SURVEYS FOR CUSTOMER
+// ====================================
+
+export async function getCustomerSurveys(
+
+customerRequestId
+
+){
+
+console.log(
+
+"[SalesSurvey Service] Loading surveys for customer:",
+
+customerRequestId
+
+);
+
+const response = await fetch(
+
+`${API}/sales-surveys/customer/${customerRequestId}`
+
+);
+
+const data = await response.json();
+
+console.log(
+
+"[SalesSurvey Service] Surveys:",
+
+data
+
+);
+
+return data;
+
+}
+
+
+// ====================================
+// GET CUSTOMER SURVEY
+// ====================================
+
+export async function getCustomerSurvey(
+
+customerRequestId,
+
+surveyId
+
+){
+
+console.log(
+
+"[SalesSurvey Service] Loading Survey:",
+
+surveyId
+
+);
+
+const response = await fetch(
+
+`${API}/sales-surveys/customer/${customerRequestId}/${surveyId}`
+
+);
+
+const data = await response.json();
+
+console.log(
+
+"[SalesSurvey Service] Survey Loaded:",
+
+data
+
+);
+
+return data;
+
+}

@@ -31,135 +31,155 @@ from "../components/operations/OpsActions";
 
 export default function OpsSelector(){
 
-const{
+    const{
 
-surveys,
+        opsData,
 
-selectedSurvey,
+        updateField,
 
-setSelectedSurvey,
+        saveOps
 
-opsData,
+    } = useOpsSelector();
 
-saveOps
+    return(
 
-}=
+        <div className="ops-selector-page">
 
-useOpsSelector();
+            {/* ==================================== */}
+            {/* HEADER */}
+            {/* ==================================== */}
 
-return(
+            <div className="ops-page-header">
 
-<div className="ops-selector-page">
+                <h1>
 
-<div className="ops-page-header">
+                    Ops Selector
 
-<h1>
+                </h1>
 
-Ops Selector
+                <p>
 
-</h1>
+                    Review the Sales Survey, modify the engineering
+                    recommendations if required, and submit the
+                    Operations Selection.
 
-<p>
+                </p>
 
-This screen pulls survey inputs and gives machine,
-pump, accessories, manpower, days and approval gate
-in one place.
+            </div>
 
-</p>
 
-</div>
+            {/* ==================================== */}
+            {/* WORKFLOW INFORMATION */}
+            {/* ==================================== */}
 
+            <div className="ops-selector-bar">
 
-<div className="ops-selector-bar">
+                <div className="ops-workflow-chip">
 
-<select
+                    <strong>
 
-value={selectedSurvey}
+                        Customer Request :
 
-onChange={(e)=>
+                    </strong>
 
-setSelectedSurvey(
+                    {" "}
 
-e.target.value
+                    CR-
 
-)
+                    {opsData.customer_request_id}
 
-}
+                </div>
 
-className="ops-survey-select"
+                <div className="ops-workflow-chip">
 
->
+                    <strong>
 
-<option value="">
+                        Sales Survey :
 
-Select Sales Survey
+                    </strong>
 
-</option>
+                    {" "}
 
-{
+                    SS-
 
-surveys.map(
+                    {opsData.sales_survey_id}
 
-survey=>(
+                </div>
 
-<option
+            </div>
 
-key={survey.id}
 
-value={survey.id}
+            {/* ==================================== */}
+            {/* INPUTS */}
+            {/* ==================================== */}
 
->
+            <div className="ops-grid">
 
-{survey.label}
+                <OpsInputs
 
-</option>
+                    inputs={
 
-)
+                        opsData.inputs
 
-)
+                    }
 
-}
+                />
 
-</select>
+                <OpsDecision
 
-</div>
+                    opsData={
 
+                        opsData
 
-<div className="ops-grid">
+                    }
 
-<OpsInputs
+                    updateField={
 
-inputs={opsData.inputs}
+                        updateField
 
-/>
+                    }
 
-<OpsDecision
+                />
 
-opsData={opsData}
+            </div>
 
-/>
 
-</div>
+            {/* ==================================== */}
+            {/* DAYS / MANPOWER */}
+            {/* ==================================== */}
 
+            <div className="ops-grid">
 
-<div className="ops-grid">
+                <OpsDaysManpower
 
-<OpsDaysManpower
+                    opsData={
 
-opsData={opsData}
+                        opsData
 
-/>
+                    }
 
-<OpsActions
+                    updateField={
 
-saveOps={saveOps}
+                        updateField
 
-/>
+                    }
 
-</div>
+                />
 
-</div>
+                <OpsActions
 
-);
+                    saveOps={
+
+                        saveOps
+
+                    }
+
+                />
+
+            </div>
+
+        </div>
+
+    );
 
 }

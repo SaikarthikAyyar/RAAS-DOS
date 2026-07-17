@@ -52,6 +52,15 @@ from backend.repositories.job_creation_repository import (
 
 )
 
+from backend.services.enquiry_service import EnquiryService
+
+from backend.services.status_service import (
+    update_customer_request_status
+)
+
+# Replace this with your actual invoice service once it exists
+# from backend.services.invoice_service import create_invoice_request
+
 # ====================================
 # CREATE JOB
 # ====================================
@@ -126,6 +135,12 @@ def create_job_request(
 
             "Quote not found."
 
+        )
+    
+    if quote.workflow_status != "MANAGEMENT_APPROVED":
+        raise HTTPException(
+            status_code=400,
+            detail="Quote has not been approved by management."
         )
 
     # ====================================
@@ -232,13 +247,103 @@ def create_job_request(
     # SAVE
     # ====================================
 
-    return create_job(
+# ====================================
+# SAVE
+# ====================================
+
+    job = create_job(
 
         db,
 
         job
 
     )
+
+    print(f"[Workflow] Job Created : {job.id}")
+
+    print("[Workflow] Completing Job Creation enquiry")
+
+    enquiries = EnquiryService.get_received_enquiries(
+
+        db,
+
+        "OPS"
+
+    )
+
+    for enquiry in enquiries:
+
+        if (
+            enquiry.requested_task == "JOB_CREATION"
+            and enquiry.approval_board_id == approval.id
+        ):
+
+            enquiry.completed = True
+            enquiry.workflow_status = "COMPLETED"
+
+            EnquiryService.update(
+
+                db,
+
+                enquiry
+
+            )
+
+            break
+
+    
+    update_customer_request_status(
+
+        db,
+
+        customer.id,
+
+        "READY_FOR_ALLOCATION"
+
+    )
+
+    print("[Workflow] Customer Status -> READY_FOR_ALLOCATION")
+
+
+    EnquiryService.create_allocation_enquiry(
+
+        db,
+
+        customer.id,
+
+        survey.id,
+
+        job.id,
+
+        {
+
+            "customer_request_id": customer.id,
+
+            "sales_survey_id": survey.id,
+
+            "job_creation_id": job.id
+
+        }
+
+    )
+
+    print("[Workflow] Allocation enquiry created")
+
+
+    # ====================================
+    # GENERATE INVOICE
+    # ====================================
+
+    # InvoiceService.create_invoice_request(
+    #     db,
+    #     job.id
+    # )
+
+    print("[Workflow] Invoice generation pending")
+
+    print("========== JOB CREATION COMPLETE ==========\n")
+
+    return job
 
 
 # ====================================

@@ -1,173 +1,337 @@
-import { useWorkflow } from "../contexts/WorkflowContext";
+import { useState, useEffect } from "react";
 
-import { useState } from "react";
+import {
+
+    listExecutions,
+
+    getExecution,
+
+    startPhase,
+
+    completePhase
+
+} from "../services/executionService";
+
 
 export default function Execution(){
 
- const { jobs, updateJob } = useWorkflow();
+    const [executions,setExecutions] = useState([]);
 
- const [selectedJob,setSelectedJob]=useState("");
+    const [selectedExecution,setSelectedExecution] = useState("");
 
- const [progress,setProgress]=useState(0);
+    const [execution,setExecution] = useState(null);
 
- function startExecution(){
 
-  if(!selectedJob){
+    // ====================================
+    // LOAD EXECUTION LIST
+    // ====================================
 
-   return;
+    useEffect(()=>{
 
-  }
+        listExecutions()
 
-  updateJob(
+        .then(data=>{
 
-   Number(selectedJob),
+            console.log("Execution List",data);
 
-   {
+            setExecutions(data);
 
-    execution:{
+        })
 
-     progress:Number(progress),
+        .catch(error=>{
 
-     completed:false
+            console.error(error);
+
+        });
+
+    },[]);
+
+
+    // ====================================
+    // LOAD SELECTED EXECUTION
+    // ====================================
+
+    useEffect(()=>{
+
+        if(!selectedExecution){
+
+            return;
+
+        }
+
+        console.log(
+
+            "Selected Execution",
+
+            selectedExecution
+
+        );
+
+        getExecution(selectedExecution)
+
+        .then(data=>{
+
+            console.log(
+
+                "Execution Loaded",
+
+                data
+
+            );
+
+            setExecution(data);
+
+        })
+
+        .catch(error=>{
+
+            console.error(error);
+
+        });
+
+    },[selectedExecution]);
+
+
+    // ====================================
+    // START PHASE
+    // ====================================
+
+    async function startCurrentPhase(){
+
+        if(!selectedExecution){
+
+            return;
+
+        }
+
+        try{
+
+            const response = await startPhase(
+
+                selectedExecution
+
+            );
+
+            console.log(
+
+                "Start Phase Response",
+
+                response
+
+            );
+
+            setExecution(response);
+
+            alert("Phase Started");
+
+        }
+
+        catch(error){
+
+            console.error(error);
+
+            alert("Failed");
+
+        }
 
     }
 
-   }
 
-  );
+    // ====================================
+    // COMPLETE PHASE
+    // ====================================
 
-  alert("Execution updated");
+    async function completeCurrentPhase(){
 
- }
+        if(!selectedExecution){
 
- return(
+            return;
 
- <div>
+        }
 
-  <h1>
+        try{
 
-   Execution
+            const response = await completePhase(
 
-  </h1>
+                selectedExecution
 
-  <select
+            );
 
-   value={selectedJob}
+            console.log(
 
-   onChange={
+                "Complete Phase Response",
 
-    e=>setSelectedJob(
+                response
 
-     e.target.value
+            );
 
-    )
+            setExecution(response);
 
-   }
+            alert("Phase Completed");
 
-  >
+        }
 
-   <option value="">
+        catch(error){
 
-    Select Customer
+            console.error(error);
 
-   </option>
+            alert("Failed");
 
-   {
-
-    jobs
-
-    .filter(
-
-      job=>job.allocation.machineAssigned
-
-    )
-
-    .map(job=>(
-
-      <option
-
-       key={job.id}
-
-       value={job.id}
-
-      >
-
-       {job.customer}
-
-      </option>
-
-    ))
-
-   }
-
-  </select>
-
-  <br/><br/>
-
-  <input
-
-   type="number"
-
-   placeholder="Progress %"
-
-   value={progress}
-
-   onChange={
-
-    e=>setProgress(
-
-     e.target.value
-
-    )
-
-   }
-
-  />
-
-  <br/><br/>
-
-  <button
-
-   onClick={startExecution}
-
-  >
-
-   Update Progress
-
-  </button>
-
-  <button
-
- onClick={()=>{
-
-  updateJob(
-
-   Number(selectedJob),
-
-   {
-
-    execution:{
-
-     progress:100,
-
-     completed:true
+        }
 
     }
 
-   }
 
-  )
+    return(
 
- }}
+    <div>
 
->
+        <h1>
 
- Complete Job
+            Execution
 
-</button>
+        </h1>
 
- </div>
+        <select
 
- )
+            value={selectedExecution}
+
+            onChange={
+
+                e=>setSelectedExecution(
+
+                    e.target.value
+
+                )
+
+            }
+
+        >
+
+            <option value="">
+
+                Select Execution
+
+            </option>
+
+            {
+
+                executions.map(execution=>(
+
+                    <option
+
+                        key={execution.id}
+
+                        value={execution.id}
+
+                    >
+
+                        Execution {execution.id}
+
+                    </option>
+
+                ))
+
+            }
+
+        </select>
+
+        <br/>
+
+        <br/>
+
+        {
+
+            execution &&
+
+            <div>
+
+                <p>
+
+                    Workflow :
+
+                    {" "}
+
+                    {execution.workflow_status}
+
+                </p>
+
+                <p>
+
+                    Current Phase :
+
+                    {" "}
+
+                    {execution.current_phase}
+
+                </p>
+
+                <p>
+
+                    Phase 1 :
+
+                    {" "}
+
+                    {execution.phase_1_status}
+
+                </p>
+
+                <p>
+
+                    Phase 2 :
+
+                    {" "}
+
+                    {execution.phase_2_status}
+
+                </p>
+
+                <p>
+
+                    Phase 3 :
+
+                    {" "}
+
+                    {execution.phase_3_status}
+
+                </p>
+
+            </div>
+
+        }
+
+        <br/>
+
+        <button
+
+            onClick={
+
+                startCurrentPhase
+
+            }
+
+        >
+
+            Start Current Phase
+
+        </button>
+
+        <button
+
+            onClick={
+
+                completeCurrentPhase
+
+            }
+
+        >
+
+            Complete Current Phase
+
+        </button>
+
+    </div>
+
+    );
 
 }

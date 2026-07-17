@@ -3,19 +3,13 @@
 # ====================================
 
 from fastapi import APIRouter
-
 from fastapi import Depends
-
 from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
 
 from backend.services.dashboard_service import (
-
-    get_dashboard_data,
-
-    get_dashboard_customer_list_request
-
+    get_dashboard_data
 )
 
 # ====================================
@@ -28,126 +22,41 @@ router = APIRouter()
 # DASHBOARD
 # ====================================
 
-@router.get(
-
-    "/dashboard"
-
-)
-
+@router.get("/dashboard")
 def dashboard(
 
-    start_customer_id: int,
+    role: str,
 
-    selected_customer_id: int | None = None,
+    received_enquiry_id: int | None = None,
 
-    selected_sales_survey_id: int | None = None,
+    sent_enquiry_id: int | None = None,
 
-    db: Session = Depends(
-
-        get_db
-
-    )
+    db: Session = Depends(get_db)
 
 ):
 
-    print(
+    print("\n========== DASHBOARD API ==========")
 
-        "\n========== DASHBOARD API =========="
+    print("Role:", role)
 
-    )
+    print("Received:", received_enquiry_id)
 
-    print(
-
-        "Start Customer:",
-
-        start_customer_id
-
-    )
-
-    print(
-
-        "Selected Customer:",
-
-        selected_customer_id
-
-    )
-
-    print(
-
-        "Selected Survey:",
-
-        selected_sales_survey_id
-
-    )
+    print("Sent:", sent_enquiry_id)
 
     dashboard = get_dashboard_data(
 
         db,
 
-        start_customer_id,
+        role,
 
-        selected_customer_id,
+        received_enquiry_id,
 
-        selected_sales_survey_id
-
-    )
-
-    print(
-
-        "Dashboard Response Ready"
+        sent_enquiry_id
 
     )
 
-    print(
+    print("Dashboard Response Ready")
 
-        "===================================\n"
-
-    )
+    print("===================================\n")
 
     return dashboard
-
-# ====================================
-# CUSTOMER NAVIGATOR
-# ====================================
-
-@router.get(
-
-    "/dashboard/customer-list"
-
-)
-
-def dashboard_customer_list(
-
-    db: Session = Depends(
-
-        get_db
-
-    )
-
-):
-
-    print(
-
-        "\n========== DASHBOARD NAVIGATOR API =========="
-
-    )
-
-    customers = get_dashboard_customer_list_request(
-
-        db
-
-    )
-
-    print(
-
-        "Navigator Response Ready"
-
-    )
-
-    print(
-
-        "=============================================\n"
-
-    )
-
-    return customers

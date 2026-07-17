@@ -1,50 +1,97 @@
-import { useWorkflow } from "../contexts/WorkflowContext";
 
-import { useState } from "react";
+
+
+
+import { useState, useEffect } from "react";
+
+import {
+
+    loadAllocation,
+
+    saveAllocation as saveAllocationService
+
+} from "../services/allocationService";
+
+
 
 export default function Allocation(){
-
- const { jobs, updateJob } = useWorkflow();
+const [allocationData,setAllocationData]=useState(null);
 
  const [selectedJob,setSelectedJob]=useState("");
 
- const [allocation,setAllocation]=useState({
+const [selectedMachines,setSelectedMachines]=useState([]);
 
-  machineAssigned:"",
+const [selectedPersonnel,setSelectedPersonnel]=useState([]);
 
-  teamAssigned:""
+const [siteLocation,setSiteLocation]=useState("");
 
- });
+ useEffect(()=>{
 
- function saveAllocation(){
+    if(!selectedJob){
 
-  if(!selectedJob){
-
-   return;
-
-  }
-
-  updateJob(
-
-   Number(selectedJob),
-
-   {
-
-    allocation:{
-
-     machineAssigned:allocation.machineAssigned,
-
-     teamAssigned:[allocation.teamAssigned]
+        return;
 
     }
 
-   }
+    console.log("Selected Job", selectedJob);
 
-  );
+    loadAllocation(selectedJob)
 
-  alert("Resources allocated");
+    .then(data=>{
 
- }
+        console.log(data);
+
+        setAllocationData(data);
+
+    });
+
+    
+
+},[selectedJob]);
+
+async function saveAllocation(){
+
+    if(!selectedJob){
+
+        return;
+
+    }
+
+    const payload={
+
+        machine_ids:selectedMachines,
+
+        personnel_ids:selectedPersonnel,
+
+        site_location:siteLocation
+
+    };
+
+    console.log(payload);
+
+    try{
+
+        const response = await saveAllocationService(
+
+            selectedJob,
+
+            payload
+
+        );
+
+        console.log("Allocation Response",response);
+
+        alert("Allocation Complete");
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("Allocation Failed");
+
+    }
+
+}
 
  return(
 
@@ -72,83 +119,140 @@ export default function Allocation(){
 
   >
 
-   <option value="">
 
-    Select Customer
 
-   </option>
+  <option value="">Select Job</option>
+  <option value="1">JOB-0001</option>
+  <option value="2">JOB-0002</option>
+  <option value="3">JOB-0003</option>
 
-   {
 
-    jobs
-
-    .filter(
-
-      job=>job.jobCreation?.created
-
-    )
-
-    .map(job=>(
-
-      <option
-
-       key={job.id}
-
-       value={job.id}
-
-      >
-
-       {job.customer}
-
-      </option>
-
-    ))
-
-   }
 
   </select>
 
   <br/><br/>
 
-  <input
 
-   placeholder="Machine"
-
-   onChange={
-
-    e=>setAllocation({
-
-     ...allocation,
-
-     machineAssigned:e.target.value
-
-    })
-
-   }
-
-  />
 
   <br/>
 
-  <input
+  {allocationData?.machines?.map(machine => (
 
-   placeholder="Team"
+      <div key={machine.id}>
 
-   onChange={
+          <input
 
-    e=>setAllocation({
+              type="checkbox"
 
-     ...allocation,
+              onChange={(e)=>{
 
-     teamAssigned:e.target.value
+                  if(e.target.checked){
 
-    })
+                      setSelectedMachines(prev=>[
 
-   }
+                          ...prev,
 
-  />
+                          machine.id
+
+                      ]);
+
+                  }else{
+
+                      setSelectedMachines(
+
+                          prev=>prev.filter(
+
+                              id=>id!==machine.id
+
+                          )
+
+                      );
+
+                  }
+
+              }}
+
+          />
+
+          {machine.machine_name}
+
+          {" - "}
+
+          {machine.asset_number}
+
+      </div>
+
+  ))}
 
   <br/><br/>
+
+  <h3>Personnel</h3>
+
+  {allocationData?.personnel?.map(person => (
+
+      <div key={person.id}>
+
+          <input
+
+              type="checkbox"
+
+              onChange={(e)=>{
+
+                  if(e.target.checked){
+
+                      setSelectedPersonnel(prev=>[
+
+                          ...prev,
+
+                          person.id
+
+                      ]);
+
+                  }else{
+
+                      setSelectedPersonnel(
+
+                          prev=>prev.filter(
+
+                              id=>id!==person.id
+
+                          )
+
+                      );
+
+                  }
+
+              }}
+
+          />
+
+          {person.name}
+
+          {" - "}
+
+          {person.designation}
+
+      </div>
+
+  ))}
+
+  <input
+
+      placeholder="Site Location"
+
+      value={siteLocation}
+
+      onChange={
+
+          e=>setSiteLocation(
+
+              e.target.value
+
+          )
+
+      }
+
+  />
 
   <button
 
@@ -161,6 +265,8 @@ export default function Allocation(){
   </button>
 
  </div>
+
+
 
  )
 

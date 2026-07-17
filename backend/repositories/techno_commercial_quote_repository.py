@@ -181,29 +181,15 @@ def create_quote(
 
 ):
 
-    quote = get_quote_by_ops_selection(
 
-        db,
-
-        payload["ops_selection_id"]
-
+    quote = Quote(
+        ops_selection_id=payload["ops_selection_id"]
     )
 
-    if quote is None:
+    db.add(quote)
 
-        quote = Quote(
+    
 
-            ops_selection_id=
-
-            payload["ops_selection_id"]
-
-        )
-
-        db.add(
-
-            quote
-
-        )
 
     
     quote.customer_request_id = (
@@ -352,37 +338,7 @@ def create_quote(
 
 
 
-# ====================================
-# GET QUOTE BY OPS
-# ====================================
 
-def get_quote_by_ops_selection(
-
-    db,
-
-    ops_selection_id
-
-):
-
-    return (
-
-        db.query(
-
-            Quote
-
-        )
-
-        .filter(
-
-            Quote.ops_selection_id ==
-
-            ops_selection_id
-
-        )
-
-        .first()
-
-    )
 
 
 # ====================================
@@ -398,23 +354,14 @@ def get_quote_by_ops_selection(
 ):
 
     return (
-
-        db.query(
-
-            Quote
-
-        )
-
+        db.query(Quote)
         .filter(
-
-            Quote.ops_selection_id ==
-
-            ops_selection_id
-
+            Quote.ops_selection_id == ops_selection_id
         )
-
+        .order_by(
+            Quote.revision_number.desc()
+        )
         .first()
-
     )
 
 

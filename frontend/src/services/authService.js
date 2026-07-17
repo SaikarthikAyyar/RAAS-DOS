@@ -1,82 +1,57 @@
-const users=[
+// ====================================
+// LOGIN USER
+// ====================================
 
-{
+export async function loginUser(
 
-email:"admin@raas.com",
+    email,
 
-password:"admin123",
-
-role:"Admin"
-
-},
-
-{
-
-email:"sales@raas.com",
-
-password:"sales123",
-
-role:"Sales"
-
-},
-
-{
-
-email:"ops@raas.com",
-
-password:"ops123",
-
-role:"Operations"
-
-},
-
-{
-
-email:"customer@raas.com",
-
-password:"cust123",
-
-role:"Customer"
-
-},
-
-{
-
-email:"manager@raas.com",
-
-password:"manager123",
-
-role:"Management"
-
-}
-
-]
-
-
-export function loginUser(
-
-email,
-
-password,
-
-role
+    password
 
 ){
 
-return users.find(
+    const response = await fetch(
 
-user=>
+        "http://127.0.0.1:8000/login",
 
-user.email===email
+        {
 
-&&
+            method:"POST",
 
-user.password===password
+            headers:{
 
-&&
+                "Content-Type":"application/json"
 
-user.role===role
+            },
 
-)
+            body:JSON.stringify({
+
+                email,
+
+                password
+
+            })
+
+        }
+
+    );
+
+    if(
+
+        !response.ok
+
+    ){
+
+        const error = await response.json();
+
+        throw new Error(
+
+            error.detail
+
+        );
+
+    }
+
+    return await response.json();
 
 }

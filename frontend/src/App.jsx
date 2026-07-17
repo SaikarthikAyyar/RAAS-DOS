@@ -10,6 +10,8 @@ import CustomerRequest from "./pages/CustomerRequest/CustomerRequest";
 
 import SalesSurvey from "./pages/SalesSurvey/SalesSurvey";
 
+import OpsApproval from "./pages/OpsApproval";
+
 import OpsSelector from "./pages/OpsSelector";
 
 import DewateringGate from "./pages/DewateringGate";
@@ -25,6 +27,8 @@ import Allocation from "./pages/Allocation";
 import Execution from "./pages/Execution";
 
 import CustomerPortal from "./pages/CustomerPortal";
+
+
 
 import Analytics from "./pages/Analytics";
 
@@ -47,11 +51,15 @@ function App() {
 
           <Route path="sales-survey" element={<SalesSurvey />} />
 
+          <Route path="ops-approval" element={<OpsApproval />} />
+
           <Route path="ops-selector" element={<OpsSelector />} />
 
           <Route path="dewatering-gate" element={<DewateringGate />} />
 
           <Route path="quote" element={<TechnoCommercialQuote />} />
+
+
 
           <Route path="approval" element={<ApprovalBoard />} />
 

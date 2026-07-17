@@ -16,6 +16,13 @@ from backend.repositories.approval_board_repository import (
 
 )
 
+from backend.repositories.techno_commercial_quote_repository import get_ops_selection, get_quote
+from backend.services.enquiry_service import EnquiryService
+
+from backend.services.status_service import (
+    update_customer_request_status
+)
+
 
 
 # ====================================
@@ -70,6 +77,8 @@ def get_approval_board_request(
 
 
 
+
+
 # ====================================
 # APPROVE QUOTE
 # ====================================
@@ -84,15 +93,13 @@ def approve_quote_request(
 
     print(
 
-        "\n========== APPROVAL SERVICE =========="
+        "\n========== APPROVAL WORKFLOW =========="
 
     )
 
     print(
 
-        "Approve Request:",
-
-        quote_id
+        f"[Workflow] Quote : {quote_id}"
 
     )
 
@@ -104,15 +111,111 @@ def approve_quote_request(
 
     )
 
+    quote = get_quote(db, quote_id)
+
+    ops = get_ops_selection(
+        db,
+        quote.ops_selection_id
+    )
+
     print(
 
-        "Approval Completed"
+        f"[Workflow] Approval ID : {approval.id}"
 
     )
 
     print(
 
-        "======================================\n"
+        "[Workflow] Searching MANAGER enquiry"
+
+    )
+
+    enquiries = EnquiryService.get_received_enquiries(
+
+        db,
+
+        "MANAGER"
+
+    )
+
+    for enquiry in enquiries:
+
+        if (
+            enquiry.requested_task == "APPROVAL_BOARD"
+            and enquiry.receiver_role == "MANAGER"
+            and enquiry.completed is False
+            and enquiry.quote_id == quote_id
+        ):
+
+            print(
+
+                f"[Workflow] Completing Enquiry {enquiry.id}"
+
+            )
+
+            enquiry.completed = True
+
+            enquiry.workflow_status = "COMPLETED"
+
+            EnquiryService.update(
+
+                db,
+
+                enquiry
+
+            )
+
+            break
+
+    print(
+
+        "[Workflow] Creating Job Creation enquiry"
+
+    )
+
+    EnquiryService.create_allocation_enquiry(
+
+        db,
+
+        quote.customer_request_id,
+
+        ops.sales_survey_id,
+
+        approval.id,
+
+        {
+
+            "customer_request_id": quote.customer_request_id,
+
+            "sales_survey_id": ops.sales_survey_id,
+
+            "approval_board_id": approval.id
+
+        }
+
+    )
+
+    
+
+    update_customer_request_status(
+
+        db,
+
+        quote.customer_request_id,
+
+        "APPROVAL_COMPLETED"
+
+    )
+
+    print(
+
+        "[Workflow] Customer Status -> APPROVAL_COMPLETED"
+
+    )
+
+    print(
+
+        "========== APPROVAL COMPLETE ==========\n"
 
     )
 

@@ -13,6 +13,8 @@ import {
 
     ClipboardCheck,
 
+    ClipboardList,
+
     Settings,
 
     Droplets,
@@ -69,6 +71,16 @@ const menuItems = [
         path: "/sales-survey",
 
         icon: <ClipboardCheck size={20} />
+
+    },
+
+    {
+
+        title: "Ops Approval",
+
+        path: "/ops-approval",
+
+        icon: <ClipboardList size={20} />
 
     },
 
@@ -181,7 +193,14 @@ export default function Sidebar() {
 
             <div className="logo">
 
-                <img src={logo} alt="JT Logo" style={{ maxWidth: "160px", height: "auto" }} />
+                <img
+                    src={logo}
+                    alt="JT Logo"
+                    style={{
+                        maxWidth: "160px",
+                        height: "auto"
+                    }}
+                />
 
             </div>
 

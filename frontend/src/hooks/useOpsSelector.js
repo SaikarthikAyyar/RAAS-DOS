@@ -8,11 +8,9 @@ import { useState } from "react";
 
 import {
 
-getOpsSurveys,
+    getOpsPrefill,
 
-getOpsPrefill,
-
-saveOpsSelector
+    saveOpsSelector
 
 }
 
@@ -25,300 +23,256 @@ from "../services/opsSelectorService";
 
 export default function useOpsSelector(){
 
-const[
+    const salesSurveyId = Number(
 
-surveys,
+        localStorage.getItem(
 
-setSurveys
+            "ops_selector_sales_survey_id"
 
-]=
+        )
 
-useState(
+    );
 
-[]
+    const customerRequestId = Number(
 
-);
+        localStorage.getItem(
 
+            "ops_selector_customer_request_id"
 
-const[
+        )
 
-selectedSurvey,
+    );
 
-setSelectedSurvey
+    const enquiryId = Number(
 
-]=
+        localStorage.getItem(
 
-useState(
+            "ops_selector_enquiry_id"
 
-""
+        )
 
-);
+    );
 
+    const [
 
-const[
+        opsData,
 
-opsData,
+        setOpsData
 
-setOpsData
+    ] = useState({
 
-]=
+        inputs:{},
 
-useState({
+        customer_request_id:
 
-inputs:{},
+            customerRequestId,
 
-doability:"",
+        sales_survey_id:
 
-service_configuration:"",
+            salesSurveyId,
 
-recommended_machine:"",
+        enquiry_id:
 
-pump_hose_package:"",
+            enquiryId,
 
-accessories:"",
+        doability:"",
 
-mobilisation_days:0,
+        service_configuration:"",
 
-setup_days:0,
+        recommended_machine:"",
 
-execution_days:0,
+        pump_hose_package:"",
 
-demob_days:0,
+        accessories:"",
 
-total_job_days:0,
+        mobilisation_days:0,
 
-manpower_required:"",
+        setup_days:0,
 
-approval_gate:"",
+        execution_days:0,
 
-internal_next_action:"",
+        demob_days:0,
 
-selection_reason:""
+        total_job_days:0,
 
-});
+        manpower_required:"",
 
+        approval_gate:"",
 
-// ====================================
-// LOAD SURVEYS
-// ====================================
+        internal_next_action:"",
 
-useEffect(
+        selection_reason:""
 
-()=>{
+    });
 
-loadSurveys();
 
-},
+    // ====================================
+    // LOAD PREFILL
+    // ====================================
 
-[]
+    useEffect(()=>{
 
-);
+        if(
 
+            !salesSurveyId
 
-// ====================================
-// LOAD PREVIEW
-// ====================================
+        ){
 
-useEffect(
+            return;
 
-()=>{
+        }
 
-if(
+        loadPrefill();
 
-!selectedSurvey
+    },[]);
 
-){
 
-return;
+    // ====================================
+    // LOAD PREFILL
+    // ====================================
 
-}
+    async function loadPrefill(){
 
-loadPrefill(
+        try{
 
-selectedSurvey
+            const data = await getOpsPrefill(
 
-);
+                salesSurveyId
 
-},
+            );
 
-[
+            setOpsData({
 
-selectedSurvey
+                ...data,
 
-]
+                customer_request_id:
 
-);
+                    customerRequestId,
 
+                sales_survey_id:
 
-// ====================================
-// LOAD SURVEYS
-// ====================================
+                    salesSurveyId,
 
-async function loadSurveys(){
+                enquiry_id:
 
-try{
+                    enquiryId
 
-const data=
+            });
 
-await getOpsSurveys();
+        }
 
-setSurveys(
+        catch(error){
 
-data
+            console.log(error);
 
-);
+        }
 
-}
+    }
 
-catch(error){
 
-console.log(
+    // ====================================
+    // UPDATE FIELD
+    // ====================================
 
-error
+    function updateField(
 
-);
+        field,
 
-}
+        value
 
-}
+    ){
 
+        setOpsData(
 
-// ====================================
-// LOAD PREFILL
-// ====================================
+            previous=>({
 
-async function loadPrefill(
+                ...previous,
 
-salesSurveyId
+                [field]:
 
-){
+                    value
 
-try{
+            })
 
-const data=
+        );
 
-await getOpsPrefill(
+    }
 
-salesSurveyId
 
-);
+    // ====================================
+    // SAVE
+    // ====================================
 
-setOpsData(
+    async function saveOps(){
 
-data
+        try{
 
-);
+            const payload = {
 
-}
+                ...opsData,
 
-catch(error){
+                sales_survey_id: salesSurveyId,
 
-console.log(
+                customer_request_id: customerRequestId,
 
-error
+                enquiry_id: enquiryId,
 
-);
+                // Convert accessories only if needed
+                accessories:
+                    Array.isArray(opsData.accessories)
+                        ? opsData.accessories.join(", ")
+                        : typeof opsData.accessories === "object"
+                        && opsData.accessories !== null
+                            ? Object.values(opsData.accessories).join(", ")
+                            : (opsData.accessories ?? ""),
 
-}
+                total_job_days:
+                    Number(opsData.mobilisation_days || 0) +
+                    Number(opsData.setup_days || 0) +
+                    Number(opsData.execution_days || 0) +
+                    Number(opsData.demob_days || 0)
 
-}
+            };
 
+            console.log(payload);
 
-// ====================================
-// SAVE
-// ====================================
+            const response = await saveOpsSelector(payload);
 
-async function saveOps(){
+            if(response.detail){
 
-try{
+                alert(response.detail);
 
-const response=
+                return;
 
-await saveOpsSelector({
+            }
 
-sales_survey_id:
+            alert("Ops Selection Saved Successfully.");
 
-selectedSurvey
+        }
 
-});
+        catch(error){
 
-if(
+            console.log(error);
 
-response.detail
+            alert("Unable to save Ops Selection.");
 
-){
+        }
 
-alert(
+    }
 
-response.detail
 
-);
+    // ====================================
+    // RETURN
+    // ====================================
 
-return;
+    return{
 
-}
+        opsData,
 
-alert(
+        updateField,
 
-"Ops Selection Saved Successfully."
+        saveOps
 
-);
-
-}
-
-catch(error){
-
-console.log(
-
-error
-
-);
-
-if(
-
-error.detail
-
-){
-
-alert(
-
-error.detail
-
-);
-
-}
-
-else{
-
-alert(
-
-"Unable to save Ops Selection."
-
-);
-
-}
-
-}
-
-}
-
-
-// ====================================
-// RETURN
-// ====================================
-
-return{
-
-surveys,
-
-selectedSurvey,
-
-setSelectedSurvey,
-
-opsData,
-
-saveOps
-
-};
+    };
 
 }

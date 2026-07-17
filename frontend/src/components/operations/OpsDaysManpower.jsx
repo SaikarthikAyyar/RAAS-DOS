@@ -4,123 +4,276 @@
 
 export default function OpsDaysManpower({
 
-opsData
+    opsData,
+
+    updateField
 
 }){
 
-return(
+    return(
 
-<div className="ops-card">
+        <div className="ops-card">
 
-<div className="ops-header">
+            <div className="ops-header">
 
-<h2>
+                <h2>
 
-Days & Manpower
+                    Days & Manpower
 
-</h2>
+                </h2>
 
-</div>
+            </div>
 
-<div className="ops-table">
+            <div className="ops-table">
 
-<div className="ops-table-header">
+                <div className="ops-table-header">
 
-<div>Parameter</div>
+                    <div>
 
-<div>Output</div>
+                        Parameter
 
-<div>Unit</div>
+                    </div>
 
-</div>
+                    <div>
 
-<Row
-label="Mobilisation"
-value={opsData?.mobilisation_days ?? "-"}
-unit="day"
-/>
+                        Output
 
-<Row
-label="Setup"
-value={opsData?.setup_days ?? "-"}
-unit="day"
-/>
+                    </div>
 
-<Row
-label="Execution"
-value={opsData?.execution_days ?? "-"}
-unit="days"
-/>
+                    <div>
 
-<Row
-label="Demobilisation"
-value={opsData?.demob_days ?? "-"}
-unit="day"
-/>
+                        Unit
 
-<Row
-label="Total Job Days"
-value={opsData?.total_job_days ?? "-"}
-unit="days"
-/>
+                    </div>
 
-<Row
-label="Manpower"
-value={
-    opsData?.manpower_required != null
-        ? `${opsData.manpower_required} Personnel`
-        : "-"
-}
-unit="-"
-/>
+                </div>
 
-</div>
+                <Row
 
-</div>
+                    label="Mobilisation"
 
-);
+                    field="mobilisation_days"
+
+                    value={opsData.mobilisation_days}
+
+                    unit="day"
+
+                    updateField={updateField}
+
+                />
+
+                <Row
+
+                    label="Setup"
+
+                    field="setup_days"
+
+                    value={opsData.setup_days}
+
+                    unit="day"
+
+                    updateField={updateField}
+
+                />
+
+                <Row
+
+                    label="Execution"
+
+                    field="execution_days"
+
+                    value={opsData.execution_days}
+
+                    unit="days"
+
+                    updateField={updateField}
+
+                />
+
+                <Row
+
+                    label="Demobilisation"
+
+                    field="demob_days"
+
+                    value={opsData.demob_days}
+
+                    unit="day"
+
+                    updateField={updateField}
+
+                />
+
+                <Row
+
+                    label="Total Job Days"
+
+                    field="total_job_days"
+
+                    value={opsData.total_job_days}
+
+                    unit="days"
+
+                    updateField={updateField}
+
+                />
+
+                <TextRow
+
+                    label="Manpower"
+
+                    field="manpower_required"
+
+                    value={opsData.manpower_required}
+
+                    unit="-"
+
+                    updateField={updateField}
+
+                />
+
+            </div>
+
+        </div>
+
+    );
 
 }
 
 
 // ====================================
-// ROW
+// NUMBER ROW
 // ====================================
 
 function Row({
 
-label,
+    label,
 
-value,
+    field,
 
-unit
+    value,
+
+    unit,
+
+    updateField
 
 }){
 
-return(
+    return(
 
-<div className="ops-table-row">
+        <div className="ops-table-row">
 
-<div className="ops-label">
+            <div className="ops-label">
 
-{label}
+                {label}
 
-</div>
+            </div>
 
-<div className="ops-value">
+            <div className="ops-value">
 
-{value}
+                <input
 
-</div>
+                    className="ops-input"
 
-<div className="ops-unit">
+                    type="number"
 
-{unit}
+                    value={value ?? 0}
 
-</div>
+                    onChange={(event)=>{
 
-</div>
+                        updateField(
 
-);
+                            field,
+
+                            Number(
+
+                                event.target.value
+
+                            )
+
+                        );
+
+                    }}
+
+                />
+
+            </div>
+
+            <div className="ops-unit">
+
+                {unit}
+
+            </div>
+
+        </div>
+
+    );
+
+}
+
+
+// ====================================
+// TEXT ROW
+// ====================================
+
+function TextRow({
+
+    label,
+
+    field,
+
+    value,
+
+    unit,
+
+    updateField
+
+}){
+
+    return(
+
+        <div className="ops-table-row">
+
+            <div className="ops-label">
+
+                {label}
+
+            </div>
+
+            <div className="ops-value">
+
+                <input
+
+                    className="ops-input"
+
+                    type="text"
+
+                    value={value ?? ""}
+
+                    onChange={(event)=>{
+
+                        updateField(
+
+                            field,
+
+                            event.target.value
+
+                        );
+
+                    }}
+
+                />
+
+            </div>
+
+            <div className="ops-unit">
+
+                {unit}
+
+            </div>
+
+        </div>
+
+    );
 
 }

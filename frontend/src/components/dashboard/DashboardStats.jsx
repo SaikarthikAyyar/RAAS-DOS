@@ -1,8 +1,13 @@
 // ====================================
-// COMPONENT
+// IMPORTS
 // ====================================
 
 import "./Dashboard.css";
+
+
+// ====================================
+// COMPONENT
+// ====================================
 
 export default function DashboardStats({
 
@@ -10,25 +15,13 @@ export default function DashboardStats({
 
 }){
 
-    console.log(
-
-        "Dashboard Statistics:",
-
-        stats
-
-    );
-
-    if(
-
-        !stats
-
-    ){
+    if(!stats){
 
         return(
 
             <div className="dashboard-placeholder">
 
-                Loading statistics...
+                Loading Dashboard...
 
             </div>
 
@@ -36,51 +29,83 @@ export default function DashboardStats({
 
     }
 
+    const cards = [
+
+        {
+
+            title:"Received Enquiries",
+
+            value:stats.received_count ?? 0
+
+        },
+
+        {
+
+            title:"Sent Enquiries",
+
+            value:stats.sent_count ?? 0
+
+        },
+
+        {
+
+            title:"Customer Requests",
+
+            value:stats.customer_requests ?? 0
+
+        },
+
+        {
+
+            title:"Sales Surveys",
+
+            value:stats.survey_completed ?? 0
+
+        },
+
+        {
+
+            title:"Quotes",
+
+            value:stats.quote_created ?? 0
+
+        },
+
+        {
+
+            title:"Jobs",
+
+            value:stats.job_in_progress ?? 0
+
+        }
+
+    ];
+
     return(
 
         <div className="dashboard-stats">
 
-            <StatCard
+            {
 
-                title="Customer Requests"
+                cards.map(
 
-                value={stats.customer_requests}
+                    (card,index)=>(
 
-            />
+                        <StatCard
 
+                            key={index}
 
+                            title={card.title}
 
-            <StatCard
+                            value={card.value}
 
-                title="Survey Completed"
+                        />
 
-                value={stats.survey_completed}
+                    )
 
-            />
+                )
 
-            <StatCard
-
-                title="Ops Completed"
-
-                value={stats.ops_completed}
-
-            />
-
-            <StatCard
-
-                title="Quote Created"
-
-                value={stats.quote_created}
-
-            />
-
-            <StatCard
-
-                title="Job In Progress"
-
-                value={stats.job_in_progress}
-
-            />
+            }
 
         </div>
 

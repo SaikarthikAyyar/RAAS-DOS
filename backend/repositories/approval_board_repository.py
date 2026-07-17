@@ -41,6 +41,10 @@ def list_approval_quotes(
 
         )
 
+        .filter(
+            Quote.workflow_status == "CUSTOMER_APPROVED"
+        )
+
         .join(
 
             CustomerRequest,
@@ -179,6 +183,13 @@ def approve_quote(
             "Quote not found."
 
         )
+    
+    print(quote.workflow_status)
+    
+    if quote.workflow_status != "MANAGEMENT_APPROVAL":
+        raise ValueError(
+            "Quote is not awaiting management approval."
+        )
 
     approval = (
 
@@ -220,45 +231,18 @@ def approve_quote(
 
     approval.approval_date = func.now()
 
-    customer = (
+    quote.workflow_status = "MANAGEMENT_APPROVED"
 
-        db.query(
-
-            CustomerRequest
-
-        )
-
-        .filter(
-
-            CustomerRequest.id ==
-
-            quote.customer_request_id
-
-        )
-
-        .first()
-
-    )
-
-    if customer is not None:
-
-        customer.status = "APPROVED"
-
-        print(
-
-            "Customer Updated:",
-
-            customer.id
-
-        )
+    print("[Repository] Quote Status -> MANAGEMENT_APPROVED")
 
     db.commit()
 
-    db.refresh(
 
-        approval
+    db.commit()
 
-    )
+    db.refresh(quote)
+    db.refresh(approval)
+
 
     print(
 

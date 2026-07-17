@@ -24,7 +24,27 @@ from backend.api.approval_board_api import (
     router as approval_board_router
 )
 
+from backend.api.auth_api import (
+
+    router as auth_router
+
+)
+
+from backend.api.allocation_api import (
+    router as allocation_router
+)
+
+from backend.api.execution_api import (
+    router as execution_router
+)
+
+from backend.api.enquiry_api import (
+    router as enquiry_router
+)
+
 from backend.api.job_creation_api import router as job_creation_router
+
+from backend.api.ops_approval_api import router as ops_approval_router
 
 from backend.database.init_db import create_tables
 
@@ -72,6 +92,12 @@ app.add_middleware(
 
 create_tables()
 
+app.include_router(
+
+    auth_router
+
+)
+
 
 app.include_router(
 
@@ -92,6 +118,12 @@ app.include_router(
 )
 
 app.include_router(report_router)
+
+app.include_router(
+
+    ops_approval_router
+
+)
 
 app.include_router(
 
@@ -129,6 +161,27 @@ app.include_router(
 
 )
 
+
+
+app.include_router(
+
+    allocation_router
+
+)
+
+
+app.include_router(
+
+    execution_router
+
+)
+
+
+app.include_router(
+
+    enquiry_router
+
+)
 
 @app.get("/")
 

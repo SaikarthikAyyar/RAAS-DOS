@@ -19,7 +19,13 @@ customers,
 
 selectedCustomer,
 
-setSelectedCustomer
+setSelectedCustomer,
+
+customerSurveys,
+
+selectedSurvey,
+
+setSelectedSurvey
 
 }){
 
@@ -39,9 +45,67 @@ A. Customer / Opportunity
 
 <div className="survey-id">
 
-Survey ID :
+<label>
 
-{surveyData.id ? `SS-${surveyData.id}` : "Pending"}
+Survey ID
+
+</label>
+
+<select
+
+value={selectedSurvey}
+
+onChange={(e)=>{
+
+console.log(
+
+"[SalesSurvey] Survey Selected:",
+
+e.target.value
+
+);
+
+setSelectedSurvey(
+
+e.target.value
+
+);
+
+}}
+
+>
+
+<option value="">
+
+Pending
+
+</option>
+
+{
+
+customerSurveys.map(
+
+survey=>(
+
+<option
+
+key={survey.id}
+
+value={survey.id}
+
+>
+
+{`SS-${survey.id}`}
+
+</option>
+
+)
+
+)
+
+}
+
+</select>
 
 </div>
 

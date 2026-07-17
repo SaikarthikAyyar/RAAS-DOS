@@ -66,7 +66,6 @@ class Quote(Base):
 
         ),
 
-        unique=True,
 
         nullable=False
 

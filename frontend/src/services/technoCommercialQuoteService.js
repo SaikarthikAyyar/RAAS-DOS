@@ -142,3 +142,88 @@ export async function getQuotePreview(
     return response.json();
 
 }
+
+// ====================================
+// CUSTOMER APPROVE QUOTE
+// ====================================
+
+export async function approveQuote(
+
+    quoteId
+
+){
+
+    const response =
+
+    await fetch(
+
+        `${API}/quote/${quoteId}/approve`,
+
+        {
+
+            method:"POST"
+
+        }
+
+    );
+
+    const data =
+
+    await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// CUSTOMER REQUEST REVISION
+// ====================================
+
+export async function requestQuoteRevision(
+
+    quoteId
+
+){
+
+    const response =
+
+    await fetch(
+
+        `${API}/quote/${quoteId}/revision`,
+
+        {
+
+            method:"POST"
+
+        }
+
+    );
+
+    const data =
+
+    await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
+
+}

@@ -8,6 +8,8 @@ export default function CommercialEstimateCard({
 
     quote,
 
+    setQuote,
+
     selectedOps,
 
     onSubmitApproval
@@ -117,51 +119,73 @@ INR Value
 
 <div className="quote-table-row">
 
-<div className="quote-label">
+    <div className="quote-label">
+        Cleaning Quote
+    </div>
 
-Cleaning Quote
+    <div style={{textAlign:"right"}}>
+
+        <input
+            type="number"
+            className="quote-input"
+            value={quote.cleaning_quote ?? ""}
+            onChange={(e)=>
+                setQuote({
+                    ...quote,
+                    cleaning_quote:Number(e.target.value)
+                })
+            }
+        />
+
+    </div>
 
 </div>
-
-<div className="quote-value">
-
-₹ {quote.cleaning_quote.toLocaleString()}
-
-</div>
-
-</div>
-
 
 <div className="quote-table-row">
 
-<div className="quote-label">
+    <div className="quote-label">
+        Dewatering Add-on
+    </div>
 
-Dewatering Add-on
+    <div style={{textAlign:"right"}}>
+
+        <input
+            type="number"
+            className="quote-input"
+            value={quote.dewatering_addon ?? ""}
+            onChange={(e)=>
+                setQuote({
+                    ...quote,
+                    dewatering_addon:Number(e.target.value)
+                })
+            }
+        />
+
+    </div>
 
 </div>
-
-<div className="quote-value">
-
-₹ {quote.dewatering_addon.toLocaleString()}
-
-</div>
-
-</div>
-
 
 <div className="quote-table-row">
 
-<div className="quote-label">
+    <div className="quote-label">
+        Combined Budgetary Value
+    </div>
 
-Combined Budgetary Value
+    <div style={{textAlign:"right"}}>
 
-</div>
+        <input
+            type="number"
+            className="quote-input"
+            value={quote.total_quote ?? ""}
+            onChange={(e)=>
+                setQuote({
+                    ...quote,
+                    total_quote:Number(e.target.value)
+                })
+            }
+        />
 
-<div className="quote-commercial-total">
-
-₹ {quote.combined_budgetary_value.toLocaleString()}
-
-</div>
+    </div>
 
 </div>
 

@@ -2,6 +2,8 @@ from backend.models.customer_requests import CustomerRequest
 from backend.models.sales_survey import SalesSurvey
 from backend.models.ops_selector import OpsSelection
 
+from backend.models.techno_commercial_quote import Quote
+
 from backend.services.status_service import (
 
     WORKFLOW_STATUS
@@ -391,6 +393,127 @@ def build_ops_summary(
 
 
 # ====================================
+# QUOTE SUMMARY
+# ====================================
+
+def build_quote_summary(
+
+    db,
+
+    sales_survey_id
+
+):
+
+    ops = (
+
+        db.query(
+
+            OpsSelection
+
+        )
+
+        .filter(
+
+            OpsSelection.sales_survey_id ==
+
+            sales_survey_id
+
+        )
+
+        .order_by(
+
+            OpsSelection.id.desc()
+
+        )
+
+        .first()
+
+    )
+
+    if ops is None:
+
+        return None
+
+    quote = (
+
+        db.query(
+
+            Quote
+
+        )
+
+        .filter(
+
+            Quote.ops_selection_id ==
+
+            ops.id
+
+        )
+
+        .order_by(
+
+            Quote.revision_number.desc()
+
+        )
+
+        .first()
+
+    )
+
+    if quote is None:
+
+        return None
+
+    return {
+
+        "quote_id":
+
+            quote.id,
+
+        "revision":
+
+            quote.revision_number,
+
+        "workflow_status":
+
+            quote.workflow_status,
+
+        "recommended_machine":
+
+            quote.recommended_machine,
+
+        "service_configuration":
+
+            quote.service_configuration,
+
+        "pump_hose_package":
+
+            quote.pump_hose_package,
+
+        "dewatering_method":
+
+            quote.dewatering_method,
+
+        "approval_gate":
+
+            quote.approval_gate,
+
+        "cleaning_quote":
+
+            quote.cleaning_quote,
+
+        "dewatering_addon":
+
+            quote.dewatering_addon,
+
+        "combined_budgetary_value":
+
+            quote.combined_budgetary_value
+
+    }
+
+
+# ====================================
 # WORKFLOW COUNT
 # ====================================
 
@@ -508,7 +631,7 @@ def get_dashboard_statistics(
 
                 customers,
 
-                "QUOTE_CREATED"
+                "MANAGEMENT_APPROVAL"
 
             ),
 

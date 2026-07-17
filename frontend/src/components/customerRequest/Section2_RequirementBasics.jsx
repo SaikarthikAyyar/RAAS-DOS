@@ -215,18 +215,26 @@ updateSection={updateSection}
 
 <FieldInput
     label="Cleaning Date"
-    type="datetime-local"
+    type="date"
     value={requirement.cleaning_date}
     section="requirement"
     field="cleaning_date"
     updateSection={updateSection}
 />
 
-<FieldInput
+<FieldSelect
     label="Cleaning Frequency"
     value={requirement.cleaning_frequency}
     section="requirement"
     field="cleaning_frequency"
+    options={[
+        "One Time",
+        "Weekly",
+        "Monthly",
+        "Quarterly",
+        "Half Yearly",
+        "Yearly"
+    ]}
     updateSection={updateSection}
 />
 

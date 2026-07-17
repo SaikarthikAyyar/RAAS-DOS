@@ -14,6 +14,14 @@ import ManpowerCard from "../components/jobCreation/ManpowerCard";
 
 import ReadinessChecklist from "../components/jobCreation/ReadinessChecklist";
 
+import {
+
+    saveJobCreation
+
+}
+
+from "../services/jobCreationService";
+
 
 // ====================================
 // PAGE
@@ -176,6 +184,33 @@ export default function JobCreation(){
                     }
 
                 />
+
+                <button
+                    onClick={async () => {
+
+                        const selected = approvedQuotes.find(
+                            q => q.quote_id === selectedQuote
+                        );
+
+                        if (!selected) {
+                            return;
+                        }
+
+                        await saveJobCreation({
+
+                            approval_board_id:
+                                selected.approval_board_id
+
+                        });
+
+                        alert("Job Created");
+
+                    }}
+                >
+
+                Create Job
+
+                </button>
 
             </div>
 

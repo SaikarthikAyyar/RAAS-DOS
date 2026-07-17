@@ -402,3 +402,54 @@ border:1px solid #d7dce5;
 background:white;
 
 }
+
+.quote-input{
+
+    width:180px;
+
+    padding:12px 18px;
+
+    border-radius:16px;
+
+    border:1px solid rgba(255,255,255,.12);
+
+    background:#2d7a77;
+
+    color:#fff;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    text-align:right;
+
+    outline:none;
+
+    transition:.2s;
+
+}
+
+.quote-input:focus{
+
+    border-color:#45d8cf;
+
+    box-shadow:0 0 12px rgba(69,216,207,.35);
+
+}
+
+.quote-input::-webkit-outer-spin-button,
+.quote-input::-webkit-inner-spin-button{
+
+    -webkit-appearance:none;
+
+    margin:0;
+
+}
+
+.quote-input[type=number]{
+
+    appearance: textfield;
+
+    -moz-appearance: textfield;
+
+}

@@ -1,204 +1,96 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/JTLOGO.jpeg";
-
-import {
-
-Home,
-
-FileText,
-
-Users,
-
-ClipboardCheck,
-
-Settings,
-
-Droplets,
-
-Calculator,
-
-CheckCircle,
-
-Briefcase,
-
-Truck,
-
-PlayCircle,
-
-UserCircle,
-
-BarChart3
-
-}
-
-from "lucide-react";
+import { ROLE_MODULES } from "../../config/navigation";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Sidebar(){
 
- const menu=[
+    const { user, logout } = useAuth();
 
- {
+    const navigate = useNavigate();
 
- title:"Dashboard",
+    const menu = ROLE_MODULES[user?.role] || [];
 
- path:"/dashboard",
+    function handleLogout(){
 
- icon:<Home size={18}/>
+        logout();
 
- },
+        navigate("/");
 
- {
+    }
 
- title:"Customer Request",
+    return(
 
- path:"/customer-request",
+        <div className="sidebar">
 
- icon:<FileText size={18}/>
+            <div className="logo">
 
- },
+                <img src={logo} alt="JT Logo"/>
 
- {
+            </div>
 
- title:"Sales Survey",
+            <div>
 
- path:"/sales-survey",
+                {
 
- icon:<ClipboardCheck size={18}/>
+                    menu.map(item=>(
 
- },
+                        <NavLink
 
- {
+                            key={item.path}
 
- title:"Ops Selector",
+                            to={item.path}
 
- path:"/ops-selector",
+                            className={({isActive})=>
 
- icon:<Settings size={18}/>
+                                isActive
 
- },
+                                ?
 
- {
+                                "menu-item active"
 
- title:"Dewatering Gate",
+                                :
 
- path:"/dewatering-gate",
+                                "menu-item"
 
- icon:<Droplets size={18}/>
+                            }
 
- },
+                        >
 
- {
+                            {item.icon}
 
- title:"Quote",
+                            <span>
 
- path:"/quote",
+                                {item.title}
 
- icon:<Calculator size={18}/>
+                            </span>
 
- },
+                        </NavLink>
 
- {
+                    ))
 
- title:"Approval",
+                }
 
- path:"/approval",
+            </div>
 
- icon:<CheckCircle size={18}/>
+            <div className="sidebar-footer">
 
- },
+                <button
 
- {
+                    className="logout-button"
 
- title:"Job Creation",
+                    onClick={handleLogout}
 
- path:"/job-creation",
+                >
 
- icon:<Briefcase size={18}/>
+                    Logout
 
- },
+                </button>
 
- {
+            </div>
 
- title:"Allocation",
+        </div>
 
- path:"/allocation",
-
- icon:<Truck size={18}/>
-
- },
-
- {
-
- title:"Execution",
-
- path:"/execution",
-
- icon:<PlayCircle size={18}/>
-
- },
-
- {
-
- title:"Customer Portal",
-
- path:"/customer-portal",
-
- icon:<UserCircle size={18}/>
-
- },
-
- {
-
- title:"Analytics",
-
- path:"/analytics",
-
- icon:<BarChart3 size={18}/>
-
- }
-
- ];
-
- return(
-
- <div className="sidebar">
-
- <div className="logo">
-
-   <img src={logo} alt="JT Logo" style={{ height: 80 }} />
-
- </div>
-
- {
-
- menu.map(item=>(
-
- <NavLink
-
- key={item.path}
-
- to={item.path}
-
- className="menu-item"
-
- >
-
- {item.icon}
-
- <span>
-
- {item.title}
-
- </span>
-
- </NavLink>
-
- ))
-
- }
-
- </div>
-
- )
+    );
 
 }

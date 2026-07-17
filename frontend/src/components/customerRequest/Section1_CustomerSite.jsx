@@ -214,14 +214,13 @@ e.target.value
 
 );
 
-if(isCompanyField){
-
-checkExistingCustomer(
-
-e.target.value
-
-);
-
+if (
+    isCompanyField &&
+    checkExistingCustomer
+){
+    checkExistingCustomer(
+        e.target.value
+    );
 }
 
 }}

@@ -8,35 +8,15 @@ import "./Dashboard.css";
 // COMPONENT
 // ====================================
 
-export default function OpsSummary({
+export default function QuoteSummary({
 
-    summary
+    summary,
+
+    role
 
 }){
 
-    console.log(
-
-        "\n========== OPERATIONS SUMMARY COMPONENT =========="
-
-    );
-
-    console.log(
-
-        summary
-
-    );
-
-    console.log(
-
-        "=============================================\n"
-
-    );
-
-    if(
-
-        !summary
-
-    ){
+    if(!summary){
 
         return null;
 
@@ -44,273 +24,195 @@ export default function OpsSummary({
 
     return(
 
-    <div className="dashboard-summary-card">
+        <div className="dashboard-summary-card">
 
-        <div className="dashboard-summary-header">
+            <div className="dashboard-summary-header">
 
-            <h3>
+                <h3>
 
-                Operations Survey Summary
+                    Techno Commercial Quote
 
-            </h3>
-
-        </div>
-
-        <div className="dashboard-summary-grid">
-
-            <div className="dashboard-summary-item">
-
-                <span>
-
-                    Ops ID
-
-                </span>
-
-                <strong>
-
-                    OPS-{summary.survey_id}
-
-                </strong>
+                </h3>
 
             </div>
 
+            <div className="dashboard-summary-grid">
 
+                <div className="dashboard-summary-item">
 
-            <div className="dashboard-summary-item">
+                    <span>
 
-                <span>
+                        Quote ID
 
-                    Doability
+                    </span>
 
-                </span>
+                    <strong>
 
-                <strong>
+                        QT-{summary.quote_id}
 
-                    {summary.doability ?? "-"}
+                    </strong>
 
-                </strong>
+                </div>
 
-            </div>
+                <div className="dashboard-summary-item">
 
-            <div className="dashboard-summary-item">
+                    <span>
 
-                <span>
+                        Revision
 
-                    Service Configuration
+                    </span>
 
-                </span>
+                    <strong>
 
-                <strong>
+                        {summary.revision}
 
-                    {summary.service_configuration ?? "-"}
+                    </strong>
 
-                </strong>
+                </div>
 
-            </div>
+                <div className="dashboard-summary-item">
 
-            <div className="dashboard-summary-item">
+                    <span>
 
-                <span>
+                        Workflow
 
-                    Recommended Machine
+                    </span>
 
-                </span>
+                    <strong>
 
-                <strong>
+                        {summary.workflow_status}
 
-                    {summary.recommended_machine ?? "-"}
+                    </strong>
 
-                </strong>
+                </div>
 
-            </div>
+                <div className="dashboard-summary-item">
 
-            <div className="dashboard-summary-item">
+                    <span>
 
-                <span>
+                        Recommended Machine
 
-                    Pump Hose Package
+                    </span>
 
-                </span>
+                    <strong>
 
-                <strong>
+                        {summary.recommended_machine}
 
-                    {summary.pump_hose_package ?? "-"}
+                    </strong>
 
-                </strong>
+                </div>
 
-            </div>
+                <div className="dashboard-summary-item">
 
-            <div className="dashboard-summary-item">
+                    <span>
 
-                <span>
+                        Service Configuration
 
-                    Accessories
+                    </span>
 
-                </span>
+                    <strong>
 
-                <strong>
+                        {summary.service_configuration}
 
-                    {summary.accessories ?? "-"}
+                    </strong>
 
-                </strong>
+                </div>
 
-            </div>
+                <div className="dashboard-summary-item">
 
+                    <span>
 
+                        Pump Hose Package
 
-            <div className="dashboard-summary-item">
+                    </span>
 
-                <span>
+                    <strong>
 
-                    Mobilisation Days
+                        {summary.pump_hose_package}
 
-                </span>
+                    </strong>
 
-                <strong>
+                </div>
 
-                    {summary.mobilisation_days ?? "-"}
+                <div className="dashboard-summary-item">
 
-                </strong>
+                    <span>
 
-            </div>
+                        Dewatering Method
 
-            <div className="dashboard-summary-item">
+                    </span>
 
-                <span>
+                    <strong>
 
-                    Setup Days
+                        {summary.dewatering_method}
 
-                </span>
+                    </strong>
 
-                <strong>
+                </div>
 
-                    {summary.setup_days ?? "-"}
+                <div className="dashboard-summary-item">
 
-                </strong>
+                    <span>
 
-            </div>
+                        Approval Gate
 
-            <div className="dashboard-summary-item">
+                    </span>
 
-                <span>
+                    <strong>
 
-                    Execution Days
+                        {summary.approval_gate}
 
-                </span>
+                    </strong>
 
-                <strong>
+                </div>
 
-                    {summary.execution_days ?? "-"}
+                <div className="dashboard-summary-item">
 
-                </strong>
+                    <span>
 
-            </div>
+                        Cleaning Quote
 
-            <div className="dashboard-summary-item">
+                    </span>
 
-                <span>
+                    <strong>
 
-                    Demobilisation Days
+                        ₹ {summary.cleaning_quote}
 
-                </span>
+                    </strong>
 
-                <strong>
+                </div>
 
-                    {summary.demob_days ?? "-"}
+                <div className="dashboard-summary-item">
 
-                </strong>
+                    <span>
 
-            </div>
+                        Dewatering Add-on
 
+                    </span>
 
-            <div className="dashboard-summary-item">
+                    <strong>
 
-                <span>
+                        ₹ {summary.dewatering_addon}
 
-                    Total Job Days
+                    </strong>
 
-                </span>
+                </div>
 
-                <strong>
+                <div className="dashboard-summary-item">
 
-                    {summary.total_job_days ?? "-"}
+                    <span>
 
-                </strong>
+                        Combined Budgetary Value
 
-            </div>
+                    </span>
 
+                    <strong>
 
-            <div className="dashboard-summary-item">
+                        ₹ {summary.combined_budgetary_value}
 
-                <span>
+                    </strong>
 
-                    Manpower Required
-
-                </span>
-
-                <strong>
-
-                    {summary.manpower_required ?? "-"}
-
-                </strong>
-
-            </div>
-
-            <div className="dashboard-summary-item">
-
-                <span>
-
-                    Approval Gate
-
-                </span>
-
-                <strong>
-
-                    {summary.approval_gate ?? "-"}
-
-                </strong>
-
-            </div>
-
-        </div>
-
-    </div>
-
-);
-
-}
-
-// ====================================
-// CARD
-// ====================================
-
-function SummaryCard({
-
-    title,
-
-    value
-
-}){
-
-    return(
-
-        <div className="dashboard-info-card">
-
-            <div className="dashboard-info-title">
-
-                {title}
-
-            </div>
-
-            <div className="dashboard-info-value">
-
-                {
-
-                    value ??
-
-                    "-"
-
-                }
+                </div>
 
             </div>
 

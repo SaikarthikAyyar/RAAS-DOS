@@ -14,7 +14,11 @@ import {
 
 getSalesPrefill,
 
-getCustomers
+getCustomers,
+
+getCustomerSurveys,
+
+getCustomerSurvey
 
 }
 
@@ -125,25 +129,103 @@ useState(
 );
 
 
+const [
+
+customerSurveys,
+
+setCustomerSurveys
+
+]
+
+=
+
+useState(
+
+[]
+
+);
+
+
+const [
+
+selectedSurvey,
+
+setSelectedSurvey
+
+]
+
+=
+
+useState(
+
+""
+
+);
+
+
 // ====================================
-// LOAD CUSTOMER LIST
+// LOAD RECEIVED ENQUIRY
 // ====================================
 
 useEffect(
 
 ()=>{
 
-async function loadCustomers(){
+async function loadSelectedEnquiry(){
 
 try{
 
-const data=
+const enquiry = JSON.parse(
 
-await getCustomers();
+localStorage.getItem(
 
-setCustomers(
+"selectedReceivedEnquiry"
 
-data
+)
+
+);
+
+if(
+
+!enquiry
+
+){
+
+return;
+
+}
+
+setSelectedCustomer(
+
+enquiry.customer_request_id
+
+);
+
+const prefill =
+
+await getSalesPrefill(
+
+enquiry.customer_request_id
+
+);
+
+setSurveyData(
+
+prefill
+
+);
+
+const surveys =
+
+await getCustomerSurveys(
+
+enquiry.customer_request_id
+
+);
+
+setCustomerSurveys(
+
+surveys
 
 );
 
@@ -161,8 +243,7 @@ error
 
 }
 
-
-loadCustomers();
+loadSelectedEnquiry();
 
 },
 
@@ -172,17 +253,81 @@ loadCustomers();
 
 
 // ====================================
-// LOAD SALES PREFILL
+// LOAD SALES PREFILL FROM DASHBOARD
+// ====================================
+
+useEffect(() => {
+
+    async function loadPrefill() {
+
+        try {
+
+            const customerRequestId =
+                localStorage.getItem(
+                    "sales_customer_request_id"
+                );
+
+            if (!customerRequestId) {
+
+                console.log(
+                    "[SalesSurvey] No Customer Request selected."
+                );
+
+                return;
+
+            }
+
+            console.log(
+                "[SalesSurvey] Customer Request:",
+                customerRequestId
+            );
+
+            setSelectedCustomer(customerRequestId);
+
+            const prefill =
+                await getSalesPrefill(
+                    customerRequestId
+                );
+
+            setSurveyData(prefill);
+
+            const surveys =
+                await getCustomerSurveys(
+                    customerRequestId
+                );
+
+            setCustomerSurveys(surveys);
+
+            setSelectedSurvey("");
+
+        }
+
+        catch(error){
+
+            console.log(error);
+
+        }
+
+    }
+
+    loadPrefill();
+
+}, []);
+
+
+// ====================================
+// LOAD EXISTING SURVEY
 // ====================================
 
 useEffect(
 
 ()=>{
 
-
 if(
 
-!selectedCustomer
+!selectedCustomer ||
+
+!selectedSurvey
 
 ){
 
@@ -190,24 +335,63 @@ return;
 
 }
 
-
-async function loadPrefill(){
+async function loadExistingSurvey(){
 
 try{
 
+console.log(
 
-const prefill=
+"[SalesSurvey] Loading Existing Survey"
 
-await getSalesPrefill(
+);
+
+console.log(
+
+"[SalesSurvey] Customer:",
 
 selectedCustomer
 
 );
 
+console.log(
+
+"[SalesSurvey] Survey:",
+
+selectedSurvey
+
+);
+
+const survey=
+
+await getCustomerSurvey(
+
+selectedCustomer,
+
+selectedSurvey
+
+);
+
+console.log(
+
+"[SalesSurvey] Existing Survey Loaded"
+
+);
+
+console.log(
+
+survey
+
+);
 
 setSurveyData(
 
-prefill
+survey
+
+);
+
+console.log(
+
+"[SalesSurvey] Survey State Updated"
 
 );
 
@@ -225,14 +409,15 @@ error
 
 }
 
-
-loadPrefill();
+loadExistingSurvey();
 
 },
 
 [
 
-selectedCustomer
+selectedCustomer,
+
+selectedSurvey
 
 ]
 
@@ -257,11 +442,27 @@ surveyData={surveyData}
 
 updateSection={updateSection}
 
-customers={customers}
+customers={[
+
+{
+
+id:selectedCustomer,
+
+company_name:surveyData.company_name
+
+}
+
+]}
 
 selectedCustomer={selectedCustomer}
 
-setSelectedCustomer={setSelectedCustomer}
+setSelectedCustomer={()=>{}}
+
+customerSurveys={customerSurveys}
+
+selectedSurvey={selectedSurvey}
+
+setSelectedSurvey={setSelectedSurvey}
 
 />
 

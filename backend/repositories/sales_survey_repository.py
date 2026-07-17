@@ -409,4 +409,64 @@ def list_sales_surveys(
 
     ]
 
+# ====================================
+# GET SURVEYS BY CUSTOMER REQUEST
+# ====================================
 
+def get_surveys_by_customer_request(
+        db,
+        customer_request_id
+):
+
+    print("\n========== SALES SURVEY REPOSITORY ==========")
+    print(f"[Repository] Loading surveys for Customer Request: {customer_request_id}")
+
+    surveys = (
+        db.query(SalesSurvey)
+        .filter(
+            SalesSurvey.customer_request_id == customer_request_id
+        )
+        .order_by(SalesSurvey.id.asc())
+        .all()
+    )
+
+    print(f"[Repository] Surveys Found: {len(surveys)}")
+
+    return [
+        {
+            "id": survey.id,
+            "status": survey.status
+        }
+        for survey in surveys
+    ]
+
+
+# ====================================
+# GET SURVEY BY CUSTOMER + SURVEY
+# ====================================
+
+def get_sales_survey_by_customer_and_id(
+        db,
+        customer_request_id,
+        sales_survey_id
+):
+
+    print("\n========== SALES SURVEY REPOSITORY ==========")
+    print(f"[Repository] Customer Request : {customer_request_id}")
+    print(f"[Repository] Survey ID        : {sales_survey_id}")
+
+    survey = (
+        db.query(SalesSurvey)
+        .filter(
+            SalesSurvey.customer_request_id == customer_request_id,
+            SalesSurvey.id == sales_survey_id
+        )
+        .first()
+    )
+
+    if survey:
+        print("[Repository] Survey Found")
+    else:
+        print("[Repository] Survey Not Found")
+
+    return survey

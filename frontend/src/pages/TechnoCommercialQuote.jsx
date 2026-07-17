@@ -245,17 +245,10 @@ export default function TechnoCommercialQuote() {
                 />
 
                 <CommercialEstimateCard
-
                     quote={quote}
-
+                    setQuote={setQuote}
                     selectedOps={selectedOps}
-
-                    onSubmitApproval={
-
-                        handleSubmitApproval
-
-                    }
-
+                    onSubmitApproval={handleSubmitApproval}
                 />
 
                 </>

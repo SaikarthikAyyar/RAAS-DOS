@@ -15,8 +15,10 @@ from backend.schemas.techno_commercial_quote_schema import (
 )
 
 from backend.services.techno_commercial_quote_service import (
+    approve_quote_by_customer,
     create_quote_request,
-    get_quote_preview_request
+    get_quote_preview_request,
+    request_quote_revision
 )
 
 from backend.services.techno_commercial_quote_service import (
@@ -174,3 +176,47 @@ def preview_quote(
     db: Session = Depends(get_db)
 ):
     return get_quote_preview_request(db, ops_selection_id)
+
+
+@router.post(
+
+    "/quote/{quote_id}/approve"
+
+)
+def approve_customer_quote(
+
+    quote_id: int,
+
+    db: Session = Depends(get_db)
+
+):
+
+    return approve_quote_by_customer(
+
+        db,
+
+        quote_id
+
+    )
+
+
+@router.post(
+
+    "/quote/{quote_id}/revision"
+
+)
+def request_revision(
+
+    quote_id: int,
+
+    db: Session = Depends(get_db)
+
+):
+
+    return request_quote_revision(
+
+        db,
+
+        quote_id
+
+    )

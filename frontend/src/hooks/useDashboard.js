@@ -2,19 +2,11 @@
 // IMPORTS
 // ====================================
 
-import {
-
-    useEffect,
-
-    useState
-
-} from "react";
+import { useEffect, useState } from "react";
 
 import {
 
-    getDashboard,
-
-    getDashboardCustomerList
+    getDashboard
 
 } from "../services/dashboardService";
 
@@ -25,85 +17,52 @@ import {
 
 export default function useDashboard(){
 
-    // ====================================
-    // DASHBOARD DATA
-    // ====================================
-
     const [
 
         dashboard,
 
         setDashboard
 
-    ] = useState(
-
-        null
-
-    );
+    ] = useState(null);
 
     const [
 
-        customerNavigator,
+        receivedEnquiryId,
 
-        setCustomerNavigator
+        setReceivedEnquiryId
 
-    ] = useState(
+    ] = useState(null);
 
-        []
+    const [
 
-    );
+        sentEnquiryId,
+
+        setSentEnquiryId
+
+    ] = useState(null);
+
+    const ROLE_MAP = {
+
+        ops: "OPERATIONS",
+
+        sales: "SALES",
+
+        customer: "CUSTOMER",
+
+        manager: "MANAGER",
+
+        admin: "ADMIN"
+
+    };
+
+    const role =
+        ROLE_MAP[
+            (localStorage.getItem("userRole") || "").toLowerCase()
+        ] || "";
+
 
     // ====================================
-    // SELECTIONS
-    // ====================================
-
-    const [
-
-        startCustomerId,
-
-        setStartCustomerId
-
-    ] = useState(
-
-        1
-
-    );
-
-
-    const [
-
-        startSurveyId,
-
-        setStartSurveyId
-
-    ] = useState(1);
-
-    const [
-
-        selectedCustomerId,
-
-        setSelectedCustomerId
-
-    ] = useState(
-
-        null
-
-    );
-
-    const [
-
-        selectedSurveyId,
-
-        setSelectedSurveyId
-
-    ] = useState(
-
-        null
-
-    );
-
-    // ====================================
-    // LOAD DASHBOARD
+    // LOAD
     // ====================================
 
     async function loadDashboard(){
@@ -112,79 +71,47 @@ export default function useDashboard(){
 
             const data = await getDashboard(
 
-                startCustomerId,
+                role,
 
-                selectedCustomerId,
+                receivedEnquiryId,
 
-                selectedSurveyId
-
-            );
-
-            console.log(
-
-                "Dashboard Loaded:",
-
-                data
+                sentEnquiryId
 
             );
 
-            setDashboard(
+            console.log(data);
 
-                data
-
-            );
+            setDashboard(data);
 
         }
 
         catch(error){
 
-            console.error(
-
-                "Dashboard Load Failed:",
-
-                error
-
-            );
+            console.error(error);
 
         }
 
     }
 
+
     // ====================================
     // RELOAD
     // ====================================
 
-    useEffect(
+    useEffect(()=>{
 
-        ()=>{
+        loadDashboard();
 
-            loadDashboard();
+    },[
 
-        },
+        role,
 
-        [
+        receivedEnquiryId,
 
-            startCustomerId,
+        sentEnquiryId
 
-            selectedCustomerId,
+    ]);
 
-            selectedSurveyId
-
-        ]
-
-    );
-
-    useEffect(
-
-        ()=>{
-
-            loadCustomerNavigator();
-
-        },
-
-        []
-
-    );
 
     // ====================================
     // RETURN
@@ -193,68 +120,17 @@ export default function useDashboard(){
     return{
 
         dashboard,
-        customerNavigator,
 
-        startCustomerId,
+        receivedEnquiryId,
 
-        setStartCustomerId,
+        setReceivedEnquiryId,
 
-        startSurveyId,
+        sentEnquiryId,
 
-        setStartSurveyId,
-
-        selectedCustomerId,
-
-        setSelectedCustomerId,
-
-        selectedSurveyId,
-
-        setSelectedSurveyId,
-
+        setSentEnquiryId,
 
         reloadDashboard: loadDashboard
 
     };
 
-    // ====================================
-// LOAD CUSTOMER NAVIGATOR
-// ====================================
-
-async function loadCustomerNavigator(){
-
-        try{
-
-            const customers = await getDashboardCustomerList();
-
-            console.log(
-
-                "Customer Navigator Loaded:",
-
-                customers
-
-            );
-
-            setCustomerNavigator(
-
-                customers
-
-            );
-
-        }
-
-        catch(error){
-
-            console.error(
-
-                "Customer Navigator Failed:",
-
-                error
-
-            );
-
-        }
-
-    }
-
 }
-

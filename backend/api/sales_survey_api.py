@@ -24,6 +24,11 @@ from backend.services.sales_survey_service import (
 
 )
 
+from backend.services.sales_survey_service import (
+    list_customer_surveys_request,
+    get_customer_survey_request
+)
+
 
 # ====================================
 # ROUTER
@@ -142,6 +147,47 @@ def get_sales_survey(
     )
 
 
+# ====================================
+# CUSTOMER SURVEYS
+# ====================================
+
+@router.get(
+    "/sales-surveys/customer/{customer_request_id}"
+)
+def customer_surveys(
+        customer_request_id: int,
+        db: Session = Depends(get_db)
+):
+
+    print("\n========== SALES SURVEY API ==========")
+    print(f"[API] Customer Request: {customer_request_id}")
+
+    return list_customer_surveys_request(
+        db,
+        customer_request_id
+    )
 
 
+# ====================================
+# CUSTOMER SURVEY
+# ====================================
+
+@router.get(
+    "/sales-surveys/customer/{customer_request_id}/{sales_survey_id}"
+)
+def customer_survey(
+        customer_request_id: int,
+        sales_survey_id: int,
+        db: Session = Depends(get_db)
+):
+
+    print("\n========== SALES SURVEY API ==========")
+    print(f"[API] Customer : {customer_request_id}")
+    print(f"[API] Survey   : {sales_survey_id}")
+
+    return get_customer_survey_request(
+        db,
+        customer_request_id,
+        sales_survey_id
+    )
 

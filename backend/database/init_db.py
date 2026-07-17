@@ -20,9 +20,40 @@ from backend.models.techno_commercial_quote import Quote
 
 from backend.models.job_creation import JobCreation
 
+from backend.models.users import User
+from backend.models.enquiry import Enquiry
+
+from backend.models.ops_approval import OpsApproval
+
+from backend.models.machine_inventory import MachineInventory
+
+from backend.models.personnel import Personnel
+
+from backend.models.personnel_document import PersonnelDocument
+
+from backend.models.execution import Execution
+
+from backend.repositories.allocation_repository import (
+    seed_machine_inventory,
+    seed_personnel
+)
+
+from backend.database.connection import SessionLocal
 
 def create_tables():
 
     Base.metadata.create_all(
         bind=engine
     )
+
+    db = SessionLocal()
+
+    try:
+
+        seed_machine_inventory(db)
+
+        seed_personnel(db)
+
+    finally:
+
+        db.close()

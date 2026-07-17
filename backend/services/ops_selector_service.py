@@ -28,6 +28,8 @@ from backend.services.sales_survey_service import (
 )
 from backend.services.status_service import update_customer_request_status
 
+from backend.services.enquiry_service import EnquiryService
+
 
 
 
@@ -183,6 +185,47 @@ def create_ops_selection_request(
             ops_payload
 
         )
+    
+    print("\n========== OPS WORKFLOW ==========")
+
+    print(f"[Workflow] OPS Selection Saved")
+
+    print(f"[Workflow] OPS ID : {ops.id}")
+
+    print(f"[Workflow] Sales Survey : {ops.sales_survey_id}")
+
+
+    print("[Workflow] Looking for incoming OPERATIONS enquiry")
+
+    incoming = EnquiryService.get_received_enquiries(
+
+        db,
+
+        "OPERATIONS"
+
+    )
+
+    for enquiry in incoming:
+
+        if enquiry.sales_survey_id == ops.sales_survey_id:
+
+            print(f"[Workflow] Completing Enquiry {enquiry.id}")
+
+            enquiry.completed = True
+
+            enquiry.workflow_status = "COMPLETED"
+
+            EnquiryService.update(
+
+                db,
+
+                enquiry
+
+            )
+
+            print("[Workflow] Incoming OPS enquiry completed")
+
+            break
 
     survey = (
 
@@ -215,6 +258,45 @@ def create_ops_selection_request(
             "OPS_COMPLETED"
 
         )
+
+    
+    print("[Workflow] Creating Quote Enquiry")
+
+    payload = {
+
+        "customer_request_id":
+
+            survey.customer_request_id,
+
+        "sales_survey_id":
+
+            ops.sales_survey_id,
+
+        "ops_selector_id":
+
+            ops.id
+
+    }
+
+    EnquiryService.create_quote_enquiry(
+
+        db,
+
+        survey.customer_request_id,
+
+        ops.sales_survey_id,
+
+        ops.id,
+
+        payload
+
+    )
+
+    print("[Workflow] Quote enquiry created")
+
+    print("[Workflow] Customer Status Updated -> OPS_COMPLETED")
+
+    print("========== OPS WORKFLOW COMPLETE ==========\n")
 
     return ops
 
