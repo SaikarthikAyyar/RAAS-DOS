@@ -11,8 +11,8 @@ from backend.services.quote_engine import (
 from backend.repositories.techno_commercial_quote_repository import (
 
     create_quote,
-
-    get_ops_selection
+    get_ops_selection,
+    get_next_revision_number
 
 )
 
@@ -67,64 +67,15 @@ def create_quote_request(
     print("\n========== QUOTE WORKFLOW ==========")
     print("[Workflow] Loading incoming SALES quote enquiry")
 
-    latest = get_latest_quote(
+    revision_number = get_next_revision_number(
         db,
-        payload.ops_selection_id
-    )    
-
-    incoming = EnquiryService.get_received_enquiries(
-
-        db,
-
-        "SALES"
-
+        ops.customer_request_id,
+        ops.sales_survey_id
     )
 
-    for enquiry in incoming:
-
-        if enquiry.requested_task == "QUOTE":
-
-            if enquiry.ops_selector_id == payload.ops_selection_id:
-
-                enquiry.completed = True
-                enquiry.workflow_status = "COMPLETED"
-                EnquiryService.update(db, enquiry)
-
-                print("[Workflow] Quote enquiry completed")
-
-                break
-
-        elif enquiry.requested_task == "QUOTE_REVISION":
-
-            if latest and enquiry.quote_id == latest.id:
-
-                enquiry.completed = True
-                enquiry.workflow_status = "COMPLETED"
-                EnquiryService.update(db, enquiry)
-
-                print("[Workflow] Quote revision enquiry completed")
-
-                break
-    
-    dewatering_assessment_id = None
-
-
-
-    if latest is None:
-
-        revision_number = 1
-
-    else:
-
-        if latest.workflow_status != "REVISION_REQUESTED":
-
-            raise ValueError(
-                "Customer has not requested a quote revision."
-            )
-
-        revision_number = latest.revision_number + 1
-
     workflow_status = "CUSTOMER_REVIEW"
+
+    dewatering_assessment_id = None
 
     # ====================================
     # BUILD COMMERCIAL QUOTE
@@ -145,10 +96,9 @@ def create_quote_request(
         "ops_selection_id":
             payload.ops_selection_id,
 
-        
         "customer_request_id":
+            ops.customer_request_id,
 
-        ops.customer_request_id,
 
         "revision_number":
             revision_number,
@@ -160,7 +110,6 @@ def create_quote_request(
             dewatering_assessment_id,
 
         **quote
-
     }
 
 
@@ -333,9 +282,18 @@ def approve_quote_by_customer(
 
         raise ValueError("Quote not found.")
     
-    if quote.workflow_status != "CUSTOMER_REVIEW":
+    BLOCKED_STATUSES = {
+        "MANAGEMENT_APPROVAL",
+        "APPROVAL_COMPLETED",
+        "JOB_SHEET_CREATED",
+        "READY_FOR_ALLOCATION",
+        "JOB_IN_PROGRESS",
+        "JOB_COMPLETED"
+    }
+
+    if quote.workflow_status in BLOCKED_STATUSES:
         raise ValueError(
-            "Quote is no longer awaiting customer review."
+            "Customer review has already been completed."
         )
     
     ops = get_ops_selection(db, quote.ops_selection_id)
@@ -393,19 +351,39 @@ def approve_quote_by_customer(
         "MANAGEMENT_APPROVAL"
     )
 
-    EnquiryService.create_approval_board_enquiry(
+    existing = EnquiryService.get_received_enquiries(
         db,
-        quote.customer_request_id,
-        ops.sales_survey_id,
-        quote.id,
-        {
-            "customer_request_id": ops.customer_request_id,
-            "sales_survey_id": ops.sales_survey_id,
-            "ops_selector_id": quote.ops_selection_id,
-            "quote_id": quote.id,
-            "revision": quote.revision_number
-        }
+        "MANAGEMENT"
     )
+
+    already_exists = any(
+        e.requested_task == "MANAGEMENT_APPROVAL"
+        and e.quote_id == quote.id
+        and not e.completed
+        for e in existing
+    )
+
+    if already_exists:
+
+        print("[Workflow] Existing Management Approval enquiry found.")
+
+    else:
+
+        EnquiryService.create_approval_board_enquiry(
+            db,
+            quote.customer_request_id,
+            ops.sales_survey_id,
+            quote.id,
+            {
+                "customer_request_id": ops.customer_request_id,
+                "sales_survey_id": ops.sales_survey_id,
+                "ops_selector_id": quote.ops_selection_id,
+                "quote_id": quote.id,
+                "revision": quote.revision_number
+            }
+        )
+
+
 
     print("[Workflow] Quote moved to MANAGEMENT_APPROVAL")
     print("[Workflow] Approval Board enquiry created")
@@ -437,9 +415,18 @@ def request_quote_revision(
 
         raise ValueError("Quote not found.")
     
-    if quote.workflow_status != "CUSTOMER_REVIEW":
+    BLOCKED_STATUSES = {
+        "MANAGEMENT_APPROVAL",
+        "APPROVAL_COMPLETED",
+        "JOB_SHEET_CREATED",
+        "READY_FOR_ALLOCATION",
+        "JOB_IN_PROGRESS",
+        "JOB_COMPLETED"
+    }
+
+    if quote.workflow_status in BLOCKED_STATUSES:
         raise ValueError(
-            "Quote is no longer awaiting customer review."
+            "Customer review has already been completed."
         )
     
     ops = get_ops_selection(
@@ -482,7 +469,7 @@ def request_quote_revision(
 
 
 
-    quote.workflow_status = "REVISION_REQUESTED"
+    quote.workflow_status = "OPS_APPROVAL"
 
     db.commit()
 
@@ -491,8 +478,22 @@ def request_quote_revision(
     update_customer_request_status(
         db,
         quote.customer_request_id,
-        "OPS_APPROVAL_PENDING"
+        "OPS_APPROVED"
     )
+
+    print("========== REVISION DEBUG ==========")
+    print("Current quote revision:", quote.revision_number)
+    print("Checking existing OPS approvals...")
+
+    for e in existing:
+        print(
+            e.id,
+            e.requested_task,
+            e.revision,
+            e.completed
+        )
+
+    print("already_exists =", already_exists)
 
     existing = EnquiryService.get_received_enquiries(
         db,
@@ -502,7 +503,7 @@ def request_quote_revision(
     already_exists = any(
         e.requested_task == "OPS_APPROVAL"
         and e.customer_request_id == quote.customer_request_id
-        and e.quote_id == quote.id
+        and e.revision == quote.revision_number + 1
         and not e.completed
         for e in existing
     )
@@ -512,6 +513,8 @@ def request_quote_revision(
         print("[Workflow] Existing OPS Approval enquiry found.")
 
     else:
+
+        print("CREATING NEW OPS APPROVAL ENQUIRY")
 
         EnquiryService.create_ops_approval_enquiry(
 
@@ -524,9 +527,12 @@ def request_quote_revision(
             {
                 "customer_request_id": ops.customer_request_id,
                 "sales_survey_id": ops.sales_survey_id,
-                "ops_selector_id": quote.ops_selection_id,
-                "quote_id": quote.id,
-                "revision": quote.revision_number
+
+                # Force new pipeline
+                "ops_selector_id": None,
+                "quote_id": None,
+
+                "revision": quote.revision_number + 1
             }
 
         )

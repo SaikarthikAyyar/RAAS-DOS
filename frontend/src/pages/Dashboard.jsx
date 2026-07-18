@@ -1,7 +1,7 @@
 import CustomerDashboard from "./dashboards/CustomerDashboard";
 import SalesDashboard from "./dashboards/SalesDashboard";
 import OperationsDashboard from "./dashboards/OperationsDashboard";
-import ManagerDashboard from "./dashboards/ManagerDashboard";
+import ManagementDashboard from "./dashboards/ManagerDashboard";
 import AdminDashboard from "./dashboards/AdminDashboard";
 
 export default function Dashboard() {
@@ -14,7 +14,7 @@ export default function Dashboard() {
 
         customer: "CUSTOMER",
 
-        manager: "MANAGER",
+        management: "MANAGER",
 
         admin: "ADMIN"
 
@@ -38,7 +38,7 @@ export default function Dashboard() {
             return <OperationsDashboard />;
 
         case "MANAGER":
-            return <ManagerDashboard />;
+            return <ManagementDashboard />;
 
         default:
             return <AdminDashboard />;

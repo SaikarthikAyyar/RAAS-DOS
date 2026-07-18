@@ -67,20 +67,19 @@ def create_ops_approval_request(
 
     for enquiry in enquiries:
 
-        if enquiry.sales_survey_id == approval.sales_survey_id:
-
-            print(f"[Service] Completing Enquiry : {enquiry.id}")
+        if (
+            enquiry.customer_request_id == approval.customer_request_id
+            and enquiry.sales_survey_id == approval.sales_survey_id
+            and enquiry.requested_task == "OPS_APPROVAL"
+            and not enquiry.completed
+        ):
 
             enquiry.workflow_status = "COMPLETED"
-
             enquiry.completed = True
 
             EnquiryService.update(
-
                 db,
-
                 enquiry
-
             )
 
             break

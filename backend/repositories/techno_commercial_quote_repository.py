@@ -8,6 +8,9 @@ from backend.models.techno_commercial_quote import Quote
 
 from backend.models.ops_selector import OpsSelection
 
+from sqlalchemy import func
+from backend.models.enquiry import Enquiry
+
 
 logger = logging.getLogger(__name__)
 
@@ -197,6 +200,7 @@ def create_quote(
         payload["customer_request_id"]
 
     )
+
 
     
 
@@ -389,12 +393,31 @@ def list_ops_selections(db):
 
     )
 
+from sqlalchemy import func
 
-    def get_quote_preview(db, ops_selection_id):
 
-        ops = get_ops_selection(db, ops_selection_id)
 
-        if ops is None:
-            return None
 
-        return build_quote(ops)
+
+
+def get_next_revision_number(
+    db,
+    customer_request_id,
+    sales_survey_id
+):
+    count = (
+        db.query(func.count(Enquiry.id))
+        .filter(
+            Enquiry.customer_request_id == customer_request_id
+        )
+        .filter(
+            Enquiry.sales_survey_id == sales_survey_id
+        )
+        .filter(
+            Enquiry.requested_task == "QUOTE_REVIEW"
+        )
+        .scalar()
+    )
+
+    return count + 1
+

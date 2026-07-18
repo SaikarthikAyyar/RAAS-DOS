@@ -49,7 +49,7 @@ export default function useDashboard(){
 
         customer: "CUSTOMER",
 
-        manager: "MANAGER",
+        management: "MANAGER",
 
         admin: "ADMIN"
 
@@ -59,6 +59,9 @@ export default function useDashboard(){
         ROLE_MAP[
             (localStorage.getItem("userRole") || "").toLowerCase()
         ] || "";
+
+    
+    console.log("Dashboard role =", role);
 
 
     // ====================================
