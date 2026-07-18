@@ -4,6 +4,9 @@
 
 import useDashboard from "../../hooks/useDashboard";
 
+import { useEffect } from "react";
+import { useState } from "react";
+
 import DashboardStats
 from "../../components/dashboard/DashboardStats";
 
@@ -39,6 +42,9 @@ from "../../components/dashboard/WorkflowTracker";
 
 export default function CustomerDashboard(){
 
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+
     const{
 
         dashboard,
@@ -66,6 +72,30 @@ export default function CustomerDashboard(){
                     Customer Service Dashboard
 
                 </h1>
+
+                {
+
+                    successMessage &&
+
+                    <div className="approval-success">
+
+                        {successMessage}
+
+                    </div>
+
+                }
+
+                {
+
+                    errorMessage &&
+
+                    <div className="approval-error">
+
+                        {errorMessage}
+
+                    </div>
+
+                }                
 
             </div>
 

@@ -61,7 +61,10 @@ function App() {
 
 
 
-          <Route path="approval" element={<ApprovalBoard />} />
+          <Route
+              path="approval/:quoteId"
+              element={<ApprovalBoard />}
+          />
 
           <Route path="job-creation" element={<JobCreation />} />
 

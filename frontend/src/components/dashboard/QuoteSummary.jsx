@@ -114,9 +114,12 @@ export default function QuoteSummary({
 
                     >
 
+
                         Approve Quote
 
                     </button>
+
+                    alert("Quote Approved successfully.");
 
                     <button
 
@@ -129,6 +132,8 @@ export default function QuoteSummary({
                         Request Revision
 
                     </button>
+
+                    alert("Revision Request submitted successfully.");
 
                 </div>
 

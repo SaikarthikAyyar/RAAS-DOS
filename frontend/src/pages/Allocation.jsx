@@ -264,6 +264,8 @@ async function saveAllocation(){
 
   </button>
 
+  alert("Allocated successfully.");
+
  </div>
 
 

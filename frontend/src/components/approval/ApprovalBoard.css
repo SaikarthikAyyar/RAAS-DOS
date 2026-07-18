@@ -248,3 +248,34 @@
     }
 
 }
+.approval-success{
+
+    background:#28a745;
+
+    color:white;
+
+    padding:14px 18px;
+
+    border-radius:10px;
+
+    margin-bottom:20px;
+
+    font-weight:600;
+
+}
+
+.approval-error{
+
+    background:#dc3545;
+
+    color:white;
+
+    padding:14px 18px;
+
+    border-radius:10px;
+
+    margin-bottom:20px;
+
+    font-weight:600;
+
+}

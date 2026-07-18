@@ -3,6 +3,7 @@
 // ====================================
 
 import useDashboard from "../../hooks/useDashboard";
+import { useNavigate } from "react-router-dom";
 
 import DashboardStats
 from "../../components/dashboard/DashboardStats";
@@ -22,12 +23,21 @@ from "../../components/dashboard/QuoteSummary";
 import WorkflowTracker
 from "../../components/dashboard/WorkflowTracker";
 
+import { useEffect } from "react";
+import { useState } from "react";
+
+
 
 // ====================================
 // PAGE
 // ====================================
 
 export default function ManagementDashboard(){
+
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");   
+
+    const navigate = useNavigate();
 
     const{
 
@@ -52,6 +62,30 @@ export default function ManagementDashboard(){
                     Management Dashboard
 
                 </h1>
+
+                {
+
+                    successMessage &&
+
+                    <div className="approval-success">
+
+                        {successMessage}
+
+                    </div>
+
+                }
+
+                {
+
+                    errorMessage &&
+
+                    <div className="approval-error">
+
+                        {errorMessage}
+
+                    </div>
+
+                }                
 
             </div>
 
@@ -254,6 +288,25 @@ export default function ManagementDashboard(){
                 />
 
             </div>
+
+            {
+            dashboard?.selected_enquiry?.requested_task === "APPROVAL_BOARD" &&
+
+            <button
+                className="dashboard-primary-action"
+                onClick={() => {
+
+                    navigate(
+                        `/approval/${dashboard.selected_enquiry.quote_id}`
+                    );
+
+                }}
+            >
+
+                Open Approval Board
+
+            </button>
+            }
 
         </div>
 

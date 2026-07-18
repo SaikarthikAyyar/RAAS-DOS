@@ -4,6 +4,9 @@
 
 import { useNavigate } from "react-router-dom";
 
+import { useEffect } from "react";
+import { useState } from "react";
+
 import useDashboard from "../../hooks/useDashboard";
 
 import DashboardStats from "../../components/dashboard/DashboardStats";
@@ -22,6 +25,10 @@ import WorkflowTracker from "../../components/dashboard/WorkflowTracker";
 // ====================================
 
 export default function OperationsDashboard(){
+
+
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");    
 
     const navigate = useNavigate();
 
@@ -52,6 +59,31 @@ export default function OperationsDashboard(){
                     Operations Dashboard
 
                 </h1>
+
+
+                {
+
+                    successMessage &&
+
+                    <div className="approval-success">
+
+                        {successMessage}
+
+                    </div>
+
+                }
+
+                {
+
+                    errorMessage &&
+
+                    <div className="approval-error">
+
+                        {errorMessage}
+
+                    </div>
+
+                }                
 
                 <p>
 

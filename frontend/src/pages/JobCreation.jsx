@@ -212,6 +212,8 @@ export default function JobCreation(){
 
                 </button>
 
+                alert("Job Created successfully.");
+
             </div>
 
         </div>

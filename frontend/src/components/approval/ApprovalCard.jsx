@@ -156,6 +156,8 @@ export default function ApprovalCard({
 
                         );
 
+                        alert("Approved successfully.");
+
                     }}
 
                 >

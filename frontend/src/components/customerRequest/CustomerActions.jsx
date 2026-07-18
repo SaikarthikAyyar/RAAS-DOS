@@ -19,8 +19,11 @@ onClick={submit}
 
 Submit Requirement
 
+
+
 </button>
 
+alert("Customer Request submitted successfully.");
 
 <button
 

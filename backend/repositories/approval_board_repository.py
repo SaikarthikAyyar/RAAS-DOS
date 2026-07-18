@@ -42,7 +42,7 @@ def list_approval_quotes(
         )
 
         .filter(
-            Quote.workflow_status == "CUSTOMER_APPROVED"
+            Quote.workflow_status == "MANAGEMENT_APPROVAL"
         )
 
         .join(
@@ -184,81 +184,43 @@ def approve_quote(
 
         )
     
-    print(quote.workflow_status)
+    print("Quote ID:", quote.id)
+    print("Workflow:", repr(quote.workflow_status))
+    print("Expected:", repr("MANAGEMENT_APPROVAL"))
+    print("Equal:", quote.workflow_status == "MANAGEMENT_APPROVAL")
     
-    if quote.workflow_status != "MANAGEMENT_APPROVAL":
+    if quote.workflow_status == "MANAGEMENT_APPROVAL":
+
+        approval = (
+            db.query(ApprovalBoard)
+            .filter(
+                ApprovalBoard.quote_id == quote_id
+            )
+            .first()
+        )
+
+        if approval is None:
+            approval = ApprovalBoard(
+                quote_id=quote_id
+            )
+            db.add(approval)
+
+        approval.approval_status = "APPROVED"
+        approval.approved_by = "ADMIN"
+        approval.approval_date = func.now()
+
+        
+
+        quote.workflow_status = "MANAGEMENT_APPROVED"
+
+    else:
         raise ValueError(
             "Quote is not awaiting management approval."
         )
 
-    approval = (
-
-        db.query(
-
-            ApprovalBoard
-
-        )
-
-        .filter(
-
-            ApprovalBoard.quote_id ==
-
-            quote_id
-
-        )
-
-        .first()
-
-    )
-
-    if approval is None:
-
-        approval = ApprovalBoard(
-
-            quote_id = quote_id
-
-        )
-
-        db.add(
-
-            approval
-
-        )
-
-    approval.approval_status = "APPROVED"
-
-    approval.approved_by = "ADMIN"
-
-    approval.approval_date = func.now()
-
-    quote.workflow_status = "MANAGEMENT_APPROVED"
-
-    print("[Repository] Quote Status -> MANAGEMENT_APPROVED")
-
-    db.commit()
 
 
-    db.commit()
 
-    db.refresh(quote)
-    db.refresh(approval)
-
-
-    print(
-
-        "Approval Saved:",
-
-        approval.id
-
-    )
-
-    print(
-
-        "=========================================\n"
-
-    )
-
-    return approval
 
 
 # ====================================
@@ -292,3 +254,58 @@ def get_approval(
         .first()
 
     )
+
+
+# ====================================
+# GET APPROVAL BY QUOTE
+# ====================================
+
+def get_approval_board_by_quote(
+    db,
+    quote_id
+):
+
+    quote, customer, ops = (
+
+        db.query(
+
+            Quote,
+            CustomerRequest,
+            OpsSelection
+
+        )
+
+        .join(
+            CustomerRequest,
+            Quote.customer_request_id == CustomerRequest.id
+        )
+
+        .join(
+            OpsSelection,
+            Quote.ops_selection_id == OpsSelection.id
+        )
+
+        .filter(
+            Quote.id == quote_id
+        )
+
+        .first()
+
+    )
+
+    return {
+
+        "quote_id": quote.id,
+
+        "customer": customer.company_name,
+
+        "summary":
+            f"{ops.service_configuration} + "
+            f"{ops.recommended_machine} + "
+            f"{ops.pump_hose_package}",
+
+        "quote_value": quote.combined_budgetary_value,
+
+        "flag": ops.approval_gate
+
+    }

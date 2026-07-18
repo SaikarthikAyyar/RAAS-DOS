@@ -83,6 +83,10 @@ from backend.repositories.techno_commercial_quote_repository import (
     get_quote_by_ops_selection
 )
 
+from backend.repositories.approval_board_repository import (
+    get_approval_board_by_quote
+)
+
 from backend.services.enquiry_service import EnquiryService
 
 
@@ -272,6 +276,19 @@ def get_dashboard_data(
         }
 
 
+    
+    approval_board_summary = None
+
+    if (
+        selected_enquiry
+        and selected_enquiry.requested_task == "APPROVAL_BOARD"
+    ):
+        approval_board_summary = get_approval_board_by_quote(
+            db,
+            selected_enquiry.quote_id
+        )
+
+
     return {
 
         "stats": {
@@ -296,7 +313,10 @@ def get_dashboard_data(
 
         "ops_summary": ops_summary,
 
-        "quote_summary": quote_summary
+        "quote_summary": quote_summary,
+
+        "approval_board_summary": approval_board_summary
+        
 
     }
 

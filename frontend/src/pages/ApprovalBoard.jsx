@@ -10,14 +10,19 @@ import "../components/approval/ApprovalBoard.css";
 import ApprovalCard
 from "../components/approval/ApprovalCard";
 
-import{
 
+
+import { useParams } from "react-router-dom";
+
+import {
     getApprovalBoard,
-
+    getApprovalBoardByQuote,
     approveQuote
-
 }
 from "../services/approvalBoardService";
+
+
+
 
 
 // ====================================
@@ -25,6 +30,10 @@ from "../services/approvalBoardService";
 // ====================================
 
 export default function ApprovalBoard(){
+
+    const { quoteId } = useParams();
+
+    const [approval,setApproval] = useState(null);
 
     // ====================================
     // STATE
@@ -47,12 +56,15 @@ export default function ApprovalBoard(){
     // ====================================
     // LOAD
     // ====================================
+    useEffect(() => {
 
-    useEffect(()=>{
+        if (!quoteId) {
 
-        loadApprovalBoard();
+            loadApprovalBoard();
 
-    },[]);
+        }
+
+    }, [quoteId]);
 
 
 
@@ -122,65 +134,64 @@ export default function ApprovalBoard(){
 
 
 
+    useEffect(() => {
+
+        async function load(){
+
+            const data = await getApprovalBoardByQuote(
+                Number(quoteId)
+            );
+
+            setApproval(data);
+
+        }
+
+        load();
+
+    },[quoteId]);
+
+
+
     // ====================================
     // APPROVAL PLACEHOLDER
     // ====================================
 
-    async function handleApprove(
-
-        quoteId
-
-    ){
+    async function handleApprove(quoteId){
 
         try{
 
-            console.log(
+            setSuccessMessage("");
+            setErrorMessage("");
 
-                "\n========== APPROVAL =========="
+            await approveQuote(quoteId);
 
-            );
-
-            console.log(
-
-                "Approving:",
-
-                quoteId
-
-            );
-
-            await approveQuote(
-
-                quoteId
-
-            );
-
-            console.log(
-
-                "Reloading Approval Board..."
-
+            setSuccessMessage(
+                `Quote Q-${quoteId} approved successfully.`
             );
 
             await loadApprovalBoard();
 
-            console.log(
+            setTimeout(() => {
 
-                "==============================\n"
+                setSuccessMessage("");
 
-            );
+            },3000);
 
         }
 
-        catch(
+        catch(error){
 
-            exception
+            setErrorMessage(
 
-        ){
-
-            console.log(
-
-                exception
+                error.detail || "Approval failed."
 
             );
+
+            setTimeout(() => {
+
+                setErrorMessage("");
+
+            },3000);
 
         }
 
@@ -204,6 +215,30 @@ export default function ApprovalBoard(){
 
                 </h1>
 
+                {
+
+                    successMessage &&
+
+                    <div className="approval-success">
+
+                        {successMessage}
+
+                    </div>
+
+                }
+
+                {
+
+                    errorMessage &&
+
+                    <div className="approval-error">
+
+                        {errorMessage}
+
+                    </div>
+
+                }
+
                 <p>
 
                     Review and approve completed techno-commercial quotations.
@@ -215,31 +250,25 @@ export default function ApprovalBoard(){
             <div className="approval-list">
 
                 {
+                    quoteId ?
+
+                    approval &&
+
+                    <ApprovalCard
+                        approval={approval}
+                        onApprove={handleApprove}
+                    />
+
+                    :
 
                     approvals.map(
 
-                        approval=>(
+                        approval => (
 
                             <ApprovalCard
-
-                                key={
-
-                                    approval.quote_id
-
-                                }
-
-                                approval={
-
-                                    approval
-
-                                }
-
-                                onApprove={
-
-                                    handleApprove
-
-                                }
-
+                                key={approval.quote_id}
+                                approval={approval}
+                                onApprove={handleApprove}
                             />
 
                         )

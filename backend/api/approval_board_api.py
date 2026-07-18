@@ -21,6 +21,10 @@ from backend.services.approval_board_service import (
 
 )
 
+from backend.services.approval_board_service import (
+    get_approval_board_by_quote_request
+)
+
 # ====================================
 # ROUTER
 # ====================================
@@ -153,3 +157,29 @@ def approve_quote(
             approval.id
 
     }
+
+# ====================================
+# GET APPROVAL BY QUOTE
+# ====================================
+
+@router.get(
+
+    "/approval-board/{quote_id}"
+
+)
+
+def approval_board_by_quote(
+
+    quote_id: int,
+
+    db: Session = Depends(get_db)
+
+):
+
+    return get_approval_board_by_quote_request(
+
+        db,
+
+        quote_id
+
+    )

@@ -1068,3 +1068,35 @@ WORKFLOW TRACKER
     }
 
 }
+
+.workflow-success{
+
+    background:#28a745;
+
+    color:white;
+
+    padding:14px;
+
+    border-radius:8px;
+
+    margin-bottom:18px;
+
+    font-weight:600;
+
+}
+
+.workflow-error{
+
+    background:#dc3545;
+
+    color:white;
+
+    padding:14px;
+
+    border-radius:8px;
+
+    margin-bottom:18px;
+
+    font-weight:600;
+
+}

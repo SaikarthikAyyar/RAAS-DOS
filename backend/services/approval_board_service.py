@@ -23,6 +23,10 @@ from backend.services.status_service import (
     update_customer_request_status
 )
 
+from backend.repositories.approval_board_repository import (
+    get_approval_board_by_quote
+)
+
 
 
 # ====================================
@@ -267,5 +271,35 @@ def get_approval_request(
         "======================================\n"
 
     )
+
+    return approval
+
+# ====================================
+# GET APPROVAL BOARD BY QUOTE
+# ====================================
+
+def get_approval_board_by_quote_request(
+
+    db,
+
+    quote_id
+
+):
+
+    print("\n========== APPROVAL SERVICE ==========")
+
+    print(f"Quote : {quote_id}")
+
+    approval = get_approval_board_by_quote(
+
+        db,
+
+        quote_id
+
+    )
+
+    print(approval)
+
+    print("======================================\n")
 
     return approval

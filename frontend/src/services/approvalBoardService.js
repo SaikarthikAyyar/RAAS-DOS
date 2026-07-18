@@ -131,3 +131,36 @@ export async function approveQuote(
     return data;
 
 }
+
+
+// ====================================
+// GET APPROVAL BOARD BY QUOTE
+// ====================================
+
+export async function getApprovalBoardByQuote(
+
+    quoteId
+
+){
+
+    const response = await fetch(
+
+        `${API}/approval-board/${quoteId}`
+
+    );
+
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
+
+}

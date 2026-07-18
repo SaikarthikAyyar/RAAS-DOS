@@ -288,6 +288,8 @@ export default function OpsApproval(){
 
                 </button>
 
+                alert("Ops Approved successfully.");
+
             </div>
 
         </div>
