@@ -169,6 +169,11 @@ def create_quote_request(
     # SAVE
     # ====================================
 
+    print("\n===== QUOTE DATA =====")
+    for k, v in quote_data.items():
+        print(k, "=", v)
+    print("======================\n")
+
     quote = create_quote(
 
         db,
@@ -204,15 +209,11 @@ def create_quote_request(
         quote.id,
 
         {
-
             "customer_request_id": ops.customer_request_id,
-
             "sales_survey_id": ops.sales_survey_id,
-
+            "ops_selector_id": quote.ops_selection_id,
             "quote_id": quote.id,
-
             "revision": quote.revision_number
-
         }
 
     )
@@ -398,8 +399,9 @@ def approve_quote_by_customer(
         ops.sales_survey_id,
         quote.id,
         {
-            "customer_request_id": quote.customer_request_id,
+            "customer_request_id": ops.customer_request_id,
             "sales_survey_id": ops.sales_survey_id,
+            "ops_selector_id": quote.ops_selection_id,
             "quote_id": quote.id,
             "revision": quote.revision_number
         }
@@ -520,15 +522,11 @@ def request_quote_revision(
             ops.sales_survey_id,
 
             {
-
-                "customer_request_id": quote.customer_request_id,
-
+                "customer_request_id": ops.customer_request_id,
                 "sales_survey_id": ops.sales_survey_id,
-
+                "ops_selector_id": quote.ops_selection_id,
                 "quote_id": quote.id,
-
                 "revision": quote.revision_number
-
             }
 
         )

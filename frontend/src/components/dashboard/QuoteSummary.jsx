@@ -26,74 +26,77 @@ export default function QuoteSummary({
 
         <div className="dashboard-summary-card">
 
-            <div className="dashboard-summary-header">
+        <div className="dashboard-summary-header">
 
-                <h3>
+            <h3>
 
-                    Techno Commercial Quote
+                OPS + Techno Commercial Quote
 
-                </h3>
+            </h3>
 
+        </div>
+
+        <div className="dashboard-summary-grid">
+
+            <div className="dashboard-summary-item">
+                <span>Quote ID</span>
+                <strong>Q-{summary.quote_id}</strong>
             </div>
 
-            <div className="dashboard-summary-grid">
-
-                <SummaryCard
-                    title="Quote ID"
-                    value={`Q-${summary.quote_id}`}
-                />
-
-                <SummaryCard
-                    title="Revision"
-                    value={summary.revision}
-                />
-
-                <SummaryCard
-                    title="Workflow"
-                    value={summary.workflow_status}
-                />
-
-                <SummaryCard
-                    title="Machine"
-                    value={summary.recommended_machine}
-                />
-
-                <SummaryCard
-                    title="Configuration"
-                    value={summary.service_configuration}
-                />
-
-                <SummaryCard
-                    title="Pump Package"
-                    value={summary.pump_hose_package}
-                />
-
-                <SummaryCard
-                    title="Dewatering"
-                    value={summary.dewatering_method}
-                />
-
-                <SummaryCard
-                    title="Approval Gate"
-                    value={summary.approval_gate}
-                />
-
-                <SummaryCard
-                    title="Cleaning Quote"
-                    value={`₹ ${summary.cleaning_quote}`}
-                />
-
-                <SummaryCard
-                    title="Dewatering Add-on"
-                    value={`₹ ${summary.dewatering_addon}`}
-                />
-
-                <SummaryCard
-                    title="Budgetary Value"
-                    value={`₹ ${summary.combined_budgetary_value}`}
-                />
-
+            <div className="dashboard-summary-item">
+                <span>Revision</span>
+                <strong>{summary.revision}</strong>
             </div>
+
+            <div className="dashboard-summary-item">
+                <span>Workflow</span>
+                <strong>{summary.workflow_status}</strong>
+            </div>
+
+            <div className="dashboard-summary-item">
+                <span>Machine</span>
+                <strong>{summary.recommended_machine}</strong>
+            </div>
+
+            <div className="dashboard-summary-item">
+                <span>Configuration</span>
+                <strong>{summary.service_configuration}</strong>
+            </div>
+
+            <div className="dashboard-summary-item">
+                <span>Pump Package</span>
+                <strong>{summary.pump_hose_package}</strong>
+            </div>
+
+            <div className="dashboard-summary-item">
+                <span>Dewatering</span>
+                <strong>{summary.dewatering_method}</strong>
+            </div>
+
+            <div className="dashboard-summary-item">
+                <span>Approval Gate</span>
+                <strong>{summary.approval_gate}</strong>
+            </div>
+
+            <div className="dashboard-summary-item">
+                <span>Cleaning Quote</span>
+                <strong>₹ {summary.cleaning_quote}</strong>
+            </div>
+
+            <div className="dashboard-summary-item">
+                <span>Dewatering Add-on</span>
+                <strong>₹ {summary.dewatering_addon}</strong>
+            </div>
+
+            <div className="dashboard-summary-item">
+                <span>Budgetary Value</span>
+                <strong>₹ {summary.combined_budgetary_value}</strong>
+            </div>
+
+        </div>
+
+
+
 
             {
 

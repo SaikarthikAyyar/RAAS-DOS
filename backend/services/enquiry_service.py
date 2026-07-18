@@ -411,7 +411,7 @@ class EnquiryService:
 
             sales_survey_id=sales_survey_id,
 
-            ops_selector_id=None,
+            ops_selector_id=payload["ops_selector_id"],
 
             dewatering_assessment_id=None,
 
@@ -484,7 +484,7 @@ class EnquiryService:
 
             sales_survey_id=sales_survey_id,
 
-            ops_selector_id=None,
+            ops_selector_id=payload["ops_selector_id"],
 
             dewatering_assessment_id=None,
 
@@ -548,7 +548,7 @@ class EnquiryService:
 
             sales_survey_id=sales_survey_id,
 
-            ops_selector_id=None,
+            ops_selector_id=payload["ops_selector_id"],
 
             dewatering_assessment_id=None,
 
@@ -617,7 +617,7 @@ class EnquiryService:
 
             sales_survey_id=sales_survey_id,
 
-            ops_selector_id=None,
+            ops_selector_id=payload["ops_selector_id"],
 
             dewatering_assessment_id=None,
 
@@ -679,7 +679,7 @@ class EnquiryService:
 
             sales_survey_id=sales_survey_id,
 
-            ops_selector_id=None,
+            ops_selector_id=payload["ops_selector_id"],
 
             dewatering_assessment_id=None,
 

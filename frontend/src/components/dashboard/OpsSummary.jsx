@@ -30,7 +30,7 @@ export default function QuoteSummary({
 
                 <h3>
 
-                    Techno Commercial Quote
+                    OPS Summary (Quote Pending)
 
                 </h3>
 
