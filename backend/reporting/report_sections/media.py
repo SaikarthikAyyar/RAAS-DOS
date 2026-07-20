@@ -94,7 +94,7 @@ def draw_media_item(
 
     url = (
 
-        "http://127.0.0.1:8000/uploads/"
+        "API/uploads/"
 
         + media.file_path.split("backend/uploads/")[-1]
 

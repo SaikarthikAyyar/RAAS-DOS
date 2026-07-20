@@ -2,6 +2,8 @@
 // LOGIN USER
 // ====================================
 
+
+const API = import.meta.env.VITE_API_URL;
 export async function loginUser(
 
     email,
@@ -12,7 +14,7 @@ export async function loginUser(
 
     const response = await fetch(
 
-        "http://127.0.0.1:8000/login",
+        "API/login",
 
         {
 
