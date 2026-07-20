@@ -23,6 +23,8 @@ class ExecutionSchema(BaseModel):
 
     current_phase: str = "PHASE_1"
 
+    execution_progress: int = 0
+
     phase_1_status: str = "PENDING"
 
     phase_2_status: str = "PENDING"
@@ -37,7 +39,17 @@ class ExecutionSchema(BaseModel):
 
     actual_completion: date | None = None
 
+    delay_days: int = 0
+
     remarks: str | None = None
+
+    current_activity: str | None = None
+
+    transport_status: str = "WAITING"
+
+
+
+    invoice_synced: str = "YES"
 
     class Config:
 

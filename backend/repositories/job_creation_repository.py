@@ -529,3 +529,18 @@ def get_job_creation_data(
                 }
 
     }
+
+
+# ====================================
+# GENERATE INVOICE
+# ====================================
+
+    create_invoice_request(
+
+        db,
+
+        job.id
+
+    )
+
+    print("[Workflow] Invoice Created")

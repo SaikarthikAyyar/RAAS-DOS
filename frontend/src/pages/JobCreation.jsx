@@ -193,26 +193,42 @@ export default function JobCreation(){
                         );
 
                         if (!selected) {
+                            alert("Please select a quote.");
                             return;
                         }
 
-                        await saveJobCreation({
+                        try {
 
-                            approval_board_id:
-                                selected.approval_board_id
+                            await saveJobCreation({
 
-                        });
+                                approval_board_id:
+                                    selected.approval_board_id
 
-                        alert("Job Created");
+                            });
+
+                            alert("Job created successfully.\nInvoice generated.\nAllocation workflow started.");
+
+                            window.location.reload();
+
+                        }
+                        catch (error) {
+
+                            alert(
+                                error?.detail ||
+                                error?.message ||
+                                "Failed to create job."
+                            );
+
+                        }
 
                     }}
                 >
 
-                Create Job
+                    Create Job
 
                 </button>
 
-                alert("Job Created successfully.");
+
 
             </div>
 

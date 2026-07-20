@@ -177,7 +177,7 @@ def approve_quote_request(
 
     )
 
-    EnquiryService.create_allocation_enquiry(
+    EnquiryService.create_job_creation_enquiry(
 
         db,
 

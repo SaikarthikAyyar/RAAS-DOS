@@ -1,6 +1,6 @@
-from datetime import date, timedelta
 
-from backend.data.machine_library import MACHINE_LIBRARY
+
+from backend.data.machine_inventory_seed import MACHINE_INVENTORY
 
 from backend.models.machine_inventory import MachineInventory
 from backend.models.personnel import Personnel
@@ -14,38 +14,33 @@ def seed_machine_inventory(db):
     if existing:
         return
 
-    today = date.today()
 
 
 
-    for machine in MACHINE_LIBRARY:
 
-        for number in range(1, 4):
+    for machine in MACHINE_INVENTORY:
 
-            start_date = today + timedelta(days=(number - 1) * 5)
-            completion_date = start_date + timedelta(days=10)
+        for number in range(1, machine["devices"] + 1):
+
+
 
             inventory = MachineInventory(
 
-                machine_code=machine["code"],
+                machine_name=machine["machine_name"],
 
-                machine_name=machine["name"],
+                machine_code=f'{machine["machine_code"]}-{number:02d}',
 
-                asset_number=f'{machine["code"]}-{number:03d}',
+                asset_number=f'ASSET-{machine["machine_code"]}-{number:03d}',
 
                 status="AVAILABLE",
 
                 current_job_id=None,
 
-                site_location="Head Office",
+                current_site="WAREHOUSE",
 
-                allocated_start=None,
+                current_gps=None,
 
-                allocated_completion=None,
-
-                estimated_arrival=None,
-
-                next_available_date=None,
+                queue_count=0,
 
                 remarks=None
 
@@ -109,7 +104,15 @@ def seed_personnel(db):
 
             skill=designation,
 
-            allocation_status="AVAILABLE",
+            current_job_id=None,
+
+            assigned_role=None,
+
+            current_invoice_id=None,
+
+            current_gps=None,
+
+            availability_status="AVAILABLE",
 
             documents_verified=True
 

@@ -13,7 +13,12 @@ return(
 
 className="survey-btn save-btn"
 
-onClick={submit}
+onClick={
+    submit
+    
+}
+
+
 
 >
 
@@ -23,7 +28,7 @@ Submit Requirement
 
 </button>
 
-alert("Customer Request submitted successfully.");
+
 
 <button
 

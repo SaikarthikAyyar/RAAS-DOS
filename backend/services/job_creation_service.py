@@ -59,7 +59,7 @@ from backend.services.status_service import (
 )
 
 # Replace this with your actual invoice service once it exists
-# from backend.services.invoice_service import create_invoice_request
+from backend.services.invoice_service import create_invoice_request
 
 # ====================================
 # CREATE JOB
@@ -334,10 +334,19 @@ def create_job_request(
     # GENERATE INVOICE
     # ====================================
 
-    # InvoiceService.create_invoice_request(
-    #     db,
-    #     job.id
-    # )
+    invoice = create_invoice_request(
+
+        db,
+
+        job.id
+
+    )
+
+    print(
+
+        f"[Workflow] Invoice Created : {invoice.id}"
+
+    )
 
     print("[Workflow] Invoice generation pending")
 

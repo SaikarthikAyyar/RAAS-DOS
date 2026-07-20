@@ -46,6 +46,10 @@ from backend.api.job_creation_api import router as job_creation_router
 
 from backend.api.ops_approval_api import router as ops_approval_router
 
+from backend.api.invoice_api import (
+    router as invoice_router
+)
+
 from backend.database.init_db import create_tables
 
 from fastapi.staticfiles import StaticFiles
@@ -158,6 +162,12 @@ app.include_router(
 app.include_router(
 
     job_creation_router
+
+)
+
+app.include_router(
+
+    invoice_router
 
 )
 

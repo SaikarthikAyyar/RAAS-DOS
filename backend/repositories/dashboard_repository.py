@@ -10,6 +10,8 @@ from backend.services.status_service import (
 
 )
 
+from backend.models.invoice import Invoice
+
 
 def get_dashboard_requests(
     db,
@@ -635,15 +637,14 @@ def get_dashboard_statistics(
 
             ),
 
-        "job_in_progress":
-
+        "purchase_orders":
             count_workflow_stage(
-
                 customers,
+                "MANAGEMENT_APPROVAL"
+            ),
 
-                "JOB_IN_PROGRESS"
-
-            )
+        "invoice_count":
+            db.query(Invoice).count()
 
     }
 
@@ -690,11 +691,8 @@ def get_dashboard_statistics(
     )
 
     print(
-
-        "Job In Progress:",
-
-        stats["job_in_progress"]
-
+        "Purchase Orders:",
+        stats["purchase_orders"]
     )
 
     print("=====================================\n")
@@ -711,7 +709,9 @@ def get_dashboard_statistics(
 
         "quote_created": stats["quote_created"],
 
-        "job_in_progress": stats["job_in_progress"]
+        "purchase_orders": stats["purchase_orders"],
+
+        "invoice_count": stats["invoice_count"]
 
     }
 

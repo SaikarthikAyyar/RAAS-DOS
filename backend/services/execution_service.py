@@ -29,6 +29,15 @@ from backend.services.status_service import (
     update_customer_request_status
 )
 
+from backend.repositories.invoice_repository import (
+    get_invoice_by_job,
+    update_invoice
+)
+
+from backend.models.machine_schedule import MachineSchedule
+
+from backend.models.machine_inventory import MachineInventory
+
 
 # ====================================
 # CREATE EXECUTION
@@ -92,6 +101,8 @@ def create_execution_request(
 
         current_phase="PHASE_1",
 
+        execution_progress=0,
+
         phase_1_status="PENDING",
 
         phase_2_status="PENDING",
@@ -104,7 +115,17 @@ def create_execution_request(
 
         estimated_completion=job.planned_completion,
 
-        remarks=None
+        actual_completion=None,
+
+        delay_days=0,
+
+        current_activity="Execution Ready",
+
+        transport_status="WAITING",
+
+        remarks=None,
+
+        invoice_synced="YES"
 
     )
 
@@ -115,6 +136,34 @@ def create_execution_request(
         execution
 
     )
+
+    invoice = get_invoice_by_job(
+
+        db,
+
+        job.id
+
+    )
+
+    if invoice:
+
+        invoice.execution_phase = "READY"
+
+        invoice.execution_progress = 0
+
+        invoice.customer_visible_status = "Execution Ready"
+
+        invoice.current_activity = "Waiting to Start Execution"
+
+        invoice.transport_status = "WAITING"
+
+        update_invoice(
+
+            db,
+
+            invoice
+
+        )
 
     print(
 
@@ -156,21 +205,7 @@ def create_execution_request(
 
             break
 
-    update_customer_request_status(
 
-        db,
-
-        job.customer_request_id,
-
-        "EXECUTION_READY"
-
-    )
-
-    print(
-
-        "[Workflow] Customer Status -> EXECUTION_READY"
-
-    )
 
     return execution
 
@@ -243,13 +278,43 @@ def start_execution_phase(
 
         )
 
-    return start_phase(
+    execution = start_phase(
 
         db,
 
         execution
 
     )
+
+    invoice = get_invoice_by_job(
+
+        db,
+
+        execution.job_creation_id
+
+    )
+
+    if invoice:
+
+        invoice.execution_phase = execution.current_phase
+
+        invoice.execution_progress = execution.execution_progress
+
+        invoice.customer_visible_status = "Execution Started"
+
+        invoice.current_activity = execution.current_activity
+
+        invoice.transport_status = execution.transport_status
+
+        update_invoice(
+
+            db,
+
+            invoice
+
+        )
+
+    return execution
 
 
 # ====================================
@@ -289,6 +354,38 @@ def complete_execution_phase(
         execution
 
     )
+
+    invoice = get_invoice_by_job(
+
+        db,
+
+        execution.job_creation_id
+
+    )
+
+    if invoice:
+
+        invoice.execution_phase = execution.current_phase
+
+        invoice.execution_progress = execution.execution_progress
+
+        invoice.customer_visible_status = execution.current_activity
+
+        invoice.current_activity = execution.current_activity
+
+        invoice.transport_status = execution.transport_status
+
+        if execution.workflow_status == "EXECUTION_COMPLETED":
+
+            invoice.invoice_status = "COMPLETED"
+
+        update_invoice(
+
+            db,
+
+            invoice
+
+        )
 
     if execution.workflow_status == "EXECUTION_COMPLETED":
 

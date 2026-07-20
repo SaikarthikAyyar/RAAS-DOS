@@ -4,6 +4,14 @@
 
 from backend.models.execution import Execution
 
+from backend.models.machine_schedule import MachineSchedule
+
+from backend.models.machine_inventory import MachineInventory
+
+from backend.models.invoice import Invoice
+
+from datetime import date
+
 
 # ====================================
 # CREATE EXECUTION
@@ -51,6 +59,21 @@ def create_execution(
 
         estimated_completion=
         payload.estimated_completion,
+
+        execution_progress=
+        payload.execution_progress,
+
+        delay_days=
+        payload.delay_days,
+
+        current_activity=
+        payload.current_activity,
+
+        transport_status=
+        payload.transport_status,
+
+        invoice_synced=
+        payload.invoice_synced,
 
         actual_completion=
         payload.actual_completion,
@@ -207,13 +230,119 @@ def start_phase(
 
         execution.phase_1_status = "IN_PROGRESS"
 
+        execution.current_activity = "Machine Mobilisation"
+
+        execution.execution_progress = 10
+
+        execution.transport_status = "IN_TRANSIT"
+
     elif execution.current_phase == "PHASE_2":
 
         execution.phase_2_status = "IN_PROGRESS"
 
+        execution.current_activity = "Site Work In Progress"
+
+        execution.execution_progress = 50
+
+
     elif execution.current_phase == "PHASE_3":
 
         execution.phase_3_status = "IN_PROGRESS"
+
+        execution.current_activity = "Testing and Demobilisation"
+
+        execution.execution_progress = 90
+
+    # ====================================
+    # ACTIVATE MACHINE SCHEDULE
+    # ====================================
+
+
+
+
+    active_schedule = (
+
+        db.query(
+
+            MachineSchedule
+
+        )
+
+        .filter(
+
+            MachineSchedule.job_creation_id == execution.job_creation_id,
+
+            MachineSchedule.queue_position == 1
+
+        )
+
+        .first()
+
+    )
+
+    if active_schedule:
+
+        active_schedule.schedule_status = "ACTIVE"
+
+        machine = (
+
+            db.query(
+
+                MachineInventory
+
+            )
+
+            .filter(
+
+                MachineInventory.id == active_schedule.machine_id
+
+            )
+
+            .first()
+
+        )
+
+        if machine:
+
+            machine.status = "ALLOCATED"
+
+            machine.current_job_id = execution.job_creation_id
+
+            machine.current_site = active_schedule.site_location
+
+    invoice = (
+
+        db.query(
+
+            Invoice
+
+        )
+
+        .filter(
+
+            Invoice.job_creation_id ==
+
+            execution.job_creation_id
+
+        )
+
+        .first()
+
+    )
+
+
+
+    if invoice:
+
+        invoice.execution_phase = execution.current_phase
+
+        invoice.execution_progress = execution.execution_progress
+
+        invoice.customer_visible_status = execution.current_activity
+
+        invoice.current_activity = execution.current_activity
+
+        invoice.transport_status = execution.transport_status
 
     db.commit()
 
@@ -255,6 +384,147 @@ def complete_phase(
         execution.phase_3_status = "COMPLETED"
 
         execution.workflow_status = "EXECUTION_COMPLETED"
+
+        execution.execution_progress = 100
+
+        execution.current_activity = "Execution Completed"
+
+        execution.transport_status = "COMPLETED"
+
+        execution.actual_completion = date.today()
+
+
+        schedules = (
+
+            db.query(
+
+                MachineSchedule
+
+            )
+
+            .filter(
+
+                MachineSchedule.job_creation_id ==
+
+                execution.job_creation_id
+
+            )
+
+            .all()
+
+        )
+
+        for schedule in schedules:
+
+            schedule.schedule_status = "COMPLETED"
+
+            machine = (
+
+                db.query(
+
+                    MachineInventory
+
+                )
+
+                .filter(
+
+                    MachineInventory.id ==
+
+                    schedule.machine_id
+
+                )
+
+                .first()
+
+            )
+
+            if machine:
+
+
+                next_schedule = (
+
+                    db.query(
+
+                        MachineSchedule
+
+                    )
+
+                    .filter(
+
+                        MachineSchedule.machine_id == machine.id,
+
+                        MachineSchedule.schedule_status == "QUEUED"
+
+                    )
+
+                    .order_by(
+
+                        MachineSchedule.queue_position
+
+                    )
+
+                    .first()
+
+                )
+
+                if next_schedule:
+
+                    next_schedule.schedule_status = "ACTIVE"
+
+                    machine.status = "ALLOCATED"
+
+                    machine.current_job_id = next_schedule.job_creation_id
+
+                    machine.current_site = next_schedule.site_location
+
+                else:
+
+                    machine.status = "AVAILABLE"
+
+                    machine.current_job_id = None
+
+
+                machine.queue_count = max(
+
+                    machine.queue_count - 1,
+
+                    0
+
+                )
+
+        invoice = (
+
+            db.query(
+
+                Invoice
+
+            )
+
+            .filter(
+
+                Invoice.job_creation_id ==
+
+                execution.job_creation_id
+
+            )
+
+            .first()
+
+        )
+
+        if invoice:
+
+            invoice.execution_progress = 100
+
+            invoice.execution_phase = "COMPLETED"
+
+            invoice.invoice_status = "COMPLETED"
+
+            invoice.customer_visible_status = "Job Completed"
+
+            invoice.current_activity = "Execution Completed"
+
+            invoice.transport_status = "COMPLETED"
 
     db.commit()
 

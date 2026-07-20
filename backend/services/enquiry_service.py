@@ -617,7 +617,7 @@ class EnquiryService:
 
             sales_survey_id=sales_survey_id,
 
-            ops_selector_id=payload["ops_selector_id"],
+            ops_selector_id=None,
 
             dewatering_assessment_id=None,
 
@@ -679,7 +679,7 @@ class EnquiryService:
 
             sales_survey_id=sales_survey_id,
 
-            ops_selector_id=payload["ops_selector_id"],
+            ops_selector_id=None,
 
             dewatering_assessment_id=None,
 

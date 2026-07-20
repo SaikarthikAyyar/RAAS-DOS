@@ -20,6 +20,8 @@ from backend.models.techno_commercial_quote import Quote
 
 from backend.models.job_creation import JobCreation
 
+from backend.models.invoice import Invoice
+
 from backend.models.users import User
 from backend.models.enquiry import Enquiry
 

@@ -21,6 +21,13 @@ from backend.services.execution_service import (
 
 from backend.services.allocation_service import get_allocation_dashboard
 
+from backend.models.machine_schedule import MachineSchedule
+
+from backend.services.invoice_service import (
+    get_invoice_by_job_request,
+    update_invoice_request
+)
+
 # ====================================
 # ALLOCATE RESOURCES
 # ====================================
@@ -67,12 +74,8 @@ def allocate_resources(
         )
 
     # ====================================
-    # ALLOCATE MACHINES
+    # CREATE MACHINE SCHEDULE
     # ====================================
-
-# ====================================
-# ALLOCATE MACHINES
-# ====================================
 
     for machine_id in machine_ids:
 
@@ -98,27 +101,50 @@ def allocate_resources(
 
             continue
 
-        if machine.status != "AVAILABLE":
+        queue_position = (
 
-            raise ValueError(
+            db.query(
 
-                f"{machine.machine_name} is already allocated."
+                MachineSchedule
 
             )
 
-        machine.current_job_id = job.id
+            .filter(
 
-        machine.status = "ALLOCATED"
+                MachineSchedule.machine_id == machine.id
 
-        machine.site_location = site_location
+            )
 
-        machine.allocated_start = payload.planned_start
+            .count()
 
-        machine.allocated_completion = payload.planned_completion
+        ) + 1
 
-        machine.estimated_arrival = payload.planned_start
+        schedule = MachineSchedule(
 
-        machine.next_available_date = payload.planned_completion
+            machine_id=machine.id,
+
+            job_creation_id=job.id,
+
+            queue_position=queue_position,
+
+            site_location=site_location,
+
+            planned_start=payload.planned_start,
+
+            planned_completion=payload.planned_completion,
+
+            schedule_status="QUEUED"
+
+        )
+
+        db.add(schedule)
+
+        machine.queue_count += 1
+
+        db.flush()
+        db.refresh(machine)
+
+
 
     # ====================================
     # ALLOCATE PERSONNEL
@@ -164,7 +190,7 @@ def allocate_resources(
 
         person.current_location = site_location
 
-        person.allocation_status = "ALLOCATED"
+        person.availablity_status = "ALLOCATED"
 
     # ====================================
     # UPDATE JOB
@@ -183,6 +209,39 @@ def allocate_resources(
     db.commit()
 
     db.refresh(job)
+
+
+    # ====================================
+    # UPDATE INVOICE
+    # ====================================
+
+    invoice = get_invoice_by_job_request(
+
+        db,
+
+        job.id
+
+    )
+
+    if invoice is not None:
+
+        invoice.planned_start = payload.planned_start
+
+        invoice.estimated_completion = payload.planned_completion
+
+        invoice.customer_visible_status = "Resources Scheduled"
+
+        invoice.execution_phase = "ALLOCATION"
+
+        invoice.current_activity = "Machines and Personnel Scheduled"
+
+        update_invoice_request(
+
+            db,
+
+            invoice
+
+        )
 
     # ====================================
     # CREATE EXECUTION ENQUIRY

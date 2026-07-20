@@ -66,6 +66,11 @@ class Execution(Base):
         server_default="PHASE_1"
     )
 
+    execution_progress = Column(
+        BigInteger,
+        default=0
+    )
+
     # ====================================
     # PHASE STATUS
     # ====================================
@@ -105,8 +110,28 @@ class Execution(Base):
         Date
     )
 
+    delay_days = Column(
+        BigInteger,
+        default=0
+    )
+
     remarks = Column(
         String(1000)
+    )
+
+    current_activity = Column(
+        String(300),
+        nullable=True
+    )
+
+    transport_status = Column(
+        String(100),
+        server_default="WAITING"
+    )
+
+    invoice_synced = Column(
+        String(20),
+        server_default="YES"
     )
 
     # ====================================

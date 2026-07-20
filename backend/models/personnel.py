@@ -56,10 +56,28 @@ class Personnel(Base):
         nullable=True
     )
 
-    allocation_status = Column(
+    assigned_role = Column(
+        String(100),
+        nullable=True
+    )
+
+    current_invoice_id = Column(
+        BigInteger,
+        nullable=True
+    )
+
+    current_gps = Column(
+        String(100),
+        nullable=True
+    )
+
+    availability_status = Column(
         String(50),
         server_default="AVAILABLE"
     )
+
+
+
 
     documents_verified = Column(
         Boolean,

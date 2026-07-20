@@ -1,19 +1,29 @@
-from sqlalchemy import (
-    Column,
-    BigInteger,
-    String,
-    Date,
-    ForeignKey,
-    TIMESTAMP,
-    text
-)
+# ====================================
+# IMPORTS
+# ====================================
+
+from sqlalchemy import Column
+from sqlalchemy import BigInteger
+from sqlalchemy import String
+from sqlalchemy import TIMESTAMP
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import text
 
 from backend.database.tables import Base
 
 
+# ====================================
+# MACHINE INVENTORY
+# ====================================
+
 class MachineInventory(Base):
 
     __tablename__ = "machine_inventory"
+
+    # ====================================
+    # PRIMARY KEY
+    # ====================================
 
     id = Column(
         BigInteger,
@@ -21,25 +31,33 @@ class MachineInventory(Base):
         index=True
     )
 
-    machine_code = Column(
-        String(50),
-        nullable=False
-    )
+    # ====================================
+    # MACHINE DETAILS
+    # ====================================
 
     machine_name = Column(
         String(200),
         nullable=False
     )
-
-    asset_number = Column(
-        String(50),
+    machine_code = Column(
+        String(100),
         unique=True,
         nullable=False
     )
 
+    asset_number = Column(
+        String(100),
+        unique=True,
+        nullable=False
+    )
+
+    # ====================================
+    # LIVE STATUS
+    # ====================================
+
     status = Column(
         String(50),
-        server_default="AVAILABLE"
+        default="AVAILABLE"
     )
 
     current_job_id = Column(
@@ -48,20 +66,29 @@ class MachineInventory(Base):
         nullable=True
     )
 
-    site_location = Column(
+    current_site = Column(
         String(200),
-        server_default="Warehouse"
+        default="WAREHOUSE"
     )
 
-    allocated_start = Column(Date)
+    current_gps = Column(
+        String(100),
+        nullable=True
+    )
 
-    allocated_completion = Column(Date)
+    queue_count = Column(
+        Integer,
+        default=0
+    )
 
-    estimated_arrival = Column(Date)
+    remarks = Column(
+        String(500),
+        nullable=True
+    )
 
-    next_available_date = Column(Date)
-
-    remarks = Column(String(500))
+    # ====================================
+    # AUDIT
+    # ====================================
 
     created_at = Column(
         TIMESTAMP,

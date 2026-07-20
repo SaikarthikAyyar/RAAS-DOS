@@ -946,6 +946,633 @@ IMPLEMENTATION RULES
 
 12. Static datasets are temporary. All architecture must support future real-time dynamic data without redesign.
 
+
+====================================================================================================================
+RAAS-DOS DASHBOARD EVOLUTION SPECIFICATION
+Version 1.0
+Status: Future Implementation
+Purpose: Dashboard redesign after completion of the Invoice Pipeline.
+====================================================================================================================
+
+OVERVIEW
+
+The current dashboards are designed around the Enquiry Pipeline.
+
+Once the Invoice Pipeline is completed, the dashboard becomes the primary workspace
+for every role.
+
+Instead of continuously creating new standalone pages, execution information should
+be exposed through Dashboard Tabs.
+
+The dashboard becomes a role-specific control center while dedicated modules
+(Job Creation, Allocation, Execution, etc.) remain detailed workspaces.
+
+The dashboard therefore becomes the primary navigation interface for all users.
+
+
+====================================================================================================================
+DESIGN PHILOSOPHY
+====================================================================================================================
+
+Dedicated Modules
+
+Customer Request
+Sales Survey
+Ops Approval
+Ops Selection
+Quote
+Approval
+Job Creation
+Allocation
+Execution
+
+↓
+
+perform work
+
+↓
+
+Dashboard
+
+↓
+
+summarizes work
+
+↓
+
+reads Invoice
+
+↓
+
+provides navigation
+
+
+The dashboard should never duplicate module functionality.
+
+Instead it displays summarized information and allows navigation into the detailed
+module when required.
+
+
+====================================================================================================================
+COMMON DASHBOARD STRUCTURE
+====================================================================================================================
+
+Every dashboard should use tabs.
+
+Example
+
+-------------------------------------------------------
+
+Overview
+
+Enquiries
+
+Invoice
+
+Analytics
+
+-------------------------------------------------------
+
+Each role then receives additional tabs depending upon their responsibilities.
+
+
+====================================================================================================================
+CUSTOMER DASHBOARD
+====================================================================================================================
+
+Tabs
+
+1.
+
+Overview
+
+Displays
+
+• Customer Request Summary
+• Active Jobs
+• Notifications
+
+-------------------------------------------------------
+
+2.
+
+Requests
+
+Displays
+
+• Previous Requests
+• Current Request Status
+• Request History
+
+-------------------------------------------------------
+
+3.
+
+Live Job
+
+Displays
+
+• Current Active Job
+• Progress
+• Phase
+• ETA
+• Machine Status
+
+-------------------------------------------------------
+
+4.
+
+Invoice
+
+Read-only Invoice
+
+Displays
+
+• Job ID
+• Execution Progress
+• Planned Completion
+• Delay Information
+• Machine Location
+• Personnel Contact
+• Notifications
+
+-------------------------------------------------------
+
+5.
+
+Analytics
+
+Displays
+
+• Completed Jobs
+• Response Time
+• Project History
+
+
+====================================================================================================================
+SALES DASHBOARD
+====================================================================================================================
+
+Tabs
+
+1.
+
+Overview
+
+Displays
+
+• Pending Quotes
+• Active Customers
+• Revenue Summary
+
+-------------------------------------------------------
+
+2.
+
+Quotes
+
+Displays
+
+• Generated Quotes
+• Customer Reviews
+• Pending Approvals
+
+-------------------------------------------------------
+
+3.
+
+Sales Statistics
+
+Invoice Data
+
+Displays
+
+Quoted Revenue
+
+Potential Revenue
+
+Invoice Revenue
+
+Guaranteed Revenue
+
+Difference
+
+Revenue Pending
+
+Revenue Confirmed
+
+Revenue Trend
+
+-------------------------------------------------------
+
+4.
+
+Invoices
+
+Displays
+
+Job ID
+
+Invoice Value
+
+Customer
+
+Execution Status
+
+Completion
+
+-------------------------------------------------------
+
+5.
+
+Analytics
+
+Displays
+
+Sales KPIs
+
+Conversion
+
+Revenue Growth
+
+Forecast
+
+
+====================================================================================================================
+OPERATIONS DASHBOARD
+====================================================================================================================
+
+Tabs
+
+1.
+
+Overview
+
+Displays
+
+• Pending Enquiries
+• Active Jobs
+• Delays
+
+-------------------------------------------------------
+
+2.
+
+Machine Inventory
+
+Displays
+
+Machine Type
+
+Machine Code
+
+Current Job
+
+Current Site
+
+Availability
+
+Queue Position
+
+Current Status
+
+-------------------------------------------------------
+
+3.
+
+Personnel Inventory
+
+Displays
+
+Personnel
+
+Execution Role
+
+Availability
+
+Verification
+
+Current Job
+
+-------------------------------------------------------
+
+4.
+
+Invoices
+
+Displays
+
+Live Invoice Information
+
+Machine
+
+Personnel
+
+Transportation
+
+Distance
+
+ETA
+
+Current Activity
+
+-------------------------------------------------------
+
+5.
+
+Execution
+
+Summary Only
+
+Displays
+
+Current Phase
+
+Progress
+
+Active Tasks
+
+Alerts
+
+Button
+
+Open Execution Module
+
+-------------------------------------------------------
+
+6.
+
+Analytics
+
+Displays
+
+Machine Utilization
+
+Personnel Utilization
+
+Execution Performance
+
+Delay Statistics
+
+
+====================================================================================================================
+MANAGEMENT DASHBOARD
+====================================================================================================================
+
+Tabs
+
+1.
+
+Overview
+
+Displays
+
+Overall Business Summary
+
+-------------------------------------------------------
+
+2.
+
+Approvals
+
+Displays
+
+Pending Management Approvals
+
+-------------------------------------------------------
+
+3.
+
+Invoices
+
+Displays
+
+Execution Summary
+
+Job Status
+
+Completion
+
+Delays
+
+-------------------------------------------------------
+
+4.
+
+Financial Summary
+
+Displays
+
+Quoted Revenue
+
+Guaranteed Revenue
+
+Completed Revenue
+
+Pending Revenue
+
+-------------------------------------------------------
+
+5.
+
+Execution Summary
+
+Displays
+
+Execution KPIs
+
+Active Jobs
+
+Delayed Jobs
+
+Completed Jobs
+
+-------------------------------------------------------
+
+6.
+
+Analytics
+
+Displays
+
+Overall Business Analytics
+
+
+====================================================================================================================
+ADMIN DASHBOARD
+====================================================================================================================
+
+Tabs
+
+Overview
+
+Users
+
+Invoices
+
+Execution
+
+Inventory
+
+Analytics
+
+System Health
+
+
+====================================================================================================================
+INVOICE TAB
+====================================================================================================================
+
+The Invoice should not remain a standalone module after the Invoice Pipeline is complete.
+
+Instead, every dashboard should expose an Invoice tab.
+
+The Invoice tab becomes a role-specific read-only view of the central Invoice.
+
+Customer
+
+↓
+
+Progress
+ETA
+Machine
+Notifications
+
+-------------------------------------------------------
+
+Sales
+
+↓
+
+Invoice Value
+Guaranteed Revenue
+Revenue Difference
+
+-------------------------------------------------------
+
+Operations
+
+↓
+
+Machine
+Personnel
+Transportation
+GPS
+ETA
+Execution Progress
+
+-------------------------------------------------------
+
+Management
+
+↓
+
+Overall Execution
+Financial Summary
+Completion
+
+-------------------------------------------------------
+
+Admin
+
+↓
+
+Complete Invoice
+
+
+====================================================================================================================
+EXECUTION MODULE
+====================================================================================================================
+
+Execution should remain a dedicated page.
+
+It is NOT replaced by dashboard tabs.
+
+Dashboard
+
+↓
+
+summary
+
+↓
+
+Execution Module
+
+↓
+
+detailed operational workspace
+
+Execution contains
+
+• Phase Control
+• Progress Updates
+• GPS Tracking
+• Images
+• Videos
+• Logs
+• Delay Management
+• Personnel Attendance
+• Customer Notifications
+
+Dashboard only summarizes these values.
+
+
+====================================================================================================================
+DESIGN RULES
+====================================================================================================================
+
+1.
+
+Dashboards summarize information.
+
+They do not replace modules.
+
+-------------------------------------------------------
+
+2.
+
+Dedicated modules perform editing.
+
+Dashboards are primarily read-only.
+
+-------------------------------------------------------
+
+3.
+
+Every Invoice view must read directly from the Invoice.
+
+No duplicate execution state should exist elsewhere.
+
+-------------------------------------------------------
+
+4.
+
+Each dashboard displays Invoice information according to the user's role.
+
+-------------------------------------------------------
+
+5.
+
+Execution remains the operational control center.
+
+Dashboard remains the operational overview.
+
+-------------------------------------------------------
+
+6.
+
+Future functionality should be added as Dashboard Tabs whenever possible
+instead of creating unnecessary standalone pages.
+
+This keeps the system centralized, scalable, and easier to navigate.
+
+====================================================================================================================
+END OF DASHBOARD EVOLUTION SPECIFICATION
+====================================================================================================================
+
+
+
+
 ====================================================================================================================
 END OF MASTER SPECIFICATION
 ====================================================================================================================

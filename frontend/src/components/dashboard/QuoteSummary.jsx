@@ -119,7 +119,7 @@ export default function QuoteSummary({
 
                     </button>
 
-                    alert("Quote Approved successfully.");
+
 
                     <button
 
@@ -133,7 +133,6 @@ export default function QuoteSummary({
 
                     </button>
 
-                    alert("Revision Request submitted successfully.");
 
                 </div>
 

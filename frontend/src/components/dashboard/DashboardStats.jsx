@@ -72,10 +72,9 @@ export default function DashboardStats({
         },
 
         {
+            title:"Purchase Orders",
 
-            title:"Jobs",
-
-            value:stats.job_in_progress ?? 0
+            value:stats.quote_approved ?? 0
 
         }
 

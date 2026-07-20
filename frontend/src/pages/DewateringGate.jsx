@@ -159,7 +159,7 @@ export default function DewateringGate(){
 
  </button>
 
- alert("Dewatered successfully.");
+
 
  </div>
 

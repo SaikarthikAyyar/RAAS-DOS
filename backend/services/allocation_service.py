@@ -7,6 +7,8 @@ from backend.models.personnel import Personnel
 from backend.models.personnel_document import PersonnelDocument
 from backend.models.job_creation import JobCreation
 
+from backend.models.invoice import Invoice
+
 
 # ====================================
 # LOAD ALLOCATION SCREEN
@@ -45,6 +47,24 @@ def get_allocation_dashboard(
             "Job not found."
 
         )
+    
+    invoice = (
+
+        db.query(
+
+            Invoice
+
+        )
+
+        .filter(
+
+            Invoice.job_creation_id == job.id
+
+        )
+
+        .first()
+
+    )
 
 
     machines = (
@@ -78,49 +98,25 @@ def get_allocation_dashboard(
 
         machine_cards.append({
 
-            "id":
+            "id": machine.id,
 
-                machine.id,
+            "machine_code": machine.machine_code,
 
-            "machine_code":
+            "machine_name": machine.machine_name,
 
-                machine.machine_code,
+            "asset_number": machine.asset_number,
 
-            "machine_name":
+            "status": machine.status,
 
-                machine.machine_name,
+            "current_job": machine.current_job_id,
 
-            "asset_number":
+            "current_site": machine.current_site,
 
-                machine.asset_number,
+            "current_gps": machine.current_gps,
 
-            "status":
+            "queue_count": machine.queue_count,
 
-                machine.status,
-
-            "current_job":
-
-                machine.current_job_id,
-
-            "site_location":
-
-                machine.site_location,
-
-            "allocated_start":
-
-                machine.allocated_start,
-
-            "allocated_completion":
-
-                machine.allocated_completion,
-
-            "estimated_arrival":
-
-                machine.estimated_arrival,
-
-            "next_available_date":
-
-                machine.next_available_date
+            "remarks": machine.remarks
 
         })
 
@@ -202,22 +198,45 @@ def get_allocation_dashboard(
         })
 
 
+    job_summary = {
+
+        "job_id": job.id,
+
+        "generated_job_id": job.generated_job_id,
+
+        "planned_start": job.planned_start,
+
+        "planned_completion": job.planned_completion,
+
+        "workflow_status": job.workflow_status
+
+    }
+
+    invoice_summary = None
+
+    if invoice:
+
+        invoice_summary = {
+
+            "status": invoice.invoice_status,
+
+            "phase": invoice.execution_phase,
+
+            "progress": invoice.execution_progress,
+
+            "customer_status": invoice.customer_visible_status
+
+        }
+
+
     return {
 
-        "job_id":
+        "job": job_summary,
 
-            job.id,
+        "invoice": invoice_summary,
 
-        "generated_job_id":
+        "machines": machine_cards,
 
-            job.generated_job_id,
-
-        "machines":
-
-            machine_cards,
-
-        "personnel":
-
-            personnel_cards
+        "personnel": personnel_cards
 
     }

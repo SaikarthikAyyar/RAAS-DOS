@@ -1,12 +1,27 @@
-const BASE_URL = "http://127.0.0.1:8000";
+// ====================================
+// API
+// ====================================
+
+const API = import.meta.env.VITE_API_URL;
+
+
+// ====================================
+// CREATE EXECUTION
+// ====================================
 
 export async function createExecution(jobId){
 
-    console.log("Creating Execution", jobId);
+    console.log(
+
+        "Creating Execution",
+
+        jobId
+
+    );
 
     const response = await fetch(
 
-        `${BASE_URL}/execution/${jobId}`,
+        `${API}/execution/${jobId}`,
 
         {
 
@@ -16,45 +31,112 @@ export async function createExecution(jobId){
 
     );
 
-    return await response.json();
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
 
 }
+
+
+// ====================================
+// GET EXECUTION
+// ====================================
 
 export async function getExecution(executionId){
 
-    console.log("Loading Execution", executionId);
+    console.log(
 
-    const response = await fetch(
+        "Loading Execution",
 
-        `${BASE_URL}/execution/${executionId}/details`
+        executionId
 
     );
 
-    return await response.json();
+    const response = await fetch(
+
+        `${API}/execution/${executionId}/details`
+
+    );
+
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
 
 }
+
+
+// ====================================
+// LIST EXECUTIONS
+// ====================================
 
 export async function listExecutions(){
 
-    console.log("Listing Executions");
+    console.log(
 
-    const response = await fetch(
-
-        `${BASE_URL}/execution`
+        "Listing Executions"
 
     );
 
-    return await response.json();
+    const response = await fetch(
+
+        `${API}/execution`
+
+    );
+
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
 
 }
+
+
+// ====================================
+// START PHASE
+// ====================================
 
 export async function startPhase(executionId){
 
-    console.log("Start Phase", executionId);
+    console.log(
+
+        "Start Phase",
+
+        executionId
+
+    );
 
     const response = await fetch(
 
-        `${BASE_URL}/execution/${executionId}/start`,
+        `${API}/execution/${executionId}/start`,
 
         {
 
@@ -64,17 +146,40 @@ export async function startPhase(executionId){
 
     );
 
-    return await response.json();
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
 
 }
 
+
+// ====================================
+// COMPLETE PHASE
+// ====================================
+
 export async function completePhase(executionId){
 
-    console.log("Complete Phase", executionId);
+    console.log(
+
+        "Complete Phase",
+
+        executionId
+
+    );
 
     const response = await fetch(
 
-        `${BASE_URL}/execution/${executionId}/complete`,
+        `${API}/execution/${executionId}/complete`,
 
         {
 
@@ -84,6 +189,18 @@ export async function completePhase(executionId){
 
     );
 
-    return await response.json();
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
 
 }

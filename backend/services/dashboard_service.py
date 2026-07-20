@@ -87,238 +87,14 @@ from backend.repositories.approval_board_repository import (
     get_approval_board_by_quote
 )
 
+from backend.models.invoice import Invoice
+
 from backend.services.enquiry_service import EnquiryService
 
 
 
 
-def get_dashboard_data(
 
-    db,
-
-    role,
-
-    received_enquiry_id=None,
-
-    sent_enquiry_id=None
-
-):
-
-    print("\n========== DASHBOARD SERVICE ==========")
-
-    stats = get_dashboard_statistics(db)
-
-    enquiry_data = EnquiryService.get_dashboard_enquiries(
-
-        db,
-
-        role
-
-    )
-
-    received = enquiry_data["received"]
-
-    sent = enquiry_data["sent"]
-
-
-    # ====================================
-    # SELECT CURRENT ENQUIRY
-    # ====================================
-
-    selected = None
-
-    if received_enquiry_id:
-
-        selected = next(
-
-            (
-
-                enquiry
-
-                for enquiry in received
-
-                if enquiry.id == received_enquiry_id
-
-            ),
-
-            None
-
-        )
-
-    if selected is None and sent_enquiry_id:
-
-        selected = next(
-
-            (
-
-                enquiry
-
-                for enquiry in sent
-
-                if enquiry.id == sent_enquiry_id
-
-            ),
-
-            None
-
-        )
-
-    if selected is None:
-
-        if received:
-
-            selected = received[0]
-
-        elif sent:
-
-            selected = sent[0]
-
-
-    customer_summary = None
-
-    sales_summary = None
-
-    ops_summary = None
-
-    quote_summary = None
-
-
-    if selected:
-
-        if selected.customer_request_id:
-
-            customer_summary = build_customer_summary(
-
-                db,
-
-                selected.customer_request_id
-
-            )
-
-            if selected.sales_survey_id:
-
-                sales_summary = build_sales_summary(
-                    db,
-                    selected.sales_survey_id
-                )
-
-                ops_summary = build_ops_summary(
-                    db,
-                    selected.sales_survey_id
-                )
-
-            if selected.ops_selector_id:
-
-                quote_summary = build_quote_summary(
-                    db,
-                    selected.ops_selector_id
-                )
-
-
-    # ====================================
-    # SERIALIZE ENQUIRY
-    # ====================================
-
-    selected_enquiry = None
-
-    if selected:
-
-        selected_enquiry = {
-
-            "id":
-                selected.id,
-
-            "customer_request_id":
-                selected.customer_request_id,
-
-            "sales_survey_id":
-                selected.sales_survey_id,
-
-            "ops_selector_id":
-                selected.ops_selector_id,
-
-            "dewatering_assessment_id":
-                selected.dewatering_assessment_id,
-
-            "quote_id":
-                selected.quote_id,
-
-            "approval_board_id":
-                selected.approval_board_id,
-
-            "job_creation_id":
-                selected.job_creation_id,
-
-            "execution_id":
-                selected.execution_id,
-
-            "sender_role":
-                selected.sender_role,
-
-            "receiver_role":
-                selected.receiver_role,
-
-            "requested_task":
-                selected.requested_task,
-
-            "current_module":
-                selected.current_module,
-
-            "workflow_status":
-                selected.workflow_status,
-
-            "completed":
-                selected.completed,
-
-            "created_at":
-                selected.created_at
-
-        }
-
-
-    
-    approval_board_summary = None
-
-    if (
-        selected_enquiry
-        and selected_enquiry.requested_task == "APPROVAL_BOARD"
-    ):
-        approval_board_summary = get_approval_board_by_quote(
-            db,
-            selected_enquiry.quote_id
-        )
-
-
-    return {
-
-        "stats": {
-
-            **stats,
-
-            "received_count": len(received),
-
-            "sent_count": len(sent)
-
-        },
-
-        "received_enquiries": received,
-
-        "sent_enquiries": sent,
-
-        "selected_enquiry": selected_enquiry,
-
-        "customer_summary": customer_summary,
-
-        "selected_summary": sales_summary,
-
-        "ops_summary": ops_summary,
-
-        "quote_summary": quote_summary,
-
-        "approval_board_summary": approval_board_summary
-        
-
-    }
 
 # ====================================
 # CUSTOMER NAVIGATOR
@@ -690,217 +466,7 @@ from backend.services.enquiry_service import EnquiryService
 
 
 
-def get_dashboard_data(
 
-    db,
-
-    role,
-
-    received_enquiry_id=None,
-
-    sent_enquiry_id=None
-
-):
-
-    print("\n========== DASHBOARD SERVICE ==========")
-
-    stats = get_dashboard_statistics(db)
-
-    enquiry_data = EnquiryService.get_dashboard_enquiries(
-
-        db,
-
-        role
-
-    )
-
-    received = enquiry_data["received"]
-
-    sent = enquiry_data["sent"]
-
-
-    # ====================================
-    # SELECT CURRENT ENQUIRY
-    # ====================================
-
-    selected = None
-
-    if received_enquiry_id:
-
-        selected = next(
-
-            (
-
-                enquiry
-
-                for enquiry in received
-
-                if enquiry.id == received_enquiry_id
-
-            ),
-
-            None
-
-        )
-
-    if selected is None and sent_enquiry_id:
-
-        selected = next(
-
-            (
-
-                enquiry
-
-                for enquiry in sent
-
-                if enquiry.id == sent_enquiry_id
-
-            ),
-
-            None
-
-        )
-
-    if selected is None:
-
-        if received:
-
-            selected = received[0]
-
-        elif sent:
-
-            selected = sent[0]
-
-
-    customer_summary = None
-
-    sales_summary = None
-
-    ops_summary = None
-
-    quote_summary = None
-
-
-    if selected:
-
-        if selected.customer_request_id:
-
-            customer_summary = build_customer_summary(
-
-                db,
-
-                selected.customer_request_id
-
-            )
-
-            if selected.sales_survey_id:
-
-                sales_summary = build_sales_summary(
-                    db,
-                    selected.sales_survey_id
-                )
-
-                ops_summary = build_ops_summary(
-                    db,
-                    selected.sales_survey_id
-                )
-
-            if selected.ops_selector_id:
-
-                quote_summary = build_quote_summary(
-                    db,
-                    selected.ops_selector_id
-                )
-
-
-    # ====================================
-    # SERIALIZE ENQUIRY
-    # ====================================
-
-    selected_enquiry = None
-
-    if selected:
-
-        selected_enquiry = {
-
-            "id":
-                selected.id,
-
-            "customer_request_id":
-                selected.customer_request_id,
-
-            "sales_survey_id":
-                selected.sales_survey_id,
-
-            "ops_selector_id":
-                selected.ops_selector_id,
-
-            "dewatering_assessment_id":
-                selected.dewatering_assessment_id,
-
-            "quote_id":
-                selected.quote_id,
-
-            "approval_board_id":
-                selected.approval_board_id,
-
-            "job_creation_id":
-                selected.job_creation_id,
-
-            "execution_id":
-                selected.execution_id,
-
-            "sender_role":
-                selected.sender_role,
-
-            "receiver_role":
-                selected.receiver_role,
-
-            "requested_task":
-                selected.requested_task,
-
-            "current_module":
-                selected.current_module,
-
-            "workflow_status":
-                selected.workflow_status,
-
-            "completed":
-                selected.completed,
-
-            "created_at":
-                selected.created_at
-
-        }
-
-
-    return {
-
-        "stats": {
-
-            **stats,
-
-            "received_count": len(received),
-
-            "sent_count": len(sent)
-
-        },
-
-        "received_enquiries": received,
-
-        "sent_enquiries": sent,
-
-        "selected_enquiry": selected_enquiry,
-
-        "customer_summary": customer_summary,
-
-        "selected_summary": sales_summary,
-
-        "ops_summary": ops_summary,
-
-        "quote_summary": quote_summary
-
-    }
 
 # ====================================
 # CUSTOMER NAVIGATOR
@@ -1285,9 +851,43 @@ def get_dashboard_data(
 
     )
 
+
     received = enquiry_data["received"]
 
     sent = enquiry_data["sent"]
+
+    invoices = (
+
+        db.query(
+
+            Invoice
+
+        )
+
+        .order_by(
+
+            Invoice.id.desc()
+
+        )
+
+        .all()
+
+    )
+
+
+    machine_count = 0
+
+    personnel_count = 0
+
+    for invoice in invoices:
+
+        if invoice.machine_name:
+
+            machine_count += 1
+
+        if invoice.personnel_json:
+
+            personnel_count += len(invoice.personnel_json)
 
 
     # ====================================
@@ -1457,7 +1057,15 @@ def get_dashboard_data(
 
             "received_count": len(received),
 
-            "sent_count": len(sent)
+            "sent_count": len(sent),
+
+            "invoice_count": len(invoices),
+
+            "job_count": len(invoices),
+
+            "machine_count": machine_count,
+
+            "personnel_count": personnel_count
 
         },
 
@@ -1473,7 +1081,59 @@ def get_dashboard_data(
 
         "ops_summary": ops_summary,
 
-        "quote_summary": quote_summary
+        "quote_summary": quote_summary,
+
+        "invoices": [
+
+            {
+
+                "id": invoice.id,
+
+                "customer_request_id": invoice.customer_request_id,
+
+                "generated_job_id": invoice.generated_job_id,
+
+                "invoice_status": invoice.invoice_status,
+
+                "execution_phase": invoice.execution_phase,
+
+                "execution_progress": invoice.execution_progress,
+
+                "customer_visible_status": invoice.customer_visible_status,
+
+                "current_activity": invoice.current_activity,
+
+                "transport_status": invoice.transport_status,
+
+                "planned_start": invoice.planned_start,
+
+                "estimated_completion": invoice.estimated_completion,
+
+                "actual_completion": invoice.actual_completion,
+
+                "machine_name": invoice.machine_name,
+
+                "machine_code": invoice.machine_code,
+
+                "machine_status": invoice.machine_status,
+
+                "personnel_status": invoice.personnel_status,
+
+                "personnel": invoice.personnel_json,
+
+                "destination": invoice.destination,
+
+                "eta_minutes": invoice.eta_minutes,
+
+                "distance_remaining_km": invoice.distance_remaining_km
+
+            }
+
+            for invoice in invoices
+
+        ]
+
+        
 
     }
 

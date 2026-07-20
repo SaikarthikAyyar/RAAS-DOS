@@ -246,55 +246,147 @@ export default function Execution(){
 
             <div>
 
-                <p>
+        <h2>
 
-                    Workflow :
+        Execution Summary
 
-                    {" "}
+        </h2>
 
-                    {execution.workflow_status}
+        <p>
 
-                </p>
+        Workflow :
 
-                <p>
+        {" "}
 
-                    Current Phase :
+        {execution.workflow_status}
 
-                    {" "}
+        </p>
 
-                    {execution.current_phase}
+        <p>
 
-                </p>
+        Current Phase :
 
-                <p>
+        {" "}
 
-                    Phase 1 :
+        {execution.current_phase}
 
-                    {" "}
+        </p>
 
-                    {execution.phase_1_status}
+        <p>
 
-                </p>
+        Execution Progress :
 
-                <p>
+        {" "}
 
-                    Phase 2 :
+        {execution.execution_progress}%
 
-                    {" "}
+        </p>
 
-                    {execution.phase_2_status}
+        <p>
 
-                </p>
+        Current Activity :
 
-                <p>
+        {" "}
 
-                    Phase 3 :
+        {execution.current_activity}
 
-                    {" "}
+        </p>
 
-                    {execution.phase_3_status}
+        <p>
 
-                </p>
+        Transport Status :
+
+        {" "}
+
+        {execution.transport_status}
+
+        </p>
+
+        <p>
+
+        Invoice Sync :
+
+        {" "}
+
+        {execution.invoice_synced}
+
+        </p>
+
+        <hr/>
+
+        <p>
+
+        Planned Start :
+
+        {" "}
+
+        {execution.planned_start}
+
+        </p>
+
+        <p>
+
+        Estimated Completion :
+
+        {" "}
+
+        {execution.estimated_completion}
+
+        </p>
+
+        <p>
+
+        Actual Completion :
+
+        {" "}
+
+        {execution.actual_completion}
+
+        </p>
+
+        <p>
+
+        Delay :
+
+        {" "}
+
+        {execution.delay_days}
+
+        days
+
+        </p>
+
+        <hr/>
+
+        <p>
+
+        Phase 1 :
+
+        {" "}
+
+        {execution.phase_1_status}
+
+        </p>
+
+        <p>
+
+        Phase 2 :
+
+        {" "}
+
+        {execution.phase_2_status}
+
+        </p>
+
+        <p>
+
+        Phase 3 :
+
+        {" "}
+
+        {execution.phase_3_status}
+
+        </p>
 
             </div>
 

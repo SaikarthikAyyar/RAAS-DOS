@@ -1,18 +1,43 @@
 // ====================================
+// API
+// ====================================
+
+const API = import.meta.env.VITE_API_URL;
+
+
+// ====================================
 // LOAD ALLOCATION
 // ====================================
 
 export async function loadAllocation(jobId){
 
-    console.log("Loading Allocation", jobId);
+    console.log(
 
-    const response = await fetch(
+        "Loading Allocation",
 
-        `http://127.0.0.1:8000/allocation/${jobId}`
+        jobId
 
     );
 
-    return await response.json();
+    const response = await fetch(
+
+        `${API}/allocation/${jobId}`
+
+    );
+
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
 
 }
 
@@ -29,11 +54,17 @@ export async function saveAllocation(
 
 ){
 
-    console.log("Saving Allocation", payload);
+    console.log(
+
+        "Saving Allocation",
+
+        payload
+
+    );
 
     const response = await fetch(
 
-        `http://127.0.0.1:8000/allocation/${jobId}`,
+        `${API}/allocation/${jobId}`,
 
         {
 
@@ -45,12 +76,28 @@ export async function saveAllocation(
 
             },
 
-            body:JSON.stringify(payload)
+            body:JSON.stringify(
+
+                payload
+
+            )
 
         }
 
     );
 
-    return await response.json();
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
 
 }

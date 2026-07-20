@@ -1,275 +1,463 @@
-
-
-
-
 import { useState, useEffect } from "react";
 
 import {
 
     loadAllocation,
 
-    saveAllocation as saveAllocationService
+    saveAllocation
 
 } from "../services/allocationService";
 
-
-
 export default function Allocation(){
-const [allocationData,setAllocationData]=useState(null);
 
- const [selectedJob,setSelectedJob]=useState("");
+    const [jobId,setJobId] = useState("");
 
-const [selectedMachines,setSelectedMachines]=useState([]);
+    const [allocation,setAllocation] = useState(null);
 
-const [selectedPersonnel,setSelectedPersonnel]=useState([]);
+    const [selectedMachines,setSelectedMachines] = useState([]);
 
-const [siteLocation,setSiteLocation]=useState("");
+    const [selectedPersonnel,setSelectedPersonnel] = useState([]);
 
- useEffect(()=>{
+    const [siteLocation,setSiteLocation] = useState("");
 
-    if(!selectedJob){
+    const [plannedStart, setPlannedStart] = useState("");
 
-        return;
+    const [plannedCompletion, setPlannedCompletion] = useState("");
 
-    }
+    const payload = {
 
-    console.log("Selected Job", selectedJob);
+        machine_ids: selectedMachines,
 
-    loadAllocation(selectedJob)
+        personnel_ids: selectedPersonnel,
 
-    .then(data=>{
+        site_location: siteLocation,
 
-        console.log(data);
+        planned_start: plannedStart,
 
-        setAllocationData(data);
-
-    });
-
-    
-
-},[selectedJob]);
-
-async function saveAllocation(){
-
-    if(!selectedJob){
-
-        return;
-
-    }
-
-    const payload={
-
-        machine_ids:selectedMachines,
-
-        personnel_ids:selectedPersonnel,
-
-        site_location:siteLocation
+        planned_completion: plannedCompletion
 
     };
 
-    console.log(payload);
 
-    try{
 
-        const response = await saveAllocationService(
+    useEffect(()=>{
 
-            selectedJob,
+        if(!jobId){
+
+            return;
+
+        }
+
+        loadAllocation(jobId)
+
+        .then(data=>{
+
+            console.log(data);
+
+            setAllocation(data);
+
+        });
+
+    },[jobId]);
+
+
+
+    async function allocate(){
+
+
+        if(!jobId){
+
+            alert("Select Job");
+
+            return;
+
+        }
+
+        await saveAllocation(
+
+            jobId,
 
             payload
 
         );
 
-        console.log("Allocation Response",response);
-
-        alert("Allocation Complete");
-
-    }catch(error){
-
-        console.error(error);
-
-        alert("Allocation Failed");
+        alert("Resources Allocated Successfully");
 
     }
 
-}
 
- return(
 
- <div>
+    return(
 
-  <h1>
+    <div className="allocationPage">
 
-   Allocation
+        <h1>
 
-  </h1>
+            Allocation
 
-  <select
+        </h1>
 
-   value={selectedJob}
+        <input
 
-   onChange={
+            placeholder="Job ID"
 
-    e=>setSelectedJob(
+            value={jobId}
 
-     e.target.value
+            onChange={
 
-    )
+                e=>setJobId(
 
-   }
+                    e.target.value
 
-  >
+                )
 
+            }
 
+        />
 
-  <option value="">Select Job</option>
-  <option value="1">JOB-0001</option>
-  <option value="2">JOB-0002</option>
-  <option value="3">JOB-0003</option>
 
 
+        {
 
-  </select>
+            allocation &&
 
-  <br/><br/>
+            <>
 
+            <hr/>
 
+            <h2>
 
-  <br/>
+                Job Summary
 
-  {allocationData?.machines?.map(machine => (
+            </h2>
 
-      <div key={machine.id}>
+            <p>
 
-          <input
+                Job :
 
-              type="checkbox"
+                {allocation.job.generated_job_id}
 
-              onChange={(e)=>{
+            </p>
 
-                  if(e.target.checked){
+            <p>
 
-                      setSelectedMachines(prev=>[
+                Planned Start :
 
-                          ...prev,
+                {allocation.job.planned_start}
 
-                          machine.id
+            </p>
 
-                      ]);
+            <p>
 
-                  }else{
+                Planned Completion :
 
-                      setSelectedMachines(
+                {allocation.job.planned_completion}
 
-                          prev=>prev.filter(
+            </p>
 
-                              id=>id!==machine.id
+            <p>
 
-                          )
+                Workflow :
 
-                      );
+                {allocation.job.workflow_status}
 
-                  }
+            </p>
 
-              }}
 
-          />
 
-          {machine.machine_name}
+            {
 
-          {" - "}
+                allocation.invoice &&
 
-          {machine.asset_number}
+                <>
 
-      </div>
+                <hr/>
 
-  ))}
+                <h2>
 
-  <br/><br/>
+                    Invoice Status
 
-  <h3>Personnel</h3>
+                </h2>
 
-  {allocationData?.personnel?.map(person => (
+                <p>
 
-      <div key={person.id}>
+                    Phase :
 
-          <input
+                    {allocation.invoice.phase}
 
-              type="checkbox"
+                </p>
 
-              onChange={(e)=>{
+                <p>
 
-                  if(e.target.checked){
+                    Progress :
 
-                      setSelectedPersonnel(prev=>[
+                    {allocation.invoice.progress}%
 
-                          ...prev,
+                </p>
 
-                          person.id
+                <p>
 
-                      ]);
+                    Customer Status :
 
-                  }else{
+                    {allocation.invoice.customer_status}
 
-                      setSelectedPersonnel(
+                </p>
 
-                          prev=>prev.filter(
+                </>
+            }
 
-                              id=>id!==person.id
 
-                          )
 
-                      );
+            <hr/>
 
-                  }
+            <h2>
 
-              }}
+                Machines
 
-          />
+            </h2>
 
-          {person.name}
+            {
 
-          {" - "}
+                allocation.machines.map(machine=>
 
-          {person.designation}
+                    <div key={machine.id}>
 
-      </div>
+                        <input
 
-  ))}
+                            type="checkbox"
 
-  <input
+                            onChange={e=>{
 
-      placeholder="Site Location"
+                                if(e.target.checked){
 
-      value={siteLocation}
+                                    setSelectedMachines(
 
-      onChange={
+                                        prev=>[
 
-          e=>setSiteLocation(
+                                            ...prev,
 
-              e.target.value
+                                            machine.id
 
-          )
+                                        ]
 
-      }
+                                    );
 
-  />
+                                }
 
-  <button
+                                else{
 
-   onClick={saveAllocation}
+                                    setSelectedMachines(
 
-  >
+                                        prev=>
 
-   Allocate
+                                        prev.filter(
 
-  </button>
+                                            id=>id!==machine.id
 
-  alert("Allocated successfully.");
+                                        )
 
- </div>
+                                    );
 
+                                }
 
+                            }}
 
- )
+                        />
+
+                        {machine.machine_name}
+
+                        {" | "}
+
+                        {machine.machine_code}
+
+                        {" | "}
+
+                        {machine.asset_number}
+
+                        {" | Queue : "}
+
+                        {machine.queue_count}
+
+                    </div>
+
+                )
+
+            }
+
+
+
+            <hr/>
+
+            <h2>
+
+                Personnel
+
+            </h2>
+
+            {
+
+                allocation.personnel.map(person=>
+
+                    <div key={person.id}>
+
+                        <input
+
+                            type="checkbox"
+
+                            onChange={e=>{
+
+                                if(e.target.checked){
+
+                                    setSelectedPersonnel(
+
+                                        prev=>[
+
+                                            ...prev,
+
+                                            person.id
+
+                                        ]
+
+                                    );
+
+                                }
+
+                                else{
+
+                                    setSelectedPersonnel(
+
+                                        prev=>
+
+                                        prev.filter(
+
+                                            id=>id!==person.id
+
+                                        )
+
+                                    );
+
+                                }
+
+                            }}
+
+                        />
+
+                        {person.name}
+
+                        {" | "}
+
+                        {person.designation}
+
+                        {" | "}
+
+                        {person.skill}
+
+                    </div>
+
+                )
+
+            }
+
+
+
+            <hr/>
+
+            <h3>
+
+            Planned Start
+
+            </h3>
+
+            <input
+
+                type="date"
+
+                value={plannedStart}
+
+                onChange={
+
+                    e=>setPlannedStart(
+
+                        e.target.value
+
+                    )
+
+                }
+
+            />
+
+            <h3>
+
+            Planned Completion
+
+            </h3>
+
+            <input
+
+                type="date"
+
+                value={plannedCompletion}
+
+                onChange={
+
+                    e=>setPlannedCompletion(
+
+                        e.target.value
+
+                    )
+
+                }
+
+            />
+
+            <h3>
+
+            Site Location
+
+            </h3>
+
+            <input
+
+                placeholder="Site Location"
+
+                value={siteLocation}
+
+                onChange={
+
+                    e=>setSiteLocation(
+
+                        e.target.value
+
+                    )
+
+                }
+
+            />
+
+
+
+            <br/>
+
+            <br/>
+
+
+
+            <button
+
+                onClick={allocate}
+
+            >
+
+                Allocate Resources
+
+            </button>
+
+            </>
+
+        }
+
+    </div>
+
+    );
 
 }
