@@ -326,6 +326,8 @@ export default function CustomerDashboard(){
 
                         catch(error){
 
+                            console.error(error);    
+
                             alert(
 
                                 "Unable to approve quote."
@@ -367,6 +369,8 @@ export default function CustomerDashboard(){
                         }
 
                         catch(error){
+
+                            console.error(error);
 
                             alert(
 
