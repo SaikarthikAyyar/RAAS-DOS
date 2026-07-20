@@ -62,29 +62,7 @@ export default function ManagementDashboard(){
 
                 </h1>
 
-                {
-
-                    successMessage &&
-
-                    <div className="approval-success">
-
-                        {successMessage}
-
-                    </div>
-
-                }
-
-                {
-
-                    errorMessage &&
-
-                    <div className="approval-error">
-
-                        {errorMessage}
-
-                    </div>
-
-                }                
+             
 
             </div>
 

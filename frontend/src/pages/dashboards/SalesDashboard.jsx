@@ -58,29 +58,7 @@ export default function SalesDashboard(){
                 </h1>
 
 
-                {
-
-                    successMessage &&
-
-                    <div className="approval-success">
-
-                        {successMessage}
-
-                    </div>
-
-                }
-
-                {
-
-                    errorMessage &&
-
-                    <div className="approval-error">
-
-                        {errorMessage}
-
-                    </div>
-
-                }                
+            
 
                 <p>
 
