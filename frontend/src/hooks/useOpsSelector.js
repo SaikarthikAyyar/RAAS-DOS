@@ -110,21 +110,7 @@ export default function useOpsSelector(){
     // LOAD PREFILL
     // ====================================
 
-    useEffect(()=>{
 
-        if(
-
-            !salesSurveyId
-
-        ){
-
-            return;
-
-        }
-
-        loadPrefill();
-
-    },[]);
 
 
     // ====================================
@@ -168,6 +154,22 @@ export default function useOpsSelector(){
         }
 
     }
+
+    useEffect(()=>{
+
+        if(
+
+            !salesSurveyId
+
+        ){
+
+            return;
+
+        }
+
+        loadPrefill();
+
+    },[]);
 
 
     // ====================================

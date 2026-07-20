@@ -39,7 +39,7 @@ from "../../components/customerRequest/CustomerActions";
 
 export default function CustomerRequest(){
 
-  const [successMessage, setSuccessMessage] = useState("");
+
 
   const navigate = useNavigate();
 
