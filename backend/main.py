@@ -52,25 +52,30 @@ from backend.api.invoice_api import (
 
 from backend.database.init_db import create_tables
 
+from pathlib import Path
 from fastapi.staticfiles import StaticFiles
-
+import os
 
 app = FastAPI()
 
+
+
+
+
+UPLOAD_DIR = os.path.abspath("backend/uploads")
+
+print("=" * 60)
+print("UPLOAD_DIR =", UPLOAD_DIR)
+print("EXISTS =", os.path.exists(UPLOAD_DIR))
+print("=" * 60)
+
 app.mount(
-
-"/uploads",
-
-StaticFiles(
-
-directory="backend/uploads"
-
-),
-
-name="uploads"
-
+    "/uploads",
+    StaticFiles(directory=UPLOAD_DIR),
+    name="uploads"
 )
 
+print("UPLOADS MOUNTED")
 # ====================================
 # CORS
 # ====================================
@@ -192,6 +197,13 @@ app.include_router(
     enquiry_router
 
 )
+
+print("\n========== ROUTES ==========")
+
+for route in app.routes:
+    print(route)
+
+print("============================")
 
 @app.get("/")
 

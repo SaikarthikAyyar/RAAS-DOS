@@ -40,6 +40,9 @@ export default function OperationsDashboard(){
 
     };
 
+    const API = import.meta.env.VITE_API_URL;
+
+
 
 
     const [activeTab, setActiveTab] = useState(
@@ -657,6 +660,8 @@ export default function OperationsDashboard(){
 
             <div className="dashboard-section">
 
+            console.log(selectedInvoiceData);
+
             <h2>
 
             Job Summary
@@ -798,7 +803,7 @@ export default function OperationsDashboard(){
 
                     <label>Machine Name</label>
 
-                    <h3>{selectedInvoice?.machine_name || "-"}</h3>
+                    <h3>{selectedInvoiceData?.machine_name || "-"}</h3>
 
                 </div>
 
@@ -806,7 +811,7 @@ export default function OperationsDashboard(){
 
                     <label>Machine Code</label>
 
-                    <h3>{selectedInvoice?.machine_code || "-"}</h3>
+                    <h3>{selectedInvoiceData?.machine_code || "-"}</h3>
 
                 </div>
 
@@ -814,7 +819,7 @@ export default function OperationsDashboard(){
 
                     <label>Machine Status</label>
 
-                    <h3>{selectedInvoice?.machine_status || "-"}</h3>
+                    <h3>{selectedInvoiceData?.machine_status || "-"}</h3>
 
                 </div>
 
@@ -822,7 +827,7 @@ export default function OperationsDashboard(){
 
                     <label>Machine Location</label>
 
-                    <h3>{selectedInvoice?.machine_location || "-"}</h3>
+                    <h3>{selectedInvoiceData?.machine_location || "-"}</h3>
 
                 </div>
 
@@ -1045,11 +1050,9 @@ export default function OperationsDashboard(){
 
         <div className="dashboard-summary-section">
 
-            <InvoiceWorkflowTracker
-
-                invoice={selectedInvoice}
-
-            />
+        <InvoiceWorkflowTracker
+            invoice={selectedInvoiceData}
+        />
 
         </div>
             

@@ -4,13 +4,22 @@ import {
 
     loadAllocation,
 
-    saveAllocation
+    saveAllocation,
+
+    loadInvoiceJobs
 
 } from "../services/allocationService";
 
+import "../components/allocation/Allocation.css";
+
 export default function Allocation(){
 
+    const API = import.meta.env.VITE_API_URL;
+
+
     const [jobId,setJobId] = useState("");
+
+    const [jobs,setJobs] = useState([]);
 
     const [allocation,setAllocation] = useState(null);
 
@@ -39,6 +48,27 @@ export default function Allocation(){
     };
 
 
+    useEffect(()=>{
+
+        loadInvoiceJobs()
+
+        .then(
+
+            data=>{
+
+                console.log(data);
+
+                setJobs(data);
+
+            }
+
+        )
+
+        .catch(console.error);
+
+    },[]);
+
+
 
     useEffect(()=>{
 
@@ -59,6 +89,8 @@ export default function Allocation(){
         });
 
     },[jobId]);
+
+
 
 
 
@@ -87,19 +119,21 @@ export default function Allocation(){
 
 
 
+
+
+
+
     return(
 
-    <div className="allocationPage">
+    <div className="allocation-page">
 
-        <h1>
-
+        <h1 className="allocation-title">
             Allocation
-
         </h1>
 
-        <input
+        <select
 
-            placeholder="Job ID"
+            className="job-selector"
 
             value={jobId}
 
@@ -107,13 +141,53 @@ export default function Allocation(){
 
                 e=>setJobId(
 
-                    e.target.value
+                    Number(
+
+                        e.target.value
+
+                    )
 
                 )
 
             }
 
-        />
+        >
+
+            <option value="">
+
+                Select Job
+
+            </option>
+
+            {
+
+                jobs.map(
+
+                    job=>(
+
+                        <option
+
+                            key={job.job_id}
+
+                            value={job.job_id}
+
+                        >
+
+                            {job.generated_job_id}
+
+                            {" | CR-"}
+
+                            {job.customer_request_id}
+
+                        </option>
+
+                    )
+
+                )
+
+            }
+
+        </select>
 
 
 
@@ -124,6 +198,12 @@ export default function Allocation(){
             <>
 
             <hr/>
+        <div className="allocation-card">
+
+            <div className="summary-grid">
+
+
+
 
             <h2>
 
@@ -162,6 +242,8 @@ export default function Allocation(){
                 {allocation.job.workflow_status}
 
             </p>
+            </div>
+        </div>
 
 
 
@@ -172,6 +254,10 @@ export default function Allocation(){
                 <>
 
                 <hr/>
+
+            <div className="allocation-card">
+
+                <div className="summary-grid">
 
                 <h2>
 
@@ -202,6 +288,9 @@ export default function Allocation(){
                     {allocation.invoice.customer_status}
 
                 </p>
+                </div>
+            </div>
+
 
                 </>
             }
@@ -216,73 +305,241 @@ export default function Allocation(){
 
             </h2>
 
+            <div className="resource-grid">
+
             {
 
                 allocation.machines.map(machine=>
 
-                    <div key={machine.id}>
 
-                        <input
 
-                            type="checkbox"
+            <div
+                key={machine.id}
+                className="resource-card"
+            >
 
-                            onChange={e=>{
+                <label className="resource-checkbox">
 
-                                if(e.target.checked){
+                    <input
+                        type="checkbox"
+                        onChange={e=>{
 
-                                    setSelectedMachines(
+                            if(e.target.checked){
 
-                                        prev=>[
+                                setSelectedMachines(prev=>[
 
-                                            ...prev,
+                                    ...prev,
 
-                                            machine.id
+                                    machine.id
 
-                                        ]
+                                ]);
 
-                                    );
+                            }
 
-                                }
+                            else{
 
-                                else{
+                                setSelectedMachines(
 
-                                    setSelectedMachines(
+                                    prev=>
 
-                                        prev=>
+                                    prev.filter(
 
-                                        prev.filter(
+                                        id=>id!==machine.id
 
-                                            id=>id!==machine.id
+                                    )
 
-                                        )
+                                );
 
-                                    );
+                            }
 
-                                }
+                        }}
+                    />
 
-                            }}
-
-                        />
+                    <span className="machine-title">
 
                         {machine.machine_name}
 
-                        {" | "}
+                    </span>
 
-                        {machine.machine_code}
+                </label>
 
-                        {" | "}
+                <div className="resource-detail">
 
-                        {machine.asset_number}
+                    <strong>Code :</strong>
 
-                        {" | Queue : "}
+                    {machine.machine_code}
 
-                        {machine.queue_count}
+                </div>
 
-                    </div>
+                <div className="resource-detail">
+
+                    <strong>Asset :</strong>
+
+                    {machine.asset_number}
+
+                </div>
+
+                <div className="resource-detail">
+
+                    <strong>Status :</strong>
+
+                    {machine.status}
+
+                </div>
+
+                <div className="resource-detail">
+
+                    <strong>Queue :</strong>
+
+                    {machine.queue_count}
+
+                </div>
+
+                <div className="resource-detail">
+
+                    <strong>Current Job :</strong>
+
+                    {machine.current_job || "Available"}
+
+                </div>
+
+                <div className="resource-detail">
+
+                    <strong>Current Site :</strong>
+
+                    {machine.current_site || "-"}
+
+                </div>
+
+                {
+
+                    machine.queue.length > 0 &&
+
+                    <details className="queue-details">
+
+                        <summary>
+
+                            View Queue
+
+                        </summary>
+
+                        {
+
+                            machine.queue.map(
+
+                                item=>
+
+                                <div
+
+                                    key={item.queue_position}
+
+                                    className="queue-item"
+
+                                >
+
+                                    <div>
+
+                                        <strong>
+
+                                            Position
+
+                                        </strong>
+
+                                        {" "}
+
+                                        {item.queue_position}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+
+                                            Job
+
+                                        </strong>
+
+                                        {" "}
+
+                                        {item.generated_job_id}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+
+                                            Site
+
+                                        </strong>
+
+                                        {" "}
+
+                                        {item.site_location}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+
+                                            Start
+
+                                        </strong>
+
+                                        {" "}
+
+                                        {item.planned_start}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+
+                                            Finish
+
+                                        </strong>
+
+                                        {" "}
+
+                                        {item.planned_completion}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+
+                                            Status
+
+                                        </strong>
+
+                                        {" "}
+
+                                        {item.status}
+
+                                    </div>
+
+                                </div>
+
+                            )
+
+                        }
+
+                    </details>
+
+                }
+
+            </div>
+
+                
 
                 )
 
             }
+
+            </div>
 
 
 
@@ -294,15 +551,26 @@ export default function Allocation(){
 
             </h2>
 
+            <div className="resource-grid">
+
             {
 
                 allocation.personnel.map(person=>
 
-                    <div key={person.id}>
+                
+
+                <div
+                    key={person.id}
+                    className="resource-card"
+                >
+
+                    <label className="resource-checkbox">
 
                         <input
 
                             type="checkbox"
+
+                            disabled={!person.documents_verified}
 
                             onChange={e=>{
 
@@ -342,31 +610,149 @@ export default function Allocation(){
 
                         />
 
-                        {person.name}
+                        <span className="machine-title">
 
-                        {" | "}
+                            {person.name}
+
+                        </span>
+
+                    </label>
+
+                    <div className="resource-detail">
+
+                        <strong>Employee :</strong>
+
+                        {person.employee_code}
+
+                    </div>
+
+                    <div className="resource-detail">
+
+                        <strong>Designation :</strong>
 
                         {person.designation}
 
-                        {" | "}
+                    </div>
+
+                    <div className="resource-detail">
+
+                        <strong>Skill :</strong>
 
                         {person.skill}
 
                     </div>
 
+                    <div className="resource-detail">
+
+                        <strong>Location :</strong>
+
+                        {person.location}
+
+                    </div>
+
+                    <div className="resource-detail">
+
+                        <strong>Status :</strong>
+
+                        {person.status}
+
+                    </div>
+
+                    <div className="resource-detail">
+
+                        <strong>Documents :</strong>
+
+                        {
+
+                            person.documents_verified
+
+                            ?
+
+                            <span className="verified">
+
+                                ✔ Verified
+
+                            </span>
+
+                            :
+
+                            <span className="pending">
+
+                                ✖ Pending
+
+                            </span>
+
+                        }
+
+                    </div>
+
+                    <details className="queue-details">
+
+                        <summary>
+
+                            View Documents
+
+                        </summary>
+
+                        {
+
+                            person.documents.length === 0
+
+                            ?
+
+                            <div className="queue-item">
+
+                                No documents uploaded.
+
+                            </div>
+
+                            :
+
+                            person.documents.map(doc => (
+                                <div key={doc.name} className="document-row">
+
+                                    <div>{doc.name}</div>
+
+                                    <div>{doc.type}</div>
+
+                                    <div>{doc.status}</div>
+
+                                    <a
+                                        href={`${API}/${doc.file}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="document-link"
+                                    >
+                                        📄 View PDF
+                                    </a>
+
+                                </div>
+                            ))}
+
+                    </details>
+
+                </div>
+                
+
+            
                 )
 
             }
+        </div>
 
 
 
             <hr/>
+
+        <div className="form-group">
 
             <h3>
 
             Planned Start
 
             </h3>
+
+
 
             <input
 
@@ -385,6 +771,9 @@ export default function Allocation(){
                 }
 
             />
+        </div>
+
+            <div className="form-group">
 
             <h3>
 
@@ -410,6 +799,10 @@ export default function Allocation(){
 
             />
 
+            </div>
+
+            <div className="form-group">
+
             <h3>
 
             Site Location
@@ -433,6 +826,7 @@ export default function Allocation(){
                 }
 
             />
+        </div>
 
 
 
@@ -455,6 +849,8 @@ export default function Allocation(){
             </>
 
         }
+
+
 
     </div>
 

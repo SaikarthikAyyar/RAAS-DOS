@@ -91,6 +91,13 @@ from backend.models.invoice import Invoice
 
 from backend.services.enquiry_service import EnquiryService
 
+from backend.models.job_creation import JobCreation
+from backend.models.machine_schedule import MachineSchedule
+from backend.models.personnel import Personnel
+from backend.models.execution import Execution
+
+from backend.models.machine_inventory import MachineInventory
+
 
 
 
@@ -1048,6 +1055,109 @@ def get_dashboard_data(
 
         }
 
+    invoice_list = []
+
+    for invoice in invoices:
+
+        job = db.query(JobCreation).filter(
+            JobCreation.id == invoice.job_creation_id
+        ).first()
+
+        machine_schedule = db.query(MachineSchedule).filter(
+            MachineSchedule.job_creation_id == invoice.job_creation_id
+        ).first()
+
+        machine = None
+
+        if machine_schedule:
+
+            machine = db.query(MachineInventory).filter(
+                MachineInventory.id == machine_schedule.machine_id
+            ).first()
+
+        personnel = db.query(Personnel).filter(
+            Personnel.current_job_id == invoice.job_creation_id
+        ).all()
+
+        execution = db.query(Execution).filter(
+            Execution.job_creation_id == invoice.job_creation_id
+        ).first()
+
+        print("\n========== EXECUTION LOOKUP ==========")
+        print("Invoice ID:", invoice.id)
+        print("Job Creation ID:", invoice.job_creation_id)
+        print("Execution:", execution)
+        if execution:
+            print("Current Phase:", execution.current_phase)
+        print("======================================")
+
+        invoice_list.append({
+
+            # =====================================
+            # INVOICE
+            # =====================================
+
+            "id": invoice.id,
+            "generated_job_id": invoice.generated_job_id,
+            "customer_request_id": invoice.customer_request_id,
+            "invoice_status": invoice.invoice_status,
+
+            # =====================================
+            # JOB
+            # =====================================
+
+            "job_creation_id": job.id if job else None,
+            "workflow_status": job.workflow_status if job else None,
+
+
+
+            # =====================================
+            # MACHINE
+            # =====================================
+
+            "machine_name": machine.machine_name if machine else None,
+            "machine_code": machine.machine_code if machine else None,
+            "site_location": machine_schedule.site_location if machine_schedule else None,
+            "machine_location": machine_schedule.site_location if machine_schedule else None,
+            "machine_status": machine_schedule.schedule_status if machine_schedule else None,
+
+            "planned_start": machine_schedule.planned_start if machine_schedule else None,
+            "estimated_completion": machine_schedule.planned_completion if machine_schedule else None,
+            "actual_completion": machine_schedule.actual_completion if machine_schedule else None,
+            "delay_days": None,
+
+            # =====================================
+            # PERSONNEL
+            # =====================================
+
+            "personnel_status": personnel[0].availability_status if personnel else None,
+
+            "personnel": [
+                {
+                    "employee_code": p.employee_code,
+                    "full_name": p.full_name,
+                    "designation": p.designation,
+                    "assigned_role": p.assigned_role,
+                    "phone_number": p.phone_number
+                }
+                for p in personnel
+            ],
+
+            # =====================================
+            # EXECUTION
+            # =====================================
+
+            "execution_phase": execution.current_phase if execution else None,
+            "execution_progress": execution.execution_progress if execution else 0,
+            "current_activity": execution.current_activity if execution else None,
+            "phase_1_status": execution.phase_1_status if execution else None,
+            "phase_2_status": execution.phase_2_status if execution else None,
+            "phase_3_status": execution.phase_3_status if execution else None,
+            "transport_status": execution.transport_status if execution else None
+
+        })
+
+
 
     return {
 
@@ -1083,57 +1193,8 @@ def get_dashboard_data(
 
         "quote_summary": quote_summary,
 
-        "invoices": [
+        "invoices": invoice_list,
 
-            {
-
-                "id": invoice.id,
-
-                "customer_request_id": invoice.customer_request_id,
-
-                "generated_job_id": invoice.generated_job_id,
-
-                "invoice_status": invoice.invoice_status,
-
-                "execution_phase": invoice.execution_phase,
-
-                "execution_progress": invoice.execution_progress,
-
-                "customer_visible_status": invoice.customer_visible_status,
-
-                "current_activity": invoice.current_activity,
-
-                "transport_status": invoice.transport_status,
-
-                "planned_start": invoice.planned_start,
-
-                "estimated_completion": invoice.estimated_completion,
-
-                "actual_completion": invoice.actual_completion,
-
-                "machine_name": invoice.machine_name,
-
-                "machine_code": invoice.machine_code,
-
-                "machine_status": invoice.machine_status,
-
-                "personnel_status": invoice.personnel_status,
-
-                "personnel": invoice.personnel_json,
-
-                "destination": invoice.destination,
-
-                "eta_minutes": invoice.eta_minutes,
-
-                "distance_remaining_km": invoice.distance_remaining_km
-
-            }
-
-            for invoice in invoices
-
-        ]
-
-        
 
     }
 

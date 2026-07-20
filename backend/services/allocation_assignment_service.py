@@ -37,15 +37,13 @@ def allocate_resources(
     db,
     payload,
 
-    job_id,
-
-    machine_ids,
-
-    personnel_ids,
-
-    site_location
+    job_id
 
 ):
+    
+    machine_ids = payload.machine_ids
+    personnel_ids = payload.personnel_ids
+    site_location = payload.site_location
 
     job = (
 
@@ -141,6 +139,10 @@ def allocate_resources(
 
         machine.queue_count += 1
 
+        machine.current_job_id = job.id
+        machine.current_site = site_location
+        machine.status = "ALLOCATED"
+
         db.flush()
         db.refresh(machine)
 
@@ -190,7 +192,7 @@ def allocate_resources(
 
         person.current_location = site_location
 
-        person.availablity_status = "ALLOCATED"
+        person.availability_status = "ALLOCATED"
 
     # ====================================
     # UPDATE JOB

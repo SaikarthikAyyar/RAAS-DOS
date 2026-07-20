@@ -9,6 +9,70 @@ from backend.models.job_creation import JobCreation
 
 from backend.models.invoice import Invoice
 
+from backend.models.machine_schedule import MachineSchedule
+
+import os
+
+
+
+
+
+# ====================================
+# LOAD JOBS FROM INVOICE
+# ====================================
+
+def get_invoice_jobs(db):
+
+    invoices = (
+
+        db.query(Invoice)
+
+        .filter(
+
+            Invoice.job_creation_id != None
+
+        )
+
+        .all()
+
+    )
+
+    results = []
+
+    for invoice in invoices:
+
+        job = (
+
+            db.query(JobCreation)
+
+            .filter(
+
+                JobCreation.id == invoice.job_creation_id
+
+            )
+
+            .first()
+
+        )
+
+        if not job:
+
+            continue
+
+        results.append({
+
+            "invoice_id": invoice.id,
+
+            "job_id": job.id,
+
+            "generated_job_id": job.generated_job_id,
+
+            "customer_request_id": invoice.customer_request_id
+
+        })
+
+    return results
+
 
 # ====================================
 # LOAD ALLOCATION SCREEN
@@ -21,6 +85,7 @@ def get_allocation_dashboard(
     job_id
 
 ):
+    
 
     job = (
 
@@ -83,7 +148,7 @@ def get_allocation_dashboard(
     personnel = (
         db.query(Personnel)
         .filter(
-            Personnel.allocation_status == "AVAILABLE"
+            Personnel.availability_status == "AVAILABLE"
         )
         .order_by(
             Personnel.full_name
@@ -95,6 +160,62 @@ def get_allocation_dashboard(
     machine_cards = []
 
     for machine in machines:
+
+        queue = (
+
+            db.query(MachineSchedule)
+
+            .filter(
+
+                MachineSchedule.machine_id == machine.id
+
+            )
+
+            .order_by(
+
+                MachineSchedule.queue_position
+
+            )
+
+            .all()
+
+        )
+
+        queue_items = []
+
+        for item in queue:
+
+            job = (
+
+                db.query(JobCreation)
+
+                .filter(
+
+                    JobCreation.id == item.job_creation_id
+
+                )
+
+                .first()
+
+            )
+
+            queue_items.append({
+
+                "queue_position": item.queue_position,
+
+                "job_creation_id": item.job_creation_id,
+
+                "generated_job_id": job.generated_job_id if job else None,
+
+                "site_location": item.site_location,
+
+                "planned_start": item.planned_start,
+
+                "planned_completion": item.planned_completion,
+
+                "status": item.schedule_status
+
+            })
 
         machine_cards.append({
 
@@ -114,7 +235,9 @@ def get_allocation_dashboard(
 
             "current_gps": machine.current_gps,
 
-            "queue_count": machine.queue_count,
+            "queue_count": len(queue_items),
+
+            "queue": queue_items,
 
             "remarks": machine.remarks
 
@@ -171,28 +294,24 @@ def get_allocation_dashboard(
 
             "status":
 
-                person.allocation_status,
+                person.availability_status,
 
             "documents_verified":
 
                 person.documents_verified,
 
-            "documents":[
-
+            "documents": [
                 {
-
                     "name": d.document_name,
-
                     "type": d.document_type,
-
                     "status": d.verification_status,
-
-                    "file": d.file_path
-
+                    "file": (
+                        f"uploads/personnel_documents/EMP004/"
+                        f"{person.employee_code}/"
+                        f"{os.path.basename(d.file_path)}"
+                    )
                 }
-
                 for d in docs
-
             ]
 
         })

@@ -101,3 +101,26 @@ export async function saveAllocation(
     return data;
 
 }
+
+
+export async function loadInvoiceJobs(){
+
+    const response = await fetch(
+
+        `${API}/allocation/jobs`
+
+    );
+
+    if(!response.ok){
+
+        throw new Error(
+
+            "Unable to load jobs."
+
+        );
+
+    }
+
+    return await response.json();
+
+}

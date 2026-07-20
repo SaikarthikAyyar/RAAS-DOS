@@ -7,7 +7,7 @@ export default function InvoiceWorkflowTracker({
 }){
 
     console.log("Invoice Object");
-    console.log(invoice);
+    console.log(JSON.stringify(invoice, null, 2));
 
     if(!invoice){
 
@@ -91,15 +91,26 @@ export default function InvoiceWorkflowTracker({
 
     ];
 
+    const phaseMap = {
+        JOB_CREATED: "JOB_CREATED",
+        MACHINE_ALLOCATION: "ALLOCATION",
+        ALLOCATION: "ALLOCATION",
+        TRANSPORT: "TRANSPORT",
+        SITE_ARRIVAL: "SITE_ARRIVAL",
+        PHASE_1: "PHASE_1",
+        PHASE_2: "PHASE_2",
+        PHASE_3: "PHASE_3",
+        COMPLETED: "COMPLETED"
+    };
+
+    const currentPhase =
+        phaseMap[invoice.execution_phase] || "JOB_CREATED";
+
     const currentIndex = stages.findIndex(
-
-        stage =>
-
-            stage.key.trim().toUpperCase() ===
-
-            invoice.execution_phase?.trim().toUpperCase()
-
+        stage => stage.key === currentPhase
     );
+
+
 
     console.log(invoice);
 
@@ -118,6 +129,10 @@ export default function InvoiceWorkflowTracker({
         currentIndex
 
     );
+
+    console.log("execution_phase =", invoice.execution_phase);
+    console.log("mapped =", currentPhase);
+    console.log("index =", currentIndex);
 
     return(
 
@@ -177,7 +192,7 @@ export default function InvoiceWorkflowTracker({
 
                     <strong>
 
-                        {invoice.execution_phase}
+                        {currentPhase}
 
                     </strong>
 
