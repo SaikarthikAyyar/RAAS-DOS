@@ -40,9 +40,7 @@ export default function OperationsDashboard(){
 
     };
 
-    const [successMessage, setSuccessMessage] = useState("");
 
-    const [errorMessage, setErrorMessage] = useState("");
 
     const [activeTab, setActiveTab] = useState(
 

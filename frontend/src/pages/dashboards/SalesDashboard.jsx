@@ -27,9 +27,7 @@ import WorkflowTracker from "../../components/dashboard/WorkflowTracker";
 export default function SalesDashboard(){
 
     const navigate = useNavigate();
-
-    const [successMessage, setSuccessMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");    
+ 
 
     const {
 

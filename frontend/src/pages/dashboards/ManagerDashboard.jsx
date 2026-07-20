@@ -34,8 +34,7 @@ import { useState } from "react";
 
 export default function ManagementDashboard(){
 
-    const [successMessage, setSuccessMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");   
+
 
     const navigate = useNavigate();
 

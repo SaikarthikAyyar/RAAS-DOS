@@ -42,8 +42,7 @@ from "../../components/dashboard/WorkflowTracker";
 
 export default function CustomerDashboard(){
 
-    const [successMessage, setSuccessMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+
 
     const{
 
