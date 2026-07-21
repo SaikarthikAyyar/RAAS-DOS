@@ -11,7 +11,7 @@ from backend.services.status_service import update_customer_request_status
 
 from backend.services.execution_service import (
 
-    create_execution_request
+    update_execution_after_allocation
 
 )
 
@@ -117,6 +117,64 @@ def allocate_resources(
 
         ) + 1
 
+        # ====================================
+        # GET LAST SCHEDULED JOB
+        # ====================================
+
+        last_schedule = (
+
+            db.query(
+
+                MachineSchedule
+
+            )
+
+            .filter(
+
+                MachineSchedule.machine_id == machine.id
+
+            )
+
+            .order_by(
+
+                MachineSchedule.queue_position.desc()
+
+            )
+
+            .first()
+
+        )
+
+        # ====================================
+        # FIFO DATE VALIDATION
+        # ====================================
+
+        if last_schedule is not None:
+
+            if payload.planned_start <= last_schedule.planned_completion:
+
+                raise ValueError(
+
+                    f"{machine.machine_name} is already scheduled until "
+
+                    f"{last_schedule.planned_completion}."
+
+                )
+
+        # ====================================
+        # NEXT QUEUE POSITION
+        # ====================================
+
+        queue_position = (
+
+            1
+
+            if last_schedule is None
+
+            else last_schedule.queue_position + 1
+
+        )
+
         schedule = MachineSchedule(
 
             machine_id=machine.id,
@@ -137,11 +195,17 @@ def allocate_resources(
 
         db.add(schedule)
 
-        machine.queue_count += 1
+        machine.queue_count = queue_position
+
+        if queue_position == 1:
+            machine.status = "ALLOCATED"
+        else:
+            machine.status = "QUEUED"
 
         machine.current_job_id = job.id
         machine.current_site = site_location
-        machine.status = "ALLOCATED"
+
+        db.add(machine)
 
         db.flush()
         db.refresh(machine)
@@ -227,15 +291,121 @@ def allocate_resources(
 
     if invoice is not None:
 
+        # ====================================
+        # SCHEDULE
+        # ====================================
+
         invoice.planned_start = payload.planned_start
 
         invoice.estimated_completion = payload.planned_completion
+
+        # ====================================
+        # CUSTOMER STATUS
+        # ====================================
 
         invoice.customer_visible_status = "Resources Scheduled"
 
         invoice.execution_phase = "ALLOCATION"
 
         invoice.current_activity = "Machines and Personnel Scheduled"
+
+        # ====================================
+        # MACHINE DETAILS
+        # ====================================
+
+        primary_schedule = (
+
+            db.query(
+
+                MachineSchedule
+
+            )
+
+            .filter(
+
+                MachineSchedule.job_creation_id == job.id
+
+            )
+
+            .first()
+
+        )
+
+        first_machine = None
+
+        if primary_schedule:
+
+            first_machine = (
+
+                db.query(MachineInventory)
+
+                .filter(
+
+                    MachineInventory.id == primary_schedule.machine_id
+
+                )
+
+                .first()
+
+            )
+
+        if first_machine:
+
+            invoice.machine_status = first_machine.status
+
+            invoice.machine_name = first_machine.machine_name
+
+            invoice.machine_code = first_machine.machine_code
+
+            invoice.machine_location = first_machine.current_site
+
+        # ====================================
+        # PERSONNEL DETAILS
+        # ====================================
+
+        allocated_personnel = (
+
+            db.query(Personnel)
+
+            .filter(
+
+                Personnel.current_job_id == job.id
+
+            )
+
+            .all()
+
+        )
+
+        if allocated_personnel:
+
+            invoice.personnel_status = "ALLOCATED"
+
+            invoice.personnel_json = [
+
+                {
+
+                    "id": person.id,
+
+                    "name": person.full_name,
+
+                    "designation": person.designation,
+
+                    "skill": person.skill,
+
+                    "location": person.current_location
+
+                }
+
+                for person in allocated_personnel
+
+            ]
+
+        else:
+
+            invoice.personnel_status = "NOT_ASSIGNED"
+
+            invoice.personnel_json = []
 
         update_invoice_request(
 
@@ -273,13 +443,11 @@ def allocate_resources(
 
     )
 
-    create_execution_request(
-
-        db,
-
-        job.id
-
-    )
+    update_execution_after_allocation(
+            db,
+            job,
+            payload
+        )
 
     return job
 

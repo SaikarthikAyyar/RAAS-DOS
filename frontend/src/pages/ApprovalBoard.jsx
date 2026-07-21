@@ -31,6 +31,7 @@ from "../services/approvalBoardService";
 
 export default function ApprovalBoard(){
 
+
     const { quoteId } = useParams();
 
     const [approval,setApproval] = useState(null);
@@ -215,29 +216,7 @@ export default function ApprovalBoard(){
 
                 </h1>
 
-                {
 
-                    successMessage &&
-
-                    <div className="approval-success">
-
-                        {successMessage}
-
-                    </div>
-
-                }
-
-                {
-
-                    errorMessage &&
-
-                    <div className="approval-error">
-
-                        {errorMessage}
-
-                    </div>
-
-                }
 
                 <p>
 
