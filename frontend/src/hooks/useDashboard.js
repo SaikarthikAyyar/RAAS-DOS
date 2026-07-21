@@ -2,7 +2,17 @@
 // IMPORTS
 // ====================================
 
-import { useEffect, useState } from "react";
+import {
+
+useEffect,
+
+useState,
+
+useCallback
+
+}
+
+from "react";
 
 import {
 
@@ -68,7 +78,7 @@ export default function useDashboard(){
     // LOAD
     // ====================================
 
-    async function loadDashboard(){
+    const loadDashboard = useCallback(async()=>{
 
         try{
 
@@ -94,7 +104,11 @@ export default function useDashboard(){
 
         }
 
-    }
+    },[
+        role,
+        receivedEnquiryId,
+        sentEnquiryId
+    ]);
 
 
     // ====================================
@@ -103,7 +117,7 @@ export default function useDashboard(){
 
     useEffect(()=>{
 
-        void loadDashboard();
+        loadDashboard();
 
     },[
         role,

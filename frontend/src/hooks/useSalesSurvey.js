@@ -159,7 +159,7 @@ geometry.hose_distance
 // ESTIMATED VOLUME
 // ====================================
 
-let estimatedVolume=0;
+let estimatedVolume
 
 
 if(

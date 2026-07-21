@@ -2,9 +2,17 @@
 // IMPORTS
 // ====================================
 
-import { useEffect } from "react";
+import {
 
-import { useState } from "react";
+useEffect,
+
+useState,
+
+useCallback
+
+}
+
+from "react";
 
 import {
 
@@ -117,7 +125,7 @@ export default function useOpsSelector(){
     // LOAD PREFILL
     // ====================================
 
-    async function loadPrefill(){
+    const loadPrefill = useCallback(async()=>{
 
         try{
 
@@ -131,17 +139,11 @@ export default function useOpsSelector(){
 
                 ...data,
 
-                customer_request_id:
+                customer_request_id: customerRequestId,
 
-                    customerRequestId,
+                sales_survey_id: salesSurveyId,
 
-                sales_survey_id:
-
-                    salesSurveyId,
-
-                enquiry_id:
-
-                    enquiryId
+                enquiry_id: enquiryId
 
             });
 
@@ -153,7 +155,11 @@ export default function useOpsSelector(){
 
         }
 
-    }
+    },[
+        salesSurveyId,
+        customerRequestId,
+        enquiryId
+    ]);
 
     useEffect(()=>{
 
@@ -163,7 +169,7 @@ export default function useOpsSelector(){
 
         }
 
-        void loadPrefill();
+        loadPrefill();
 
     },[
         salesSurveyId,

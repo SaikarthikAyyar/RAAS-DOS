@@ -6,9 +6,17 @@
 // IMPORTS
 // ====================================
 
-import { useEffect } from "react";
+import {
 
-import { useState } from "react";
+useEffect,
+
+useState,
+
+useCallback
+
+}
+
+from "react";
 
 import "../components/quote/TechnoCommercialQuote.css";
 
@@ -22,9 +30,7 @@ import {
 
 getQuoteOps,
 
-getQuotePreview,
-
-saveQuote
+getQuotePreview
 
 }
 
@@ -54,26 +60,21 @@ export default function TechnoCommercialQuote() {
 
 
 
-    async function loadOpsList(){
+    const loadOpsList = useCallback(async()=>{
 
-    const data=
+        const data = await getQuoteOps();
 
-    await getQuoteOps();
-
-    setOpsList(
-
-    data
-
-    );
-
-    }
-
-    useEffect(()=>{
-
-    loadOpsList();
+        setOpsList(data);
 
     },[]);
 
+    useEffect(()=>{
+
+        loadOpsList();
+
+    },[
+        loadOpsList
+    ]);
 
     // ====================================
     // LOAD QUOTE

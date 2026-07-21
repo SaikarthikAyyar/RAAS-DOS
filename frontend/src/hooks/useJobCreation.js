@@ -182,65 +182,7 @@ export default function useJobCreation(){
 
     }
 
-    async function loadSelectedJob(
 
-        quoteId
-
-    ){
-
-        try{
-
-            setLoading(
-
-                true
-
-            );
-
-            const data = await getJobCreation(
-
-                quoteId
-
-            );
-
-            setJobData(
-
-                data
-
-            );
-
-        }
-
-        catch(
-
-            exception
-
-        ){
-
-            console.log(
-
-                exception
-
-            );
-
-            setError(
-
-                true
-
-            );
-
-        }
-
-        finally{
-
-            setLoading(
-
-                false
-
-            );
-
-        }
-
-    }
 
     // ====================================
     // HANDLE QUOTE CHANGE

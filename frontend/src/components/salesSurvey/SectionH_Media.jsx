@@ -6,7 +6,9 @@ import {
 
 useEffect,
 
-useState
+useState,
+
+useCallback
 
 }
 
@@ -70,29 +72,19 @@ null
 // LOAD MEDIA
 // ====================================
 
-// ====================================
-// LOAD MEDIA
-// ====================================
 
-async function loadMedia(){
+
+const loadMedia = useCallback(async()=>{
 
     try{
 
-        const response = await getMedia(
-
-            customerRequestId
-
-        );
+        const response = await getMedia(customerRequestId);
 
         setMedia(response);
 
         if(response.length){
 
-            setSelected(
-
-                response[0]
-
-            );
+            setSelected(response[0]);
 
         }
 
@@ -110,7 +102,9 @@ async function loadMedia(){
 
     }
 
-}
+},[
+    customerRequestId
+]);
 
 // ====================================
 // LOAD MEDIA
@@ -118,20 +112,13 @@ async function loadMedia(){
 
 useEffect(()=>{
 
-    if(!customerRequestId){
+    if(customerRequestId){
 
-        setMedia([]);
-
-        setSelected(null);
-
-        return;
+        void loadMedia();
 
     }
 
-    loadMedia();
-
 },[
-    customerRequestId,
     loadMedia
 ]);
 

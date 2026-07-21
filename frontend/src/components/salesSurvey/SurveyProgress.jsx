@@ -2,13 +2,7 @@
 // COMPONENT
 // ====================================
 
-export default function SurveyProgress({
-
-completion = 0,
-
-metrics = {}
-
-}){
+export default function SurveyProgress(){
 
 
 return(
