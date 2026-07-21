@@ -17,10 +17,16 @@ export default defineConfig([
     rules: {
 
       // ====================================
-      // React 19 Compiler Rules
+      // React 19 Compiler
       // ====================================
 
       "react-hooks/set-state-in-effect": "off",
+
+      // ====================================
+      // Fast Refresh
+      // ====================================
+
+      "react-refresh/only-export-components": "off",
 
     },
     languageOptions: {

@@ -1,14 +1,12 @@
 export default function Section3_Uploads({
 
-customerData,
+
 
 updateMedia
 
 }){
 
-const uploads=
 
-customerData.uploads || {};
 
 
 return(
