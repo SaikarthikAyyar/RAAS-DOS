@@ -4,7 +4,7 @@
 
 import "../../components/salesSurvey/SalesSurvey.css";
 
-import { useState } from "react";
+
 
 import { searchCustomer } from "../../services/customerService";
 

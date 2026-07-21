@@ -39,7 +39,7 @@ const {
 
 estimatedVolume = 0,
 
-averageOutput = 0,
+
 
 totalDuration = 0,
 

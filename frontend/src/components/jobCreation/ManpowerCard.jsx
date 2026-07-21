@@ -2,7 +2,7 @@
 // IMPORTS
 // ====================================
 
-import { useMemo } from "react";
+
 
 import { useState } from "react";
 
@@ -15,7 +15,7 @@ import "./JobCreation.css";
 
 export default function ManpowerCard({
 
-    manpower
+
 
 }){
 

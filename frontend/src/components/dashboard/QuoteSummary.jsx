@@ -144,32 +144,3 @@ export default function QuoteSummary({
 
 }
 
-function SummaryCard({
-
-    title,
-
-    value
-
-}){
-
-    return(
-
-        <div className="dashboard-info-card">
-
-            <div className="dashboard-info-title">
-
-                {title}
-
-            </div>
-
-            <div className="dashboard-info-value">
-
-                {value ?? "-"}
-
-            </div>
-
-        </div>
-
-    );
-
-}

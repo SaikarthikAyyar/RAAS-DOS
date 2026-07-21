@@ -10,9 +10,7 @@ export default function CommercialEstimateCard({
 
     setQuote,
 
-    selectedOps,
-
-    onSubmitApproval
+    selectedOps
 
 }){
 
