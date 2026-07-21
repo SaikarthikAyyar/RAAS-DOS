@@ -10,9 +10,7 @@ import "./Dashboard.css";
 
 export default function QuoteSummary({
 
-    summary,
-
-    role
+    summary
 
 }){
 
