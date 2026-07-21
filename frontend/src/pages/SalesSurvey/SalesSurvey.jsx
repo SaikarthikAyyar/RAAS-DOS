@@ -14,7 +14,7 @@ import {
 
 getSalesPrefill,
 
-getCustomers,
+
 
 getCustomerSurveys,
 
@@ -95,21 +95,7 @@ canSubmit
 useSalesSurvey();
 
 
-const [
 
-customers,
-
-setCustomers
-
-]
-
-=
-
-useState(
-
-[]
-
-);
 
 
 const [

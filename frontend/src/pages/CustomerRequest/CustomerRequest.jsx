@@ -6,7 +6,7 @@ import "../../components/salesSurvey/SalesSurvey.css";
 
 
 
-import { searchCustomer } from "../../services/customerService";
+
 
 import { useNavigate } from "react-router-dom";
 

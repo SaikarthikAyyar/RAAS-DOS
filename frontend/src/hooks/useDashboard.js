@@ -103,16 +103,13 @@ export default function useDashboard(){
 
     useEffect(()=>{
 
-        loadDashboard();
+        void loadDashboard();
 
     },[
-
         role,
-
         receivedEnquiryId,
-
-        sentEnquiryId
-
+        sentEnquiryId,
+        loadDashboard
     ]);
 
 

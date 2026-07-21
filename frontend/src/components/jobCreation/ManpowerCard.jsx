@@ -13,11 +13,7 @@ import "./JobCreation.css";
 // COMPONENT
 // ====================================
 
-export default function ManpowerCard({
-
-
-
-}){
+export default function ManpowerCard(){
 
     const roles=[
 

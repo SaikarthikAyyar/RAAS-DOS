@@ -70,105 +70,70 @@ null
 // LOAD MEDIA
 // ====================================
 
-useEffect(
-
-()=>{
-
-
-if(
-
-!customerRequestId
-
-){
-
-setMedia(
-
-[]
-
-);
-
-setSelected(
-
-null
-
-);
-
-return;
-
-}
-
-
-loadMedia();
-
-},
-
-[
-
-customerRequestId
-
-]
-
-);
-
+// ====================================
+// LOAD MEDIA
+// ====================================
 
 async function loadMedia(){
 
-try{
+    try{
 
+        const response = await getMedia(
 
-const response=
+            customerRequestId
 
-await getMedia(
+        );
 
-customerRequestId
+        setMedia(response);
 
-);
+        if(response.length){
 
+            setSelected(
 
-setMedia(
+                response[0]
 
-response
+            );
 
-);
+        }
 
+        else{
 
-if(
+            setSelected(null);
 
-response.length
+        }
 
-){
+    }
 
-setSelected(
+    catch(error){
 
-response[0]
+        console.log(error);
 
-);
-
-}
-
-else{
-
-setSelected(
-
-null
-
-);
+    }
 
 }
 
-}
+// ====================================
+// LOAD MEDIA
+// ====================================
 
-catch(error){
+useEffect(()=>{
 
-console.log(
+    if(!customerRequestId){
 
-error
+        setMedia([]);
 
-);
+        setSelected(null);
 
-}
+        return;
 
-}
+    }
+
+    loadMedia();
+
+},[
+    customerRequestId,
+    loadMedia
+]);
 
 
 // ====================================

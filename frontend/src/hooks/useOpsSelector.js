@@ -157,19 +157,18 @@ export default function useOpsSelector(){
 
     useEffect(()=>{
 
-        if(
-
-            !salesSurveyId
-
-        ){
+        if(!salesSurveyId){
 
             return;
 
         }
 
-        loadPrefill();
+        void loadPrefill();
 
-    },[]);
+    },[
+        salesSurveyId,
+        loadPrefill
+    ]);
 
 
     // ====================================

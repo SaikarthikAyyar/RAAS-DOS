@@ -51,11 +51,7 @@ export default function TechnoCommercialQuote() {
     // LOAD OPS LIST
     // ====================================
 
-    useEffect(()=>{
 
-    loadOpsList();
-
-    },[]);
 
 
     async function loadOpsList(){
@@ -71,6 +67,12 @@ export default function TechnoCommercialQuote() {
     );
 
     }
+
+    useEffect(()=>{
+
+    loadOpsList();
+
+    },[]);
 
 
     // ====================================
