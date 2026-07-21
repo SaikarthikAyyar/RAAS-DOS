@@ -13,6 +13,16 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
+
+    rules: {
+
+      // ====================================
+      // React 19 Compiler Rules
+      // ====================================
+
+      "react-hooks/set-state-in-effect": "off",
+
+    },
     languageOptions: {
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
