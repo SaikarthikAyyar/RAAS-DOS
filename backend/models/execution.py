@@ -6,7 +6,9 @@ from sqlalchemy import (
     Column,
     BigInteger,
     String,
+    Float,
     Date,
+    Boolean,
     TIMESTAMP,
     ForeignKey,
     text
@@ -133,6 +135,96 @@ class Execution(Base):
         String(20),
         server_default="YES"
     )
+
+    # ====================================
+    # LIVE GPS
+    # ====================================
+
+    latitude = Column(
+        Float,
+        nullable=True
+    )
+
+    longitude = Column(
+        Float,
+        nullable=True
+    )
+
+    speed_kmph = Column(
+        Float,
+        default=0
+    )
+
+    heading = Column(
+        Float,
+        default=0
+    )
+
+    altitude = Column(
+        Float,
+        default=0
+    )
+
+    accuracy_meters = Column(
+        Float,
+        default=0
+    )
+
+    gps_timestamp = Column(
+        TIMESTAMP,
+        nullable=True
+    )
+
+    last_update_source = Column(
+        String(30),
+        default="OPS"
+    )
+
+    # ====================================
+    # LIVE EXECUTION
+    # ====================================
+
+    eta_minutes = Column(
+        BigInteger,
+        default=0
+    )
+
+    distance_remaining_km = Column(
+        Float,
+        default=0
+    )
+
+    today_output = Column(
+        Float,
+        default=0
+    )
+
+    total_output = Column(
+        Float,
+        default=0
+    )
+
+    daily_target = Column(
+        Float,
+        default=0
+    )
+
+    output_unit = Column(
+        String(20),
+        default="m³"
+    )
+
+    proof_uploaded = Column(
+        Boolean,
+        default=False
+    )
+
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=text("CURRENT_TIMESTAMP")
+    )
+
+
 
     # ====================================
     # AUDIT

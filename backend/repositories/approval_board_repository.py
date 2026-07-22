@@ -205,18 +205,25 @@ def approve_quote(
             )
             db.add(approval)
 
-        approval.approval_status = "APPROVED"
-        approval.approved_by = "ADMIN"
-        approval.approval_date = func.now()
+            approval.approval_status = "APPROVED"
+            approval.approved_by = "ADMIN"
+            approval.approval_date = func.now()
 
-        
+            quote.workflow_status = "MANAGEMENT_APPROVED"
 
-        quote.workflow_status = "MANAGEMENT_APPROVED"
+            db.commit()
 
-    else:
-        raise ValueError(
-            "Quote is not awaiting management approval."
-        )
+            db.refresh(approval)
+
+            db.refresh(quote)
+
+            return approval
+
+        else:
+
+            raise ValueError(
+                "Quote is not awaiting management approval."
+            )
 
 
 

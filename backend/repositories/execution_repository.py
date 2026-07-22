@@ -79,7 +79,39 @@ def create_execution(
         payload.actual_completion,
 
         remarks=
-        payload.remarks
+        payload.remarks,
+
+        latitude = None,
+
+        longitude = None,
+
+        speed_kmph = 0,
+
+        heading = 0,
+
+        altitude = 0,
+
+        accuracy_meters = 0,
+
+        gps_timestamp = None,
+
+        last_update_source = "OPS",
+
+        eta_minutes = 0,
+
+        distance_remaining_km = 0,
+
+        today_output = 0,
+
+        total_output = 0,
+
+        daily_target = 0,
+
+        output_unit = "m³",
+
+        proof_uploaded = False
+
+
 
     )
 
@@ -343,6 +375,8 @@ def start_phase(
         invoice.current_activity = execution.current_activity
 
         invoice.transport_status = execution.transport_status
+
+    execution.last_updated = date.today()
 
     db.commit()
 

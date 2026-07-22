@@ -134,9 +134,6 @@ def get_allocation_dashboard(
 
     machines = (
         db.query(MachineInventory)
-        .filter(
-            MachineInventory.status == "AVAILABLE"
-        )
         .order_by(
             MachineInventory.machine_name,
             MachineInventory.asset_number

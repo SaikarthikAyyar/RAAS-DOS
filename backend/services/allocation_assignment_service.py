@@ -9,11 +9,7 @@ from backend.models.job_creation import JobCreation
 from backend.services.enquiry_service import EnquiryService
 from backend.services.status_service import update_customer_request_status
 
-from backend.services.execution_service import (
 
-    update_execution_after_allocation
-
-)
 
 # ====================================
 # IMPORTS
@@ -153,6 +149,7 @@ def allocate_resources(
 
             if payload.planned_start <= last_schedule.planned_completion:
 
+
                 raise ValueError(
 
                     f"{machine.machine_name} is already scheduled until "
@@ -160,6 +157,9 @@ def allocate_resources(
                     f"{last_schedule.planned_completion}."
 
                 )
+
+
+
 
         # ====================================
         # NEXT QUEUE POSITION
@@ -437,17 +437,23 @@ def allocate_resources(
 
 
 
-    print(
+    from backend.services.execution_service import (
+        create_execution_request,
+        update_execution_after_allocation
+    )
 
-        "[Workflow] Creating Execution"
+    print("[Workflow] Creating Execution")
 
+    create_execution_request(
+        db,
+        job.id
     )
 
     update_execution_after_allocation(
-            db,
-            job,
-            payload
-        )
+        db,
+        job,
+        payload
+    )
 
     return job
 

@@ -19,8 +19,8 @@ import QuoteSummary
 from "../../components/dashboard/QuoteSummary";
 import WorkflowTracker from "../../components/dashboard/WorkflowTracker";
 
-// import InvoiceStats from "../../components/dashboard/InvoiceStats";
-// import InvoiceWorkflowTracker from "../../components/dashboard/InvoiceWorkflowTracker";
+import InvoiceStats from "../../components/dashboard/InvoiceStats";
+import InvoiceWorkflowTracker from "../../components/dashboard/InvoiceWorkflowTracker";
 
 
 // ====================================
@@ -75,13 +75,13 @@ export default function OperationsDashboard(){
     console.log("selected =", dashboard?.selected_enquiry);
     console.log("==========================================");
 
-    //const [
+    const [
 
-    //    selectedInvoice,
+       selectedInvoice,
 
-    //    setSelectedInvoice
+       setSelectedInvoice
 
-    //] = useState("");
+    ] = useState("");
 
     console.log(selectedInvoice);
 

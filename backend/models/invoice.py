@@ -71,6 +71,14 @@ class Invoice(
 
     )
 
+    execution_id = Column(
+
+        Integer,
+
+        nullable=True
+
+    )
+
     # ====================================
     # WORKFLOW
     # ====================================

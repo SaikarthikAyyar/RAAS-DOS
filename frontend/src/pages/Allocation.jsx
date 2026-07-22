@@ -96,24 +96,33 @@ export default function Allocation(){
 
     async function allocate(){
 
-
         if(!jobId){
-
             alert("Select Job");
-
             return;
+        }
+
+        try{
+
+            await saveAllocation(
+                jobId,
+                payload
+            );
+
+            alert("Resources Allocated Successfully");
 
         }
 
-        await saveAllocation(
+        catch(error){
 
-            jobId,
+            console.error(error);
 
-            payload
+            alert(
+                error.detail ||
+                error.message ||
+                "Allocation Failed"
+            );
 
-        );
-
-        alert("Resources Allocated Successfully");
+        }
 
     }
 
