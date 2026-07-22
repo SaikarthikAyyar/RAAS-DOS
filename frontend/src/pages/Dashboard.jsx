@@ -7,17 +7,13 @@ import AdminDashboard from "./dashboards/AdminDashboard";
 export default function Dashboard() {
 
     const ROLE_MAP = {
-
         ops: "OPERATIONS",
-
+        operations: "OPERATIONS",
         sales: "SALES",
-
         customer: "CUSTOMER",
-
         management: "MANAGER",
-
+        manager: "MANAGER",
         admin: "ADMIN"
-
     };
 
     const role =
