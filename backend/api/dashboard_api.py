@@ -12,6 +12,8 @@ from backend.services.dashboard_service import (
     get_dashboard_data
 )
 
+import traceback
+
 # ====================================
 # ROUTER
 # ====================================
@@ -34,29 +36,40 @@ def dashboard(
     db: Session = Depends(get_db)
 
 ):
+    try:
 
-    print("\n========== DASHBOARD API ==========")
+        print("\n========== DASHBOARD API ==========")
 
-    print("Role:", role)
+        print("Role:", role)
 
-    print("Received:", received_enquiry_id)
+        print("Received:", received_enquiry_id)
 
-    print("Sent:", sent_enquiry_id)
+        print("Sent:", sent_enquiry_id)
 
-    dashboard = get_dashboard_data(
+        dashboard = get_dashboard_data(
 
-        db,
+            db,
 
-        role,
+            role,
 
-        received_enquiry_id,
+            received_enquiry_id,
 
-        sent_enquiry_id
+            sent_enquiry_id
 
-    )
+        )
 
-    print("Dashboard Response Ready")
+        print("Dashboard Response Ready")
 
-    print("===================================\n")
+        print(dashboard)
 
-    return dashboard
+        print("===================================\n")
+
+        return dashboard
+
+    except Exception as e:
+
+        print("DASHBOARD FAILED")
+
+        traceback.print_exc()
+
+        raise

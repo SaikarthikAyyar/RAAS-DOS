@@ -91,6 +91,12 @@ export async function getDashboard(
 
     );
 
+    console.log(response.status);
+
+    console.log(response.statusText);
+
+
+
     const data = await response.json();
 
     console.log(
