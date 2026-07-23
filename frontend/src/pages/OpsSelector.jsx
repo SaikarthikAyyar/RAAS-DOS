@@ -51,7 +51,7 @@ export default function OpsSelector(){
 
             <div className="ops-page-header">
 
-                <h1>
+                <h1 style={{ color: "#ffffff" }}>
 
                     Ops Selector
 
