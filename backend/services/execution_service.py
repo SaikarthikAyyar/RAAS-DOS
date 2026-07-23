@@ -475,6 +475,8 @@ def sync_invoice_from_execution(
 
     )
 
+    logs = logs[-1000:]
+
     invoice.live_execution_log = logs
 
 
@@ -551,6 +553,20 @@ def sync_invoice_from_execution(
 
         invoice.invoice_status = "ACTIVE"
 
+    print("\n========== INVOICE SYNC ==========")
+    print(f"Invoice ID          : {invoice.id}")
+    print(f"Execution Phase     : {invoice.execution_phase}")
+    print(f"Progress            : {invoice.execution_progress}")
+    print(f"Customer Status     : {invoice.customer_visible_status}")
+    print(f"Transport           : {invoice.transport_status}")
+    print(f"Machine             : {invoice.machine_name}")
+    print(f"Personnel Count     : {len(invoice.personnel_json)}")
+    print(f"GPS                 : {invoice.gps_location}")
+    print(f"ETA                 : {invoice.eta_minutes}")
+    print(f"Distance Remaining  : {invoice.distance_remaining_km}")
+    print(f"Live Log Entries    : {len(invoice.live_execution_log)}")
+
+
     update_invoice(
 
         db,
@@ -603,6 +619,22 @@ def update_execution_progress(
     execution.proof_uploaded = payload.proof_uploaded
 
     execution.last_updated = datetime.utcnow()
+
+
+    print("\n========== EXECUTION UPDATE ==========")
+    print(f"Execution ID : {execution.id}")
+    print(f"Progress     : {execution.execution_progress}")
+    print(f"Activity     : {execution.current_activity}")
+    print(f"Transport    : {execution.transport_status}")
+    print(f"GPS          : {execution.latitude}, {execution.longitude}")
+    print(f"ETA          : {execution.eta_minutes}")
+    print(f"Distance     : {execution.distance_remaining_km}")
+    print(f"Today Output : {execution.today_output}")
+    print(f"Total Output : {execution.total_output}")
+    print(f"Updated By   : {execution.last_update_source}")
+
+    print("\n========== EXECUTION SAVED ==========")
+    print(f"Timestamp : {execution.last_updated}")
 
     db.commit()
 

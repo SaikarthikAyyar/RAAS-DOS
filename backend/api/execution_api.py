@@ -19,10 +19,15 @@ from backend.services.execution_service import (
 
     start_execution_phase,
 
-    complete_execution_phase
+    complete_execution_phase,
+
+    update_execution_progress
 
 )
 
+from backend.schemas.execution_schema import (
+    ExecutionProgressUpdateSchema
+)
 
 # ====================================
 # ROUTER
@@ -198,5 +203,44 @@ def complete_phase(
         db,
 
         execution_id
+
+    )
+
+
+# ====================================
+# UPDATE EXECUTION PROGRESS
+# ====================================
+
+@router.put(
+
+    "/execution/{execution_id}/progress"
+
+)
+
+def update_progress(
+
+    execution_id: int,
+
+    payload: ExecutionProgressUpdateSchema,
+
+    db: Session = Depends(get_db)
+
+):
+
+    print("\n========== EXECUTION API ==========")
+
+    print(
+
+        f"Execution Progress Update : {execution_id}"
+
+    )
+
+    return update_execution_progress(
+
+        db,
+
+        execution_id,
+
+        payload
 
     )

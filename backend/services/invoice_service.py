@@ -241,7 +241,7 @@ def get_invoice_by_job_request(
 
 ):
 
-    return get_invoice_by_job(
+    invoice = get_invoice_by_job(
 
         db,
 
@@ -249,6 +249,19 @@ def get_invoice_by_job_request(
 
     )
 
+    print("\n========== CUSTOMER POLL ==========")
+    print(f"Job ID      : {job_id}")
+
+    if invoice:
+
+        print(f"Invoice ID  : {invoice.id}")
+        print(f"Progress    : {invoice.execution_progress}")
+        print(f"Activity    : {invoice.current_activity}")
+        print(f"Transport   : {invoice.transport_status}")
+        print(f"Machine     : {invoice.machine_name}")
+        print(f"GPS         : {invoice.gps_location}")
+
+    return invoice
 
 # ====================================
 # UPDATE
