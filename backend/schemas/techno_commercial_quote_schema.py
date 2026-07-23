@@ -9,15 +9,17 @@ from pydantic import BaseModel
 # CREATE
 # ====================================
 
-class QuoteCreateSchema(
-
-    BaseModel
-
-):
+class QuoteCreateSchema(BaseModel):
 
     ops_selection_id: int
 
     dewatering_assessment_id: int | None = None
+
+    cleaning_quote: float | None = None
+
+    dewatering_addon: float | None = None
+
+    combined_budgetary_value: float | None = None
 
 
 

@@ -99,7 +99,6 @@ def create_quote_request(
         "customer_request_id":
             ops.customer_request_id,
 
-
         "revision_number":
             revision_number,
 
@@ -107,9 +106,76 @@ def create_quote_request(
             workflow_status,
 
         "dewatering_assessment_id":
-            dewatering_assessment_id,
+            payload.dewatering_assessment_id,
 
-        **quote
+        # --------------------------------
+        # Engine values
+        # --------------------------------
+
+        "recommended_machine":
+            quote["recommended_machine"],
+
+        "service_configuration":
+            quote["service_configuration"],
+
+        "pump_hose_package":
+            quote["pump_hose_package"],
+
+        "approval_gate":
+            quote["approval_gate"],
+
+        "mobilisation_cost":
+            quote["mobilisation_cost"],
+
+        "setup_cost":
+            quote["setup_cost"],
+
+        "execution_cost":
+            quote["execution_cost"],
+
+        "pump_addon_cost":
+            quote["pump_addon_cost"],
+
+        "documentation_buffer":
+            quote["documentation_buffer"],
+
+        "access_support_buffer":
+            quote["access_support_buffer"],
+
+        "overhead_cost":
+            quote["overhead_cost"],
+
+        "contingency_cost":
+            quote["contingency_cost"],
+
+        "margin_percentage":
+            quote["margin_percentage"],
+
+        "margin_value":
+            quote["margin_value"],
+
+        "dewatering_method":
+            quote["dewatering_method"],
+
+        # --------------------------------
+        # User editable fields
+        # --------------------------------
+
+        "cleaning_quote":
+            payload.cleaning_quote
+            if payload.cleaning_quote is not None
+            else quote["cleaning_quote"],
+
+        "dewatering_addon":
+            payload.dewatering_addon
+            if payload.dewatering_addon is not None
+            else quote["dewatering_addon"],
+
+        "combined_budgetary_value":
+            payload.combined_budgetary_value
+            if payload.combined_budgetary_value is not None
+            else quote["combined_budgetary_value"]
+
     }
 
 

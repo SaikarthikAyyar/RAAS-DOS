@@ -39,11 +39,20 @@ async function handleSave(){
 
             await saveQuote({
 
-                ops_selection_id:Number(
+                ops_selection_id: Number(
 
                     selectedOps
 
-                )
+                ),
+
+                cleaning_quote:
+                    quote.cleaning_quote,
+
+                dewatering_addon:
+                    quote.dewatering_addon,
+
+                combined_budgetary_value:
+                    quote.combined_budgetary_value
 
             });
 
@@ -174,11 +183,12 @@ INR Value
         <input
             type="number"
             className="quote-input"
-            value={quote.total_quote ?? ""}
+            value={quote.combined_budgetary_value ?? ""}
+
             onChange={(e)=>
                 setQuote({
                     ...quote,
-                    total_quote:Number(e.target.value)
+                    combined_budgetary_value:Number(e.target.value)
                 })
             }
         />
