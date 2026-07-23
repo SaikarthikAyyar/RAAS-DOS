@@ -8,6 +8,8 @@ from backend.schemas.execution_schema import (
     ExecutionSchema
 )
 
+from datetime import datetime
+
 from backend.repositories.execution_repository import (
     create_execution,
     get_execution,
@@ -125,7 +127,29 @@ def create_execution_request(
 
         remarks=None,
 
-        invoice_synced="YES"
+        invoice_synced="YES",
+
+        latitude=None,
+        longitude=None,
+        speed_kmph=0,
+        heading=0,
+        altitude=0,
+        accuracy_meters=0,
+        gps_timestamp=None,
+        last_update_source="OPS",
+
+        eta_minutes=0,
+        distance_remaining_km=0,
+
+        today_output=0,
+        total_output=0,
+        daily_target=0,
+
+        output_unit="m³",
+
+        proof_uploaded=False
+
+
 
     )
 
@@ -245,6 +269,14 @@ def update_execution_after_allocation(
     db.commit()
 
     db.refresh(execution)
+
+    sync_invoice_from_execution(
+
+        db,
+
+        execution
+
+    )
 
     print("\n========== EXECUTION UPDATED ==========")
 
@@ -372,6 +404,8 @@ def sync_invoice_from_execution(
 
     invoice.current_activity = execution.current_activity
 
+
+
     # ====================================
     # SCHEDULE
     # ====================================
@@ -389,6 +423,63 @@ def sync_invoice_from_execution(
     # ====================================
 
     invoice.transport_status = execution.transport_status
+
+    invoice.gps_location = (
+        None
+        if execution.latitude is None
+        else f"{execution.latitude},{execution.longitude}"
+    )
+
+    invoice.distance_remaining_km = execution.distance_remaining_km
+
+    invoice.eta_minutes = execution.eta_minutes
+
+    logs = invoice.live_execution_log or []
+
+    logs.append(
+
+        {
+
+            "timestamp": str(execution.last_updated),
+
+            "phase": execution.current_phase,
+
+            "activity": execution.current_activity,
+
+            "progress": execution.execution_progress,
+
+            "today_output": execution.today_output,
+
+            "total_output": execution.total_output,
+
+            "transport": execution.transport_status,
+
+            "gps": invoice.gps_location,
+
+
+            "machine": machine.machine_name if machine else None,
+
+            "machine_status": machine.status if machine else None,
+
+            "site": execution.site_location,
+
+
+            "eta": execution.eta_minutes,
+
+            "distance": execution.distance_remaining_km,
+
+            "source": execution.last_update_source
+
+
+        }
+
+    )
+
+    invoice.live_execution_log = logs
+
+
+
+
 
     # ====================================
     # MACHINE DETAILS
@@ -467,6 +558,64 @@ def sync_invoice_from_execution(
         invoice
 
     )
+
+
+def update_execution_progress(
+    db,
+    execution,
+    payload
+):
+
+    execution.execution_progress = payload.execution_progress
+
+    execution.current_activity = payload.current_activity
+
+    execution.transport_status = payload.transport_status
+
+    execution.latitude = payload.latitude
+
+    execution.longitude = payload.longitude
+
+    execution.speed_kmph = payload.speed_kmph
+
+    execution.heading = payload.heading
+
+    execution.altitude = payload.altitude
+
+    execution.accuracy_meters = payload.accuracy_meters
+
+    execution.gps_timestamp = payload.gps_timestamp
+
+    execution.last_update_source = payload.last_update_source
+
+    execution.distance_remaining_km = payload.distance_remaining_km
+
+    execution.eta_minutes = payload.eta_minutes
+
+    execution.today_output = payload.today_output
+
+    execution.total_output = payload.total_output
+
+    execution.daily_target = payload.daily_target
+
+    execution.output_unit = payload.output_unit
+
+    execution.proof_uploaded = payload.proof_uploaded
+
+    execution.last_updated = datetime.utcnow()
+
+    db.commit()
+
+    db.refresh(execution)
+
+    sync_invoice_from_execution(
+        db,
+        execution
+    )
+
+    return execution
+
+
 
 
 # ====================================
