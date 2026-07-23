@@ -91,3 +91,44 @@ class ExecutionSchema(BaseModel):
     class Config:
 
         from_attributes = True
+
+
+# ====================================
+# EXECUTION PROGRESS UPDATE
+# ====================================
+
+class ExecutionProgressUpdateSchema(BaseModel):
+
+    latitude: float | None = None
+
+    longitude: float | None = None
+
+    speed_kmph: float | None = None
+
+    heading: float | None = None
+
+    altitude: float | None = None
+
+    accuracy_meters: float | None = None
+
+    gps_timestamp: datetime | None = None
+
+    eta_minutes: int | None = None
+
+    distance_remaining_km: float | None = None
+
+    today_output: float | None = None
+
+    total_output: float | None = None
+
+    daily_target: float | None = None
+
+    output_unit: str | None = None
+
+    proof_uploaded: bool | None = None
+
+    current_activity: str | None = None
+
+    transport_status: str | None = None
+
+    remarks: str | None = None

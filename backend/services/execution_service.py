@@ -618,6 +618,8 @@ def update_execution_progress(
 
     execution.proof_uploaded = payload.proof_uploaded
 
+    execution.remarks = payload.remarks
+
     execution.last_updated = datetime.utcnow()
 
 

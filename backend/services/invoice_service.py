@@ -249,19 +249,130 @@ def get_invoice_by_job_request(
 
     )
 
+    if invoice is None:
+
+        return None
+
     print("\n========== CUSTOMER POLL ==========")
-    print(f"Job ID      : {job_id}")
 
-    if invoice:
+    print(f"Invoice ID : {invoice.id}")
 
-        print(f"Invoice ID  : {invoice.id}")
-        print(f"Progress    : {invoice.execution_progress}")
-        print(f"Activity    : {invoice.current_activity}")
-        print(f"Transport   : {invoice.transport_status}")
-        print(f"Machine     : {invoice.machine_name}")
-        print(f"GPS         : {invoice.gps_location}")
+    response = {
 
-    return invoice
+        "id": invoice.id,
+
+        # ====================================
+        # JOB TAB
+        # ====================================
+
+        "job": {
+
+            "generated_job_id":
+                invoice.generated_job_id,
+
+            "job_creation_id":
+                invoice.job_creation_id,
+
+            "customer_request_id":
+                invoice.customer_request_id,
+
+            "invoice_status":
+                invoice.invoice_status,
+
+            "planned_start":
+                invoice.planned_start,
+
+            "estimated_completion":
+                invoice.estimated_completion,
+
+            "actual_completion":
+                invoice.actual_completion
+
+        },
+
+        # ====================================
+        # EXECUTION TAB
+        # ====================================
+
+        "execution": {
+
+            "phase":
+                invoice.execution_phase,
+
+            "progress":
+                invoice.execution_progress,
+
+            "customer_visible_status":
+                invoice.customer_visible_status,
+
+            "current_activity":
+                invoice.current_activity,
+
+            "transport_status":
+                invoice.transport_status,
+
+            "gps_location":
+                invoice.gps_location,
+
+            "distance_remaining_km":
+                invoice.distance_remaining_km,
+
+            "eta_minutes":
+                invoice.eta_minutes,
+
+            "delay_days":
+                invoice.delay_days,
+
+            "machine_status":
+                invoice.machine_status,
+
+            "machine_name":
+                invoice.machine_name,
+
+            "machine_code":
+                invoice.machine_code,
+
+            "machine_location":
+                invoice.machine_location,
+
+            "live_execution_log":
+                invoice.live_execution_log
+
+        },
+
+        # ====================================
+        # PERSONNEL TAB (Future)
+        # ====================================
+
+        "personnel": {
+
+            "status":
+                invoice.personnel_status,
+
+            "members":
+                invoice.personnel_json
+
+        },
+
+        # ====================================
+        # ANALYSIS TAB (Future)
+        # ====================================
+
+        "analysis": {}
+
+    }
+
+    print(f"Phase      : {invoice.execution_phase}")
+
+    print(f"Progress   : {invoice.execution_progress}")
+
+    print(f"Activity   : {invoice.current_activity}")
+
+    print(f"Transport  : {invoice.transport_status}")
+
+    print(f"Machine    : {invoice.machine_name}")
+
+    return response
 
 # ====================================
 # UPDATE
