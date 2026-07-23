@@ -77,6 +77,14 @@ material_category:
 surveyData.job?.material_category,
 
 
+job_type:
+surveyData.job?.job_type,
+
+cleaning_date:
+surveyData.job?.cleaning_date,
+
+cleaning_frequency:
+surveyData.job?.cleaning_frequency,
 
 
 
@@ -129,6 +137,30 @@ surveyData.job?.sample_available,
 // ====================================
 // COMPUTED
 // ====================================
+
+
+tank_type:
+surveyData.geometry?.tank_type,
+
+tank_length:
+Number(
+    surveyData.geometry?.length_dia
+) || null,
+
+tank_width:
+Number(
+    surveyData.geometry?.width
+) || null,
+
+tank_depth:
+Number(
+    surveyData.geometry?.sludge_depth
+) || null,
+
+average_output:
+Number(
+    surveyData.geometry?.average_output
+) || null,
 
 estimated_volume:
 
@@ -227,6 +259,18 @@ surveyData.geometry?.access_path_width
 || null,
 
 
+scaffolding_needed:
+surveyData.geometry?.scaffolding_needed,
+
+crane_available:
+surveyData.geometry?.crane_available,
+
+opening_height:
+Number(
+    surveyData.geometry?.opening_height
+) || null,
+
+
 
 access_support:
 surveyData.geometry?.access_support,
@@ -270,6 +314,11 @@ surveyData.safety?.ehs_restriction,
 
 air_supply_available:
 surveyData.safety?.air_supply_available,
+
+power_distance:
+Number(
+    surveyData.safety?.power_distance
+) || null,
 
 // ====================================
 // SECTION E

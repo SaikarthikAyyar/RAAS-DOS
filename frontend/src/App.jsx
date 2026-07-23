@@ -59,7 +59,10 @@ function App() {
 
           <Route path="quote" element={<TechnoCommercialQuote />} />
 
-
+          <Route
+              path="approval"
+              element={<ApprovalBoard />}
+          />
 
           <Route
               path="approval/:quoteId"

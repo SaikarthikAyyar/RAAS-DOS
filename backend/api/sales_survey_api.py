@@ -16,6 +16,8 @@ from backend.services.sales_survey_service import (
     create_sales_survey_request
 )
 
+from backend.schemas.sales_survey_schema import SalesSurveyResponseSchema
+
 from backend.services.sales_survey_service import (
 
     get_sales_survey_request,
@@ -173,7 +175,8 @@ def customer_surveys(
 # ====================================
 
 @router.get(
-    "/sales-surveys/customer/{customer_request_id}/{sales_survey_id}"
+    "/sales-surveys/customer/{customer_request_id}/{sales_survey_id}",
+    response_model=SalesSurveyResponseSchema
 )
 def customer_survey(
         customer_request_id: int,

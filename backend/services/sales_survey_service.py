@@ -436,7 +436,10 @@ def get_customer_survey_request(
 
             "ehs_restriction":
 
-            survey.ehs_restriction
+            survey.ehs_restriction,
+
+            "power_distance":
+            survey.power_distance
 
         },
 

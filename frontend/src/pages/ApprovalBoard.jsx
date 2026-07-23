@@ -38,7 +38,38 @@ export default function ApprovalBoard(){
 
     const { quoteId } = useParams();
 
+    if (!quoteId) {
+
+        return (
+
+            <div
+                style={{
+                    padding: "40px",
+                    color: "#ffffff",
+                    textAlign: "center"
+                }}
+            >
+
+                <h2>Approval Board</h2>
+
+                <p style={{ marginTop: "20px" }}>
+                    No approval request has been selected.
+                </p>
+
+                <p>
+                    Please open the Approval Board from the Manager Dashboard by selecting a received enquiry.
+                </p>
+
+            </div>
+
+        );
+
+    }
+
     const [approval,setApproval] = useState(null);
+
+
+
 
     // ====================================
     // STATE

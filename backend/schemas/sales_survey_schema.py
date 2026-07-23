@@ -159,3 +159,92 @@ class SalesSurveySchema(BaseModel):
     # ====================================
 
     status:Optional[str]="SURVEY_COMPLETED"
+
+
+
+
+class CustomerSection(BaseModel):
+    company_name: Optional[str]
+    plant_site_location: Optional[str]
+    contact_person: Optional[str]
+    contact_number: Optional[str]
+    nearest_hub: Optional[str]
+    urgency: Optional[str]
+    survey_date: Optional[str]
+
+
+class JobSection(BaseModel):
+    job_type: Optional[str]
+    material_category: Optional[str]
+    cleaning_date: Optional[str]
+    cleaning_frequency: Optional[str]
+    sludge_hardness: Optional[str]
+    debris_level: Optional[str]
+    water_visibility: Optional[str]
+    bulk_density: Optional[float]
+    pumpable: Optional[str]
+    large_object_type: Optional[str]
+    hazard_level: Optional[str]
+    ph_min: Optional[float]
+    ph_max: Optional[float]
+    flow_after_agitation: Optional[str]
+    temperature_range: Optional[str]
+    sample_available: Optional[str]
+
+
+class GeometrySection(BaseModel):
+    tank_type: Optional[str]
+    length_dia: Optional[float]
+    width: Optional[float]
+    sludge_depth: Optional[float]
+    estimated_volume: Optional[float]
+    average_output: Optional[float]
+    opening_length: Optional[float]
+    opening_width: Optional[float]
+    height_from_ground: Optional[float]
+    drop_to_floor: Optional[float]
+    setup_distance: Optional[float]
+    vertical_lift: Optional[float]
+    hose_distance: Optional[float]
+    access_path_width: Optional[float]
+    access_support: Optional[str]
+    customer_support: Optional[str]
+
+
+class SafetySection(BaseModel):
+    power_available: Optional[str]
+    water_available: Optional[str]
+    air_supply_available: Optional[str]
+    confined_space: Optional[str]
+    ventilation_required: Optional[str]
+    gas_testing_required: Optional[str]
+    ehs_restriction: Optional[str]
+    power_distance: Optional[float]
+
+
+class PumpSection(BaseModel):
+    discharge_pit_dimension: Optional[str]
+    discharge_medium: Optional[str]
+    disposal_route: Optional[str]
+    disposal_responsibility: Optional[str]
+    discharge_point_distance: Optional[float]
+    hose_route_bends: Optional[int]
+
+
+class DewateringSection(BaseModel):
+    pass
+
+
+class InsightSection(BaseModel):
+    customer_pain: Optional[str]
+
+
+class SalesSurveyResponseSchema(BaseModel):
+    id: int
+    customer: CustomerSection
+    job: JobSection
+    geometry: GeometrySection
+    safety: SafetySection
+    pump: PumpSection
+    dewatering: DewateringSection
+    insights: InsightSection
