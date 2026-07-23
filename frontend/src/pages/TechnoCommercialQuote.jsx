@@ -149,7 +149,7 @@ export default function TechnoCommercialQuote() {
 
             <div className="quote-header">
 
-                <h1>
+                <h1 style={{ color: "#ffffff" }}>
 
                     Techno-Commercial Quote
 

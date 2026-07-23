@@ -116,61 +116,91 @@ def create_ops_selection_request(
 
     ops_payload = {
 
-    "sales_survey_id":
-        payload.sales_survey_id,
+        "sales_survey_id":
+            payload.sales_survey_id,
 
-    "customer_request_id":
-        sales_survey.customer_request_id,
+        "customer_request_id":
+            sales_survey.customer_request_id,
 
-    "doability":
-        ops_output["doability"],
+        "doability":
+            payload.doability
+            if payload.doability is not None
+            else ops_output["doability"],
 
-    "service_configuration":
-        ops_output["service_configuration"],
+        "service_configuration":
+            payload.service_configuration
+            if payload.service_configuration is not None
+            else ops_output["service_configuration"],
 
-    "recommended_machine":
-        ops_output["recommended_machine"],
+        "recommended_machine":
+            payload.recommended_machine
+            if payload.recommended_machine is not None
+            else ops_output["recommended_machine"],
 
-    "pump_hose_package":
-        ops_output["pump_hose_package"],
+        "pump_hose_package":
+            payload.pump_hose_package
+            if payload.pump_hose_package is not None
+            else ops_output["pump_hose_package"],
 
-    "accessories":
-        ops_output["accessories"],
+        "accessories":
+            payload.accessories
+            if payload.accessories is not None
+            else ops_output["accessories"],
 
-    "mobilisation_days":
-        ops_output["mobilisation_days"],
+        "mobilisation_days":
+            payload.mobilisation_days
+            if payload.mobilisation_days is not None
+            else ops_output["mobilisation_days"],
 
-    "setup_days":
-        ops_output["setup_days"],
+        "setup_days":
+            payload.setup_days
+            if payload.setup_days is not None
+            else ops_output["setup_days"],
 
-    "execution_days":
-        ops_output["execution_days"],
+        "execution_days":
+            payload.execution_days
+            if payload.execution_days is not None
+            else ops_output["execution_days"],
 
-    "ops_engine_version":
-        ops_output.get("ops_engine_version"),
+        "ops_engine_version":
+            payload.ops_engine_version
+            if payload.ops_engine_version is not None
+            else ops_output.get("ops_engine_version"),
 
-    "demob_days":
-        ops_output["demob_days"],
+        "demob_days":
+            payload.demob_days
+            if payload.demob_days is not None
+            else ops_output["demob_days"],
 
-    "total_job_days":
-        ops_output["total_job_days"],
+        "total_job_days":
+            payload.total_job_days
+            if payload.total_job_days is not None
+            else ops_output["total_job_days"],
 
-    "manpower_required":
-        ops_output["manpower_required"],
+        "manpower_required":
+            payload.manpower_required
+            if payload.manpower_required is not None
+            else ops_output["manpower_required"],
 
-    "approval_gate":
-        ops_output["approval_gate"],
+        "approval_gate":
+            payload.approval_gate
+            if payload.approval_gate is not None
+            else ops_output["approval_gate"],
 
-    "internal_next_action":
-        ops_output["internal_next_action"],
+        "internal_next_action":
+            payload.internal_next_action
+            if payload.internal_next_action is not None
+            else ops_output["internal_next_action"],
 
-    "selection_reason":
-        ops_output["selection_reason"],
+        "selection_reason":
+            payload.selection_reason
+            if payload.selection_reason is not None
+            else ops_output["selection_reason"],
 
-    "workflow_status":
-        "COMPLETED"
+        "workflow_status":
+            "COMPLETED"
 
-}
+    }
 
 
 
