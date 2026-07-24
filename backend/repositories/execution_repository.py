@@ -258,7 +258,10 @@ def start_phase(
 
 ):
 
+    execution.workflow_status = "CURRENTLY_WORKING"
+
     if execution.current_phase == "PHASE_1":
+
 
         execution.phase_1_status = "IN_PROGRESS"
 
@@ -476,29 +479,15 @@ def complete_phase(
 
 
                 next_schedule = (
-
                     db.query(
-
                         MachineSchedule
-
                     )
-
                     .filter(
-
                         MachineSchedule.machine_id == machine.id,
-
+                        MachineSchedule.queue_position == schedule.queue_position + 1,
                         MachineSchedule.schedule_status == "QUEUED"
-
                     )
-
-                    .order_by(
-
-                        MachineSchedule.queue_position
-
-                    )
-
                     .first()
-
                 )
 
                 if next_schedule:

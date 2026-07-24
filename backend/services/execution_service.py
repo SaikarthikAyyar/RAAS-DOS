@@ -578,11 +578,28 @@ def sync_invoice_from_execution(
 
 def update_execution_progress(
     db,
-    execution,
+    execution_id,
     payload
 ):
 
-    execution.execution_progress = payload.execution_progress
+    execution = get_execution(
+
+        db,
+
+        execution_id
+
+    )
+
+    if execution is None:
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail="Execution not found."
+
+        )
+
 
     execution.current_activity = payload.current_activity
 
@@ -602,7 +619,7 @@ def update_execution_progress(
 
     execution.gps_timestamp = payload.gps_timestamp
 
-    execution.last_update_source = payload.last_update_source
+    execution.last_update_source = "OPS"
 
     execution.distance_remaining_km = payload.distance_remaining_km
 
@@ -744,13 +761,9 @@ def start_execution_phase(
 
             MachineSchedule.job_creation_id == execution.job_creation_id,
 
+            MachineSchedule.queue_position == 1,
+
             MachineSchedule.schedule_status == "QUEUED"
-
-        )
-
-        .order_by(
-
-            MachineSchedule.queue_position
 
         )
 
@@ -768,7 +781,7 @@ def start_execution_phase(
 
         print(f"Machine : {current_schedule.machine_id}")
 
-        current_schedule.schedule_status = "IN_PROGRESS"
+        current_schedule.schedule_status = "ACTIVE"
 
         machine = (
 
@@ -832,6 +845,100 @@ def start_execution_phase(
 
 
 # ====================================
+# FUTURE: AUTOMATIC EXECUTION PROGRESS
+# ====================================
+#
+# execution_progress must NOT be manually entered once live tracking
+# is integrated. It should be automatically calculated from the
+# execution state during each phase.
+#
+# -------------------------
+# PHASE 1 (0% -> 33%)
+# -------------------------
+# Objective:
+# Machine mobilisation from warehouse to customer site.
+#
+# Inputs:
+# - Total route distance
+# - Remaining distance (GPS)
+#
+# Formula:
+# phase1_progress =
+#     (distance_covered / total_route_distance) * 100
+#
+# Overall execution contribution:
+# execution_progress =
+#     phase1_progress * 0.33
+#
+# Reaches approximately 33% once machine reaches site.
+#
+#
+# -------------------------
+# PHASE 2 (33% -> 66%)
+# -------------------------
+# Objective:
+# Actual cleaning / dredging / dewatering operation.
+#
+# Inputs:
+# - Estimated work volume
+# - Total output completed
+#
+# Formula:
+# phase2_progress =
+#     (total_output / estimated_volume) * 100
+#
+# Overall execution contribution:
+# execution_progress =
+#     33 + (phase2_progress * 0.33)
+#
+# Phase automatically completes once total_output >= estimated_volume.
+#
+#
+# -------------------------
+# PHASE 3 (66% -> 100%)
+# -------------------------
+# Objective:
+# Demobilisation + return to warehouse + maintenance.
+#
+# Stage A:
+# Return journey
+# - Remaining distance
+# - Total return distance
+#
+# Stage B:
+# Maintenance duration
+# - Planned repair duration
+# - Actual repair elapsed time
+#
+# Combined Phase 3 Progress:
+#
+# return_progress =
+#     distance_covered / total_return_distance
+#
+# maintenance_progress =
+#     elapsed_repair_time / planned_repair_time
+#
+# phase3_progress =
+#     weighted(return_progress, maintenance_progress)
+#
+# Overall execution contribution:
+# execution_progress =
+#     66 + (phase3_progress * 0.34)
+#
+# When execution_progress reaches 100:
+# - workflow_status = EXECUTION_COMPLETED
+# - perform FIFO dequeue
+# - activate next queued schedule
+# - release machine if queue empty
+# - sync invoice
+# - update customer request status
+#
+# IMPORTANT:
+# execution_progress should become a computed field derived from
+# telemetry and operational metrics rather than a user-editable value.
+
+
+# ====================================
 # COMPLETE PHASE
 # ====================================
 
@@ -844,11 +951,28 @@ def complete_execution_phase(
 ):
 
     execution = get_execution(
-
         db,
-
         execution_id
+    )
 
+    if execution is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Execution not found."
+        )
+
+    current_schedule = (
+        db.query(MachineSchedule)
+        .filter(
+            MachineSchedule.job_creation_id == execution.job_creation_id,
+            MachineSchedule.schedule_status == "ACTIVE"
+        )
+        .first()
+    )
+
+    execution = complete_phase(
+        db,
+        execution
     )
 
     if execution is None:
@@ -861,37 +985,53 @@ def complete_execution_phase(
 
         )
 
-    execution = complete_phase(
 
-        db,
 
-        execution
+    # ====================================
+    # PHASE NOT FINISHED YET
+    # ====================================
 
-    )
+    if execution.workflow_status != "EXECUTION_COMPLETED":
+
+        sync_invoice_from_execution(
+            db,
+            execution
+        )
+
+        return execution
 
     # ====================================
     # COMPLETE CURRENT MACHINE SCHEDULE
     # ====================================
 
-    current_schedule = (
+    print("Execution Job ID :", execution.job_creation_id)
 
-        db.query(
-
-            MachineSchedule
-
-        )
-
-        .filter(
-
-            MachineSchedule.job_creation_id == execution.job_creation_id,
-
-            MachineSchedule.schedule_status == "IN_PROGRESS"
-
-        )
-
-        .first()
-
+    all_schedules = (
+        db.query(MachineSchedule)
+        .all()
     )
+
+    for s in all_schedules:
+        print(
+            s.id,
+            s.job_creation_id,
+            s.machine_id,
+            s.queue_position,
+            s.schedule_status
+        )
+
+
+
+
+    print("\n===== CURRENT SCHEDULE =====")
+    print(current_schedule)
+
+    if current_schedule:
+        print(current_schedule.id)
+        print(current_schedule.machine_id)
+        print(current_schedule.schedule_status)
+        print(current_schedule.queue_position)
+
 
     if current_schedule:
 
@@ -997,7 +1137,7 @@ def complete_execution_phase(
 
         print(f"Machine : {machine_id}")
 
-        next_schedule.schedule_status = "IN_PROGRESS"
+        next_schedule.schedule_status = "ACTIVE"
 
         machine = (
 
@@ -1249,9 +1389,16 @@ def complete_execution_phase(
 
 
 
-
-
     if execution.workflow_status == "EXECUTION_COMPLETED":
+
+
+        sync_invoice_from_execution(
+
+            db,
+
+            execution
+
+        )
 
         update_customer_request_status(
 

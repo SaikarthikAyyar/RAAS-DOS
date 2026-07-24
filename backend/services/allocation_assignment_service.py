@@ -195,21 +195,29 @@ def allocate_resources(
 
         db.add(schedule)
 
-        machine.queue_count = queue_position
+        machine.queue_count = (
+            db.query(
+                MachineSchedule
+            )
+            .filter(
+                MachineSchedule.machine_id == machine.id
+            )
+            .count()
+        )
 
         if queue_position == 1:
-            machine.status = "ALLOCATED"
-        else:
-            machine.status = "QUEUED"
 
-        machine.current_job_id = job.id
-        machine.current_site = site_location
+            machine.status = "ALLOCATED"
+
+            machine.current_job_id = job.id
+
+            machine.current_site = site_location
 
         db.add(machine)
 
         db.flush()
-        db.refresh(machine)
 
+        db.refresh(machine)
 
 
     # ====================================
