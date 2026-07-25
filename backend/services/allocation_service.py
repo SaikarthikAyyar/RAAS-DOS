@@ -85,7 +85,8 @@ def get_allocation_dashboard(
     job_id
 
 ):
-    
+
+    print(f"\n========== ALLOCATION DASHBOARD : job_id={job_id} ==========")
 
     job = (
 
@@ -164,7 +165,9 @@ def get_allocation_dashboard(
 
             .filter(
 
-                MachineSchedule.machine_id == machine.id
+                MachineSchedule.machine_id == machine.id,
+
+                MachineSchedule.schedule_status.in_(["QUEUED", "ACTIVE"])
 
             )
 
@@ -178,11 +181,16 @@ def get_allocation_dashboard(
 
         )
 
+        print(
+            f"[QUEUE] machine={machine.id} ({machine.machine_code}) "
+            f"live_entries={len(queue)}"
+        )
+
         queue_items = []
 
         for item in queue:
 
-            job = (
+            item_job = (
 
                 db.query(JobCreation)
 
@@ -196,13 +204,20 @@ def get_allocation_dashboard(
 
             )
 
+            print(
+                f"  [QUEUE ITEM] pos={item.queue_position} "
+                f"job={item.job_creation_id} "
+                f"generated_id={item_job.generated_job_id if item_job else None} "
+                f"status={item.schedule_status}"
+            )
+
             queue_items.append({
 
                 "queue_position": item.queue_position,
 
                 "job_creation_id": item.job_creation_id,
 
-                "generated_job_id": job.generated_job_id if job else None,
+                "generated_job_id": item_job.generated_job_id if item_job else None,
 
                 "site_location": item.site_location,
 
@@ -313,6 +328,12 @@ def get_allocation_dashboard(
 
         })
 
+
+    print(
+        f"\n[JOB SUMMARY] job_id={job.id} "
+        f"generated_id={job.generated_job_id} "
+        f"status={job.workflow_status}"
+    )
 
     job_summary = {
 

@@ -404,157 +404,145 @@ def complete_phase(
 
 ):
 
+    print("\n========== PHASE TRANSITION ==========")
+    print(f"Execution ID   : {execution.id}")
+    print(f"Current Phase  : {execution.current_phase}")
+
     if execution.current_phase == "PHASE_1":
 
         execution.phase_1_status = "COMPLETED"
-
         execution.current_phase = "PHASE_2"
 
     elif execution.current_phase == "PHASE_2":
 
         execution.phase_2_status = "COMPLETED"
-
         execution.current_phase = "PHASE_3"
 
     elif execution.current_phase == "PHASE_3":
 
         execution.phase_3_status = "COMPLETED"
-
         execution.workflow_status = "EXECUTION_COMPLETED"
-
         execution.execution_progress = 100
-
         execution.current_activity = "Execution Completed"
-
         execution.transport_status = "COMPLETED"
-
         execution.actual_completion = date.today()
 
-
-        schedules = (
-
-            db.query(
-
-                MachineSchedule
-
-            )
-
-            .filter(
-
-                MachineSchedule.job_creation_id ==
-
-                execution.job_creation_id
-
-            )
-
-            .all()
-
-        )
-
-        for schedule in schedules:
-
-            schedule.schedule_status = "COMPLETED"
-
-            machine = (
-
-                db.query(
-
-                    MachineInventory
-
-                )
-
-                .filter(
-
-                    MachineInventory.id ==
-
-                    schedule.machine_id
-
-                )
-
-                .first()
-
-            )
-
-            if machine:
-
-
-                next_schedule = (
-                    db.query(
-                        MachineSchedule
-                    )
-                    .filter(
-                        MachineSchedule.machine_id == machine.id,
-                        MachineSchedule.queue_position == schedule.queue_position + 1,
-                        MachineSchedule.schedule_status == "QUEUED"
-                    )
-                    .first()
-                )
-
-                if next_schedule:
-
-                    next_schedule.schedule_status = "ACTIVE"
-
-                    machine.status = "ALLOCATED"
-
-                    machine.current_job_id = next_schedule.job_creation_id
-
-                    machine.current_site = next_schedule.site_location
-
-                else:
-
-                    machine.status = "AVAILABLE"
-
-                    machine.current_job_id = None
-
-
-                machine.queue_count = max(
-
-                    machine.queue_count - 1,
-
-                    0
-
-                )
-
-        invoice = (
-
-            db.query(
-
-                Invoice
-
-            )
-
-            .filter(
-
-                Invoice.job_creation_id ==
-
-                execution.job_creation_id
-
-            )
-
-            .first()
-
-        )
-
-        if invoice:
-
-            invoice.execution_progress = 100
-
-            invoice.execution_phase = "COMPLETED"
-
-            invoice.invoice_status = "COMPLETED"
-
-            invoice.customer_visible_status = "Job Completed"
-
-            invoice.current_activity = "Execution Completed"
-
-            invoice.transport_status = "COMPLETED"
+    print(f"New Phase       : {execution.current_phase}")
+    print(f"Workflow Status : {execution.workflow_status}")
 
     db.commit()
-
-    db.refresh(
-
-        execution
-
-    )
+    db.refresh(execution)
 
     return execution
+
+
+
+# ====================================
+# DEQUEUE EXECUTION SCHEDULES
+# ====================================
+
+def dequeue_execution_schedules(
+
+    db,
+
+    execution
+
+):
+    """
+    Authoritative dequeue. Matches on execution_id only (exact FK
+    link set at allocation time) — never on site/date, which are
+    single-valued on Execution but can be multi-valued across a
+    job's MachineSchedule rows. Returns the list of schedule rows
+    it completed, so the caller knows which machines to check for
+    promotion.
+    """
+
+    print("\n========== DEQUEUE (execution_id-linked) ==========")
+    print(f"Execution ID    : {execution.id}")
+    print(f"Job Creation ID : {execution.job_creation_id}")
+
+    completed_schedules = (
+        db.query(MachineSchedule)
+        .filter(MachineSchedule.execution_id == execution.id)
+        .all()
+    )
+
+    if not completed_schedules:
+        print("[ERROR] No schedules linked to this execution_id.")
+        return []
+
+    machine_ids = {s.machine_id for s in completed_schedules}
+
+    for machine_id in machine_ids:
+
+        # Row-lock this machine for the duration of the transaction.
+        # Serializes concurrent completions/allocations on the SAME
+        # machine only -- unrelated machines are never blocked.
+        machine = (
+            db.query(MachineInventory)
+            .filter(MachineInventory.id == machine_id)
+            .with_for_update()
+            .first()
+        )
+
+        if machine is None:
+            print(f"[WARNING] Machine {machine_id} not found, skipping")
+            continue
+
+        this_machines_completed = [
+            s for s in completed_schedules if s.machine_id == machine_id
+        ]
+
+        for s in this_machines_completed:
+            print(
+                f"[DEQUEUE] schedule={s.id} machine={machine_id} "
+                f"job={s.job_creation_id} pos={s.queue_position} -> COMPLETED"
+            )
+            s.schedule_status = "COMPLETED"
+            s.actual_completion = date.today()
+
+        # Lock and re-fetch everything still QUEUED/ACTIVE for this
+        # machine, in position order, then compact to 1,2,3...
+        remaining = (
+            db.query(MachineSchedule)
+            .filter(
+                MachineSchedule.machine_id == machine_id,
+                MachineSchedule.schedule_status.in_(["QUEUED", "ACTIVE"])
+            )
+            .order_by(MachineSchedule.queue_position)
+            .with_for_update()
+            .all()
+        )
+
+        for index, s in enumerate(remaining, start=1):
+            if s.queue_position != index:
+                print(
+                    f"[RENUMBER] schedule={s.id} machine={machine_id} "
+                    f"pos {s.queue_position} -> {index}"
+                )
+                s.queue_position = index
+
+        if remaining:
+            next_schedule = remaining[0]
+            next_schedule.schedule_status = "ACTIVE"
+            machine.status = "ALLOCATED"
+            machine.current_job_id = next_schedule.job_creation_id
+            machine.current_site = next_schedule.site_location
+            print(
+                f"[PROMOTE] machine={machine_id} -> job="
+                f"{next_schedule.job_creation_id} (schedule={next_schedule.id}, "
+                f"pos 1, ACTIVE)"
+            )
+        else:
+            machine.status = "AVAILABLE"
+            machine.current_job_id = None
+            machine.current_site = None
+            print(f"[RELEASE] machine={machine_id} -> AVAILABLE, queue empty")
+
+        machine.queue_count = len(remaining)
+        print(f"[QUEUE COUNT] machine={machine_id} -> {machine.queue_count}")
+
+    db.commit()
+    print("========== DEQUEUE COMPLETE ==========\n")
+
+    return completed_schedules

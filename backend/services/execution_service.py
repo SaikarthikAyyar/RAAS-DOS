@@ -16,7 +16,8 @@ from backend.repositories.execution_repository import (
     get_execution_by_job,
     list_executions,
     start_phase,
-    complete_phase
+    complete_phase,
+    dequeue_execution_schedules
 )
 
 from backend.repositories.job_creation_repository import (
@@ -253,6 +254,33 @@ def update_execution_after_allocation(
         .order_by(MachineInventory.id)
         .first()
     )
+
+    schedules = (
+        db.query(MachineSchedule)
+        .filter(
+            MachineSchedule.job_creation_id == job.id
+        )
+        .all()
+    )
+
+    print("\n========== LINK EXECUTION TO MACHINE SCHEDULE ==========")
+
+    if not schedules:
+        print(f"[WARNING] No machine schedules found for job {job.id}")
+
+    for schedule in schedules:
+
+        schedule.execution_id = execution.id
+
+        print(f"Schedule ID          : {schedule.id}")
+        print(f"Execution ID         : {execution.id}")
+        print(f"Machine ID           : {schedule.machine_id}")
+        print(f"Site                 : {schedule.site_location}")
+        print(f"Planned Start        : {schedule.planned_start}")
+        print(f"Planned Completion   : {schedule.planned_completion}")
+        print("---")
+
+    db.commit()
 
     execution.workflow_status = "READY"
 
@@ -759,7 +787,13 @@ def start_execution_phase(
 
         .filter(
 
-            MachineSchedule.job_creation_id == execution.job_creation_id,
+            MachineSchedule.execution_id == execution.id,
+
+            MachineSchedule.site_location == execution.site_location,
+
+            MachineSchedule.planned_start == execution.planned_start,
+
+            MachineSchedule.planned_completion == execution.estimated_completion,
 
             MachineSchedule.queue_position == 1,
 
@@ -950,10 +984,7 @@ def complete_execution_phase(
 
 ):
 
-    execution = get_execution(
-        db,
-        execution_id
-    )
+    execution = get_execution(db, execution_id)
 
     if execution is None:
         raise HTTPException(
@@ -961,453 +992,102 @@ def complete_execution_phase(
             detail="Execution not found."
         )
 
-    current_schedule = (
-        db.query(MachineSchedule)
-        .filter(
-            MachineSchedule.job_creation_id == execution.job_creation_id,
-            MachineSchedule.schedule_status == "ACTIVE"
-        )
-        .first()
-    )
+    print("\n========== EXECUTION SERVICE : COMPLETE PHASE ==========")
+    print(f"Execution ID    : {execution.id}")
+    print(f"Job Creation ID : {execution.job_creation_id}")
+    print(f"Phase Before    : {execution.current_phase}")
 
-    execution = complete_phase(
-        db,
-        execution
-    )
+    execution = complete_phase(db, execution)
 
     if execution is None:
-
         raise HTTPException(
-
             status_code=404,
-
             detail="Execution not found."
-
         )
-
-
-
-    # ====================================
-    # PHASE NOT FINISHED YET
-    # ====================================
 
     if execution.workflow_status != "EXECUTION_COMPLETED":
 
-        sync_invoice_from_execution(
-            db,
-            execution
-        )
+        print(f"Phase After     : {execution.current_phase} (not final yet)")
+
+        sync_invoice_from_execution(db, execution)
 
         return execution
 
+    print("Final phase reached -> dequeuing machine schedules")
+
+    affected_schedules = dequeue_execution_schedules(db, execution)
+
     # ====================================
-    # COMPLETE CURRENT MACHINE SCHEDULE
+    # RESET NEXT EXECUTION PER PROMOTED MACHINE
     # ====================================
 
-    print("Execution Job ID :", execution.job_creation_id)
+    promoted_machine_ids = {s.machine_id for s in affected_schedules}
 
-    all_schedules = (
-        db.query(MachineSchedule)
-        .all()
-    )
+    for machine_id in promoted_machine_ids:
 
-    for s in all_schedules:
+        promoted = (
+            db.query(MachineSchedule)
+            .filter(
+                MachineSchedule.machine_id == machine_id,
+                MachineSchedule.queue_position == 1,
+                MachineSchedule.schedule_status == "ACTIVE"
+            )
+            .first()
+        )
+
+        if not promoted:
+            print(f"[NEXT] Machine {machine_id} : queue empty, nothing to promote")
+            continue
+
         print(
-            s.id,
-            s.job_creation_id,
-            s.machine_id,
-            s.queue_position,
-            s.schedule_status
+            f"[NEXT] Machine {machine_id} : promoting job "
+            f"{promoted.job_creation_id} (schedule {promoted.id})"
         )
 
+        next_execution = get_execution_by_job(db, promoted.job_creation_id)
 
+        if not next_execution:
+            print(f"[NEXT] No execution row for job {promoted.job_creation_id}")
+            continue
 
-
-    print("\n===== CURRENT SCHEDULE =====")
-    print(current_schedule)
-
-    if current_schedule:
-        print(current_schedule.id)
-        print(current_schedule.machine_id)
-        print(current_schedule.schedule_status)
-        print(current_schedule.queue_position)
-
-
-    if current_schedule:
-
-        print("\n========== FIFO DEQUEUE ==========")
-
-        print(f"Completed Job : {execution.job_creation_id}")
-
-        print(f"Machine ID : {current_schedule.machine_id}")
-
-        print(f"Queue Position : {current_schedule.queue_position}")
-
-        machine_id = current_schedule.machine_id
-
-        db.delete(current_schedule)
-
-        db.flush()
-
-    else:
-
-        machine_id = None
-
-    db.commit()
-
-    # ====================================
-    # PROMOTE NEXT FIFO JOB
-    # ====================================
-
-    if machine_id is not None:
-
-        remaining_jobs = (
-
-            db.query(
-
-                MachineSchedule
-
-            )
-
-            .filter(
-
-                MachineSchedule.machine_id == machine_id
-
-            )
-
-            .order_by(
-
-                MachineSchedule.queue_position
-
-            )
-
-            .all()
-
-        )
-
-        print("\n========== FIFO QUEUE ==========")
-
-        print(f"Remaining Jobs : {len(remaining_jobs)}")
-
-        for index, schedule in enumerate(remaining_jobs, start=1):
-
-            old_position = schedule.queue_position
-
-            schedule.queue_position = index
-
-            print(
-
-                f"Job {schedule.job_creation_id} : "
-
-                f"{old_position} -> {index}"
-
-            )
+        next_execution.workflow_status = "READY"
+        next_execution.current_phase = "PHASE_1"
+        next_execution.execution_progress = 0
+        next_execution.phase_1_status = "PENDING"
+        next_execution.phase_2_status = "PENDING"
+        next_execution.phase_3_status = "PENDING"
+        next_execution.current_activity = "Resources Allocated"
+        next_execution.site_location = promoted.site_location
+        next_execution.planned_start = promoted.planned_start
+        next_execution.estimated_completion = promoted.planned_completion
+        next_execution.actual_completion = None
+        next_execution.delay_days = 0
+        next_execution.transport_status = "WAITING"
 
         db.commit()
+        db.refresh(next_execution)
 
-    # ====================================
-    # START NEXT FIFO JOB
-    # ====================================
+        # Relink promoted schedule to its new execution -- without this,
+        # the NEXT completion on this machine hits the same failure
+        # mode this whole fix addresses.
+        promoted.execution_id = next_execution.id
+        db.commit()
 
-    next_schedule = (
-
-        db.query(
-
-            MachineSchedule
-
+        print(
+            f"[NEXT] Execution {next_execution.id} reset to READY/PHASE_1, "
+            f"relinked to schedule {promoted.id}"
         )
 
-        .filter(
+        sync_invoice_from_execution(db, next_execution)
 
-            MachineSchedule.machine_id == machine_id,
+    sync_invoice_from_execution(db, execution)
 
-            MachineSchedule.queue_position == 1
-
-        )
-
-        .first()
-
+    update_customer_request_status(
+        db,
+        execution.customer_request_id,
+        "EXECUTION_COMPLETED"
     )
 
-    if next_schedule:
-
-        print("\n========== NEXT FIFO JOB ==========")
-
-        print(f"Job : {next_schedule.job_creation_id}")
-
-        print(f"Machine : {machine_id}")
-
-        next_schedule.schedule_status = "ACTIVE"
-
-        machine = (
-
-            db.query(
-
-                MachineInventory
-
-            )
-
-            .filter(
-
-                MachineInventory.id == machine_id
-
-            )
-
-            .first()
-
-        )
-
-        if machine:
-
-            next_job = (
-
-                get_job(
-
-                    db,
-
-                    next_schedule.job_creation_id
-
-                )
-
-            )
-
-            machine.status = "ALLOCATED"
-
-            machine.current_job_id = next_job.id
-
-            machine.current_site = next_schedule.site_location
-
-            machine.queue_count = (
-
-                db.query(
-
-                    MachineSchedule
-
-                )
-
-                .filter(
-
-                    MachineSchedule.machine_id == machine.id
-
-                )
-
-                .count()
-
-            )
-
-            print(f"Machine Status : {machine.status}")
-
-            print(f"Current Job : {machine.current_job_id}")
-
-            print(f"Queue Count : {machine.queue_count}")
-
-        db.commit()
-
-        # ====================================
-        # UPDATE NEXT EXECUTION
-        # ====================================
-
-        next_execution = (
-
-            get_execution_by_job(
-
-                db,
-
-                next_schedule.job_creation_id
-
-            )
-
-        )
-
-        if next_execution:
-
-            # ====================================
-            # RESET EXECUTION STATE
-            # ====================================
-
-            next_execution.workflow_status = "READY"
-
-            next_execution.current_phase = "PHASE_1"
-
-            next_execution.execution_progress = 0
-
-            next_execution.phase_1_status = "PENDING"
-
-            next_execution.phase_2_status = "PENDING"
-
-            next_execution.phase_3_status = "PENDING"
-
-            # ====================================
-            # RESOURCE DETAILS
-            # ====================================
-
-            next_execution.current_activity = "Resources Allocated"
-
-            next_execution.site_location = next_schedule.site_location
-
-            # ====================================
-            # SCHEDULE
-            # ====================================
-
-            next_execution.planned_start = next_schedule.planned_start
-
-            next_execution.estimated_completion = (
-
-                next_schedule.planned_completion
-
-            )
-
-            next_execution.actual_completion = None
-
-            next_execution.delay_days = 0
-
-            # ====================================
-            # TRANSPORT
-            # ====================================
-
-            next_execution.transport_status = "WAITING"
-
-            print("\n========== EXECUTION RESET ==========")
-
-            print(
-
-                f"Execution : {next_execution.id}"
-
-            )
-
-            print(
-
-                f"Workflow : {next_execution.workflow_status}"
-
-            )
-
-            print(
-
-                f"Phase : {next_execution.current_phase}"
-
-            )
-
-            print(
-
-                f"Transport : {next_execution.transport_status}"
-
-            )
-
-            print("\n========== EXECUTION PROMOTED ==========")
-
-            print(
-
-                f"Execution : {next_execution.id}"
-
-            )
-
-            print(
-
-                f"Job : {next_execution.job_creation_id}"
-
-            )
-
-            print(
-
-                f"Site : {next_execution.site_location}"
-
-            )
-
-            db.commit()
-
-            db.refresh(next_execution)
-
-            sync_invoice_from_execution(
-
-                db,
-
-                next_execution
-
-            )
-
-    else:
-
-        print("\n========== MACHINE RELEASE ==========")
-
-        machine = (
-
-            db.query(
-
-                MachineInventory
-
-            )
-
-            .filter(
-
-                MachineInventory.id == machine_id
-
-            )
-
-            .first()
-
-        )
-
-        if machine:
-
-            machine.status = "AVAILABLE"
-
-            machine.current_job_id = None
-
-            machine.current_site = None
-
-            machine.queue_count = 0
-
-            print(
-
-                f"Machine : {machine.machine_name}"
-
-            )
-
-            print(
-
-                "Queue Empty"
-
-            )
-
-            print(
-
-                "Machine Released"
-
-            )
-
-        db.commit()
-
-        db.refresh(execution)
-
-        sync_invoice_from_execution(
-
-            db,
-
-            execution
-
-        )
-
-
-
-    if execution.workflow_status == "EXECUTION_COMPLETED":
-
-
-        sync_invoice_from_execution(
-
-            db,
-
-            execution
-
-        )
-
-        update_customer_request_status(
-
-            db,
-
-            execution.customer_request_id,
-
-            "EXECUTION_COMPLETED"
-
-        )
+    print("========== COMPLETE PHASE DONE ==========\n")
 
     return execution

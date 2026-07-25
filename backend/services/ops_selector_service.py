@@ -80,15 +80,8 @@ def create_ops_selection_request(
 
     )
 
-    if existing:
 
-        raise HTTPException(
 
-            status_code=409,
-
-            detail="Ops Selection already exists for this Sales Survey."
-
-        )
 
     # ====================================
     # MAP TO ENGINE INPUTS

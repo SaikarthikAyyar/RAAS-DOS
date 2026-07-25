@@ -40,6 +40,13 @@ class MachineSchedule(Base):
         nullable=False
     )
 
+    execution_id = Column(
+        BigInteger,
+        ForeignKey("executions.id"),
+        nullable=True
+    )
+
+
     queue_position = Column(
         Integer,
         nullable=False
