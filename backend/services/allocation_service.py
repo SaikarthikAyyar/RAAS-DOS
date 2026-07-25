@@ -143,16 +143,43 @@ def get_allocation_dashboard(
     )
 
 
+    print("\n========== PERSONNEL LOADED ==========")
+
+
+
     personnel = (
-        db.query(Personnel)
-        .filter(
-            Personnel.availability_status == "AVAILABLE"
+
+        db.query(
+
+            Personnel
+
         )
+
         .order_by(
+
             Personnel.full_name
+
         )
+
         .all()
+
     )
+
+    print(f"Total Personnel : {len(personnel)}")
+
+    for person in personnel:
+
+        print(
+
+            person.id,
+
+            person.full_name,
+
+            person.availability_status
+
+        )
+
+    print("======================================\n")
 
 
     machine_cards = []

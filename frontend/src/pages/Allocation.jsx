@@ -579,9 +579,18 @@ export default function Allocation(){
 
                             type="checkbox"
 
-                            disabled={!person.documents_verified}
+                            disabled={
+                                !person.documents_verified ||
+                                person.status === "ALLOCATED"
+                            }
 
                             onChange={e=>{
+
+                                if(person.status === "ALLOCATED"){
+
+                                    return;
+
+                                }
 
                                 if(e.target.checked){
 
@@ -656,6 +665,18 @@ export default function Allocation(){
                         <strong>Location :</strong>
 
                         {person.location}
+
+                        {
+                            person.status === "ALLOCATED" &&
+
+                            <div className="resource-detail">
+
+                                <strong>Allocation :</strong>
+
+                                Currently Assigned
+
+                            </div>
+                        }
 
                     </div>
 
