@@ -198,10 +198,40 @@ def create_ops_selection_request(
 
 
     # ====================================
-    # SAVE
+    # SAVE / UPDATE
     # ====================================
 
-    ops = create_ops_selection(
+    if existing:
+
+        print(f"[OPS] Updating Existing OPS Selection : {existing.id}")
+
+        for key, value in ops_payload.items():
+
+            setattr(
+
+                existing,
+
+                key,
+
+                value
+
+            )
+
+        db.commit()
+
+        db.refresh(
+
+            existing
+
+        )
+
+        ops = existing
+
+    else:
+
+        print("[OPS] Creating New OPS Selection")
+
+        ops = create_ops_selection(
 
             db,
 
