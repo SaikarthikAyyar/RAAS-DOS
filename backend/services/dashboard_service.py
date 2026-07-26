@@ -1143,17 +1143,87 @@ def get_dashboard_data(
                 for p in personnel
             ],
 
+
+
             # =====================================
             # EXECUTION
             # =====================================
 
-            "execution_phase": execution.current_phase if execution else None,
-            "execution_progress": execution.execution_progress if execution else 0,
-            "current_activity": execution.current_activity if execution else None,
-            "phase_1_status": execution.phase_1_status if execution else None,
-            "phase_2_status": execution.phase_2_status if execution else None,
-            "phase_3_status": execution.phase_3_status if execution else None,
-            "transport_status": execution.transport_status if execution else None
+            "execution": (
+
+                {
+
+                    "id": execution.id,
+
+                    "job_creation_id": execution.job_creation_id,
+
+                    "customer_request_id": execution.customer_request_id,
+
+                    "sales_survey_id": execution.sales_survey_id,
+
+                    "workflow_status": execution.workflow_status,
+
+                    "current_phase": execution.current_phase,
+
+                    "execution_progress": execution.execution_progress,
+
+                    "phase_1_status": execution.phase_1_status,
+
+                    "phase_2_status": execution.phase_2_status,
+
+                    "phase_3_status": execution.phase_3_status,
+
+                    "site_location": execution.site_location,
+
+                    "planned_start": execution.planned_start,
+
+                    "estimated_completion": execution.estimated_completion,
+
+                    "actual_completion": execution.actual_completion,
+
+                    "delay_days": execution.delay_days,
+
+                    "remarks": execution.remarks,
+
+                    "current_activity": execution.current_activity,
+
+                    "transport_status": execution.transport_status,
+
+                    "latitude": execution.latitude,
+
+                    "longitude": execution.longitude,
+
+                    "speed_kmph": execution.speed_kmph,
+
+                    "heading": execution.heading,
+
+                    "altitude": execution.altitude,
+
+                    "accuracy_meters": execution.accuracy_meters,
+
+                    "gps_timestamp": execution.gps_timestamp,
+
+                    "eta_minutes": execution.eta_minutes,
+
+                    "distance_to_cover_km": execution.distance_to_cover_km,
+
+                    "today_output": execution.today_output,
+
+                    "total_output": execution.total_output,
+
+                    "daily_target": execution.daily_target,
+
+                    "output_unit": execution.output_unit,
+
+                    "proof_uploaded": execution.proof_uploaded
+
+                }
+
+                if execution
+
+                else None
+
+            ),
 
         })
 

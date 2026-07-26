@@ -5,7 +5,13 @@
 import { useNavigate } from "react-router-dom";
 
 
-import { useState } from "react";
+import {
+
+    useState,
+
+    useEffect
+
+} from "react";
 
 import useDashboard from "../../hooks/useDashboard";
 
@@ -21,6 +27,9 @@ import WorkflowTracker from "../../components/dashboard/WorkflowTracker";
 
 import InvoiceStats from "../../components/dashboard/InvoiceStats";
 import InvoiceWorkflowTracker from "../../components/dashboard/InvoiceWorkflowTracker";
+
+import InvoiceDashboard
+from "../../components/dashboard/InvoiceDashboard";
 
 
 // ====================================
@@ -83,6 +92,8 @@ export default function OperationsDashboard(){
 
     ] = useState("");
 
+
+
     console.log(selectedInvoice);
 
     const selectedInvoiceData =
@@ -96,6 +107,36 @@ export default function OperationsDashboard(){
     String(selectedInvoice)
 
     );
+
+    useEffect(()=>{
+
+        if(
+
+            !selectedInvoice &&
+
+            dashboard?.invoices?.length
+
+        ){
+
+            setSelectedInvoice(
+
+                String(
+
+                    dashboard.invoices[0].id
+
+                )
+
+            );
+
+        }
+
+    },[
+
+        dashboard,
+
+        selectedInvoice
+
+    ]);
 
         return(
 
@@ -578,499 +619,82 @@ export default function OperationsDashboard(){
                 </>
                 }
 
-            {
-
-                activeTab === DASHBOARD_TABS.INVOICES &&
-
-                <>
-
-                <div className="dashboard-section">
-
-                <h2>
-
-                    Invoice Dashboard
-
-                </h2>
-
-                <br/>
-
-                <InvoiceStats
-
-                    stats={dashboard?.stats}
-
-                />
-
-                <br/>
-
-                <h3>
-
-                    Select Job
-
-                </h3>
-
-                <select
-
-                    className="dashboard-select"
-
-                    value={selectedInvoice}
-
-                    onChange={
-
-                        e=>setSelectedInvoice(
-
-                            e.target.value
-
-                        )
-
-                    }
-
-                >
-
-                <option value="">
-
-                    Select Job
-
-                </option>
-
                 {
+                    activeTab === DASHBOARD_TABS.INVOICES && (
 
-                    dashboard?.invoices?.map(
+                        <>
 
-                        invoice=>(
+                            <div className="dashboard-section">
 
-                            <option
+                                <h2>
 
-                                key={invoice.id}
+                                    Invoice Dashboard
 
-                                value={invoice.id}
+                                </h2>
 
-                            >
+                                <select
 
-                                {invoice.generated_job_id}
+                                    value={selectedInvoice}
 
-                                {" | Enquiry #"}
+                                    onChange={(event)=>{
 
-                                {invoice.customer_request_id}
+                                        setSelectedInvoice(
 
-                            </option>
+                                            event.target.value
 
-                        )
+                                        );
+
+                                    }}
+
+                                >
+
+                                    {
+
+                                        dashboard?.invoices?.map(
+
+                                            (invoice)=>(
+
+                                                <option
+
+                                                    key={invoice.id}
+
+                                                    value={invoice.id}
+
+                                                >
+
+                                                    INV-{invoice.id} | JOB-{invoice.job_creation_id}
+
+                                                </option>
+
+                                            )
+
+                                        )
+
+                                    }
+
+                                </select>
+
+                            </div>
+
+                            <InvoiceDashboard
+
+                                invoice={
+
+                                    selectedInvoiceData ||
+
+                                    dashboard?.invoices?.[0] ||
+
+                                    null
+
+                                }
+
+                            />
+
+                        </>
 
                     )
-
                 }
-
-                </select>
-
-                <br/>
-
-                <br/>
-
-                {
-                selectedInvoiceData && (
-
-                <div className="dashboard-section">
-
-                console.log(selectedInvoiceData);
-
-                <h2>
-
-                Job Summary
-
-                </h2>
-
-                <div className="invoice-summary-grid">
-
-                    <div className="invoice-summary-card">
-
-                        <h3>Job Information</h3>
-
-                        <div className="invoice-summary-item">
-                            <span>Generated Job ID</span>
-                            <strong>{selectedInvoiceData.generated_job_id || "-"}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Customer Request</span>
-                            <strong>CR-{selectedInvoiceData.customer_request_id || "-"}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Site Location</span>
-                            <strong>{selectedInvoiceData.destination || "-"}</strong>
-                        </div>
-
-                    </div>
-
-
-                    <div className="invoice-summary-card">
-
-                        <h3>Schedule</h3>
-
-                        <div className="invoice-summary-item">
-                            <span>Planned Start</span>
-                            <strong>{selectedInvoiceData.planned_start || "-"}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Estimated Completion</span>
-                            <strong>{selectedInvoiceData.estimated_completion || "-"}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Actual Completion</span>
-                            <strong>{selectedInvoiceData.actual_completion || "-"}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Delay</span>
-                            <strong>{selectedInvoiceData.delay_days || 0} Days</strong>
-                        </div>
-
-                    </div>
-
-
-                    <div className="invoice-summary-card">
-
-                        <h3>Execution</h3>
-
-                        <div className="invoice-summary-item">
-                            <span>Invoice Status</span>
-                            <strong>{selectedInvoiceData.invoice_status}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Execution Phase</span>
-                            <strong>{selectedInvoiceData.execution_phase}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Execution Progress</span>
-                            <strong>{selectedInvoiceData.execution_progress}%</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Transport Status</span>
-                            <strong>{selectedInvoiceData.transport_status}</strong>
-                        </div>
-
-                    </div>
-
-
-                    <div className="invoice-summary-card">
-
-                        <h3>Allocation</h3>
-
-                        <div className="invoice-summary-item">
-                            <span>Machine</span>
-                            <strong>{selectedInvoiceData.machine_name || "-"}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Machine Status</span>
-                            <strong>{selectedInvoiceData.machine_status || "-"}</strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Personnel</span>
-                            <strong>
-
-                                {selectedInvoiceData.personnel_json?.length || 0}
-
-                            </strong>
-                        </div>
-
-                        <div className="invoice-summary-item">
-                            <span>Personnel Status</span>
-                            <strong>{selectedInvoiceData.personnel_status || "-"}</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                </div>
-
-                )
-                }
-                </div>
-
-
-                {/* =======================================
-                MACHINE SUMMARY
-                ======================================= */}
-
-    
-            <div className="dashboard-summary-section">
-                <h2 className="dashboard-section-title">
-
-                    Machine Summary
-
-                </h2>
-
-                <div className="summary-grid">
-
-                    <div className="summary-card">
-
-                        <label>Machine Name</label>
-
-                        <h3>{selectedInvoiceData?.machine_name || "-"}</h3>
-
-                    </div>
-
-                    <div className="summary-card">
-
-                        <label>Machine Code</label>
-
-                        <h3>{selectedInvoiceData?.machine_code || "-"}</h3>
-
-                    </div>
-
-                    <div className="summary-card">
-
-                        <label>Machine Status</label>
-
-                        <h3>{selectedInvoiceData?.machine_status || "-"}</h3>
-
-                    </div>
-
-                    <div className="summary-card">
-
-                        <label>Machine Location</label>
-
-                        <h3>{selectedInvoiceData?.machine_location || "-"}</h3>
-
-                    </div>
-
-                </div>
-
-            </div>
-            
-
-
-
-            
-
-
-                {/* =======================================
-                PERSONNEL SUMMARY
-                ======================================= */}
-
-            <div className="dashboard-summary-section">
-
-                <h2 className="dashboard-section-title">
-
-                    Personnel Summary
-
-                </h2>
-
-                <div className="summary-grid">
-
-                    <div className="summary-card">
-
-                        <label>Personnel Status</label>
-
-                        <h3>{selectedInvoice?.personnel_status || "-"}</h3>
-
-                    </div>
-
-                    <div className="summary-card">
-
-                        <label>Assigned Personnel</label>
-
-                        <h3>
-
-                            {
-
-                                selectedInvoice?.personnel_json?.length
-
-                                ||
-
-                                0
-
-                            }
-
-                        </h3>
-
-                    </div>
-
-                    <div className="summary-card">
-
-                        <label>Personnel List</label>
-
-                        <h3>
-
-                            {
-
-                                selectedInvoice?.personnel_json?.join(", ")
-
-                                ||
-
-                                "-"
-
-                            }
-
-                        </h3>
-
-                    </div>
-
-                </div>
-            
-            </div>
-
-            {/* =======================================
-            TRANSPORT SUMMARY
-            ======================================= */}
-
-            <div className="dashboard-summary-section">
-
-            <h2 className="dashboard-section-title">
-
-                Transport Summary
-
-            </h2>
-
-            <div className="summary-grid">
-
-                <div className="summary-card">
-
-                    <label>Transport Status</label>
-
-                    <h3>{selectedInvoice?.transport_status || "-"}</h3>
-
-                </div>
-
-                <div className="summary-card">
-
-                    <label>Current GPS</label>
-
-                    <h3>{selectedInvoice?.gps_location || "-"}</h3>
-
-                </div>
-
-                <div className="summary-card">
-
-                    <label>Destination</label>
-
-                    <h3>{selectedInvoice?.destination || "-"}</h3>
-
-                </div>
-
-                <div className="summary-card">
-
-                    <label>Distance Remaining</label>
-
-                    <h3>
-
-                        {selectedInvoice?.distance_remaining_km ?? 0}
-
-                        {" km"}
-
-                    </h3>
-
-                </div>
-
-                <div className="summary-card">
-
-                    <label>ETA</label>
-
-                    <h3>
-
-                        {selectedInvoice?.eta_minutes ?? 0}
-
-                        {" mins"}
-
-                    </h3>
-
-                </div>
-
-            </div>
-
-            </div>
-
-            {/* =======================================
-            EXECUTION SUMMARY
-            ======================================= */}
-
-            <div className="dashboard-summary-section">
-
-            <h2 className="dashboard-section-title">
-
-                Execution Summary
-
-            </h2>
-
-            <div className="summary-grid">
-
-                <div className="summary-card">
-
-                    <label>Execution Phase</label>
-
-                    <h3>{selectedInvoice?.execution_phase || "-"}</h3>
-
-                </div>
-
-                <div className="summary-card">
-
-                    <label>Progress</label>
-
-                    <h3>
-
-                        {selectedInvoice?.execution_progress ?? 0}
-
-                        %
-
-                    </h3>
-
-                </div>
-
-                <div className="summary-card">
-
-                    <label>Current Activity</label>
-
-                    <h3>{selectedInvoice?.current_activity || "-"}</h3>
-
-                </div>
-
-                <div className="summary-card">
-
-                    <label>Customer Status</label>
-
-                    <h3>{selectedInvoice?.customer_visible_status || "-"}</h3>
-
-                </div>
-
-                <div className="summary-card">
-
-                    <label>Delay</label>
-
-                    <h3>
-
-                        {selectedInvoice?.delay_days ?? 0}
-
-                        {" Days"}
-
-                    </h3>
-
-                </div>
-
-            </div>
-
-            </div>
-
-
-            <div className="dashboard-summary-section">
-
-            <InvoiceWorkflowTracker
-                invoice={selectedInvoiceData}
-            />
-
-            </div>
                 
-
-                </>
-
-                }
             </div>
 
         );

@@ -1260,3 +1260,89 @@ WORKFLOW TRACKER
     margin-bottom:35px;
 
 }
+
+/* ==========================================
+   INVOICE JOB TAB
+   (Same Style as Execution Tab)
+========================================== */
+
+.invoice-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(320px,1fr));
+
+    gap:22px;
+
+    margin-top:30px;
+
+}
+
+.invoice-grid-item{
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:20px;
+
+    padding:22px;
+
+    min-height:92px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    transition:.2s;
+
+}
+
+.invoice-grid-item:hover{
+
+    border-color:#41d8d0;
+
+    transform:translateY(-2px);
+
+}
+
+.invoice-label{
+
+    font-size:15px;
+
+    color:#9ebfc7;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+}
+
+.invoice-value{
+
+    font-size:18px;
+
+    color:#ffffff;
+
+    font-weight:700;
+
+    word-break:break-word;
+
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:1100px){
+
+    .invoice-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
