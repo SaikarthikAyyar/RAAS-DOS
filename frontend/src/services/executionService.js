@@ -164,6 +164,69 @@ export async function startPhase(executionId){
 
 
 // ====================================
+// UPDATE EXECUTION
+// ====================================
+
+export async function updateExecutionProgress(
+
+    executionId,
+
+    payload
+
+){
+
+    console.log(
+
+        "Update Execution",
+
+        executionId,
+
+        payload
+
+    );
+
+    const response = await fetch(
+
+        `${API}/execution/${executionId}/progress`,
+
+        {
+
+            method:"PUT",
+
+            headers:{
+
+                "Content-Type":"application/json"
+
+            },
+
+            body:JSON.stringify(
+
+                payload
+
+            )
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // COMPLETE PHASE
 // ====================================
 

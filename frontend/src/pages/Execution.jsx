@@ -8,9 +8,24 @@ import {
 
     startPhase,
 
-    completePhase
+    completePhase,
 
-} from "../services/executionService";
+    updateExecutionProgress
+
+}
+
+from "../services/executionService";
+
+
+import ExecutionSummary from "../components/execution/ExecutionSummary";
+
+import ExecutionControls from "../components/execution/ExecutionControls";
+
+import Phase1Mobilisation from "../components/execution/Phase1Mobilisation";
+
+import Phase2Execution from "../components/execution/Phase2Execution";
+
+import Phase3Demobilisation from "../components/execution/Phase3Demobilisation";
 
 
 export default function Execution(){
@@ -20,6 +35,12 @@ export default function Execution(){
     const [selectedExecution,setSelectedExecution] = useState("");
 
     const [execution,setExecution] = useState(null);
+
+    const executionCompleted =
+
+        execution?.workflow_status ===
+
+        "EXECUTION_COMPLETED";
 
 
     // ====================================
@@ -120,9 +141,11 @@ export default function Execution(){
 
             );
 
-            setExecution(response);
-
             alert("Phase Started");
+
+            const updated = await getExecution(selectedExecution);
+
+            setExecution(updated);
 
         }
 
@@ -165,9 +188,11 @@ export default function Execution(){
 
             );
 
-            setExecution(response);
-
             alert("Phase Completed");
+
+            const updated = await getExecution(selectedExecution);
+
+            setExecution(updated);
 
         }
 
@@ -176,6 +201,80 @@ export default function Execution(){
             console.error(error);
 
             alert("Failed");
+
+        }
+
+    }
+
+    // ====================================
+    // UPDATE EXECUTION
+    // ====================================
+
+    async function updateExecution(){
+
+        if(!selectedExecution){
+
+            return;
+
+        }
+
+        try{
+
+            await updateExecutionProgress(
+
+                selectedExecution,
+
+                {
+
+                    current_activity:
+
+                        execution.current_activity,
+
+                    transport_status:
+
+                        execution.transport_status,
+
+                    remarks:
+
+                        execution.remarks
+
+                }
+
+            );
+
+            const updated = await getExecution(
+
+                selectedExecution
+
+            );
+
+            setExecution(
+
+                updated
+
+            );
+
+            alert(
+
+                "Execution Updated"
+
+            );
+
+        }
+
+        catch(error){
+
+            console.error(
+
+                error
+
+            );
+
+            alert(
+
+                "Update Failed"
+
+            );
 
         }
 
@@ -226,7 +325,7 @@ export default function Execution(){
 
                     >
 
-                        Execution {execution.id}
+                        Execution {execution.id} | Job {execution.job_creation_id}
 
                     </option>
 
@@ -240,187 +339,102 @@ export default function Execution(){
 
         <br/>
 
+        <ExecutionSummary
+
+            execution={execution}
+
+        />
+
         {
 
-            execution &&
+            execution?.current_phase === "PHASE_1" && (
 
-            <div>
+                <Phase1Mobilisation
 
-        <h2>
+                    execution={execution}
 
-        Execution Summary
+                />
 
-        </h2>
-
-        <p>
-
-        Workflow :
-
-        {" "}
-
-        {execution.workflow_status}
-
-        </p>
-
-        <p>
-
-        Current Phase :
-
-        {" "}
-
-        {execution.current_phase}
-
-        </p>
-
-        <p>
-
-        Execution Progress :
-
-        {" "}
-
-        {execution.execution_progress}%
-
-        </p>
-
-        <p>
-
-        Current Activity :
-
-        {" "}
-
-        {execution.current_activity}
-
-        </p>
-
-        <p>
-
-        Transport Status :
-
-        {" "}
-
-        {execution.transport_status}
-
-        </p>
-
-        <p>
-
-        Invoice Sync :
-
-        {" "}
-
-        {execution.invoice_synced}
-
-        </p>
-
-        <hr/>
-
-        <p>
-
-        Planned Start :
-
-        {" "}
-
-        {execution.planned_start}
-
-        </p>
-
-        <p>
-
-        Estimated Completion :
-
-        {" "}
-
-        {execution.estimated_completion}
-
-        </p>
-
-        <p>
-
-        Actual Completion :
-
-        {" "}
-
-        {execution.actual_completion}
-
-        </p>
-
-        <p>
-
-        Delay :
-
-        {" "}
-
-        {execution.delay_days}
-
-        days
-
-        </p>
-
-        <hr/>
-
-        <p>
-
-        Phase 1 :
-
-        {" "}
-
-        {execution.phase_1_status}
-
-        </p>
-
-        <p>
-
-        Phase 2 :
-
-        {" "}
-
-        {execution.phase_2_status}
-
-        </p>
-
-        <p>
-
-        Phase 3 :
-
-        {" "}
-
-        {execution.phase_3_status}
-
-        </p>
-
-            </div>
+            )
 
         }
 
+        {
+
+            execution?.current_phase === "PHASE_2" && (
+
+                <Phase2Execution
+
+                    execution={execution}
+
+                />
+
+            )
+
+        }
+
+        {
+
+            execution?.current_phase === "PHASE_3" && (
+
+                <Phase3Demobilisation
+
+                    execution={execution}
+
+                />
+
+            )
+
+        }
+
+
+
+        <div
+            style={{
+                width:"100%",
+                height:"18px",
+                background:"#444"
+            }}
+        >
+
+        {execution && (
+
+        <div
+            style={{
+                width:"100%",
+                height:"18px",
+                background:"#444"
+            }}
+        >
+
+            <div
+                style={{
+                    width:`${execution.execution_progress}%`,
+                    height:"100%",
+                    background:"#4caf50"
+                }}
+            />
+
+        </div>
+
+        )}
+
+        </div>
+
         <br/>
 
-        <button
 
-            onClick={
+        <ExecutionControls
 
-                startCurrentPhase
+            execution={execution}
 
-            }
+            startCurrentPhase={startCurrentPhase}
 
-        >
+            completeCurrentPhase={completeCurrentPhase}
 
-            Start Current Phase
+            updateExecution={updateExecution}
 
-        </button>
-
-        <button
-
-            onClick={
-
-                completeCurrentPhase
-
-            }
-
-        >
-
-            Complete Current Phase
-
-        </button>
+        />
 
     </div>
 

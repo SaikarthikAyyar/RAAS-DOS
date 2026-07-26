@@ -189,7 +189,7 @@ class Execution(Base):
         default=0
     )
 
-    distance_remaining_km = Column(
+    distance_to_cover_km = Column(
         Float,
         default=0
     )

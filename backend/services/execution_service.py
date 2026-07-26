@@ -10,6 +10,8 @@ from backend.schemas.execution_schema import (
 
 from datetime import datetime
 
+from backend.models.sales_survey import SalesSurvey
+
 from backend.repositories.execution_repository import (
     create_execution,
     get_execution,
@@ -702,20 +704,49 @@ def update_execution_progress(
 # ====================================
 
 def get_execution_request(
-
     db,
-
     execution_id
-
 ):
 
-    return get_execution(
-
+    execution = get_execution(
         db,
-
         execution_id
+    )
+
+    if execution is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Execution not found."
+        )
+
+    survey = (
+
+        db.query(SalesSurvey)
+
+        .filter(
+
+            SalesSurvey.id == execution.sales_survey_id
+
+        )
+
+        .first()
 
     )
+
+    result = execution.__dict__.copy()
+
+    result["estimated_volume"] = (
+
+        survey.estimated_volume
+
+        if survey
+
+        else 0
+
+    )
+
+    return result
 
 
 # ====================================
