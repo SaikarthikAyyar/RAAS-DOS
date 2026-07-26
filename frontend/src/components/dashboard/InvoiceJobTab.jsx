@@ -128,7 +128,13 @@ export default function InvoiceJobTab({
 
                         <div className="invoice-value">
 
-                            {invoice.sales_survey_id}
+                            {
+
+                                invoice.execution?.sales_survey_id ??
+
+                                "-"
+
+                            }
 
                         </div>
 
