@@ -4,6 +4,8 @@
 
 import { useEffect, useState } from "react";
 
+import "./Execution.css";
+
 import {
 
     updateExecutionProgress
@@ -15,7 +17,6 @@ from "../../services/executionService";
 
 // ====================================
 // PHASE 3
-// DEMOBILISATION
 // ====================================
 
 export default function Phase3Demobilisation({
@@ -25,6 +26,14 @@ export default function Phase3Demobilisation({
     refreshExecution
 
 }){
+
+    const [
+
+        initialDistance,
+
+        setInitialDistance
+
+    ] = useState(null);
 
     const [
 
@@ -48,7 +57,7 @@ export default function Phase3Demobilisation({
 
         eta_minutes:0,
 
-        distance_remaining_km:0,
+        distance_to_cover_km:0,
 
         proof_uploaded:false
 
@@ -97,9 +106,9 @@ export default function Phase3Demobilisation({
 
                 execution.eta_minutes ?? 0,
 
-            distance_remaining_km:
+            distance_to_cover_km:
 
-                execution.distance_remaining_km ?? 0,
+                execution.distance_to_cover_km ?? 0,
 
             proof_uploaded:
 
@@ -107,7 +116,25 @@ export default function Phase3Demobilisation({
 
         });
 
-    },[execution]);
+        if(
+
+            initialDistance === null
+
+        ){
+
+            setInitialDistance(
+
+                execution.distance_to_cover_km ?? 0
+
+            );
+
+        }
+
+    },[
+
+        execution
+
+    ]);
 
 
     // ====================================
@@ -122,21 +149,80 @@ export default function Phase3Demobilisation({
 
     ){
 
-        setForm(
+        setForm(previous=>({
 
-            previous=>({
+            ...previous,
 
-                ...previous,
+            [field]:
 
-                [field]:
+                value
 
-                    value
+        }));
 
-            })
+    }
+
+
+    // ====================================
+    // CALCULATIONS
+    // ====================================
+
+    const totalDistance =
+
+        Number(
+
+            initialDistance ?? 0
 
         );
 
-    }
+    const remainingDistance =
+
+        Number(
+
+            form.distance_to_cover_km ?? 0
+
+        );
+
+    const travelledDistance =
+
+        Math.max(
+
+            totalDistance -
+
+            remainingDistance,
+
+            0
+
+        );
+
+    const phaseProgress =
+
+        totalDistance > 0
+
+        ?
+
+        (
+
+            travelledDistance /
+
+            totalDistance
+
+        ) * 100
+
+        :
+
+        0;
+
+    const executionContribution =
+
+        66 +
+
+        (
+
+            phaseProgress *
+
+            0.34
+
+        );
 
 
     // ====================================
@@ -169,9 +255,9 @@ export default function Phase3Demobilisation({
 
                         Number(form.eta_minutes),
 
-                    distance_remaining_km:
+                    distance_to_cover_km:
 
-                        Number(form.distance_remaining_km),
+                        Number(form.distance_to_cover_km),
 
                     transport_status:
 
@@ -193,19 +279,13 @@ export default function Phase3Demobilisation({
 
             );
 
-            alert(
-
-                "Demobilisation Updated"
-
-            );
-
             if(
 
                 refreshExecution
 
             ){
 
-                refreshExecution(
+                await refreshExecution(
 
                     execution.id
 
@@ -213,15 +293,17 @@ export default function Phase3Demobilisation({
 
             }
 
+            alert(
+
+                "Demobilisation Updated"
+
+            );
+
         }
 
         catch(error){
 
-            console.error(
-
-                error
-
-            );
+            console.error(error);
 
             alert(
 
@@ -240,249 +322,406 @@ export default function Phase3Demobilisation({
 
     return(
 
-        <div
-            style={{
+        <div className="execution-card">
 
-                marginTop:"20px",
-
-                padding:"20px",
-
-                border:"1px solid #444",
-
-                borderRadius:"8px",
-
-                background:"#1f1f1f",
-
-                color:"#ffffff"
-
-            }}
-        >
-
-            <h2>
+            <h2 className="execution-section-title">
 
                 Phase 3 - Demobilisation
 
             </h2>
 
-            <hr/>
+            <div className="execution-metric-grid">
 
-            <h3>
+                <div className="execution-metric">
 
-                Return Journey
+                    <h5>
 
-            </h3>
+                        Total Distance
 
-            <p>
+                    </h5>
 
-                Latitude :
+                    <h2>
 
-                {" "}
+                        {totalDistance.toFixed(2)} km
 
-                {form.latitude}
+                    </h2>
 
-            </p>
+                </div>
 
-            <p>
+                <div className="execution-metric">
 
-                Longitude :
+                    <h5>
 
-                {" "}
+                        Distance Travelled
 
-                {form.longitude}
+                    </h5>
 
-            </p>
+                    <h2>
 
-            <p>
+                        {travelledDistance.toFixed(2)} km
 
-                Speed :
+                    </h2>
 
-                {" "}
+                </div>
 
-                {form.speed_kmph}
+                <div className="execution-metric">
 
-                km/h
+                    <h5>
 
-            </p>
+                        Distance Remaining
 
-            <p>
+                    </h5>
 
-                ETA :
+                    <h2>
 
-                {" "}
+                        {remainingDistance.toFixed(2)} km
 
-                {form.eta_minutes}
+                    </h2>
 
-                minutes
+                </div>
 
-            </p>
+                <div className="execution-metric">
 
-            <p>
+                    <h5>
 
-                Distance Remaining :
+                        Phase Progress
 
-                {" "}
+                    </h5>
 
-                {form.distance_remaining_km}
+                    <h2>
 
-                km
+                        {phaseProgress.toFixed(1)}%
 
-            </p>
+                    </h2>
 
-            <hr/>
-
-            <label>
-
-                Transport Status
-
-            </label>
-
-            <br/>
-
-            <input
-
-                value={form.transport_status}
-
-                onChange={
-
-                    e=>updateField(
-
-                        "transport_status",
-
-                        e.target.value
-
-                    )
-
-                }
-
-            />
-
-            <br/><br/>
-
-            <label>
-
-                Current Activity
-
-            </label>
-
-            <br/>
-
-            <textarea
-
-                rows={3}
-
-                value={form.current_activity}
-
-                onChange={
-
-                    e=>updateField(
-
-                        "current_activity",
-
-                        e.target.value
-
-                    )
-
-                }
-
-            />
-
-            <br/><br/>
-
-            <label>
-
-                Remarks
-
-            </label>
-
-            <br/>
-
-            <textarea
-
-                rows={4}
-
-                value={form.remarks}
-
-                onChange={
-
-                    e=>updateField(
-
-                        "remarks",
-
-                        e.target.value
-
-                    )
-
-                }
-
-            />
-
-            <br/><br/>
-
-            <label>
-
-                <input
-
-                    type="checkbox"
-
-                    checked={form.proof_uploaded}
-
-                    onChange={
-
-                        e=>updateField(
-
-                            "proof_uploaded",
-
-                            e.target.checked
-
-                        )
-
-                    }
-
-                />
-
-                Proof Uploaded
-
-            </label>
-
-            <br/><br/>
-
-            <div
-                style={{
-
-                    height:"250px",
-
-                    border:"1px dashed #666",
-
-                    display:"flex",
-
-                    justifyContent:"center",
-
-                    alignItems:"center",
-
-                    color:"#888"
-
-                }}
-            >
-
-                Live Return GPS Map
+                </div>
 
             </div>
 
-            <br/>
+            <div className="execution-progress">
 
-            <button
+                <div
 
-                onClick={
+                    className="execution-progress-fill"
 
-                    saveDemobilisation
+                    style={{
 
-                }
+                        width:`${phaseProgress}%`
 
+                    }}
+
+                />
+
+            </div>
+
+            <p
+                style={{
+                    marginTop:"12px",
+                    fontWeight:"600",
+                    color:"#d8ecec"
+                }}
             >
 
-                Save Demobilisation
+                Overall Execution Progress :
 
-            </button>
+                {" "}
+
+                {executionContribution.toFixed(1)}%
+
+            </p>
+
+            <div className="execution-map">
+
+                Live Return GPS Map
+
+                <br/>
+
+                (Google Maps Integration)
+
+            </div>
+
+            <div className="execution-form-grid">
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Latitude
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.latitude}
+
+                        onChange={e=>updateField(
+
+                            "latitude",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Longitude
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.longitude}
+
+                        onChange={e=>updateField(
+
+                            "longitude",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Speed (km/h)
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.speed_kmph}
+
+                        onChange={e=>updateField(
+
+                            "speed_kmph",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        ETA (Minutes)
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.eta_minutes}
+
+                        onChange={e=>updateField(
+
+                            "eta_minutes",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Distance To Cover (km)
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.distance_to_cover_km}
+
+                        onChange={e=>updateField(
+
+                            "distance_to_cover_km",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Transport Status
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        value={form.transport_status}
+
+                        onChange={e=>updateField(
+
+                            "transport_status",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div
+                    className="execution-form-group"
+                    style={{gridColumn:"1 / -1"}}
+                >
+
+                    <label>
+
+                        Current Activity
+
+                    </label>
+
+                    <textarea
+
+                        className="execution-textarea"
+
+                        rows={3}
+
+                        value={form.current_activity}
+
+                        onChange={e=>updateField(
+
+                            "current_activity",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div
+                    className="execution-form-group"
+                    style={{gridColumn:"1 / -1"}}
+                >
+
+                    <label>
+
+                        Remarks
+
+                    </label>
+
+                    <textarea
+
+                        className="execution-textarea"
+
+                        rows={4}
+
+                        value={form.remarks}
+
+                        onChange={e=>updateField(
+
+                            "remarks",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div
+                    className="execution-form-group"
+                    style={{gridColumn:"1 / -1"}}
+                >
+
+                    <label
+                        style={{
+                            display:"flex",
+                            alignItems:"center",
+                            gap:"12px"
+                        }}
+                    >
+
+                        <input
+
+                            type="checkbox"
+
+                            checked={form.proof_uploaded}
+
+                            onChange={e=>updateField(
+
+                                "proof_uploaded",
+
+                                e.target.checked
+
+                            )}
+
+                        />
+
+                        Proof Uploaded
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div className="execution-actions">
+
+                <button
+
+                    className="execution-btn"
+
+                    onClick={saveDemobilisation}
+
+                >
+
+                    Save Demobilisation
+
+                </button>
+
+            </div>
 
         </div>
 

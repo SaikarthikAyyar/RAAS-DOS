@@ -1,201 +1,539 @@
 // ====================================
+// IMPORTS
+// ====================================
+
+import { useEffect, useState } from "react";
+
+import "./Execution.css";
+
+import {
+    updateExecutionProgress
+}
+from "../../services/executionService";
+
+
+// ====================================
 // PHASE 1
-// MOBILISATION
 // ====================================
 
 export default function Phase1Mobilisation({
 
-    execution
+    execution,
+
+    refreshExecution
 
 }){
 
-    if(!execution){
+    const [
 
-        return null;
+        initialDistance,
+
+        setInitialDistance
+
+    ] = useState(null);
+
+    const [
+
+        form,
+
+        setForm
+
+    ] = useState({
+
+        latitude:0,
+
+        longitude:0,
+
+        speed_kmph:0,
+
+        heading:0,
+
+        altitude:0,
+
+        accuracy_meters:0,
+
+        eta_minutes:0,
+
+        distance_to_cover_km:0,
+
+        transport_status:"",
+
+        current_activity:"",
+
+        remarks:""
+
+    });
+
+
+    // ====================================
+    // LOAD
+    // ====================================
+
+    useEffect(()=>{
+
+        if(!execution){
+
+            return;
+
+        }
+
+        setForm({
+
+            latitude:execution.latitude ?? 0,
+
+            longitude:execution.longitude ?? 0,
+
+            speed_kmph:execution.speed_kmph ?? 0,
+
+            heading:execution.heading ?? 0,
+
+            altitude:execution.altitude ?? 0,
+
+            accuracy_meters:execution.accuracy_meters ?? 0,
+
+            eta_minutes:execution.eta_minutes ?? 0,
+
+            distance_to_cover_km:execution.distance_to_cover_km ?? 0,
+
+            transport_status:execution.transport_status ?? "",
+
+            current_activity:execution.current_activity ?? "",
+
+            remarks:execution.remarks ?? ""
+
+        });
+
+        if(initialDistance === null){
+
+            setInitialDistance(
+
+                execution.distance_to_cover_km ?? 0
+
+            );
+
+        }
+
+    },[execution]);
+
+
+    // ====================================
+    // UPDATE FIELD
+    // ====================================
+
+    function updateField(field,value){
+
+        setForm(previous=>({
+
+            ...previous,
+
+            [field]:value
+
+        }));
 
     }
 
+
+    // ====================================
+    // CALCULATIONS
+    // ====================================
+
+    const totalDistance =
+
+        Number(initialDistance ?? 0);
+
+    const remainingDistance =
+
+        Number(form.distance_to_cover_km ?? 0);
+
+    const travelledDistance =
+
+        Math.max(
+
+            totalDistance -
+
+            remainingDistance,
+
+            0
+
+        );
+
+    const phaseProgress =
+
+        totalDistance > 0
+
+        ?
+
+        (travelledDistance / totalDistance) * 100
+
+        :
+
+        0;
+
+
+    // ====================================
+    // SAVE
+    // ====================================
+
+    async function saveMobilisation(){
+
+        try{
+
+            await updateExecutionProgress(
+
+                execution.id,
+
+                {
+
+                    latitude:Number(form.latitude),
+
+                    longitude:Number(form.longitude),
+
+                    speed_kmph:Number(form.speed_kmph),
+
+                    heading:Number(form.heading),
+
+                    altitude:Number(form.altitude),
+
+                    accuracy_meters:Number(form.accuracy_meters),
+
+                    eta_minutes:Number(form.eta_minutes),
+
+                    distance_to_cover_km:Number(form.distance_to_cover_km),
+
+                    transport_status:form.transport_status,
+
+                    current_activity:form.current_activity,
+
+                    remarks:form.remarks
+
+                }
+
+            );
+
+            if(refreshExecution){
+
+                await refreshExecution(
+
+                    execution.id
+
+                );
+
+            }
+
+            alert(
+
+                "Mobilisation Updated"
+
+            );
+
+        }
+
+        catch(error){
+
+            console.error(error);
+
+            alert(
+
+                "Update Failed"
+
+            );
+
+        }
+
+    }
+
+
+    // ====================================
+    // UI
+    // ====================================
+
     return(
 
-        <div
-            style={{
+        <div className="execution-card">
 
-                marginTop:"20px",
-
-                padding:"20px",
-
-                border:"1px solid #444",
-
-                borderRadius:"8px",
-
-                background:"#1f1f1f",
-
-                color:"#ffffff"
-
-            }}
-        >
-
-            <h2>
+            <h2 className="execution-section-title">
 
                 Phase 1 - Mobilisation
 
             </h2>
 
-            <hr/>
+            <div className="execution-metric-grid">
 
-            <h3>
+                <div className="execution-metric">
 
-                Machine Transport
+                    <h5>Total Distance</h5>
 
-            </h3>
+                    <h2>
 
-            <p>
+                        {totalDistance.toFixed(2)} km
 
-                <strong>Transport Status :</strong>
+                    </h2>
 
-                {" "}
+                </div>
 
-                {execution.transport_status}
+                <div className="execution-metric">
 
-            </p>
+                    <h5>Distance Travelled</h5>
 
-            <p>
+                    <h2>
 
-                <strong>Current Activity :</strong>
+                        {travelledDistance.toFixed(2)} km
 
-                {" "}
+                    </h2>
 
-                {execution.current_activity}
+                </div>
 
-            </p>
+                <div className="execution-metric">
 
-            <hr/>
+                    <h5>Distance Remaining</h5>
 
-            <h3>
+                    <h2>
 
-                Live GPS
+                        {remainingDistance.toFixed(2)} km
 
-            </h3>
+                    </h2>
 
-            <p>
+                </div>
 
-                Latitude :
+                <div className="execution-metric">
 
-                {" "}
+                    <h5>Phase Progress</h5>
 
-                {execution.latitude}
+                    <h2>
 
-            </p>
+                        {phaseProgress.toFixed(1)}%
 
-            <p>
+                    </h2>
 
-                Longitude :
+                </div>
 
-                {" "}
+            </div>
 
-                {execution.longitude}
+            <div className="execution-progress">
 
-            </p>
+                <div
 
-            <p>
+                    className="execution-progress-fill"
 
-                Speed :
+                    style={{
 
-                {" "}
+                        width:`${phaseProgress}%`
 
-                {execution.speed_kmph}
+                    }}
 
-                {" "}km/h
+                />
 
-            </p>
+            </div>
 
-            <p>
+            <br/>
 
-                Heading :
+            <div className="execution-form-grid">
 
-                {" "}
+                <div className="execution-form-group">
 
-                {execution.heading}
+                    <label>
 
-            </p>
+                        Latitude
 
-            <p>
+                    </label>
 
-                Altitude :
+                    <input
 
-                {" "}
+                        className="execution-input"
 
-                {execution.altitude}
+                        type="number"
 
-            </p>
+                        value={form.latitude}
 
-            <p>
+                        onChange={e=>updateField("latitude",e.target.value)}
 
-                Accuracy :
+                    />
 
-                {" "}
+                </div>
 
-                {execution.accuracy_meters}
+                <div className="execution-form-group">
 
-                {" "}m
+                    <label>
 
-            </p>
+                        Longitude
 
-            <hr/>
+                    </label>
 
-            <h3>
+                    <input
 
-                Journey
+                        className="execution-input"
 
-            </h3>
+                        type="number"
 
-            <p>
+                        value={form.longitude}
 
-                Distance Remaining :
+                        onChange={e=>updateField("longitude",e.target.value)}
 
-                {" "}
+                    />
 
-                {execution.distance_remaining_km}
+                </div>
 
-                {" "}km
+                <div className="execution-form-group">
 
-            </p>
+                    <label>
 
-            <p>
+                        Speed (km/h)
 
-                ETA :
+                    </label>
 
-                {" "}
+                    <input
 
-                {execution.eta_minutes}
+                        className="execution-input"
 
-                {" "}minutes
+                        type="number"
 
-            </p>
+                        value={form.speed_kmph}
 
-            <hr/>
+                        onChange={e=>updateField("speed_kmph",e.target.value)}
 
-            <div
-                style={{
+                    />
 
-                    height:"250px",
+                </div>
 
-                    border:"1px dashed #666",
+                <div className="execution-form-group">
 
-                    display:"flex",
+                    <label>
 
-                    alignItems:"center",
+                        ETA (Minutes)
 
-                    justifyContent:"center",
+                    </label>
 
-                    color:"#888"
+                    <input
 
-                }}
-            >
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.eta_minutes}
+
+                        onChange={e=>updateField("eta_minutes",e.target.value)}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Distance To Cover (km)
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.distance_to_cover_km}
+
+                        onChange={e=>updateField("distance_to_cover_km",e.target.value)}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Transport Status
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        value={form.transport_status}
+
+                        onChange={e=>updateField("transport_status",e.target.value)}
+
+                    />
+
+                </div>
+
+                <div
+                    className="execution-form-group"
+                    style={{gridColumn:"1 / -1"}}
+                >
+
+                    <label>
+
+                        Current Activity
+
+                    </label>
+
+                    <textarea
+
+                        className="execution-textarea"
+
+                        rows={3}
+
+                        value={form.current_activity}
+
+                        onChange={e=>updateField("current_activity",e.target.value)}
+
+                    />
+
+                </div>
+
+                <div
+                    className="execution-form-group"
+                    style={{gridColumn:"1 / -1"}}
+                >
+
+                    <label>
+
+                        Remarks
+
+                    </label>
+
+                    <textarea
+
+                        className="execution-textarea"
+
+                        rows={3}
+
+                        value={form.remarks}
+
+                        onChange={e=>updateField("remarks",e.target.value)}
+
+                    />
+
+                </div>
+
+            </div>
+
+            <div className="execution-map">
 
                 Live GPS Map
 
-                (Google Maps later)
+                <br/>
+
+                (Google Maps Integration)
+
+            </div>
+
+            <div className="execution-actions">
+
+                <button
+
+                    className="execution-btn"
+
+                    onClick={saveMobilisation}
+
+                >
+
+                    Save Mobilisation
+
+                </button>
 
             </div>
 

@@ -1,4 +1,11 @@
 // ====================================
+// IMPORTS
+// ====================================
+
+import "./Execution.css";
+
+
+// ====================================
 // EXECUTION SUMMARY
 // ====================================
 
@@ -16,153 +23,175 @@ export default function ExecutionSummary({
 
     return(
 
-        <div
-            style={{
+        <div className="execution-card">
 
-                border:"1px solid #444",
-
-                borderRadius:"8px",
-
-                padding:"20px",
-
-                marginBottom:"20px",
-
-                background:"#1f1f1f",
-
-                color:"#ffffff"
-
-            }}
-        >
-
-            <h2>
+            <h2 className="execution-section-title">
 
                 Execution Summary
 
             </h2>
 
-            <hr/>
+            <div className="execution-summary-grid">
 
-            <p>
+                <div className="execution-summary-item">
 
-                <strong>Execution ID :</strong>
+                    <span>
 
-                {" "}
+                        Execution ID
 
-                {execution.id}
+                    </span>
 
-            </p>
+                    <strong>
 
-            <p>
+                        {execution.id}
 
-                <strong>Job ID :</strong>
+                    </strong>
 
-                {" "}
+                </div>
 
-                {execution.job_creation_id}
+                <div className="execution-summary-item">
 
-            </p>
+                    <span>
 
-            <p>
+                        Job ID
 
-                <strong>Customer Request :</strong>
+                    </span>
 
-                {" "}
+                    <strong>
 
-                {execution.customer_request_id}
+                        {execution.job_creation_id}
 
-            </p>
+                    </strong>
 
-            <p>
+                </div>
 
-                <strong>Workflow :</strong>
+                <div className="execution-summary-item">
 
-                {" "}
+                    <span>
 
-                {execution.workflow_status}
+                        Customer Request
 
-            </p>
+                    </span>
 
-            <p>
+                    <strong>
 
-                <strong>Current Phase :</strong>
+                        {execution.customer_request_id}
 
-                {" "}
+                    </strong>
 
-                {execution.current_phase}
+                </div>
 
-            </p>
+                <div className="execution-summary-item">
 
-            <p>
+                    <span>
 
-                <strong>Execution Progress :</strong>
+                        Workflow
 
-                {" "}
+                    </span>
+
+                    <strong>
+
+                        {execution.workflow_status}
+
+                    </strong>
+
+                </div>
+
+                <div className="execution-summary-item">
+
+                    <span>
+
+                        Current Phase
+
+                    </span>
+
+                    <strong>
+
+                        {execution.current_phase}
+
+                    </strong>
+
+                </div>
+
+                <div className="execution-summary-item">
+
+                    <span>
+
+                        Current Activity
+
+                    </span>
+
+                    <strong>
+
+                        {execution.current_activity || "-"}
+
+                    </strong>
+
+                </div>
+
+                <div className="execution-summary-item">
+
+                    <span>
+
+                        Transport Status
+
+                    </span>
+
+                    <strong>
+
+                        {execution.transport_status}
+
+                    </strong>
+
+                </div>
+
+                <div className="execution-summary-item">
+
+                    <span>
+
+                        Delay
+
+                    </span>
+
+                    <strong>
+
+                        {execution.delay_days} Days
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <br/>
+
+            <div className="execution-progress">
+
+                <div
+
+                    className="execution-progress-fill"
+
+                    style={{
+
+                        width:`${execution.execution_progress}%`
+
+                    }}
+
+                />
+
+            </div>
+
+            <div
+                style={{
+                    marginTop:"10px",
+                    textAlign:"right",
+                    fontWeight:"700"
+                }}
+            >
 
                 {execution.execution_progress}%
 
-            </p>
-
-            <p>
-
-                <strong>Current Activity :</strong>
-
-                {" "}
-
-                {execution.current_activity}
-
-            </p>
-
-            <p>
-
-                <strong>Transport Status :</strong>
-
-                {" "}
-
-                {execution.transport_status}
-
-            </p>
-
-            <p>
-
-                <strong>Planned Start :</strong>
-
-                {" "}
-
-                {execution.planned_start}
-
-            </p>
-
-            <p>
-
-                <strong>Estimated Completion :</strong>
-
-                {" "}
-
-                {execution.estimated_completion}
-
-            </p>
-
-            <p>
-
-                <strong>Actual Completion :</strong>
-
-                {" "}
-
-                {execution.actual_completion}
-
-            </p>
-
-            <p>
-
-                <strong>Delay :</strong>
-
-                {" "}
-
-                {execution.delay_days}
-
-                {" "}days
-
-            </p>
+            </div>
 
         </div>
 

@@ -4,6 +4,8 @@
 
 import { useEffect, useState } from "react";
 
+import "./Execution.css";
+
 import {
 
     updateExecutionProgress,
@@ -111,19 +113,13 @@ export default function Phase2Execution({
 
     ){
 
-        setForm(
+        setForm(previous=>({
 
-            previous=>({
+            ...previous,
 
-                ...previous,
+            [field]:value
 
-                [field]:
-
-                    value
-
-            })
-
-        );
+        }));
 
     }
 
@@ -166,17 +162,35 @@ export default function Phase2Execution({
 
         ?
 
-        (
+        Math.min(
 
-            totalOutput /
+            (
 
-            estimatedVolume
+                totalOutput /
 
-        ) * 100
+                estimatedVolume
+
+            ) * 100,
+
+            100
+
+        )
 
         :
 
         0;
+
+    const executionContribution =
+
+        33 +
+
+        (
+
+            completionPercentage *
+
+            0.33
+
+        );
 
 
     // ====================================
@@ -225,19 +239,9 @@ export default function Phase2Execution({
 
             );
 
-            alert(
+            if(refreshExecution){
 
-                "Execution Updated"
-
-            );
-
-            if(
-
-                refreshExecution
-
-            ){
-
-                refreshExecution(
+                await refreshExecution(
 
                     execution.id
 
@@ -255,15 +259,17 @@ export default function Phase2Execution({
 
             }
 
+            alert(
+
+                "Execution Updated"
+
+            );
+
         }
 
         catch(error){
 
-            console.error(
-
-                error
-
-            );
+            console.error(error);
 
             alert(
 
@@ -282,309 +288,352 @@ export default function Phase2Execution({
 
     return(
 
-        <div
-            style={{
+        <div className="execution-card">
 
-                marginTop:"20px",
-
-                padding:"20px",
-
-                border:"1px solid #444",
-
-                borderRadius:"8px",
-
-                background:"#1f1f1f",
-
-                color:"#ffffff"
-
-            }}
-        >
-
-            <h2>
+            <h2 className="execution-section-title">
 
                 Phase 2 - Live Execution
 
             </h2>
 
-            <hr/>
+            <div className="execution-metric-grid">
 
-            <h3>
+                <div className="execution-metric">
 
-                Production Summary
+                    <h5>
 
-            </h3>
+                        Estimated Volume
 
-            <p>
+                    </h5>
 
-                Estimated Volume :
+                    <h2>
 
-                {" "}
+                        {estimatedVolume.toFixed(2)}
 
-                <strong>
+                        {" "}
 
-                    {estimatedVolume}
+                        {form.output_unit}
 
-                    {" "}
+                    </h2>
 
-                    {form.output_unit}
+                </div>
 
-                </strong>
+                <div className="execution-metric">
 
-            </p>
+                    <h5>
 
-            <p>
+                        Completed Volume
 
-                Remaining Volume :
+                    </h5>
 
-                {" "}
+                    <h2>
 
-                <strong>
+                        {totalOutput.toFixed(2)}
 
-                    {remainingVolume}
+                        {" "}
 
-                    {" "}
+                        {form.output_unit}
 
-                    {form.output_unit}
+                    </h2>
 
-                </strong>
+                </div>
 
-            </p>
+                <div className="execution-metric">
 
-            <p>
+                    <h5>
 
-                Completion :
+                        Remaining Volume
 
-                {" "}
+                    </h5>
 
-                <strong>
+                    <h2>
 
-                    {completionPercentage.toFixed(1)}%
+                        {remainingVolume.toFixed(2)}
 
-                </strong>
+                        {" "}
 
-            </p>
+                        {form.output_unit}
 
-            <div
-                style={{
-                    width:"100%",
-                    height:"18px",
-                    background:"#555",
-                    borderRadius:"4px",
-                    overflow:"hidden"
-                }}
-            >
+                    </h2>
+
+                </div>
+
+                <div className="execution-metric">
+
+                    <h5>
+
+                        Phase Progress
+
+                    </h5>
+
+                    <h2>
+
+                        {completionPercentage.toFixed(1)}%
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div className="execution-progress">
 
                 <div
+
+                    className="execution-progress-fill"
+
                     style={{
-                        width:`${completionPercentage}%`,
-                        height:"100%",
-                        background:"#4caf50"
+
+                        width:`${completionPercentage}%`
+
                     }}
+
                 />
 
             </div>
 
-            <hr/>
-
-            <h3>
-
-                Daily Production
-
-            </h3>
-
-            <label>
-
-                Today's Output
-
-            </label>
-
-            <br/>
-
-            <input
-
-                type="number"
-
-                value={form.today_output}
-
-                onChange={
-
-                    e=>updateField(
-
-                        "today_output",
-
-                        e.target.value
-
-                    )
-
-                }
-
-            />
-
-            <br/><br/>
-
-            <label>
-
-                Total Output
-
-            </label>
-
-            <br/>
-
-            <input
-
-                type="number"
-
-                value={form.total_output}
-
-                onChange={
-
-                    e=>updateField(
-
-                        "total_output",
-
-                        e.target.value
-
-                    )
-
-                }
-
-            />
-
-            <br/><br/>
-
-            <label>
-
-                Daily Target
-
-            </label>
-
-            <br/>
-
-            <input
-
-                type="number"
-
-                value={form.daily_target}
-
-                onChange={
-
-                    e=>updateField(
-
-                        "daily_target",
-
-                        e.target.value
-
-                    )
-
-                }
-
-            />
-
-            <br/><br/>
-
-            <label>
-
-                Current Activity
-
-            </label>
-
-            <br/>
-
-            <textarea
-
-                rows={3}
-
-                value={form.current_activity}
-
-                onChange={
-
-                    e=>updateField(
-
-                        "current_activity",
-
-                        e.target.value
-
-                    )
-
-                }
-
-            />
-
-            <br/><br/>
-
-            <label>
-
-                Remarks
-
-            </label>
-
-            <br/>
-
-            <textarea
-
-                rows={4}
-
-                value={form.remarks}
-
-                onChange={
-
-                    e=>updateField(
-
-                        "remarks",
-
-                        e.target.value
-
-                    )
-
-                }
-
-            />
-
-            <br/><br/>
-
-            <label>
-
-                <input
-
-                    type="checkbox"
-
-                    checked={form.proof_uploaded}
-
-                    onChange={
-
-                        e=>updateField(
-
-                            "proof_uploaded",
-
-                            e.target.checked
-
-                        )
-
-                    }
-
-                />
+            <p
+                style={{
+                    marginTop:"12px",
+                    fontWeight:"600",
+                    color:"#d8ecec"
+                }}
+            >
+
+                Overall Execution Progress :
 
                 {" "}
 
-                Proof Uploaded
+                {executionContribution.toFixed(1)}%
 
-            </label>
+            </p>
 
-            <br/><br/>
+            <div className="execution-form-grid">
 
-            <button
+                <div className="execution-form-group">
 
-                onClick={
+                    <label>
 
-                    saveProgress
+                        Today's Output
 
-                }
+                    </label>
 
-            >
+                    <input
 
-                Save Execution Progress
+                        className="execution-input"
 
-            </button>
+                        type="number"
+
+                        value={form.today_output}
+
+                        onChange={e=>updateField(
+
+                            "today_output",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Total Output
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.total_output}
+
+                        onChange={e=>updateField(
+
+                            "total_output",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Daily Target
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        type="number"
+
+                        value={form.daily_target}
+
+                        onChange={e=>updateField(
+
+                            "daily_target",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div className="execution-form-group">
+
+                    <label>
+
+                        Output Unit
+
+                    </label>
+
+                    <input
+
+                        className="execution-input"
+
+                        value={form.output_unit}
+
+                        onChange={e=>updateField(
+
+                            "output_unit",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div
+                    className="execution-form-group"
+                    style={{gridColumn:"1 / -1"}}
+                >
+
+                    <label>
+
+                        Current Activity
+
+                    </label>
+
+                    <textarea
+
+                        className="execution-textarea"
+
+                        rows={3}
+
+                        value={form.current_activity}
+
+                        onChange={e=>updateField(
+
+                            "current_activity",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div
+                    className="execution-form-group"
+                    style={{gridColumn:"1 / -1"}}
+                >
+
+                    <label>
+
+                        Remarks
+
+                    </label>
+
+                    <textarea
+
+                        className="execution-textarea"
+
+                        rows={4}
+
+                        value={form.remarks}
+
+                        onChange={e=>updateField(
+
+                            "remarks",
+
+                            e.target.value
+
+                        )}
+
+                    />
+
+                </div>
+
+                <div
+                    className="execution-form-group"
+                    style={{gridColumn:"1 / -1"}}
+                >
+
+                    <label
+                        style={{
+                            display:"flex",
+                            alignItems:"center",
+                            gap:"12px"
+                        }}
+                    >
+
+                        <input
+
+                            type="checkbox"
+
+                            checked={form.proof_uploaded}
+
+                            onChange={e=>updateField(
+
+                                "proof_uploaded",
+
+                                e.target.checked
+
+                            )}
+
+                        />
+
+                        Proof Uploaded
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div className="execution-actions">
+
+                <button
+
+                    className="execution-btn"
+
+                    onClick={saveProgress}
+
+                >
+
+                    Save Execution Progress
+
+                </button>
+
+            </div>
 
         </div>
 

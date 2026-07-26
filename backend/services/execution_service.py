@@ -142,7 +142,8 @@ def create_execution_request(
         last_update_source="OPS",
 
         eta_minutes=0,
-        distance_remaining_km=0,
+        distance_to_cover_km=0,
+        initial_distance_km=0,
 
         today_output=0,
         total_output=0,
@@ -460,7 +461,12 @@ def sync_invoice_from_execution(
         else f"{execution.latitude},{execution.longitude}"
     )
 
-    invoice.distance_remaining_km = execution.distance_remaining_km
+    remaining_distance = max(
+        execution.distance_to_cover_km,
+        0
+    )
+
+    invoice.distance_remaining_km = remaining_distance
 
     invoice.eta_minutes = execution.eta_minutes
 
@@ -496,7 +502,7 @@ def sync_invoice_from_execution(
 
             "eta": execution.eta_minutes,
 
-            "distance": execution.distance_remaining_km,
+            "distance": execution.distance_to_cover_km,
 
             "source": execution.last_update_source
 
@@ -651,7 +657,21 @@ def update_execution_progress(
 
     execution.last_update_source = "OPS"
 
-    execution.distance_remaining_km = payload.distance_remaining_km
+    if payload.distance_to_cover_km is not None:
+
+        if (
+
+            execution.initial_distance_km is None
+
+            or
+
+            execution.initial_distance_km == 0
+
+        ):
+
+            execution.initial_distance_km = payload.distance_to_cover_km
+
+        execution.distance_to_cover_km = payload.distance_to_cover_km
 
     execution.eta_minutes = payload.eta_minutes
 
@@ -669,6 +689,109 @@ def update_execution_progress(
 
     execution.last_updated = datetime.utcnow()
 
+    # ====================================
+    # AUTO PROGRESS CALCULATION
+    # ====================================
+
+    survey = (
+        db.query(SalesSurvey)
+        .filter(
+            SalesSurvey.id == execution.sales_survey_id
+        )
+        .first()
+    )
+
+    estimated_volume = (
+        survey.estimated_volume
+        if survey and survey.estimated_volume
+        else 0
+    )
+
+    progress = execution.execution_progress
+
+    # -------------------------------
+    # PHASE 1
+    # -------------------------------
+
+    if execution.current_phase == "PHASE_1":
+
+        total_distance = execution.initial_distance_km or 0
+
+        remaining = execution.distance_to_cover_km or 0
+
+        travelled = max(
+
+            total_distance -
+
+            remaining,
+
+            0
+
+        )
+
+        if total_distance > 0:
+
+            phase_progress = min(
+                travelled / total_distance,
+                1
+            )
+
+            progress = phase_progress * 33
+
+    # -------------------------------
+    # PHASE 2
+    # -------------------------------
+
+    elif execution.current_phase == "PHASE_2":
+
+        if estimated_volume > 0:
+
+            phase_progress = min(
+                execution.total_output / estimated_volume,
+                1
+            )
+
+            progress = 33 + phase_progress * 33
+
+    # -------------------------------
+    # PHASE 3
+    # -------------------------------
+
+    elif execution.current_phase == "PHASE_3":
+
+        total_distance = execution.initial_distance_km or 0
+
+        remaining = execution.distance_to_cover_km or 0
+
+        travelled = max(
+
+            total_distance -
+
+            remaining,
+
+            0
+
+        )
+
+        if total_distance > 0:
+
+            phase_progress = min(
+                travelled / total_distance,
+                1
+            )
+
+            progress = 66 + phase_progress * 34
+
+    execution.execution_progress = round(
+        min(progress,100)
+    )
+
+    if execution.execution_progress >= 100:
+
+        execution.execution_progress = 100
+
+        execution.workflow_status = "EXECUTION_COMPLETED"
+
 
     print("\n========== EXECUTION UPDATE ==========")
     print(f"Execution ID : {execution.id}")
@@ -677,7 +800,7 @@ def update_execution_progress(
     print(f"Transport    : {execution.transport_status}")
     print(f"GPS          : {execution.latitude}, {execution.longitude}")
     print(f"ETA          : {execution.eta_minutes}")
-    print(f"Distance     : {execution.distance_remaining_km}")
+    print(f"Distance     : {execution.distance_to_cover_km}")
     print(f"Today Output : {execution.today_output}")
     print(f"Total Output : {execution.total_output}")
     print(f"Updated By   : {execution.last_update_source}")

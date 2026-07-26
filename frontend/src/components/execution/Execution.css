@@ -1,0 +1,418 @@
+/* ===========================================
+   PAGE
+=========================================== */
+
+.execution-page{
+
+    min-height:100vh;
+
+    padding:40px;
+
+    background:linear-gradient(
+        135deg,
+        #0b5c61,
+        #123b63
+    );
+
+    color:white;
+
+    font-family:Inter,sans-serif;
+
+}
+
+
+/* ===========================================
+   HEADER
+=========================================== */
+
+.execution-title{
+
+    font-size:42px;
+
+    font-weight:700;
+
+    margin-bottom:30px;
+
+}
+
+
+/* ===========================================
+   CARD
+=========================================== */
+
+.execution-card{
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    border-radius:24px;
+
+    padding:30px;
+
+    margin-bottom:30px;
+
+    backdrop-filter:blur(12px);
+
+}
+
+
+/* ===========================================
+   SECTION TITLE
+=========================================== */
+
+.execution-section-title{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    margin-bottom:20px;
+
+}
+
+
+/* ===========================================
+   SELECT
+=========================================== */
+
+.execution-selector{
+
+    width:360px;
+
+    padding:12px 16px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#1f5663;
+
+    color:white;
+
+    font-size:16px;
+
+    margin-bottom:25px;
+
+}
+
+
+/* ===========================================
+   SUMMARY GRID
+=========================================== */
+
+.execution-summary-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px;
+
+}
+
+
+.execution-summary-item{
+
+    background:rgba(255,255,255,.05);
+
+    padding:18px;
+
+    border-radius:16px;
+
+}
+
+
+.execution-summary-item span{
+
+    display:block;
+
+    color:#9ed9dd;
+
+    font-size:13px;
+
+    margin-bottom:6px;
+
+}
+
+
+.execution-summary-item strong{
+
+    font-size:18px;
+
+}
+
+
+/* ===========================================
+   METRICS
+=========================================== */
+
+.execution-metric-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:18px;
+
+    margin-bottom:25px;
+
+}
+
+
+.execution-metric{
+
+    background:rgba(255,255,255,.05);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+}
+
+
+.execution-metric h5{
+
+    margin:0 0 10px;
+
+    color:#9ed9dd;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+
+.execution-metric h2{
+
+    margin:0;
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+
+/* ===========================================
+   FORM
+=========================================== */
+
+.execution-form-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+}
+
+
+.execution-form-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+.execution-form-group label{
+
+    color:#b8e5e5;
+
+    margin-bottom:8px;
+
+    font-size:14px;
+
+}
+
+
+.execution-input,
+
+.execution-select,
+
+.execution-textarea{
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#1e5563;
+
+    color:white;
+
+    font-size:15px;
+
+}
+
+
+.execution-textarea{
+
+    resize:vertical;
+
+    min-height:100px;
+
+}
+
+
+/* ===========================================
+   MAP
+=========================================== */
+
+.execution-map{
+
+    width:100%;
+
+    height:340px;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    border:1px solid rgba(255,255,255,.10);
+
+    background:rgba(255,255,255,.05);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    margin-top:25px;
+
+}
+
+
+/* ===========================================
+   PROGRESS
+=========================================== */
+
+.execution-progress{
+
+    width:100%;
+
+    height:18px;
+
+    background:rgba(255,255,255,.12);
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+}
+
+
+.execution-progress-fill{
+
+    height:100%;
+
+    background:#33d4ca;
+
+    transition:.35s;
+
+}
+
+
+/* ===========================================
+   ACTIONS
+=========================================== */
+
+.execution-actions{
+
+    display:flex;
+
+    gap:18px;
+
+    margin-top:25px;
+
+    flex-wrap:wrap;
+
+}
+
+
+.execution-btn{
+
+    padding:14px 30px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#31d4ca;
+
+    color:#09333f;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+
+.execution-btn:hover{
+
+    transform:translateY(-2px);
+
+    background:#56e6dc;
+
+}
+
+
+.execution-btn:disabled{
+
+    opacity:.45;
+
+    cursor:not-allowed;
+
+}
+
+
+/* ===========================================
+   RESPONSIVE
+=========================================== */
+
+@media(max-width:1000px){
+
+    .execution-summary-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .execution-metric-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+    .execution-form-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:700px){
+
+    .execution-metric-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}

@@ -36,6 +36,30 @@ export default function Execution(){
 
     const [execution,setExecution] = useState(null);
 
+    // ====================================
+    // REFRESH EXECUTION
+    // ====================================
+
+    async function refreshExecution(
+
+        executionId
+
+    ){
+
+        await refreshExecution(
+
+            selectedExecution
+
+        );
+
+        setExecution(
+
+            updated
+
+        );
+
+    }
+
     const executionCompleted =
 
         execution?.workflow_status ===
@@ -190,9 +214,11 @@ export default function Execution(){
 
             alert("Phase Completed");
 
-            const updated = await getExecution(selectedExecution);
+            await refreshExecution(
 
-            setExecution(updated);
+                selectedExecution
+
+            );
 
         }
 
@@ -242,15 +268,9 @@ export default function Execution(){
 
             );
 
-            const updated = await getExecution(
+            await refreshExecution(
 
                 selectedExecution
-
-            );
-
-            setExecution(
-
-                updated
 
             );
 
@@ -353,6 +373,8 @@ export default function Execution(){
 
                     execution={execution}
 
+                    refreshExecution={refreshExecution}
+
                 />
 
             )
@@ -366,6 +388,8 @@ export default function Execution(){
                 <Phase2Execution
 
                     execution={execution}
+
+                    refreshExecution={refreshExecution}
 
                 />
 
@@ -381,6 +405,8 @@ export default function Execution(){
 
                     execution={execution}
 
+                    refreshExecution={refreshExecution}
+
                 />
 
             )
@@ -389,21 +415,15 @@ export default function Execution(){
 
 
 
-        <div
-            style={{
-                width:"100%",
-                height:"18px",
-                background:"#444"
-            }}
-        >
-
         {execution && (
 
         <div
             style={{
                 width:"100%",
                 height:"18px",
-                background:"#444"
+                background:"#444",
+                borderRadius:"4px",
+                overflow:"hidden"
             }}
         >
 
@@ -418,8 +438,6 @@ export default function Execution(){
         </div>
 
         )}
-
-        </div>
 
         <br/>
 

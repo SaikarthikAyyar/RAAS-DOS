@@ -1,4 +1,11 @@
 // ====================================
+// IMPORTS
+// ====================================
+
+import "./Execution.css";
+
+
+// ====================================
 // EXECUTION CONTROLS
 // ====================================
 
@@ -26,83 +33,84 @@ export default function ExecutionControls({
 
         "EXECUTION_COMPLETED";
 
+    const canStart =
+
+        !completed;
+
+    const canUpdate =
+
+        !completed;
+
+    const canComplete =
+
+        !completed;
+
     return(
 
-        <div
-            style={{
+        <div className="execution-card">
 
-                marginTop:"20px",
-
-                padding:"20px",
-
-                border:"1px solid #444",
-
-                borderRadius:"8px",
-
-                background:"#1f1f1f"
-
-            }}
-        >
-
-            <h2>
+            <h2 className="execution-section-title">
 
                 Execution Controls
 
             </h2>
 
-            <br/>
-
-            <button
-
-                disabled={completed}
-
-                onClick={
-
-                    startCurrentPhase
-
-                }
-
+            <p
+                style={{
+                    color:"#b8e5e5",
+                    marginBottom:"24px"
+                }}
             >
 
-                Start Current Phase
+                Use the controls below to progress the execution workflow.
 
-            </button>
+            </p>
 
-            {" "}
+            <div className="execution-actions">
 
-            <button
+                <button
 
-                disabled={completed}
+                    className="execution-btn"
 
-                onClick={
+                    disabled={!canStart}
 
-                    updateExecution
+                    onClick={startCurrentPhase}
 
-                }
+                >
 
-            >
+                    Start Current Phase
 
-                Update Execution
+                </button>
 
-            </button>
+                <button
 
-            {" "}
+                    className="execution-btn"
 
-            <button
+                    disabled={!canUpdate}
 
-                disabled={completed}
+                    onClick={updateExecution}
 
-                onClick={
+                >
 
-                    completeCurrentPhase
+                    Update Execution
 
-                }
+                </button>
 
-            >
+                <button
 
-                Complete Current Phase
+                    className="execution-btn"
 
-            </button>
+                    disabled={!canComplete}
+
+                    onClick={completeCurrentPhase}
+
+                >
+
+                    Complete Current Phase
+
+                </button>
+
+            </div>
 
         </div>
 
