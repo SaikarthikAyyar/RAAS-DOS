@@ -156,9 +156,9 @@ const menuItems = [
 
     {
 
-        title: "Customer Portal",
+        title: "Customer Live Order",
 
-        path: "/customer-portal",
+        path: "/customer-live-order",
 
         icon: <UserCircle size={20} />
 

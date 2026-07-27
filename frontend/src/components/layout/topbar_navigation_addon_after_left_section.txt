@@ -1,0 +1,45 @@
+            {/* Center Section */}
+
+            <div className="topbar-navigation">
+
+                {
+
+                    menu.map(item=>(
+
+                        <NavLink
+
+                            key={item.path}
+
+                            to={item.path}
+
+                            className={({isActive})=>
+
+                                isActive
+
+                                ?
+
+                                "topbar-link active"
+
+                                :
+
+                                "topbar-link"
+
+                            }
+
+                        >
+
+                            {item.icon}
+
+                            <span>
+
+                                {item.title}
+
+                            </span>
+
+                        </NavLink>
+
+                    ))
+
+                }
+
+            </div>

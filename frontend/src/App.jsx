@@ -26,7 +26,7 @@ import Allocation from "./pages/Allocation";
 
 import Execution from "./pages/Execution";
 
-import CustomerPortal from "./pages/CustomerPortal";
+import CustomerPortal from "./pages/CustomerLiveOrder";
 
 
 

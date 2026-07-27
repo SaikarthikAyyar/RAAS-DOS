@@ -71,6 +71,7 @@ export default function InvoiceExecutionTab({
                             execution={execution}
 
                             refreshExecution={()=>{}}
+                            readOnly={true}
 
                         />
 
@@ -91,6 +92,7 @@ export default function InvoiceExecutionTab({
                             execution={execution}
 
                             refreshExecution={()=>{}}
+                            readOnly={true}                            
 
                         />
 
@@ -111,6 +113,7 @@ export default function InvoiceExecutionTab({
                             execution={execution}
 
                             refreshExecution={()=>{}}
+                            readOnly={true}                             
 
                         />
 

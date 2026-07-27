@@ -221,25 +221,21 @@ background:#14958e;
 
 .topbar{
 
-height:80px;
+    display:flex;
 
-display:flex;
+    align-items:center;
 
-justify-content:space-between;
+    height:80px;
 
-align-items:center;
+    width:100%;
 
-padding:0 35px;
+    padding:0 20px;
 
-border-bottom:
-1px solid rgba(255,255,255,.08);
+    gap:20px;
 
-background:
-rgba(0,0,0,.10);
+    background:rgba(0,0,0,.10);
 
-backdrop-filter:blur(12px);
-
-color:white;
+    border-bottom:1px solid rgba(255,255,255,.08);
 
 }
 
@@ -252,6 +248,10 @@ color:white;
 display:flex;
 align-items:center;
 gap:15px;
+
+flex-shrink:0;
+
+flex:0 0 auto;
 
 font-size:18px;
 font-weight:700;
@@ -269,6 +269,44 @@ color:#eef7ff;
 display:flex;
 align-items:center;
 gap:15px;
+
+flex-shrink:0;
+
+flex:0 0 auto;
+
+}
+
+.logout-button-topbar{
+
+    height:46px;
+
+    padding:0 24px;
+
+    border:none;
+
+    border-radius:999px;
+
+    background:#117d77;
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    flex-shrink:0;
+
+}
+
+.logout-button-topbar:hover{
+
+    background:#14958e;
+
+    transform:translateY(-2px);
 
 }
 
@@ -521,16 +559,119 @@ height:auto;
 
 }
 
-.topbar{
 
-padding:0 20px;
-
-}
 
 .app-content{
 
 padding:16px;
 
 }
+
+}
+
+
+.topbar-navigation{
+
+    flex:1;
+
+    min-width:0;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    overflow-x:auto;
+
+    overflow-y:hidden;
+
+    scrollbar-width:thin;
+
+    scrollbar-color:#37c6be rgba(255,255,255,.08);
+
+    padding-bottom:6px;
+
+}
+
+.topbar-navigation::-webkit-scrollbar{
+
+    height:10px;
+
+}
+
+.topbar-navigation::-webkit-scrollbar-track{
+
+    background:rgba(255,255,255,.08);
+
+    border-radius:999px;
+
+}
+
+.topbar-navigation::-webkit-scrollbar-thumb{
+
+    background:linear-gradient(
+        90deg,
+        #37c6be,
+        #2ab6a8
+    );
+
+    border-radius:999px;
+
+    border:2px solid rgba(0,0,0,.08);
+
+}
+
+.topbar-navigation::-webkit-scrollbar-thumb:hover{
+
+    background:linear-gradient(
+        90deg,
+        #4fded6,
+        #37c6be
+    );
+
+}
+
+.topbar-navigation::-webkit-scrollbar-corner{
+
+    background:transparent;
+
+}
+
+
+
+.topbar-link{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:10px 16px;
+
+    flex:0 0 auto;
+
+    white-space:nowrap;
+
+    text-decoration:none;
+
+    color:white;
+
+    border-radius:12px;
+
+}
+
+.topbar-link:hover{
+
+    background:rgba(255,255,255,0.08);
+
+}
+
+.topbar-link.active{
+
+    background:#37c6be;
+
+    color:white;
 
 }

@@ -143,7 +143,7 @@ def create_execution_request(
 
         eta_minutes=0,
         distance_to_cover_km=0,
-        initial_distance_km=0,
+        distance_travelled_km=0,
 
         today_output=0,
         total_output=0,
@@ -462,13 +462,15 @@ def sync_invoice_from_execution(
     )
 
     remaining_distance = max(
-        execution.distance_to_cover_km,
+        execution.distance_to_cover_km
+        if execution.distance_to_cover_km is not None
+        else 0,
         0
     )
 
     invoice.distance_remaining_km = remaining_distance
 
-    invoice.eta_minutes = execution.eta_minutes
+    invoice.eta_minutes = execution.eta_minutes or 0
 
     logs = invoice.live_execution_log or []
 
@@ -658,20 +660,10 @@ def update_execution_progress(
     execution.last_update_source = "OPS"
 
     if payload.distance_to_cover_km is not None:
-
-        if (
-
-            execution.initial_distance_km is None
-
-            or
-
-            execution.initial_distance_km == 0
-
-        ):
-
-            execution.initial_distance_km = payload.distance_to_cover_km
-
         execution.distance_to_cover_km = payload.distance_to_cover_km
+
+    if payload.distance_travelled_km is not None:
+        execution.distance_travelled_km = payload.distance_travelled_km
 
     execution.eta_minutes = payload.eta_minutes
 
@@ -715,28 +707,15 @@ def update_execution_progress(
 
     if execution.current_phase == "PHASE_1":
 
-        total_distance = execution.initial_distance_km or 0
+        total_distance = execution.distance_to_cover_km or 0
+
+        travelled = execution.distance_travelled_km or 0
 
         remaining = execution.distance_to_cover_km or 0
 
-        travelled = max(
+        phase_progress = travelled / total_distance
 
-            total_distance -
-
-            remaining,
-
-            0
-
-        )
-
-        if total_distance > 0:
-
-            phase_progress = min(
-                travelled / total_distance,
-                1
-            )
-
-            progress = phase_progress * 33
+        progress = phase_progress * 33
 
     # -------------------------------
     # PHASE 2

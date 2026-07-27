@@ -50,6 +50,8 @@ from backend.api.invoice_api import (
     router as invoice_router
 )
 
+from backend.api.customer_live_order_api import router as customer_live_order_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -190,6 +192,8 @@ app.include_router(
     execution_router
 
 )
+
+app.include_router(customer_live_order_api)
 
 
 app.include_router(

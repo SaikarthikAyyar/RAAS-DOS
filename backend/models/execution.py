@@ -194,6 +194,11 @@ class Execution(Base):
         default=0
     )
 
+    distance_travelled_km = Column(
+        Float,
+        default=0
+    )
+
     today_output = Column(
         Float,
         default=0
