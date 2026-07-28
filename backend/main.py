@@ -30,6 +30,8 @@ from backend.api.auth_api import (
 
 )
 
+from backend.api.administrationUsers_api import api as administrationUsers_api
+
 from backend.api.allocation_api import (
     router as allocation_router
 )
@@ -177,6 +179,8 @@ app.include_router(
     invoice_router
 
 )
+
+app.include_router(administrationUsers_api)
 
 
 

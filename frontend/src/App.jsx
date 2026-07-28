@@ -28,6 +28,9 @@ import Execution from "./pages/Execution";
 
 import CustomerPortal from "./pages/CustomerLiveOrder";
 
+import AdministrationPage
+from "./pages/AdministrationPage";
+
 
 
 import Analytics from "./pages/Analytics";
@@ -46,6 +49,14 @@ function App() {
           <Route index element={<Login />} />
 
           <Route path="dashboard" element={<Dashboard />} />
+
+          <Route
+
+              path="/administration"
+
+              element={<AdministrationPage/>}
+
+          />
 
           <Route path="customer-request" element={<CustomerRequest />} />
 

@@ -9,6 +9,8 @@ import {
 
     Home,
 
+    ShieldCheck,
+
     FileText,
 
     ClipboardCheck,
@@ -53,6 +55,18 @@ const menuItems = [
         icon: <Home size={20} />
 
     },
+
+    {
+
+        title:"Administration",
+
+        path:"/administration",
+
+        icon:<ShieldCheck size={20}/>
+
+    },
+
+
 
     {
 

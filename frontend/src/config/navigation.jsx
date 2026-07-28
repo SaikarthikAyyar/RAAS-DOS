@@ -2,9 +2,11 @@
 // IMPORTS
 // ====================================
 
-import {
+import{
 
 Home,
+
+ShieldCheck,
 
 FileText,
 
@@ -44,6 +46,8 @@ export const ROLE_MODULES={
 admin:[
 
 {title:"Dashboard",path:"/dashboard",icon:<Home size={18}/>},
+
+{title:"Administration",path:"/administration",icon:<ShieldCheck size={18}/>},
 
 {title:"Customer Request",path:"/customer-request",icon:<FileText size={18}/>},
 
