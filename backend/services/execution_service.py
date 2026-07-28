@@ -291,11 +291,14 @@ def update_execution_after_allocation(
 
     execution.current_activity = "Resources Allocated"
 
-    execution.site_location = payload.site_location
+    if execution.site_location is None and payload.site_location is not None:
+        execution.site_location = payload.site_location
 
-    execution.planned_start = payload.planned_start
+    if execution.planned_start is not None and payload.planned_start is not None:
+        execution.planned_start = payload.planned_start
 
-    execution.estimated_completion = payload.planned_completion
+    if execution.planned_completion is not None and payload.planned_completion is not None:
+        execution.estimated_completion = payload.planned_completion
 
     db.commit()
 
@@ -461,10 +464,11 @@ def sync_invoice_from_execution(
         else f"{execution.latitude},{execution.longitude}"
     )
 
+    total = execution.distance_to_cover_km or 0
+    travelled = execution.distance_travelled_km or 0
+
     remaining_distance = max(
-        execution.distance_to_cover_km
-        if execution.distance_to_cover_km is not None
-        else 0,
+        total - travelled,
         0
     )
 
@@ -504,7 +508,11 @@ def sync_invoice_from_execution(
 
             "eta": execution.eta_minutes,
 
-            "distance": execution.distance_to_cover_km,
+            "distance_remaining": remaining_distance,
+
+            "distance_travelled": execution.distance_travelled_km,
+
+            "total_distance": execution.distance_to_cover_km,
 
             "source": execution.last_update_source
 
@@ -659,8 +667,6 @@ def update_execution_progress(
 
     execution.last_update_source = "OPS"
 
-    if payload.distance_to_cover_km is not None:
-        execution.distance_to_cover_km = payload.distance_to_cover_km
 
     if payload.distance_travelled_km is not None:
         execution.distance_travelled_km = payload.distance_travelled_km
@@ -708,12 +714,12 @@ def update_execution_progress(
     if execution.current_phase == "PHASE_1":
 
         total_distance = execution.distance_to_cover_km or 0
-
         travelled = execution.distance_travelled_km or 0
 
-        remaining = execution.distance_to_cover_km or 0
-
-        phase_progress = travelled / total_distance
+        if total_distance > 0:
+            phase_progress = min(travelled / total_distance, 1)
+        else:
+            phase_progress = 0
 
         progress = phase_progress * 33
 
@@ -738,28 +744,15 @@ def update_execution_progress(
 
     elif execution.current_phase == "PHASE_3":
 
-        total_distance = execution.initial_distance_km or 0
-
-        remaining = execution.distance_to_cover_km or 0
-
-        travelled = max(
-
-            total_distance -
-
-            remaining,
-
-            0
-
-        )
+        total_distance = execution.distance_to_cover_km or 0
+        travelled = execution.distance_travelled_km or 0
 
         if total_distance > 0:
+            phase_progress = min(travelled / total_distance, 1)
+        else:
+            phase_progress = 0
 
-            phase_progress = min(
-                travelled / total_distance,
-                1
-            )
-
-            progress = 66 + phase_progress * 34
+        progress = 66 + phase_progress * 34
 
     execution.execution_progress = round(
         min(progress,100)
@@ -905,6 +898,18 @@ def start_execution_phase(
         execution
 
     )
+
+    if execution.current_phase == "PHASE_1":
+
+        execution.distance_to_cover_km = 18      # temporary constant
+
+        execution.distance_travelled_km = 0
+
+    if execution.current_phase == "PHASE_3":
+
+        execution.distance_to_cover_km = 15      # return journey
+
+        execution.distance_travelled_km = 0
 
     # ====================================
     # START MACHINE SCHEDULE

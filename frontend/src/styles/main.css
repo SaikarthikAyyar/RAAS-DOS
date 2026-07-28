@@ -38,7 +38,7 @@ width:100vw;
 
 height:100vh;
 
-background:linear-gradient(135deg,#041b1d,#0d3f38,#08312d);
+background:#f4f7fb;
 
 overflow:hidden;
 
@@ -73,18 +73,21 @@ padding:30px;
 .sidebar-logo{
 
 display:flex;
+height:50%;
+
+width:100%;
 
 justify-content:center;
 
 align-items:center;
 
-margin-bottom:30px;
+margin: bottom 100px;
 
 }
 
 .sidebar-logo-text{
 
-font-size:40px;
+font-size:80px;
 
 font-weight:800;
 
@@ -166,19 +169,23 @@ overflow:hidden;
 
 .app-topnav{
 
-height:80px;
+height:78px;
 
 display:flex;
 
-justify-content:flex-end;
-
 align-items:center;
 
-gap:40px;
+justify-content:space-between;
 
-padding:0 40px;
+padding:0 28px;
 
-color:white;
+background:#ffffff;
+
+border-bottom:1px solid #e5e7eb;
+
+box-shadow:0 2px 10px rgba(15,23,42,.05);
+
+z-index:100;
 
 }
 
@@ -192,8 +199,8 @@ flex:1;
 
 overflow-y:auto;
 
-width:100%;
+padding:28px;
 
-padding:20px;
+background:#f4f7fb;
 
 }

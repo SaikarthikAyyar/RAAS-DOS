@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from "../../assets/JTLOGO.jpeg";
+import logo from "../../assets/JanyutechLogo.jpg";
 import { ROLE_MODULES } from "../../config/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -29,7 +29,7 @@ export default function Sidebar(){
 
             </div>
 
-            <div>
+            <div className="sidebar-menu">
 
                 {
 

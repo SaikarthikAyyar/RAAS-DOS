@@ -1,4 +1,4 @@
-import logo from "../assets/JTLOGO.jpeg";
+import logo from "../assets/JanyutechLogo.jpg";
 
 function Header(){
 
@@ -18,7 +18,7 @@ function Header(){
 
    }}>
 
-     <img src={logo} alt="JT Logo" style={{ height: 40 }} />
+     <img src={logo} alt="JT Logo" style={{ height: 100 }} />
 
      <div>
 

@@ -10,13 +10,7 @@
 
     padding:32px 40px 60px;
 
-    background:
-    linear-gradient(
-        135deg,
-        #002f38,
-        #004d4d 50%,
-        #003f55
-    );
+    background:var(--bg);
 
     overflow-y:auto;
 
@@ -37,21 +31,15 @@
 
     width:100%;
 
-    background:
-    linear-gradient(
-        135deg,
-        rgba(20,72,78,.92),
-        rgba(14,84,77,.92) 45%,
-        rgba(18,52,88,.92)
-    );
+    background:var(--card);
 
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
 
     border-radius:26px;
 
     padding:28px;
 
-    box-shadow:0 12px 35px rgba(0,0,0,.25);
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
 
 }
 
@@ -64,7 +52,7 @@
 
     margin:0 0 24px;
 
-    color:#eef7ff;
+    color:var(--ink);
 
     font-size:28px;
 
@@ -104,7 +92,7 @@
 
 .jobField label{
 
-    color:#9fb4c4;
+    color:var(--muted);
 
     font-size:15px;
 
@@ -133,15 +121,15 @@
 
     padding:0 18px;
 
-    background:rgba(255,255,255,.08);
+    background:white;
 
-    color:#eef7ff;
+    color:var(--ink);
 
     font-size:16px;
 
     outline:none;
 
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
 
 }
 
@@ -162,9 +150,9 @@
 
 .jobField input:disabled{
 
-    background:rgba(255,255,255,.05);
+    background:#f8fafc;
 
-    color:#d9e4ee;
+    color:var(--muted);
 
     cursor:not-allowed;
 
@@ -183,7 +171,7 @@
 
     overflow:hidden;
 
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
 
 }
 
@@ -209,11 +197,11 @@
 
 .jobTableHeader{
 
-    background:rgba(255,255,255,.10);
+    background:#f8fafc;
 
     font-weight:800;
 
-    color:#eef7ff;
+    color:#475569;
 
 }
 
@@ -227,11 +215,11 @@
 
 .jobTableRow{
 
-    background:rgba(255,255,255,.04);
+    background:white;
 
-    border-top:1px solid rgba(255,255,255,.05);
+    border-top:1px solid var(--line);
 
-    color:#eef7ff;
+    color:var(--ink);
 
 }
 
@@ -311,7 +299,7 @@
 
     border-radius:18px;
 
-    background:#2ab6a8;
+    background:var(--orange);
 
     color:white;
 
@@ -329,6 +317,8 @@
 
     transform:translateY(-2px);
 
+    background:#d96b0d;
+
 }
 
 .jobSecondaryButton{
@@ -337,13 +327,13 @@
 
     height:56px;
 
-    border:none;
+    border:1px solid var(--line);
 
     border-radius:18px;
 
-    background:rgba(255,255,255,.08);
+    background:white;
 
-    color:#eef7ff;
+    color:var(--ink);
 
     font-size:17px;
 
@@ -357,7 +347,7 @@
 
 .jobSecondaryButton:hover{
 
-    background:rgba(255,255,255,.14);
+    background:#f8fafc;
 
 }
 
@@ -423,7 +413,7 @@
 
 .jobField select{
 
-    color:#ffffff;
+    color:var(--ink);
 
 }
 

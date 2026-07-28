@@ -78,6 +78,8 @@ class ExecutionSchema(BaseModel):
 
     distance_to_cover_km: float = 0
 
+    distance_travelled_km: float = 0
+
     today_output: float = 0
 
     total_output: float = 0
@@ -116,6 +118,8 @@ class ExecutionProgressUpdateSchema(BaseModel):
     eta_minutes: int | None = None
 
     distance_to_cover_km: float | None = None
+
+    distance_travelled_km: float | None = None
     
     today_output: float | None = None
 

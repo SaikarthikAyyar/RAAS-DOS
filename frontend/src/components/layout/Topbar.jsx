@@ -27,17 +27,7 @@ export default function Topbar(){
 
             {/* Left Section */}
 
-            <div className="topbar-left">
 
-                <Bell size={20}/>
-
-                <span>
-
-                    Notifications
-
-                </span>
-
-            </div>
 
 
 
@@ -62,6 +52,18 @@ export default function Topbar(){
                 <div className="user-chip">
 
                     {user?.role}
+
+                </div>
+
+                <Bell size={20}/>
+
+                <div className="topbar-left">
+
+                <span>
+
+                    Notifications
+
+                </span>
 
                 </div>
 

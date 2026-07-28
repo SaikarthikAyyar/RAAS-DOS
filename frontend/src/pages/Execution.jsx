@@ -40,23 +40,29 @@ export default function Execution(){
     // REFRESH EXECUTION
     // ====================================
 
-    async function refreshExecution(
+    async function refreshExecution(executionId){
 
-        executionId
+        if(!executionId){
 
-    ){
+            return;
 
-        await refreshExecution(
+        }
 
-            selectedExecution
+        try{
 
-        );
+            const updated = await getExecution(executionId);
 
-        setExecution(
+            console.log("Execution Refreshed", updated);
 
-            updated
+            setExecution(updated);
 
-        );
+        }
+
+        catch(error){
+
+            console.error(error);
+
+        }
 
     }
 
