@@ -50,16 +50,18 @@ export default function AdministrationUsers({
     const roles = [
 
         ...new Set(
+            [
 
-            users
+            ...users
 
                 .map(
 
                     user => user.role
 
-                )
+                ),
+                "partner"
 
-                .filter(Boolean)
+            ]
 
         )
 

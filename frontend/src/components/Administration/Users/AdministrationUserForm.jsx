@@ -180,7 +180,7 @@ export default function AdministrationUserForm({
 
             onSubmit={handleSubmit}
 
-            className="administration-user-form"
+            className="administration-form"
 
         >
 
@@ -377,21 +377,25 @@ export default function AdministrationUserForm({
 
             >
 
-                <button
+            <button
 
-                    type="button"
+                type="button"
 
-                    onClick={onCancel}
+                className="administration-button secondary"
 
-                >
+                onClick={onCancel}
 
-                    Cancel
+            >
 
-                </button>
+                Cancel
+
+            </button>
 
                 <button
 
                     type="submit"
+
+                    className="administration-button primary"
 
                     disabled={loading}
 

@@ -109,11 +109,18 @@ def update_user(
 
     update_data = payload.model_dump(exclude_unset=True)
 
+    # Do not overwrite password if it was left blank
+    if "password" in update_data and (
+        update_data["password"] is None or
+        update_data["password"].strip() == ""
+    ):
+        del update_data["password"]
+
     for field, value in update_data.items():
 
         setattr(user, field, value)
 
-        print(f"      Updated {field} -> {value}")
+        print(f"Updated {field} -> {value}")
 
     db.commit()
 

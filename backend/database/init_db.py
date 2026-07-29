@@ -35,6 +35,8 @@ from backend.models.personnel_document import PersonnelDocument
 
 from backend.models.execution import Execution
 
+from backend.models.partners import Partner
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel

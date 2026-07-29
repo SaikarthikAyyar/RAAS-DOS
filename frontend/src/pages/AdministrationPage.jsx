@@ -9,6 +9,9 @@ import "../components/Administration/administration.css";
 import AdministrationUsers
 from "../components/Administration/Users/AdministrationUsers";
 
+import AdministrationPartners
+from "../components/Administration/Partners/AdministrationPartners";
+
 
 // =========================================
 // COMPONENT
@@ -30,9 +33,21 @@ export default function AdministrationPage(){
 
     const [
 
-        createSignal,
+        createPartnerSignal,
 
-        setCreateSignal
+        setCreatePartnerSignal
+
+    ] = useState(
+
+        0
+
+    );
+
+    const [
+
+        createUserSignal,
+
+        setCreateUserSignal
 
     ] = useState(
 
@@ -170,19 +185,61 @@ export default function AdministrationPage(){
 
                             className="administration-add-button"
 
-                            onClick={()=>
+                            onClick={()=>{
 
-                                setCreateSignal(
+                                if(
 
-                                    value=>value+1
+                                    activeTab==="users"
 
-                                )
+                                ){
 
-                            }
+                                    setCreateUserSignal(
+
+                                        previous=>previous+1
+
+                                    );
+
+                                }
+
+                                else if(
+
+                                    activeTab==="partners"
+
+                                ){
+
+                                    setCreatePartnerSignal(
+
+                                        previous=>previous+1
+
+                                    );
+
+                                }
+
+                            }}
 
                         >
 
-                            + Add User
+                            {
+
+                                activeTab==="users"
+
+                                ?
+
+                                "Add User"
+
+                                :
+
+                                activeTab==="partners"
+
+                                ?
+
+                                "Add Partner"
+
+                                :
+
+                                "Add"
+
+                            }
 
                         </button>
 
@@ -192,7 +249,7 @@ export default function AdministrationPage(){
 
                         createSignal={
 
-                            createSignal
+                            createUserSignal
 
                         }
 
@@ -246,11 +303,41 @@ export default function AdministrationPage(){
 
                         <div className="administration-card-title">
 
-                            Partners
+                            Partner Firms
 
                         </div>
 
+                        <button
+
+                            className="administration-add-button"
+
+                            onClick={()=>{
+
+                                setCreatePartnerSignal(
+
+                                    previous=>previous+1
+
+                                );
+
+                            }}
+
+                        >
+
+                            Add Partner
+
+                        </button>
+
                     </div>
+
+                    <AdministrationPartners
+
+                        createSignal={
+
+                            createPartnerSignal
+
+                        }
+
+                    />
 
                 </section>
 
