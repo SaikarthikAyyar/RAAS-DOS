@@ -24,6 +24,9 @@ from backend.models.invoice import Invoice
 
 from backend.models.users import User
 from backend.models.enquiry import Enquiry
+from backend.models.roles import Role
+from backend.models.modules import Module
+from backend.models.role_permissions import RolePermission
 
 from backend.models.ops_approval import OpsApproval
 

@@ -30,6 +30,8 @@ from backend.api.auth_api import (
 
 )
 
+from backend.api.administrationRoles_api import api as administration_roles_api
+
 from backend.api.administrationUsers_api import api as administrationUsers_api
 
 from backend.api.allocation_api import (
@@ -207,6 +209,7 @@ app.include_router(
 
 )
 
+app.include_router(administration_roles_api)
 
 app.include_router(
 

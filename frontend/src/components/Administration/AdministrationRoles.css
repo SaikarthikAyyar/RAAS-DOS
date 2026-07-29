@@ -1,0 +1,237 @@
+/* ==========================================
+   Administration Roles
+========================================== */
+
+.administration-roles-sidebar{
+
+    width:340px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+    margin-top:20px;
+
+}
+
+
+/* ==========================================
+   Role Card
+========================================== */
+
+.role-card{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 22px;
+
+    border:1px solid #dcdcdc;
+
+    border-radius:10px;
+
+    background:#ffffff;
+
+    transition:
+
+        box-shadow .2s ease,
+
+        transform .2s ease,
+
+        border-color .2s ease;
+
+}
+
+
+.role-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+
+        0 4px 12px rgba(
+
+            0,
+
+            0,
+
+            0,
+
+            0.08
+
+        );
+
+}
+
+
+.role-card-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+
+.role-name{
+
+    font-size:18px;
+
+    font-weight:600;
+
+    color:#222;
+
+}
+
+
+.role-type{
+
+    font-size:14px;
+
+    color:#666;
+
+}
+
+
+/* ==========================================
+   Status Badge
+========================================== */
+
+.role-status{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:max-content;
+
+    padding:4px 10px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+
+.role-status.active{
+
+    color:#1b5e20;
+
+    background:#e8f5e9;
+
+}
+
+
+.role-status.inactive{
+
+    color:#b71c1c;
+
+    background:#ffebee;
+
+}
+
+
+/* ==========================================
+   Card Actions
+========================================== */
+
+.role-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+
+.role-edit-button,
+
+.role-delete-button{
+
+    min-width:90px;
+
+    padding:8px 14px;
+
+    border:none;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    transition:opacity .2s ease;
+
+}
+
+
+.role-edit-button{
+
+    background:#1976d2;
+
+    color:white;
+
+}
+
+
+.role-delete-button{
+
+    background:#d32f2f;
+
+    color:white;
+
+}
+
+
+.role-edit-button:hover,
+
+.role-delete-button:hover{
+
+    opacity:.9;
+
+}
+
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media (
+
+    max-width:768px
+
+){
+
+    .role-card{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:16px;
+
+    }
+
+    .role-actions{
+
+        width:100%;
+
+        justify-content:flex-end;
+
+    }
+
+}

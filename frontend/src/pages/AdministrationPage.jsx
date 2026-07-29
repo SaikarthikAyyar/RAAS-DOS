@@ -12,6 +12,9 @@ from "../components/Administration/Users/AdministrationUsers";
 import AdministrationPartners
 from "../components/Administration/Partners/AdministrationPartners";
 
+import AdministrationRoles
+from "../components/Administration/AdministrationRoles";
+
 
 // =========================================
 // COMPONENT
@@ -48,6 +51,18 @@ export default function AdministrationPage(){
         createUserSignal,
 
         setCreateUserSignal
+
+    ] = useState(
+
+        0
+
+    );
+
+    const [
+
+        createRoleSignal,
+
+        setCreateRoleSignal
 
     ] = useState(
 
@@ -203,6 +218,20 @@ export default function AdministrationPage(){
 
                                 else if(
 
+                                    activeTab==="roles"
+
+                                ){
+
+                                    setCreateRoleSignal(
+
+                                        previous=>previous+1
+
+                                    );
+
+                                }
+
+                                else if(
+
                                     activeTab==="partners"
 
                                 ){
@@ -219,27 +248,35 @@ export default function AdministrationPage(){
 
                         >
 
-                            {
+                        {
 
-                                activeTab==="users"
+                            activeTab==="users"
 
-                                ?
+                            ?
 
-                                "Add User"
+                            "Add User"
 
-                                :
+                            :
 
-                                activeTab==="partners"
+                            activeTab==="roles"
 
-                                ?
+                            ?
 
-                                "Add Partner"
+                            "Add Role"
 
-                                :
+                            :
 
-                                "Add"
+                            activeTab==="partners"
 
-                            }
+                            ?
+
+                            "Add Partner"
+
+                            :
+
+                            "Add"
+
+                        }
 
                         </button>
 
@@ -270,19 +307,15 @@ export default function AdministrationPage(){
 
                 &&
 
-                <section className="administration-card">
+                <AdministrationRoles
 
-                    <div className="administration-card-header">
+                    createSignal={
 
-                        <div className="administration-card-title">
+                        createRoleSignal
 
-                            Roles & Permissions
+                    }
 
-                        </div>
-
-                    </div>
-
-                </section>
+                />
 
             }
 
