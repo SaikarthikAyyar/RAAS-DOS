@@ -180,6 +180,50 @@ class CustomerRequest(Base):
 
     )
 
+    # ====================================
+    # CUSTOMER DETAILS (EXTENDED)
+    # ====================================
+
+    existing_asset = Column(
+        String(255),
+        nullable=True
+    )
+
+    lead_source = Column(
+        String(100),
+        nullable=True
+    )
+
+    client_contact_email = Column(
+        String(255),
+        nullable=True
+    )
+
+    estimated_volume = Column(
+        Float,
+        nullable=True
+    )
+
+    division = Column(
+        String(255),
+        nullable=True
+    )
+
+    department = Column(
+        String(255),
+        nullable=True
+    )
+
+    asset_name = Column(
+        String(255),
+        nullable=True
+    )
+
+    asset_type = Column(
+        String(255),
+        nullable=True
+    )
+
 
     # ====================================
     # MEDIA COUNTS

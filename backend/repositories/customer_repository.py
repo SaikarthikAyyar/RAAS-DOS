@@ -43,6 +43,29 @@ def create_customer(
 
         payload.urgency,
 
+        existing_asset=
+        payload.existing_asset,
+
+        lead_source=
+        payload.lead_source,
+
+        client_contact_email=
+        payload.client_contact_email,
+
+        estimated_volume=
+        payload.estimated_volume,
+
+        division=
+        payload.division,
+
+        department=
+        payload.department,
+
+        asset_name=
+        payload.asset_name,
+
+        asset_type=
+        payload.asset_type,
 
         service_requirement_type=
 
@@ -56,6 +79,8 @@ def create_customer(
 
         payload.estimated_quantity_known,
 
+        tank_type=
+        payload.tank_type,
 
         approx_length_dia=
 

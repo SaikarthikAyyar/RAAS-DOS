@@ -281,31 +281,7 @@ def sales_prefill(
 
     )
 
-# ====================================
-# CUSTOMER LIST
-# ====================================
 
-@router.get(
-
-    "/customers"
-
-)
-
-def customers(
-
-        db:Session=Depends(
-
-            get_db
-
-        )
-
-):
-
-    return get_all_customers(
-
-        db
-
-    )
 
 # ====================================
 # GET ALL CUSTOMERS

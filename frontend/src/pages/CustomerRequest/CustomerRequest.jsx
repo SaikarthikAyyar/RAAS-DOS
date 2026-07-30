@@ -177,10 +177,7 @@ updateSection={updateSection}
         updateSection={updateSection}
       />
 
-      <Section3_Uploads
-        customerData={customerData}
-        updateMedia={updateMedia}
-      />
+
 
       <CustomerActions
         submit={submit}

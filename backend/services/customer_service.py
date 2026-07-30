@@ -80,21 +80,66 @@ def create_customer_request(
 
     enquiry_payload = {
 
+        # ====================================
+        # WORKFLOW
+        # ====================================
+
         "customer_request_id": customer_request.id,
+
+        "status": customer_request.status,
+
+
+        # ====================================
+        # CUSTOMER
+        # ====================================
 
         "company_name": customer_request.company_name,
 
         "contact_person": customer_request.contact_person,
 
+        "client_contact_email": customer_request.client_contact_email,
+
+        "plant_site_location": customer_request.plant_site_location,
+
+        "nearest_city_hub": customer_request.nearest_city_hub,
+
+        "division": customer_request.division,
+
+        "department": customer_request.department,
+
+
+        # ====================================
+        # ASSET
+        # ====================================
+
+        "existing_asset": customer_request.existing_asset,
+
+        "asset_name": customer_request.asset_name,
+
+        "asset_type": customer_request.asset_type,
+
+
+        # ====================================
+        # JOB
+        # ====================================
+
+        "service_requirement_type": customer_request.service_requirement_type,
+
+        "observed_material": customer_request.observed_material,
+
+        "tank_type": customer_request.tank_type,
+
+        "estimated_volume": customer_request.estimated_volume,
+
+        "urgency": customer_request.urgency,
+
+        "lead_source": customer_request.lead_source,
+
         "cleaning_date": (
             customer_request.cleaning_date.isoformat()
             if customer_request.cleaning_date
             else None
-        ),
-
-        "plant_site_location": customer_request.plant_site_location,
-
-        "status": customer_request.status
+        )
 
     }
 
@@ -244,7 +289,7 @@ def get_sales_prefill(
 
             "tank_type":
 
-            None,
+            customer.tank_type,
 
 
             "length_dia":

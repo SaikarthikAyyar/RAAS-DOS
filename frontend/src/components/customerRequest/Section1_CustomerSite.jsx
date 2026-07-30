@@ -2,7 +2,9 @@ import {
 
 nearestHubs,
 
-urgencyOptions
+urgencyOptions,
+
+leadSourceOptions
 
 }
 
@@ -55,7 +57,7 @@ Required
 
 <FieldInput
 
-label="Company Name"
+label="*Company Name"
 
 value={customer.company_name}
 
@@ -76,7 +78,7 @@ checking={checking}
 
 <FieldInput
 
-label="Plant / Site Location"
+label="*Plant / Site Location"
 
 value={customer.plant_site_location}
 
@@ -152,6 +154,38 @@ updateSection={updateSection}
 
 />
 
+<FieldInput
+label="Client Contact Email"
+value={customer.client_contact_email}
+section="customer"
+field="client_contact_email"
+updateSection={updateSection}
+/>
+
+<FieldInput
+label="Division"
+value={customer.division}
+section="customer"
+field="division"
+updateSection={updateSection}
+/>
+
+<FieldInput
+label="Department"
+value={customer.department}
+section="customer"
+field="department"
+updateSection={updateSection}
+/>
+
+<FieldSelect
+label="Lead Source"
+value={customer.lead_source}
+section="customer"
+field="lead_source"
+options={leadSourceOptions}
+updateSection={updateSection}
+/>
 
 </div>
 

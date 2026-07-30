@@ -468,3 +468,51 @@ export const disposalResponsibilityOptions = [
     "Customer"
 
 ];
+
+// ====================================
+// CUSTOMER REQUEST
+// ====================================
+
+export const leadSourceOptions = [
+
+    "Existing Customer",
+
+    "Referral",
+
+    "Tender",
+
+    "Website",
+
+    "Email",
+
+    "Phone",
+
+    "Sales Visit",
+
+    "Distributor",
+
+    "Other"
+
+];
+
+export const assetTypeOptions = [
+
+    "Tank",
+
+    "Pit",
+
+    "Sump",
+
+    "Clarifier",
+
+    "Lagoon",
+
+    "Pipeline",
+
+    "Reactor",
+
+    "Scrubber",
+
+    "Other"
+
+];

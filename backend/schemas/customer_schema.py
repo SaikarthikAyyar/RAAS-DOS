@@ -45,6 +45,26 @@ class CustomerRequestSchema(BaseModel):
 
     tank_type: Optional[str] = None
 
+    # ====================================
+    # ENQUIRY DETAILS (EXTENDED)
+    # ====================================
+
+    existing_asset: Optional[str] = None
+
+    lead_source: Optional[str] = None
+
+    client_contact_email: Optional[str] = None
+
+    estimated_volume: Optional[float] = None
+
+    division: Optional[str] = None
+
+    department: Optional[str] = None
+
+    asset_name: Optional[str] = None
+
+    asset_type: Optional[str] = None
+
 
     # ====================================
     # DIMENSIONS

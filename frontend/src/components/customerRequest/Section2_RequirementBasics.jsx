@@ -6,7 +6,11 @@ materialCategories,
 
 accessTypeOptions,
 
-tankTypeOptions
+tankTypeOptions,
+
+leadSourceOptions,
+
+assetTypeOptions
 
 }
 
@@ -214,7 +218,7 @@ updateSection={updateSection}
 />
 
 <FieldInput
-    label="Cleaning Date"
+    label="*Cleaning Date"
     type="date"
     value={requirement.cleaning_date}
     section="requirement"
@@ -223,7 +227,7 @@ updateSection={updateSection}
 />
 
 <FieldSelect
-    label="Cleaning Frequency"
+    label="*Cleaning Frequency"
     value={requirement.cleaning_frequency}
     section="requirement"
     field="cleaning_frequency"
@@ -238,7 +242,67 @@ updateSection={updateSection}
     updateSection={updateSection}
 />
 
+<FieldSelect
 
+label="Lead Source"
+
+value={requirement.lead_source}
+
+section="requirement"
+
+field="lead_source"
+
+options={leadSourceOptions}
+
+updateSection={updateSection}
+
+/>
+
+<FieldInput
+
+label="Asset Name"
+
+value={requirement.asset_name}
+
+section="requirement"
+
+field="asset_name"
+
+updateSection={updateSection}
+
+/>
+
+<FieldSelect
+
+label="Asset Type"
+
+value={requirement.asset_type}
+
+section="requirement"
+
+field="asset_type"
+
+options={assetTypeOptions}
+
+updateSection={updateSection}
+
+/>
+
+<FieldInput
+
+label="Estimated Volume (m³)"
+
+type="number"
+
+value={requirement.estimated_volume}
+
+section="requirement"
+
+field="estimated_volume"
+
+updateSection={updateSection}
+
+/>
 
 
 <div

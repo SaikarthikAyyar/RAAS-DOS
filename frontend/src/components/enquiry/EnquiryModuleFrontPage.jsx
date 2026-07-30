@@ -20,6 +20,8 @@ import EnquiryStatusTabs from "./EnquiryStatusTabs";
 
 import EnquirySearchBar from "./EnquirySearchBar";
 
+import EnquiryToolbar from "./EnquiryToolbar";
+
 import EnquiryTable from "./EnquiryTable";
 
 import EnquiryPagination from "./EnquiryPagination";
@@ -483,6 +485,30 @@ export default function EnquiryModuleFrontPage(){
 
     }
 
+    function handleExport(){
+
+        console.log(
+
+            "[Enquiry] Export requested"
+
+        );
+
+        // Backend endpoint will be connected later.
+
+    }
+
+    function handleNewEnquiry(){
+
+        console.log(
+
+            "[Enquiry] New enquiry requested"
+
+        );
+
+        // Will navigate to Customer Request module
+        // after we integrate it.
+
+    }
 
     // ====================================
     // RENDER
@@ -493,6 +519,14 @@ export default function EnquiryModuleFrontPage(){
         <div className="enquiry-module-front-page">
 
             <EnquiryHeader />
+
+            <EnquiryToolbar
+
+                onExport={handleExport}
+
+                onNewEnquiry={handleNewEnquiry}
+
+            />
 
             <EnquiryStatusTabs
 

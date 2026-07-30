@@ -17,7 +17,12 @@ export async function createCustomerRequest(payload){
    }
  )
 
- const data=await response.json()
+  const data = await response.json();
+
+  if (!response.ok) {
+      throw data;
+  }
+
 
  console.log("SERVER RESPONSE",data)
 
