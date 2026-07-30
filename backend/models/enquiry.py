@@ -88,6 +88,37 @@ class Enquiry(Base):
     )
 
     # ====================================
+    # CONSOLIDATED ENQUIRY
+    # ====================================
+
+    status = Column(
+        String(30),
+        nullable=False,
+        default="OPEN"
+    )
+
+    stage = Column(
+        String(100),
+        nullable=False,
+        default="CUSTOMER_REQUEST"
+    )
+
+    owner_role = Column(
+        String(50),
+        nullable=True
+    )
+
+    owner_user_id = Column(
+        Integer,
+        nullable=True
+    )
+
+    closed_at = Column(
+        DateTime,
+        nullable=True
+    )
+
+    # ====================================
     # SNAPSHOT
     # ====================================
 

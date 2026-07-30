@@ -31,7 +31,7 @@ import CustomerPortal from "./pages/CustomerLiveOrder";
 import AdministrationPage
 from "./pages/AdministrationPage";
 
-
+import EnquiryPage from "./pages/EnquiryPage";
 
 import Analytics from "./pages/Analytics";
 
@@ -56,6 +56,11 @@ function App() {
 
               element={<AdministrationPage/>}
 
+          />
+
+          <Route
+              path="/enquiry"
+              element={<EnquiryPage/>}
           />
 
           <Route path="customer-request" element={<CustomerRequest />} />

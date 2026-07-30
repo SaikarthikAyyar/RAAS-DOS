@@ -30,7 +30,9 @@ PlayCircle,
 
 UserCircle,
 
-BarChart3
+BarChart3,
+
+FolderOpen
 
 }
 
@@ -48,6 +50,8 @@ admin:[
 {title:"Dashboard",path:"/dashboard",icon:<Home size={18}/>},
 
 {title:"Administration",path:"/administration",icon:<ShieldCheck size={18}/>},
+
+{title:"Enquiries",path:"/enquiry",icon:<FolderOpen size={18}/>},
 
 {title:"Customer Request",path:"/customer-request",icon:<FileText size={18}/>},
 
