@@ -43,7 +43,7 @@ export default function CustomerRequest(){
 
   const navigate = useNavigate();
 
-useNavigate();
+
 
 const{
 
@@ -85,6 +85,14 @@ async function submit(){
           contact_number: customer.contact_number,
           nearest_city_hub: customer.nearest_city_hub,
           urgency: customer.urgency,
+          client_contact_email: customer.client_contact_email,
+          lead_source: customer.lead_source,
+          division: customer.division,
+          department: customer.department,
+
+          asset_name: requirement.asset_name,
+          asset_type: requirement.asset_type,
+          estimated_volume: Number(requirement.estimated_volume) || null,
 
           service_requirement_type: requirement.service_requirement_type,
           observed_material: requirement.observed_material,
@@ -136,14 +144,15 @@ async function submit(){
         customerId
       );
 
-      alert("Customer request has been created");
 
       await uploadMedia(
         customerId,
         uploads
       );
 
-      navigate("/dashboard");
+      alert("Customer request has been created");
+
+     navigate("/enquiry");
 
     }
 

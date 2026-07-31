@@ -181,7 +181,7 @@ export default function EnquiryTableRow({
 
                 >
 
-                    View
+                    Open
 
                 </button>
 

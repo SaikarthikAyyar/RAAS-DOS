@@ -108,6 +108,11 @@ def create_customer_request(
         "department": customer_request.department,
 
 
+        "client_contact_email": customer_request.client_contact_email,
+        "lead_source": customer_request.lead_source,
+        "division": customer_request.division,
+        "department": customer_request.department,
+
         # ====================================
         # ASSET
         # ====================================

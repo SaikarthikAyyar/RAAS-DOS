@@ -12,6 +12,8 @@ import {
 
 } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import "./EnquiryModuleFrontPage.css";
 
 import EnquiryHeader from "./EnquiryHeader";
@@ -115,6 +117,8 @@ export default function EnquiryModuleFrontPage(){
         setTotal
 
     ] = useState(0);
+
+    const navigate = useNavigate();
 
     const pageSize = 20;
 
@@ -505,8 +509,7 @@ export default function EnquiryModuleFrontPage(){
 
         );
 
-        // Will navigate to Customer Request module
-        // after we integrate it.
+        navigate("/customer-request");
 
     }
 
