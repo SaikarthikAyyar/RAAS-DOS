@@ -173,7 +173,7 @@ export default function EnquiryTableRow({
 
                         ()=>onView?.(
 
-                            enquiry.id
+                            enquiry
 
                         )
 

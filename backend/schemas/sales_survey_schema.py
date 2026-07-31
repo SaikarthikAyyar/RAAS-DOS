@@ -6,6 +6,8 @@ from pydantic import BaseModel
 
 from typing import Optional
 
+from datetime import date
+
 
 # ====================================
 # SALES SURVEY SCHEMA
@@ -25,7 +27,7 @@ class SalesSurveySchema(BaseModel):
     # SECTION A
     # ====================================
 
-    survey_date:Optional[str]=None
+    survey_date: date | None
 
     plant_site_location: str
 
@@ -128,7 +130,7 @@ class SalesSurveySchema(BaseModel):
 
     ehs_restriction:Optional[str]=None
 
-    power_distance:Optional[float]=None
+
 
     # ====================================
     # SECTION E
@@ -170,7 +172,7 @@ class CustomerSection(BaseModel):
     contact_number: Optional[str]
     nearest_hub: Optional[str]
     urgency: Optional[str]
-    survey_date: Optional[str]
+    survey_date:  date | None
 
 
 class JobSection(BaseModel):
@@ -219,7 +221,7 @@ class SafetySection(BaseModel):
     ventilation_required: Optional[str]
     gas_testing_required: Optional[str]
     ehs_restriction: Optional[str]
-    power_distance: Optional[float]
+
 
 
 class PumpSection(BaseModel):

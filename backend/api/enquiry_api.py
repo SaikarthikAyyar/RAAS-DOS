@@ -33,3 +33,4 @@ def update_enquiry(enquiry_id: int):
         "message": "Update enquiry",
         "enquiry_id": enquiry_id
     }
+

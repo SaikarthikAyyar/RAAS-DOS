@@ -355,23 +355,24 @@ export default function EnquiryModuleFrontPage(){
 
     function handleOpen(
 
-        enquiryId
+        enquiry
 
     ){
 
         console.log(
 
-            "[EnquiryModuleFrontPage] Open Enquiry:",
+            "[EnquiryModuleFrontPage] Opening Workspace:",
 
-            enquiryId
+            enquiry
+
+        );
+
+        navigate(
+
+            `/enquiries/workspace/${enquiry.id}`
 
         );
 
-        console.log(
-
-            "Open workflow not implemented yet."
-
-        );
     }
 
 

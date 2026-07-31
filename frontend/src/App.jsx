@@ -33,6 +33,8 @@ from "./pages/AdministrationPage";
 
 import EnquiryPage from "./pages/EnquiryPage";
 
+import EnquiryWorkspace from "./pages/EnquiryWorkspace";
+
 import Analytics from "./pages/Analytics";
 
 
@@ -61,6 +63,14 @@ function App() {
           <Route
               path="/enquiry"
               element={<EnquiryPage/>}
+          />
+
+          <Route
+
+              path="/enquiries/workspace/:enquiryId"
+
+              element={<EnquiryWorkspace />}
+
           />
 
           <Route path="customer-request" element={<CustomerRequest />} />

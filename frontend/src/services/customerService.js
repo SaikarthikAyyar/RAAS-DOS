@@ -66,3 +66,36 @@ return null;
 return response.json();
 
 }
+
+
+// ====================================
+// GET CUSTOMER REQUEST
+// ====================================
+
+export async function getCustomerRequest(
+
+    customerId
+
+){
+
+    const response = await fetch(
+
+        `${API}/customer-request/${customerId}`
+
+    );
+
+    const data = await response.json();
+
+    if(
+
+        !response.ok
+
+    ){
+
+        throw data;
+
+    }
+
+    return data;
+
+}

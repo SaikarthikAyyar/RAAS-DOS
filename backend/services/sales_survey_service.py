@@ -15,7 +15,7 @@ from backend.repositories.sales_survey_repository import (
     list_sales_surveys
 
 )
-from backend.services.status_service import update_customer_request_status
+
 
 from backend.repositories.sales_survey_repository import (
     get_surveys_by_customer_request,
@@ -24,7 +24,11 @@ from backend.repositories.sales_survey_repository import (
 
 from backend.models.customer_requests import CustomerRequest
 
-from backend.services.enquiry_service import EnquiryService
+from backend.services.enquiry_consolidated_service import (
+    update_module_reference
+)
+
+
 
 
 
@@ -48,79 +52,19 @@ def create_sales_survey_request(
 
     )
 
-    print("\n========== SALES SURVEY WORKFLOW ==========")
-    print("[Workflow] Survey Saved")
-    print(f"[Workflow] Survey ID : {survey.id}")
-    print("[Workflow] Looking for incoming SALES enquiry")
-
-    incoming = EnquiryService.get_received_enquiries(
+    update_module_reference(
 
         db,
 
-        "SALES"
+        payload.enquiry_id,
+
+        "sales_survey_id",
+
+        survey.id
 
     )
 
-    for enquiry in incoming:
 
-        if enquiry.customer_request_id == survey.customer_request_id:
-
-            print(f"[Workflow] Completing Enquiry {enquiry.id}")
-
-            enquiry.completed = True
-
-            enquiry.workflow_status = "COMPLETED"
-
-            EnquiryService.update(
-
-                db,
-
-                enquiry
-
-            )
-
-            print("[Workflow] Incoming enquiry completed")
-
-            break
-
-    
-    print("[Workflow] Creating OPS enquiry")
-
-    payload = {
-
-        "customer_request_id":
-
-            survey.customer_request_id,
-
-        "sales_survey_id":
-
-            survey.id
-
-    }
-
-    EnquiryService.create_sales_survey_enquiry(
-
-        db,
-
-        survey.customer_request_id,
-
-        survey.id,
-
-        payload
-
-    )
-
-    print("[Workflow] OPS enquiry created")
-
-    update_customer_request_status(
-
-        db,
-
-        survey.customer_request_id,
-
-        "SURVEY_COMPLETED"
-
-    )
 
     print("[Workflow] Customer Request Status Updated")
 
@@ -438,8 +382,7 @@ def get_customer_survey_request(
 
             survey.ehs_restriction,
 
-            "power_distance":
-            survey.power_distance
+
 
         },
 

@@ -154,6 +154,82 @@ def get_enquiry(
 
     )
 
+# ====================================
+# UPDATE MODULE REFERENCE
+# ====================================
+
+def update_module_reference(
+
+        db,
+
+        enquiry_id,
+
+        reference_field,
+
+        reference_id
+
+):
+
+    print("\n========================================")
+    print("[SERVICE] UPDATE MODULE REFERENCE")
+    print(f"[SERVICE] Enquiry ID      : {enquiry_id}")
+    print(f"[SERVICE] Reference Field : {reference_field}")
+    print(f"[SERVICE] Reference ID    : {reference_id}")
+
+    enquiry = _get_enquiry_or_404(
+
+        db,
+
+        enquiry_id
+
+    )
+
+    if not hasattr(
+
+        enquiry,
+
+        reference_field
+
+    ):
+
+        raise HTTPException(
+
+            status_code=status.HTTP_400_BAD_REQUEST,
+
+            detail=f"Invalid reference field: {reference_field}"
+
+        )
+
+    setattr(
+
+        enquiry,
+
+        reference_field,
+
+        reference_id
+
+    )
+
+    db.commit()
+
+    db.refresh(
+
+        enquiry
+
+    )
+
+    print("[SERVICE] Module Reference Updated")
+    print("========================================\n")
+
+    return EnquiryLifecycleResponse(
+
+        success=True,
+
+        message="Enquiry updated successfully.",
+
+        enquiry=enquiry
+
+    )
 
 # ====================================
 # ARCHIVE
