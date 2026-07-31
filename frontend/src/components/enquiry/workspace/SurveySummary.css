@@ -1,0 +1,58 @@
+.survey-summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
+    gap:20px;
+    margin-top:24px;
+}
+
+.survey-summary-card{
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+}
+
+.survey-summary-title{
+    margin:0 0 18px;
+    font-size:20px;
+    font-weight:700;
+    color:#111827;
+}
+
+.survey-summary-body{
+    display:flex;
+    flex-direction:column;
+}
+
+.survey-summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    padding:10px 0;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.survey-summary-row:last-child{
+    border-bottom:none;
+}
+
+.survey-summary-label{
+    color:#4b5563;
+    font-size:14px;
+    font-weight:500;
+}
+
+.survey-summary-value{
+    text-align:right;
+    color:#111827;
+    font-size:14px;
+    font-weight:700;
+    word-break:break-word;
+    max-width:55%;
+}
+
+.survey-empty{
+    color:#9ca3af;
+}

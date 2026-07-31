@@ -1,4 +1,6 @@
 import SurveySummary from "./SurveySummary";
+
+import SurveyWorkspace from "./SurveyWorkspace";
 // ====================================
 // COMPONENT
 // ====================================
@@ -23,13 +25,9 @@ export default function WorkspaceContent({
 
         case "survey":
 
-            return (
+            return(
 
                 <SurveySummary
-
-                    enquiry={enquiry}
-
-                    customer={customer}
 
                     survey={survey}
 
