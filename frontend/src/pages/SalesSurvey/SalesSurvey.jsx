@@ -6,6 +6,12 @@ import { useEffect } from "react";
 
 import { useState } from "react";
 
+import {
+
+    useLocation
+
+} from "react-router-dom";
+
 import "../../components/salesSurvey/SalesSurvey.css";
 
 import useSalesSurvey from "../../hooks/useSalesSurvey";
@@ -23,6 +29,8 @@ getCustomerSurvey
 }
 
 from "../../services/salesSurveyService";
+
+
 
 import SurveySummary
 
@@ -148,143 +156,94 @@ useState(
 
 );
 
+const location = useLocation();
 
-// ====================================
-// LOAD RECEIVED ENQUIRY
-// ====================================
+const {
 
-useEffect(
+    enquiryId,
 
-()=>{
+    customerRequestId,
 
-async function loadSelectedEnquiry(){
+    salesSurveyId
 
-try{
+} = location.state || {};
 
-const enquiry = JSON.parse(
-
-localStorage.getItem(
-
-"selectedReceivedEnquiry"
-
-)
-
-);
-
-if(
-
-!enquiry
-
-){
-
-return;
-
-}
-
-setSelectedCustomer(
-
-enquiry.customer_request_id
-
-);
-
-const prefill =
-
-await getSalesPrefill(
-
-enquiry.customer_request_id
-
-);
-
-setSurveyData(
-
-prefill
-
-);
-
-const surveys =
-
-await getCustomerSurveys(
-
-enquiry.customer_request_id
-
-);
-
-setCustomerSurveys(
-
-surveys
-
-);
-
-}
-
-catch(error){
-
-console.log(
-
-error
-
-);
-
-}
-
-}
-
-loadSelectedEnquiry();
-
-},
-
-[]
-
-);
-
-
-// ====================================
-// LOAD SALES PREFILL FROM DASHBOARD
-// ====================================
 
 useEffect(() => {
 
-    async function loadPrefill() {
+    async function initializeSurvey(){
 
-        try {
+        try{
 
-            const customerRequestId =
-                localStorage.getItem(
-                    "sales_customer_request_id"
-                );
-
-            if (!customerRequestId) {
-
-                console.log(
-                    "[SalesSurvey] No Customer Request selected."
-                );
+            if(!customerRequestId){
 
                 return;
 
             }
 
-            console.log(
-                "[SalesSurvey] Customer Request:",
+            setSelectedCustomer(
+
                 customerRequestId
+
             );
 
-            setSelectedCustomer(customerRequestId);
-
-            const prefill =
-                await getSalesPrefill(
-                    customerRequestId
-                );
-
-            setSurveyData(prefill);
-
             const surveys =
+
                 await getCustomerSurveys(
+
                     customerRequestId
+
                 );
 
-            setCustomerSurveys(surveys);
+            setCustomerSurveys(
 
-            setSelectedSurvey("");
+                surveys
+
+            );
+
+            if(salesSurveyId){
+
+                const survey =
+
+                    await getCustomerSurvey(
+
+                        customerRequestId,
+
+                        salesSurveyId
+
+                    );
+
+                setSelectedSurvey(
+
+                    salesSurveyId
+
+                );
+
+                setSurveyData(
+
+                    survey
+
+                );
+
+            }
+
+            else{
+
+                const prefill =
+
+                    await getSalesPrefill(
+
+                        customerRequestId
+
+                    );
+
+                setSurveyData(
+
+                    prefill
+
+                );
+
+            }
 
         }
 
@@ -296,118 +255,22 @@ useEffect(() => {
 
     }
 
-    loadPrefill();
-
-}, []);
-
-
-// ====================================
-// LOAD EXISTING SURVEY
-// ====================================
-
-useEffect(
-
-()=>{
-
-if(
-
-!selectedCustomer ||
-
-!selectedSurvey
-
-){
-
-return;
-
-}
-
-async function loadExistingSurvey(){
-
-try{
-
-console.log(
-
-"[SalesSurvey] Loading Existing Survey"
-
-);
-
-console.log(
-
-"[SalesSurvey] Customer:",
-
-selectedCustomer
-
-);
-
-console.log(
-
-"[SalesSurvey] Survey:",
-
-selectedSurvey
-
-);
-
-const survey=
-
-await getCustomerSurvey(
-
-selectedCustomer,
-
-selectedSurvey
-
-);
-
-console.log(
-
-"[SalesSurvey] Existing Survey Loaded"
-
-);
-
-console.log(
-
-survey
-
-);
-
-setSurveyData(
-
-survey
-
-);
-
-console.log(
-
-"[SalesSurvey] Survey State Updated"
-
-);
-
-}
-
-catch(error){
-
-console.log(
-
-error
-
-);
-
-}
-
-}
-
-loadExistingSurvey();
+    initializeSurvey();
 
 },
 
 [
 
-selectedCustomer,
+    customerRequestId,
 
-selectedSurvey
+    salesSurveyId
 
-]
+]);
 
-);
+
+
+
+
 
 
 // ====================================
@@ -534,6 +397,10 @@ metrics={metrics}
 canSubmit={canSubmit}
 
 customerRequestId={selectedCustomer}
+
+enquiryId={enquiryId}
+
+salesSurveyId={salesSurveyId}
 
 />
 

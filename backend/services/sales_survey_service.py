@@ -4,7 +4,9 @@
 
 from backend.repositories.sales_survey_repository import (
 
-    create_sales_survey
+    create_sales_survey,
+
+    update_sales_survey
 
 )
 
@@ -44,31 +46,29 @@ def create_sales_survey_request(
 
 ):
 
-    survey = create_sales_survey(
+    if payload.sales_survey_id:
+
+        print("[Workflow] Updating Existing Survey")
+
+        return update_sales_survey(
+
+            db,
+
+            payload.sales_survey_id,
+
+            payload
+
+        )
+
+    print("[Workflow] Creating New Survey")
+
+    return create_sales_survey(
 
         db,
 
         payload
 
     )
-
-    update_module_reference(
-
-        db,
-
-        payload.enquiry_id,
-
-        "sales_survey_id",
-
-        survey.id
-
-    )
-
-
-
-    print("[Workflow] Customer Request Status Updated")
-
-    return survey
 
 
 # ====================================
@@ -197,7 +197,9 @@ def get_customer_survey_request(
 
             "survey_date":
 
-            survey.survey_date
+            survey.survey_date.isoformat()
+            if survey.survey_date
+            else None,
 
         },
 
@@ -218,7 +220,9 @@ def get_customer_survey_request(
 
             "cleaning_date":
 
-            survey.cleaning_date,
+            survey.cleaning_date.isoformat()
+            if survey.cleaning_date
+            else None,
 
             "cleaning_frequency":
 

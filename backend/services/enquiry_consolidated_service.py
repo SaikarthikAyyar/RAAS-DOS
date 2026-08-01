@@ -16,6 +16,11 @@ from backend.schemas.enquiry_consolidated_schema import (
     EnquiryStatus,
 )
 
+from backend.services.enquiry_service import EnquiryService
+
+from backend.services.workflow_service import (
+    advance_to_next_stage
+)
 
 # ====================================
 # PRIVATE
@@ -229,6 +234,44 @@ def update_module_reference(
 
         enquiry=enquiry
 
+    )
+
+def create_survey_branch(
+    db,
+    enquiry_id
+):
+
+    enquiry = get_enquiry(
+        db,
+        enquiry_id
+    )
+
+    return EnquiryService.create_customer_request_enquiry(
+
+        db,
+
+        enquiry.customer_request_id,
+
+        {}
+    )
+
+# ====================================
+# REQUEST OPS REVIEW
+# ====================================
+
+def request_ops_review(
+    db,
+    enquiry_id
+):
+
+    enquiry = get_enquiry(
+        db,
+        enquiry_id
+    )
+
+    return advance_to_next_stage(
+        db,
+        enquiry.customer_request_id
     )
 
 # ====================================

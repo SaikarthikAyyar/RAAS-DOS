@@ -56,3 +56,65 @@
 .survey-empty{
     color:#9ca3af;
 }
+
+.survey-actions{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+
+    margin-top:8px;
+
+}
+
+.survey-action-button{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:14px 18px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.survey-edit-button{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.survey-create-button{
+
+    background:#16a34a;
+
+    color:white;
+
+}
+
+.survey-ops-button{
+
+    background:#ea580c;
+
+    color:white;
+
+}
+
+.survey-action-button:hover{
+
+    opacity:.92;
+
+}

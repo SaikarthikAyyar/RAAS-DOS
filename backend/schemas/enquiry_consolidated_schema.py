@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
+
 # ============================================================
 # ENUMS
 # ============================================================
@@ -124,3 +125,10 @@ class EnquiryDeleteResponse(BaseModel):
     success: bool
 
     message: str
+
+
+class ModuleReferenceUpdateRequest(BaseModel):
+
+    reference_field: str
+
+    reference_id: int

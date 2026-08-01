@@ -62,3 +62,86 @@ export async function getEnquiry(
     return data;
 
 }
+
+
+// ====================================
+// UPDATE MODULE REFERENCE
+// ====================================
+
+export async function updateModuleReference(
+
+    enquiryId,
+
+    referenceField,
+
+    referenceId
+
+){
+
+    const response = await fetch(
+
+        `${API}/enquiry-consolidated/${enquiryId}/module-reference`,
+
+        {
+
+            method:"PUT",
+
+            headers:{
+
+                "Content-Type":"application/json"
+
+            },
+
+            body:JSON.stringify({
+
+                reference_field:referenceField,
+
+                reference_id:referenceId
+
+            })
+
+        }
+
+    );
+
+    return response.json();
+
+}
+
+export async function createSurveyBranch(
+    enquiryId
+){
+
+    const response = await fetch(
+
+        `${API}/enquiry-consolidated/${enquiryId}/create-survey`,
+
+        {
+
+            method:"POST"
+
+        }
+
+    );
+
+    return response.json();
+
+}
+
+export async function requestOpsReview(
+    enquiryId
+){
+
+    const response = await fetch(
+
+        `${API}/enquiry-consolidated/${enquiryId}/request-ops-review`,
+
+        {
+            method:"PUT"
+        }
+
+    );
+
+    return response.json();
+
+}

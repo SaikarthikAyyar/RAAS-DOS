@@ -10,6 +10,13 @@ createSalesSurvey
 
 from "../../services/salesSurveyService";
 
+import {
+
+    updateModuleReference
+
+}
+
+from "../../services/enquiryWorkspaceService";
 
 // ====================================
 // COMPONENT
@@ -23,8 +30,11 @@ metrics,
 
 canSubmit,
 
-customerRequestId
+customerRequestId,
 
+enquiryId,
+
+salesSurveyId
 
 }){
 
@@ -47,6 +57,10 @@ Number(
 customerRequestId
 
 ),
+
+sales_survey_id:
+
+salesSurveyId,
 
 
 survey_date:
@@ -359,16 +373,33 @@ surveyData.insights?.customer_pain
 };
 
 
-await createSalesSurvey(
+const survey = await createSalesSurvey(
 
-payload
+    payload
 
 );
 
+if(
+
+    !salesSurveyId
+
+){
+
+    await updateModuleReference(
+
+        enquiryId,
+
+        "sales_survey_id",
+
+        survey.id
+
+    );
+
+}
 
 alert(
 
-"Sales Survey Saved"
+    "Sales Survey Saved"
 
 );
 

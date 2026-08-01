@@ -236,6 +236,10 @@ export default function EnquiryWorkspace() {
 
                 activeTab={activeTab}
 
+                enquiry={enquiry}
+
+                customer={customer}
+
                 survey={survey}
 
             />

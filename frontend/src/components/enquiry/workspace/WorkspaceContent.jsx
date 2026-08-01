@@ -29,6 +29,8 @@ export default function WorkspaceContent({
 
                 <SurveySummary
 
+                    enquiry={enquiry}
+
                     survey={survey}
 
                 />

@@ -1,12 +1,10 @@
-// ====================================
-// COMPONENT
-// ====================================
-
 export default function SurveySummaryCard({
 
     title,
 
-    fields
+    fields = [],
+
+    actions
 
 }){
 
@@ -14,59 +12,61 @@ export default function SurveySummaryCard({
 
         <div className="survey-summary-card">
 
-            <div className="survey-summary-card-header">
+            <h3 className="survey-summary-title">
 
-                <h3>
+                {title}
 
-                    {title}
+            </h3>
 
-                </h3>
+            {
 
-            </div>
+                actions ? (
 
-            <div className="survey-summary-card-body">
+                    actions
 
-                {
+                ) : (
 
-                    fields.map(
+                    <div className="survey-summary-body">
 
-                        field=>(
+                        {
 
-                            <div
+                            fields.map(
 
-                                key={field.label}
+                                (field,index)=>(
 
-                                className="survey-summary-row"
+                                    <div
 
-                            >
+                                        key={index}
 
-                                <div className="survey-summary-label">
+                                        className="survey-summary-row"
 
-                                    {field.label}
+                                    >
 
-                                </div>
+                                        <span className="survey-summary-label">
 
-                                <div className="survey-summary-value">
+                                            {field.label}
 
-                                    {
+                                        </span>
 
-                                        field.value ??
+                                        <span className="survey-summary-value">
 
-                                        "—"
+                                            {field.value ?? "—"}
 
-                                    }
+                                        </span>
 
-                                </div>
+                                    </div>
 
-                            </div>
+                                )
 
-                        )
+                            )
 
-                    )
+                        }
 
-                }
+                    </div>
 
-            </div>
+                )
+
+            }
 
         </div>
 

@@ -21,6 +21,7 @@ class SalesSurveySchema(BaseModel):
     # ====================================
 
     customer_request_id:int
+    sales_survey_id: int | None = None
 
 
     # ====================================

@@ -1,27 +1,77 @@
 import SurveySummaryCard from "./SurveySummaryCard";
 import "./SurveySummary.css";
 
+import { useNavigate } from "react-router-dom";
+
+import {
+    createSurveyBranch
+} from "../../../services/enquiryWorkspaceService";
+
+import {
+    requestOpsReview
+}
+from "../../../services/enquiryWorkspaceService";
+
 export default function SurveySummary({
+
+    enquiry,
 
     survey
 
 }){
+    const navigate = useNavigate();
 
-    if(
+    function handleFillEditSurvey(){
 
-        !survey
+        navigate(
 
-    ){
+            "/sales-survey",
 
-        return(
+            {
 
-            <div>
+                state:{
 
-                No survey found.
+                    enquiryId:
 
-            </div>
+                        enquiry.id,
+
+                    customerRequestId:
+
+                        enquiry.customer_request_id,
+
+                    salesSurveyId:
+
+                        enquiry.sales_survey_id
+
+                }
+
+            }
 
         );
+
+    }
+
+    async function handleCreateSurvey(){
+
+        const newEnquiry = await createSurveyBranch(
+            enquiry.id
+        );
+
+        navigate(
+            `/enquiries/workspace/${newEnquiry.id}`
+        );
+
+    }
+
+    async function handleRequestOpsReview(){
+
+        await requestOpsReview(
+
+            enquiry.id
+
+        );
+
+        window.location.reload();
 
     }
 
@@ -29,7 +79,10 @@ export default function SurveySummary({
 
         <div className="survey-summary-grid">
 
-            <SurveySummaryCard
+            {
+                survey && (
+                <>
+                               <SurveySummaryCard
 
                 title="Customer Details"
 
@@ -531,6 +584,71 @@ export default function SurveySummary({
 
                 ]}
 
+            />
+                </>
+
+                )
+            }
+
+
+
+            <SurveySummaryCard
+                title="Completeness & Actions"
+                actions={
+
+                    <div className="survey-actions">
+
+                        <button
+
+                            className="survey-action-button"
+
+                            onClick={handleFillEditSurvey}
+
+                        >
+
+                            {
+
+                                survey
+
+                                    ?
+
+                                    "Edit Survey"
+
+                                    :
+
+                                    "Fill Survey"
+
+                            }
+
+                        </button>
+
+                        <button
+
+                            className="survey-action-button survey-create-button"
+
+                            onClick={handleCreateSurvey}
+
+                        >
+
+                            Create Survey
+
+                        </button>
+
+                        <button
+
+                            className="survey-action-button survey-action-button-orange"
+
+                            onClick={handleRequestOpsReview}
+
+                        >
+
+                            Request Ops Review
+
+                        </button>
+
+                    </div>
+
+                }
             />
 
         </div>

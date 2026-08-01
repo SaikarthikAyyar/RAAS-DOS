@@ -18,7 +18,9 @@ from backend.schemas.enquiry_consolidated_schema import (
 
     EnquiryLifecycleResponse,
 
-    EnquiryDeleteResponse
+    EnquiryDeleteResponse,
+
+    ModuleReferenceUpdateRequest
 
 )
 
@@ -95,6 +97,39 @@ def get_enquiry(
 
     )
 
+# ====================================
+# UPDATE MODULE REFERENCE
+# ====================================
+
+@router.put(
+
+    "/{enquiry_id}/module-reference",
+
+    response_model=EnquiryLifecycleResponse
+
+)
+
+def update_module_reference(
+
+    enquiry_id: int,
+
+    payload: ModuleReferenceUpdateRequest,
+
+    db: Session = Depends(get_db)
+
+):
+
+    return service.update_module_reference(
+
+        db,
+
+        enquiry_id,
+
+        payload.reference_field,
+
+        payload.reference_id
+
+    )
 
 # ====================================
 # ARCHIVE
@@ -238,4 +273,41 @@ def delete_enquiry(
 
         enquiry_id
 
+    )
+
+@router.post(
+    "/{enquiry_id}/create-survey"
+)
+def create_survey_branch(
+
+    enquiry_id:int,
+
+    db:Session=Depends(get_db)
+
+):
+
+    return service.create_survey_branch(
+
+        db,
+
+        enquiry_id
+
+    )
+
+
+# ====================================
+# REQUEST OPS REVIEW
+# ====================================
+
+@router.put(
+    "/{enquiry_id}/request-ops-review"
+)
+def request_ops_review(
+    enquiry_id: int,
+    db: Session = Depends(get_db)
+):
+
+    return service.request_ops_review(
+        db,
+        enquiry_id
     )
