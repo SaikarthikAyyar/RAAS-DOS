@@ -15,19 +15,17 @@ from enum import Enum
 
 class WorkflowStage(str, Enum):
 
-    SURVEY = "Survey"
+    SALES_SURVEY = "SALES_SURVEY"
 
-    OPS_REVIEW = "Ops Review"
+    OPS_REVIEW = "OPS_REVIEW"
 
-    TECHNO_COMMERCIAL_APPROVAL = "Techno-Commercial Approval"
+    QUOTE = "QUOTE"
 
-    COMMERCIAL_APPROVAL = "Commercial Approval"
+    JOB_CREATION = "JOB_CREATION"
 
-    QUOTE_RELEASED = "Quote Released"
+    EXECUTION = "EXECUTION"
 
-    PO_RECEIVED = "PO Received"
-
-    JOB_CREATED = "Job Created"
+    COMPLETED = "COMPLETED"
 
 
 # ====================================
@@ -36,19 +34,17 @@ class WorkflowStage(str, Enum):
 
 WORKFLOW_ORDER = [
 
-    WorkflowStage.SURVEY,
+    WorkflowStage.SALES_SURVEY,
 
     WorkflowStage.OPS_REVIEW,
 
-    WorkflowStage.TECHNO_COMMERCIAL_APPROVAL,
+    WorkflowStage.QUOTE,
 
-    WorkflowStage.COMMERCIAL_APPROVAL,
+    WorkflowStage.JOB_CREATION,
 
-    WorkflowStage.QUOTE_RELEASED,
+    WorkflowStage.EXECUTION,
 
-    WorkflowStage.PO_RECEIVED,
-
-    WorkflowStage.JOB_CREATED
+    WorkflowStage.COMPLETED
 
 ]
 

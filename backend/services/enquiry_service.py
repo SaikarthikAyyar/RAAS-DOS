@@ -1,5 +1,6 @@
 from backend.models.enquiry import Enquiry
 from backend.repositories.enquiry_repository import EnquiryRepository
+from backend.services.workflow_service import WorkflowStage
 
 
 class EnquiryService:
@@ -36,6 +37,8 @@ class EnquiryService:
             requested_task="SALES_SURVEY",
 
             current_module="CUSTOMER_REQUEST",
+
+            stage="SALES_SURVEY",
 
             workflow_status="PENDING",
 
