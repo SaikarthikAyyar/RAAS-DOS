@@ -19,7 +19,8 @@ from backend.schemas.enquiry_consolidated_schema import (
 from backend.services.enquiry_service import EnquiryService
 
 from backend.services.workflow_service import (
-    advance_to_next_stage
+    advance_to_next_stage,
+    update_stage
 )
 
 # ====================================
@@ -267,6 +268,26 @@ def request_ops_review(
     return advance_to_next_stage(
         db,
         enquiry_id
+    )
+
+
+# ====================================
+# SET STAGE
+# (used by "Send back to Sales" on the
+# Ops Review decision card - reverts the
+# stage rather than advancing it)
+# ====================================
+
+def set_stage(
+    db,
+    enquiry_id,
+    stage
+):
+
+    return update_stage(
+        db,
+        enquiry_id,
+        stage.value if hasattr(stage, "value") else stage
     )
 
 # ====================================

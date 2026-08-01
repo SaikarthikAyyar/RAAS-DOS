@@ -6,20 +6,27 @@
 
 .survey-summary-grid{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+
+    /* minmax(0, 1fr) rather than plain 1fr - a plain 1fr track still
+       respects its content's intrinsic min-width, so a wide table in
+       one card (e.g. Machine Scoring, Deployment Plan) can force that
+       track wide and starve the others unevenly. minmax(0, 1fr) makes
+       all three tracks truly equal regardless of content. */
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+
     gap:14px;
     margin-top:16px;
 }
 
 @media (max-width:1100px){
     .survey-summary-grid{
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns:repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width:720px){
     .survey-summary-grid{
-        grid-template-columns:1fr;
+        grid-template-columns:minmax(0, 1fr);
     }
 }
 
@@ -29,6 +36,66 @@
     border-radius:14px;
     padding:16px;
     box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+    /* Belt-and-braces alongside minmax(0,1fr) above: any table that's
+       still wider than its card scrolls internally instead of
+       distorting the grid's column widths. */
+    overflow-x:auto;
+}
+
+/* Algorithm Recommendation | Deployment Plan sit side by side,
+   matching the wireframe's "grid cols2" (roughly 2:1 here, using
+   our existing 3-column grid rather than a separate nested grid). */
+.ops-recommendation-card{
+    grid-column:span 2;
+}
+
+.ops-deployment-card{
+    grid-column:span 1;
+}
+
+/* Ops Review Decision | Mid-job Amendment sit side by side too,
+   same 2:1 split, instead of Decision spanning full width alone
+   with a large empty gap next to its button row. */
+.ops-decision-card{
+    grid-column:span 2;
+}
+
+.ops-amendment-card{
+    grid-column:span 1;
+}
+
+@media (max-width:1100px){
+    .ops-recommendation-card,
+    .ops-deployment-card,
+    .ops-decision-card,
+    .ops-amendment-card{
+        grid-column:1 / -1;
+    }
+}
+
+.ops-subheading{
+    margin:16px 0 8px;
+    font-size:12px;
+    font-weight:800;
+    color:#374151;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+}
+
+/* The recommendation card is full-width, so its plain fieldRows
+   would otherwise stretch into very wide, sparse single-column
+   rows. Pack them 2-up instead, closer to the wireframe's density. */
+.ops-recommendation-card > .survey-summary-body{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    column-gap:32px;
+}
+
+@media (max-width:720px){
+    .ops-recommendation-card > .survey-summary-body{
+        grid-template-columns:1fr;
+    }
 }
 
 .survey-summary-title{
@@ -114,4 +181,159 @@
     background:#dcfce7;
     border-color:#bbf7d0;
     color:#166534;
+}
+
+/* "Save override" — matches wireframe .btn.danger */
+.survey-action-button-danger{
+    background:#fee2e2;
+    border-color:#fecaca;
+    color:#991b1b;
+}
+
+.survey-action-button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+
+/* ====================================
+   MACHINE SCORING TABLE
+   (matches wireframe table styling)
+==================================== */
+
+.ops-scoring-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    font-size:12.5px;
+}
+
+.ops-scoring-table th,
+.ops-scoring-table td{
+    text-align:left;
+    border-bottom:1px solid #e5e7eb;
+    padding:8px 9px;
+    vertical-align:top;
+}
+
+.ops-scoring-table th{
+    color:#475569;
+    background:#f8fafc;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-weight:800;
+}
+
+.ops-scoring-table tr:hover td{
+    background:#fffaf3;
+}
+
+.ops-scoring-table tr.ops-scoring-top td{
+    background:#fff7ed;
+}
+
+
+/* ====================================
+   OVERRIDE FORM
+==================================== */
+
+.ops-override-form{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-width:480px;
+}
+
+.ops-override-form select,
+.ops-override-form input{
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:7px 8px;
+    font-size:12.5px;
+    font-family:inherit;
+}
+
+.ops-override-form button{
+    align-self:flex-start;
+}
+
+
+/* ====================================
+   DEPLOYMENT PLAN
+==================================== */
+
+.ops-days-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:10px;
+    margin-top:4px;
+}
+
+.ops-days-grid label{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    font-size:11px;
+    font-weight:800;
+    color:#475569;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+}
+
+.ops-days-grid input,
+.ops-days-grid select{
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:7px 8px;
+    font-size:12.5px;
+    font-family:inherit;
+    font-weight:400;
+    text-transform:none;
+    color:#111827;
+}
+
+.ops-plan-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    font-size:12.5px;
+    margin-top:4px;
+}
+
+.ops-plan-table th,
+.ops-plan-table td{
+    text-align:left;
+    border-bottom:1px solid #e5e7eb;
+    padding:6px 8px;
+    vertical-align:middle;
+}
+
+.ops-plan-table th{
+    color:#475569;
+    background:#f8fafc;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-weight:800;
+}
+
+.ops-plan-table input,
+.ops-plan-table select{
+    width:100%;
+    border:1px solid #e5e7eb;
+    border-radius:6px;
+    padding:5px 6px;
+    font-size:12.5px;
+    font-family:inherit;
+}
+
+.ops-row-remove{
+    border:none;
+    background:transparent;
+    color:#991b1b;
+    font-size:16px;
+    line-height:1;
+    cursor:pointer;
+    padding:2px 6px;
 }

@@ -2,12 +2,15 @@
 # IMPORTS
 # ====================================
 
+from datetime import date
 
 from backend.repositories.ops_selector_repository import (
 
     create_ops_selection,
 
-    get_ops_selection_by_survey
+    get_ops_selection_by_survey,
+
+    get_ops_selection
 
 )
 
@@ -20,7 +23,8 @@ from backend.mapping.survey_field_mapper import (
 )
 
 from backend.services.ops_engine import (
-    run_ops_engine
+    run_ops_engine,
+    score_all_machines
 )
 
 from backend.services.sales_survey_service import (
@@ -426,3 +430,234 @@ def get_ops_selection_preview(
         "OPS_COMPLETED"
 
     )
+
+
+# ====================================
+# MACHINE SCORING TABLE
+# ====================================
+
+def get_ops_selection_scoring(
+
+        db,
+
+        ops_selection_id
+
+):
+
+    ops = get_ops_selection(
+
+        db,
+
+        ops_selection_id
+
+    )
+
+    if ops is None:
+
+        raise ValueError(
+
+            "Ops Selection not found."
+
+        )
+
+    sales_survey = get_sales_survey_request(
+
+        db,
+
+        ops.sales_survey_id
+
+    )
+
+    if sales_survey is None:
+
+        raise ValueError(
+
+            "Sales Survey not found."
+
+        )
+
+    engineering_inputs = map_sales_survey_to_ops(
+
+        sales_survey
+
+    )
+
+    return score_all_machines(
+
+        engineering_inputs
+
+    )
+
+
+# ====================================
+# SAVE HUMAN OVERRIDE
+# ====================================
+
+def save_ops_override(
+
+        db,
+
+        ops_selection_id,
+
+        override_machine,
+
+        override_reason
+
+):
+
+    ops = get_ops_selection(
+
+        db,
+
+        ops_selection_id
+
+    )
+
+    if ops is None:
+
+        raise ValueError(
+
+            "Ops Selection not found."
+
+        )
+
+    ops.override_machine = override_machine
+
+    ops.override_reason = override_reason
+
+    db.commit()
+
+    db.refresh(
+
+        ops
+
+    )
+
+    return ops
+
+
+# ====================================
+# SAVE DEPLOYMENT PLAN
+# ====================================
+
+def save_deployment_plan(
+
+        db,
+
+        ops_selection_id,
+
+        payload
+
+):
+
+    ops = get_ops_selection(
+
+        db,
+
+        ops_selection_id
+
+    )
+
+    if ops is None:
+
+        raise ValueError(
+
+            "Ops Selection not found."
+
+        )
+
+    ops.mobilisation_days = payload.mobilisation_days
+
+    ops.setup_days = payload.setup_days
+
+    ops.execution_days = payload.execution_days
+
+    ops.demob_days = payload.demob_days
+
+    ops.total_job_days = (
+
+        payload.mobilisation_days +
+        payload.setup_days +
+        payload.execution_days +
+        payload.demob_days
+
+    )
+
+    ops.crew_plan = [
+
+        role.dict() for role in payload.crew_plan
+
+    ]
+
+    ops.accessories_plan = [
+
+        item.dict() for item in payload.accessories_plan
+
+    ]
+
+    ops.dewatering_method_min = payload.dewatering_method_min
+
+    ops.dewatering_method_max = payload.dewatering_method_max
+
+    db.commit()
+
+    db.refresh(
+
+        ops
+
+    )
+
+    return ops
+
+
+# ====================================
+# SAVE OPS REVIEW DECISION
+# ====================================
+
+def save_ops_review_decision(
+
+        db,
+
+        ops_selection_id,
+
+        status,
+
+        reviewed_by,
+
+        review_note
+
+):
+
+    ops = get_ops_selection(
+
+        db,
+
+        ops_selection_id
+
+    )
+
+    if ops is None:
+
+        raise ValueError(
+
+            "Ops Selection not found."
+
+        )
+
+    ops.review_status = status
+
+    ops.reviewed_by = reviewed_by
+
+    ops.reviewed_date = date.today().isoformat()
+
+    ops.review_note = review_note
+
+    db.commit()
+
+    db.refresh(
+
+        ops
+
+    )
+
+    return ops

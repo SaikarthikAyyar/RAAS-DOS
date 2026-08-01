@@ -15,11 +15,19 @@ from enum import Enum
 
 class WorkflowStage(str, Enum):
 
+    CUSTOMER_REQUEST = "CUSTOMER_REQUEST"
+
     SALES_SURVEY = "SALES_SURVEY"
 
     OPS_REVIEW = "OPS_REVIEW"
 
-    QUOTE = "QUOTE"
+    TECHNO_COMMERCIAL_APPROVAL = "TECHNO_COMMERCIAL_APPROVAL"
+
+    COMMERCIAL_APPROVAL = "COMMERCIAL_APPROVAL"
+
+    QUOTE_RELEASED = "QUOTE_RELEASED"
+
+    PO_RECEIVED = "PO_RECEIVED"
 
     JOB_CREATION = "JOB_CREATION"
 
@@ -30,15 +38,25 @@ class WorkflowStage(str, Enum):
 
 # ====================================
 # WORKFLOW ORDER
+# 10 stages, matching the RAAS DOS
+# wireframe's STAGES array.
 # ====================================
 
 WORKFLOW_ORDER = [
+
+    WorkflowStage.CUSTOMER_REQUEST,
 
     WorkflowStage.SALES_SURVEY,
 
     WorkflowStage.OPS_REVIEW,
 
-    WorkflowStage.QUOTE,
+    WorkflowStage.TECHNO_COMMERCIAL_APPROVAL,
+
+    WorkflowStage.COMMERCIAL_APPROVAL,
+
+    WorkflowStage.QUOTE_RELEASED,
+
+    WorkflowStage.PO_RECEIVED,
 
     WorkflowStage.JOB_CREATION,
 

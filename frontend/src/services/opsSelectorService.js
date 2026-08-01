@@ -48,6 +48,243 @@ return response.json();
 
 
 // ====================================
+// GET OPS SELECTION
+// ====================================
+
+export async function getOpsSelection(
+
+opsSelectorId
+
+){
+
+const response=
+
+await fetch(
+
+`${API}/ops-selector/${opsSelectorId}`
+
+);
+
+const data = await response.json();
+
+if(
+
+!response.ok
+
+){
+
+throw data;
+
+}
+
+return data;
+
+}
+
+
+// ====================================
+// GET MACHINE SCORING TABLE
+// ====================================
+
+export async function getOpsScoring(
+
+opsSelectorId
+
+){
+
+const response=
+
+await fetch(
+
+`${API}/ops-selector/${opsSelectorId}/scoring`
+
+);
+
+const data = await response.json();
+
+if(
+
+!response.ok
+
+){
+
+throw data;
+
+}
+
+return data;
+
+}
+
+
+// ====================================
+// SAVE DEPLOYMENT PLAN
+// ====================================
+
+export async function saveDeploymentPlan(
+
+opsSelectorId,
+
+payload
+
+){
+
+const response = await fetch(
+
+`${API}/ops-selector/${opsSelectorId}/deployment-plan`,
+
+{
+
+method:"PUT",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify(payload)
+
+}
+
+);
+
+const data = await response.json();
+
+if(
+
+!response.ok
+
+){
+
+throw data;
+
+}
+
+return data;
+
+}
+
+
+// ====================================
+// SAVE HUMAN OVERRIDE
+// ====================================
+
+export async function saveOpsOverride(
+
+opsSelectorId,
+
+overrideMachine,
+
+overrideReason
+
+){
+
+const response = await fetch(
+
+`${API}/ops-selector/${opsSelectorId}/override`,
+
+{
+
+method:"PUT",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+override_machine:overrideMachine,
+
+override_reason:overrideReason
+
+})
+
+}
+
+);
+
+const data = await response.json();
+
+if(
+
+!response.ok
+
+){
+
+throw data;
+
+}
+
+return data;
+
+}
+
+
+// ====================================
+// SAVE OPS REVIEW DECISION
+// ====================================
+
+export async function saveOpsReviewDecision(
+
+opsSelectorId,
+
+status,
+
+reviewedBy,
+
+reviewNote
+
+){
+
+const response = await fetch(
+
+`${API}/ops-selector/${opsSelectorId}/review`,
+
+{
+
+method:"PUT",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+status,
+
+reviewed_by:reviewedBy,
+
+review_note:reviewNote
+
+})
+
+}
+
+);
+
+const data = await response.json();
+
+if(
+
+!response.ok
+
+){
+
+throw data;
+
+}
+
+return data;
+
+}
+
+
+// ====================================
 // SAVE OPS SELECTION
 // ====================================
 

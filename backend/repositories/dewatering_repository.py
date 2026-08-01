@@ -96,3 +96,40 @@ def create_dewatering_assessment(
 
 
     return assessment
+
+
+# ====================================
+# GET BY OPS SELECTION
+# ====================================
+
+def get_dewatering_assessment_by_ops_selection(
+
+        db,
+
+        ops_selection_id
+
+):
+
+    return (
+
+        db.query(
+
+            DewateringAssessment
+
+        )
+
+        .filter(
+
+            DewateringAssessment.ops_selection_id == ops_selection_id
+
+        )
+
+        .order_by(
+
+            DewateringAssessment.id.desc()
+
+        )
+
+        .first()
+
+    )

@@ -30,6 +30,20 @@ import {
 
 } from "../services/salesSurveyService";
 
+import {
+
+    getOpsSelection,
+
+    getOpsScoring
+
+} from "../services/opsSelectorService";
+
+import {
+
+    getDewateringByOpsSelection
+
+} from "../services/dewateringService";
+
 import "../components/enquiry/workspace/EnquiryWorkspace.css";
 
 import WorkspaceHeader from "../components/enquiry/workspace/WorkspaceHeader";
@@ -62,6 +76,12 @@ export default function EnquiryWorkspace() {
     const [customer, setCustomer] = useState(null);
 
     const [survey, setSurvey] = useState(null);
+
+    const [opsSelection, setOpsSelection] = useState(null);
+
+    const [opsScoring, setOpsScoring] = useState([]);
+
+    const [dewatering, setDewatering] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -126,6 +146,28 @@ export default function EnquiryWorkspace() {
                         );
 
                         setSurvey(surveyData);
+
+                    }
+
+                    if (response.ops_selector_id) {
+
+                        const opsData = await getOpsSelection(
+                            response.ops_selector_id
+                        );
+
+                        setOpsSelection(opsData);
+
+                        const scoringData = await getOpsScoring(
+                            response.ops_selector_id
+                        );
+
+                        setOpsScoring(scoringData);
+
+                        const dewateringData = await getDewateringByOpsSelection(
+                            response.ops_selector_id
+                        );
+
+                        setDewatering(dewateringData);
 
                     }
 
@@ -241,6 +283,12 @@ export default function EnquiryWorkspace() {
                 customer={customer}
 
                 survey={survey}
+
+                opsSelection={opsSelection}
+
+                opsScoring={opsScoring}
+
+                dewatering={dewatering}
 
             />
 

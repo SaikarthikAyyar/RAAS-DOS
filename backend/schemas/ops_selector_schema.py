@@ -2,7 +2,7 @@
 # IMPORTS
 # ====================================
 
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -50,3 +50,66 @@ class OpsSelectorSchema(BaseModel):
     internal_next_action: Optional[str] = None
 
     selection_reason: Optional[str] = None
+
+
+# ====================================
+# OPS OVERRIDE SCHEMA
+# ====================================
+
+class OpsOverrideSchema(BaseModel):
+
+    override_machine: str
+
+    override_reason: str
+
+
+# ====================================
+# DEPLOYMENT PLAN SCHEMA
+# ====================================
+
+class CrewRoleSchema(BaseModel):
+
+    role: str
+
+    qty_min: int
+
+    qty_max: int
+
+
+class AccessoryPlanSchema(BaseModel):
+
+    name: str
+
+    needed: str
+
+
+class DeploymentPlanSchema(BaseModel):
+
+    mobilisation_days: int
+
+    setup_days: int
+
+    execution_days: int
+
+    demob_days: int
+
+    crew_plan: List[CrewRoleSchema] = []
+
+    accessories_plan: List[AccessoryPlanSchema] = []
+
+    dewatering_method_min: Optional[str] = None
+
+    dewatering_method_max: Optional[str] = None
+
+
+# ====================================
+# OPS REVIEW DECISION SCHEMA
+# ====================================
+
+class OpsReviewDecisionSchema(BaseModel):
+
+    status: str
+
+    reviewed_by: str
+
+    review_note: Optional[str] = None

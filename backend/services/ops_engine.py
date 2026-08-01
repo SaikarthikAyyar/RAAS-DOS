@@ -545,35 +545,23 @@ def score_volume(
 
 
 # ====================================
-# MACHINE SELECTION
+# MACHINE SCORING (ALL MACHINES)
 # ====================================
 
-def select_machine(
+def score_all_machines(
 
         engineering_inputs
 
 ):
-    
-    opening_width = engineering_inputs.get(
-        "opening_width"
-    )
+    """
+    Scores every machine in the library and returns
+    them ranked best-first, with a 1-based "rank" field.
 
-    opening_height = engineering_inputs.get(
-        "opening_height"
-    )
+    Used by:
+      - select_machine() below, for the winner
+      - the Ops Review tab's machine scoring table
+    """
 
-    material_category = engineering_inputs.get(
-        "material_category"
-    )
-
-    job_type = engineering_inputs.get(
-        "job_type"
-    )
-
-    estimated_volume = engineering_inputs.get(
-        "estimated_volume"
-    )
-    
     machine_scores = []
 
     for machine in MACHINE_LIBRARY:
@@ -646,16 +634,38 @@ def select_machine(
 
         )
 
-        best_machine = max(
+    machine_scores.sort(
 
-        machine_scores,
+        key=lambda m: m["total_score"],
 
-        key=lambda m: m["total_score"]
+        reverse=True
 
     )
 
+    for index, entry in enumerate(machine_scores):
 
-    return best_machine
+        entry["rank"] = index + 1
+
+    return machine_scores
+
+
+# ====================================
+# MACHINE SELECTION
+# ====================================
+
+def select_machine(
+
+        engineering_inputs
+
+):
+
+    machine_scores = score_all_machines(
+
+        engineering_inputs
+
+    )
+
+    return machine_scores[0]
 
 
 # ====================================

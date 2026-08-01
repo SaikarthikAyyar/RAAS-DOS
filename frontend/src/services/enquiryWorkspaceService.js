@@ -145,3 +145,32 @@ export async function requestOpsReview(
     return response.json();
 
 }
+
+export async function setEnquiryStage(
+    enquiryId,
+    stage
+){
+
+    const response = await fetch(
+
+        `${API}/enquiry-consolidated/${enquiryId}/stage`,
+
+        {
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({ stage })
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}

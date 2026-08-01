@@ -1,6 +1,8 @@
 import SurveySummary from "./SurveySummary";
 
 import SurveyWorkspace from "./SurveyWorkspace";
+
+import OpsReviewSummary from "./OpsReviewSummary";
 // ====================================
 // COMPONENT
 // ====================================
@@ -13,7 +15,13 @@ export default function WorkspaceContent({
 
     customer,
 
-    survey
+    survey,
+
+    opsSelection,
+
+    opsScoring,
+
+    dewatering
 
 }){
 
@@ -41,11 +49,17 @@ export default function WorkspaceContent({
 
             return(
 
-                <div>
+                <OpsReviewSummary
 
-                    Ops Review Placeholder
+                    enquiry={enquiry}
 
-                </div>
+                    opsSelection={opsSelection}
+
+                    opsScoring={opsScoring}
+
+                    dewatering={dewatering}
+
+                />
 
             );
 

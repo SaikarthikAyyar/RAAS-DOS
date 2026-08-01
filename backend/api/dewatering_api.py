@@ -21,6 +21,14 @@ from backend.services.dewatering_service import (
 
 )
 
+from fastapi import HTTPException
+
+from backend.repositories.dewatering_repository import (
+
+    get_dewatering_assessment_by_ops_selection
+
+)
+
 
 # ====================================
 # ROUTER
@@ -86,3 +94,42 @@ def dewatering(
         print(e)
 
         raise e
+
+
+# ====================================
+# GET BY OPS SELECTION
+# ====================================
+
+@router.get(
+
+    "/dewatering/by-ops-selection/{ops_selection_id}"
+
+)
+
+def get_dewatering_by_ops_selection(
+
+        ops_selection_id: int,
+
+        db=Depends(get_db)
+
+):
+
+    assessment = get_dewatering_assessment_by_ops_selection(
+
+        db,
+
+        ops_selection_id
+
+    )
+
+    if not assessment:
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail="No dewatering assessment for this Ops Selection."
+
+        )
+
+    return assessment

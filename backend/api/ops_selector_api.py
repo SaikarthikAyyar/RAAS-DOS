@@ -11,7 +11,13 @@ from backend.database.connection import get_db
 
 from backend.schemas.ops_selector_schema import (
 
-    OpsSelectorSchema
+    OpsSelectorSchema,
+
+    OpsOverrideSchema,
+
+    DeploymentPlanSchema,
+
+    OpsReviewDecisionSchema
 
 )
 
@@ -29,7 +35,23 @@ from backend.services.sales_survey_service import (
 
 from backend.services.ops_selector_service import (
 
-    get_ops_selection_preview
+    get_ops_selection_preview,
+
+    get_ops_selection_scoring,
+
+    save_ops_override,
+
+    save_deployment_plan,
+
+    save_ops_review_decision
+
+)
+
+from fastapi import HTTPException
+
+from backend.repositories.ops_selector_repository import (
+
+    get_ops_selection
 
 )
 
@@ -152,5 +174,220 @@ def get_ops_preview(
         sales_survey_id
 
     )
-    
+
+
+# ====================================
+# GET OPS SELECTION BY ID
+# ====================================
+# NOTE: registered after /ops-selector/surveys and
+# /ops-selector/prefill/{sales_survey_id} so those more
+# specific paths are not shadowed by {ops_selector_id}.
+
+@router.get(
+
+    "/ops-selector/{ops_selector_id}"
+
+)
+
+def get_ops_selection_by_id(
+
+        ops_selector_id: int,
+
+        db=Depends(get_db)
+
+):
+
+    ops = get_ops_selection(
+
+        db,
+
+        ops_selector_id
+
+    )
+
+    if not ops:
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail="Ops Selection not found."
+
+        )
+
+    return ops
+
+
+# ====================================
+# MACHINE SCORING TABLE
+# ====================================
+
+@router.get(
+
+    "/ops-selector/{ops_selector_id}/scoring"
+
+)
+
+def get_ops_scoring(
+
+        ops_selector_id: int,
+
+        db=Depends(get_db)
+
+):
+
+    try:
+
+        return get_ops_selection_scoring(
+
+            db,
+
+            ops_selector_id
+
+        )
+
+    except ValueError as e:
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail=str(e)
+
+        )
+
+
+# ====================================
+# SAVE DEPLOYMENT PLAN
+# ====================================
+
+@router.put(
+
+    "/ops-selector/{ops_selector_id}/deployment-plan"
+
+)
+
+def put_deployment_plan(
+
+        ops_selector_id: int,
+
+        payload: DeploymentPlanSchema,
+
+        db=Depends(get_db)
+
+):
+
+    try:
+
+        return save_deployment_plan(
+
+            db,
+
+            ops_selector_id,
+
+            payload
+
+        )
+
+    except ValueError as e:
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail=str(e)
+
+        )
+
+
+# ====================================
+# SAVE HUMAN OVERRIDE
+# ====================================
+
+@router.put(
+
+    "/ops-selector/{ops_selector_id}/override"
+
+)
+
+def put_ops_override(
+
+        ops_selector_id: int,
+
+        payload: OpsOverrideSchema,
+
+        db=Depends(get_db)
+
+):
+
+    try:
+
+        return save_ops_override(
+
+            db,
+
+            ops_selector_id,
+
+            payload.override_machine,
+
+            payload.override_reason
+
+        )
+
+    except ValueError as e:
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail=str(e)
+
+        )
+
+
+# ====================================
+# SAVE OPS REVIEW DECISION
+# ====================================
+
+@router.put(
+
+    "/ops-selector/{ops_selector_id}/review"
+
+)
+
+def put_ops_review_decision(
+
+        ops_selector_id: int,
+
+        payload: OpsReviewDecisionSchema,
+
+        db=Depends(get_db)
+
+):
+
+    try:
+
+        return save_ops_review_decision(
+
+            db,
+
+            ops_selector_id,
+
+            payload.status,
+
+            payload.reviewed_by,
+
+            payload.review_note
+
+        )
+
+    except ValueError as e:
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail=str(e)
+
+        )
 

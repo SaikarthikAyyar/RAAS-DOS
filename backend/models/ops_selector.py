@@ -7,6 +7,8 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 
+from sqlalchemy.dialects.postgresql import JSONB
+
 from backend.database.tables import Base
 
 
@@ -163,4 +165,63 @@ class OpsSelection(Base):
 
         default="DRAFT"
 
+    )
+
+
+    # --------------------------------
+    # Human Override
+    # (Ops Review tab - wireframe parity)
+    # --------------------------------
+
+    override_machine = Column(
+        String(50)
+    )
+
+    override_reason = Column(
+        String(500)
+    )
+
+
+    # --------------------------------
+    # Deployment Plan
+    # (Ops Review tab - wireframe parity)
+    # --------------------------------
+
+    crew_plan = Column(
+        JSONB
+    )
+
+    accessories_plan = Column(
+        JSONB
+    )
+
+    dewatering_method_min = Column(
+        String(100)
+    )
+
+    dewatering_method_max = Column(
+        String(100)
+    )
+
+
+    # --------------------------------
+    # Ops Review Decision
+    # (Ops Review tab - wireframe parity)
+    # --------------------------------
+
+    review_status = Column(
+        String(50),
+        default="Pending"
+    )
+
+    reviewed_by = Column(
+        String(100)
+    )
+
+    reviewed_date = Column(
+        String(20)
+    )
+
+    review_note = Column(
+        String(500)
     )

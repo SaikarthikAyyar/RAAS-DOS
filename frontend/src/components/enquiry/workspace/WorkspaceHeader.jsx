@@ -7,7 +7,10 @@ const STAGE_LABELS = {
     CUSTOMER_REQUEST: "Customer Request",
     SALES_SURVEY: "Sales Survey",
     OPS_REVIEW: "Ops Review",
-    QUOTE: "Quote",
+    TECHNO_COMMERCIAL_APPROVAL: "Techno-Commercial Approval",
+    COMMERCIAL_APPROVAL: "Commercial Approval",
+    QUOTE_RELEASED: "Quote Released",
+    PO_RECEIVED: "PO Received",
     JOB_CREATION: "Job Creation",
     EXECUTION: "Execution",
     COMPLETED: "Completed"

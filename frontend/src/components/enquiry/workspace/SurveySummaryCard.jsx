@@ -4,13 +4,15 @@ export default function SurveySummaryCard({
 
     fields = [],
 
-    actions
+    actions,
+
+    className = ""
 
 }){
 
     return(
 
-        <div className="survey-summary-card">
+        <div className={`survey-summary-card ${className}`.trim()}>
 
             <h3 className="survey-summary-title">
 

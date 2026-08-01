@@ -21,7 +21,10 @@ class EnquiryStage(str, Enum):
     CUSTOMER_REQUEST = "CUSTOMER_REQUEST"
     SALES_SURVEY = "SALES_SURVEY"
     OPS_REVIEW = "OPS_REVIEW"
-    QUOTE = "QUOTE"
+    TECHNO_COMMERCIAL_APPROVAL = "TECHNO_COMMERCIAL_APPROVAL"
+    COMMERCIAL_APPROVAL = "COMMERCIAL_APPROVAL"
+    QUOTE_RELEASED = "QUOTE_RELEASED"
+    PO_RECEIVED = "PO_RECEIVED"
     JOB_CREATION = "JOB_CREATION"
     EXECUTION = "EXECUTION"
     COMPLETED = "COMPLETED"
@@ -132,3 +135,8 @@ class ModuleReferenceUpdateRequest(BaseModel):
     reference_field: str
 
     reference_id: int
+
+
+class SetStageRequest(BaseModel):
+
+    stage: EnquiryStage

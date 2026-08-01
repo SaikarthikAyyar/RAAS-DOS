@@ -20,7 +20,9 @@ from backend.schemas.enquiry_consolidated_schema import (
 
     EnquiryDeleteResponse,
 
-    ModuleReferenceUpdateRequest
+    ModuleReferenceUpdateRequest,
+
+    SetStageRequest
 
 )
 
@@ -310,4 +312,24 @@ def request_ops_review(
     return service.request_ops_review(
         db,
         enquiry_id
+    )
+
+
+# ====================================
+# SET STAGE
+# ====================================
+
+@router.put(
+    "/{enquiry_id}/stage"
+)
+def set_stage(
+    enquiry_id: int,
+    payload: SetStageRequest,
+    db: Session = Depends(get_db)
+):
+
+    return service.set_stage(
+        db,
+        enquiry_id,
+        payload.stage
     )
