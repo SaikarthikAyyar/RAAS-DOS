@@ -1,4 +1,21 @@
 // ====================================
+// STAGE LABELS
+// ====================================
+
+const STAGE_LABELS = {
+
+    CUSTOMER_REQUEST: "Customer Request",
+    SALES_SURVEY: "Sales Survey",
+    OPS_REVIEW: "Ops Review",
+    QUOTE: "Quote",
+    JOB_CREATION: "Job Creation",
+    EXECUTION: "Execution",
+    COMPLETED: "Completed"
+
+};
+
+
+// ====================================
 // COMPONENT
 // ====================================
 
@@ -9,6 +26,37 @@ export default function WorkspaceHeader({
 
 }){
 
+    const stageLabel = STAGE_LABELS[enquiry?.stage] ?? enquiry?.stage ?? "-";
+
+    let pillClass = "blue";
+    let pillText = stageLabel;
+
+    if(enquiry?.status === "LOST"){
+        pillClass = "red";
+        pillText = "Lost";
+    } else if(enquiry?.status === "ARCHIVED"){
+        pillClass = "gray";
+        pillText = "Archived";
+    }
+
+    const subtitleParts = [
+
+        customer?.plant_site_location,
+
+        customer?.nearest_city_hub
+            ? `Hub: ${customer.nearest_city_hub}`
+            : null,
+
+        enquiry?.owner_role
+            ? `Owner: ${enquiry.owner_role}`
+            : null,
+
+        enquiry?.created_at
+            ? `Created ${new Date(enquiry.created_at).toLocaleDateString()}`
+            : null
+
+    ].filter(Boolean);
+
     return(
 
         <div className="workspace-header">
@@ -17,87 +65,31 @@ export default function WorkspaceHeader({
 
                 <h2>
 
-                    Enquiry Workspace
+                    {enquiry?.id ? `Enquiry #${enquiry.id}` : "Enquiry Workspace"}
+                    {" - "}
+                    {customer?.company_name ?? "-"}
 
                 </h2>
 
-            </div>
-
-            <div className="workspace-header-details">
-
-                <div>
-
-                    <strong>Enquiry ID:</strong>
-
-                    {" "}
-
-                    {enquiry?.id ?? "—"}
-
-                </div>
-
-                <div>
-
-                    <strong>Customer:</strong>
-
-                    {" "}
-
-                    {customer?.company_name ?? "—"}
-
-                </div>
-
-                <div>
-
-                    <strong>Current Stage:</strong>
-
-                    {" "}
-
-                    {enquiry?.stage ?? "—"}
-
-                </div>
-
-                <div>
-
-                    <strong>Status:</strong>
-
-                    {" "}
-
-                    {enquiry?.status ?? "—"}
-
-                </div>
-
-                <div>
-
-                    <strong>Owner:</strong>
-
-                    {" "}
-
-                    {enquiry?.owner_role ?? "—"}
-
-                </div>
-
-                <div>
-
-                    <strong>Created:</strong>
-
-                    {" "}
+                <p className="workspace-header-subtitle">
 
                     {
 
-                        enquiry?.created_at
-
-                            ? new Date(
-
-                                enquiry.created_at
-
-                            ).toLocaleDateString()
-
-                            : "—"
+                        subtitleParts.length
+                            ? subtitleParts.join(" · ")
+                            : "No customer details available."
 
                     }
 
-                </div>
+                </p>
 
             </div>
+
+            <span className={`workspace-header-pill ${pillClass}`}>
+
+                {pillText}
+
+            </span>
 
         </div>
 

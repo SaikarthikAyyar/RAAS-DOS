@@ -1,26 +1,18 @@
 // ====================================
 // WORKFLOW STAGES
+// Keys match the backend EnquiryStage enum
+// (backend/schemas/enquiry_consolidated_schema.py)
 // ====================================
 
 const WORKFLOW_STAGES = [
 
-    "Customer Request",
-
-    "Sales Survey",
-
-    "Ops Review",
-
-    "Techno Commercial",
-
-    "Commercial Approval",
-
-    "Purchase Order",
-
-    "Job Creation",
-
-    "Execution",
-
-    "Closed"
+    { key: "CUSTOMER_REQUEST", label: "Customer Request" },
+    { key: "SALES_SURVEY", label: "Sales Survey" },
+    { key: "OPS_REVIEW", label: "Ops Review" },
+    { key: "QUOTE", label: "Quote" },
+    { key: "JOB_CREATION", label: "Job Creation" },
+    { key: "EXECUTION", label: "Execution" },
+    { key: "COMPLETED", label: "Completed" }
 
 ];
 
@@ -35,6 +27,12 @@ export default function WorkflowStepper({
 
 }){
 
+    const currentIndex = WORKFLOW_STAGES.findIndex(
+
+        stage => stage.key === currentStage
+
+    );
+
     return(
 
         <div className="workflow-stepper">
@@ -42,41 +40,51 @@ export default function WorkflowStepper({
             {
 
                 WORKFLOW_STAGES.map(
+                    (stage, index) => {
 
-                    (stage,index)=>(
+                        const done = currentIndex !== -1 && index < currentIndex;
 
-                        <div
+                        const now = index === currentIndex;
 
-                            key={stage}
+                        const stepClass =
+                            "workflow-step" +
+                            (done ? " workflow-step-done" : "") +
+                            (now ? " workflow-step-now" : "");
 
-                            className={
+                        return(
 
-                                stage===currentStage
+                            <div
+                                className={stepClass}
+                                key={stage.key}
+                            >
 
-                                    ? "workflow-step workflow-step-active"
+                                <div className="workflow-step-number">
 
-                                    : "workflow-step"
+                                    {done ? "✓" : index + 1}
 
-                            }
+                                </div>
 
-                        >
+                                <div className="workflow-step-name">
 
-                            <div className="workflow-step-number">
+                                    {stage.label}
 
-                                {index+1}
+                                </div>
+
+                                {
+
+                                    index < WORKFLOW_STAGES.length - 1 && (
+
+                                        <div className="workflow-step-connector" />
+
+                                    )
+
+                                }
 
                             </div>
 
-                            <div className="workflow-step-name">
+                        );
 
-                                {stage}
-
-                            </div>
-
-                        </div>
-
-                    )
-
+                    }
                 )
 
             }

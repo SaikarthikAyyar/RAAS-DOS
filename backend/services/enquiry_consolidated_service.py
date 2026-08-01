@@ -264,14 +264,9 @@ def request_ops_review(
     enquiry_id
 ):
 
-    enquiry = get_enquiry(
-        db,
-        enquiry_id
-    )
-
     return advance_to_next_stage(
         db,
-        enquiry.customer_request_id
+        enquiry_id
     )
 
 # ====================================

@@ -1,92 +1,187 @@
 /* ====================================
    ENQUIRY WORKSPACE
+   Visual language ported from the RAAS DOS
+   HTML wireframe (RAAS_DOS_Final_Demo.html)
 ==================================== */
 
 .enquiry-workspace{
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
+
     display:flex;
     flex-direction:column;
-    gap:20px;
-    padding:24px;
-    background:#f5f7fa;
-    min-height:100vh;
+    gap:16px;
+    padding:20px;
+    max-width:1520px;
+    margin:0 auto;
+    font-family:Inter,"Segoe UI",Arial,sans-serif;
+    color:var(--ink);
+    font-size:14px;
 }
 
 
 /* ====================================
-   HEADER
+   HEADER (matches wireframe .title)
 ==================================== */
 
 .workspace-header{
-    background:#ffffff;
-    border-radius:10px;
-    padding:20px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
 }
 
 .workspace-header-title h2{
-    margin:0 0 16px;
+    font-size:21px;
+    margin:0;
+    font-weight:800;
 }
 
+.workspace-header-subtitle{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.workspace-header-pill{
+    display:inline-flex;
+    align-items:center;
+    border-radius:999px;
+    padding:3px 10px;
+    font-size:11px;
+    font-weight:800;
+    border:1px solid var(--line);
+    background:#fff;
+    white-space:nowrap;
+}
+
+.workspace-header-pill.blue{
+    color:#1d4ed8;
+    background:#dbeafe;
+    border-color:#bfdbfe;
+}
+
+.workspace-header-pill.red{
+    color:#991b1b;
+    background:#fee2e2;
+    border-color:#fecaca;
+}
+
+.workspace-header-pill.gray{
+    color:#475569;
+    background:#f1f5f9;
+}
+
+/* Fallback detail grid, used only when no subtitle line is available */
 .workspace-header-details{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:12px;
+    width:100%;
 }
 
 
 /* ====================================
-   WORKFLOW STEPPER
+   WORKFLOW STEPPER (matches wireframe .stepper/.step/.dot/.conn)
 ==================================== */
 
 .workflow-stepper{
     display:flex;
-    gap:12px;
+    align-items:center;
+    gap:0;
+    margin-bottom:4px;
     overflow-x:auto;
+    padding-bottom:4px;
 }
 
 .workflow-step{
     display:flex;
-    flex-direction:column;
     align-items:center;
-    min-width:110px;
-    padding:12px;
-    border-radius:8px;
-    background:#ffffff;
-    border:1px solid #dcdcdc;
-}
-
-.workflow-step-active{
-    background:#1976d2;
-    color:#ffffff;
+    gap:6px;
+    flex-shrink:0;
 }
 
 .workflow-step-number{
-    font-weight:bold;
-    margin-bottom:6px;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:#e5e7eb;
+    color:#6b7280;
+    display:grid;
+    place-items:center;
+    font-size:10.5px;
+    font-weight:800;
+    border:2px solid #e5e7eb;
+    margin-bottom:0;
+}
+
+.workflow-step-name{
+    font-size:11px;
+    font-weight:800;
+    color:#374151;
+    white-space:nowrap;
+}
+
+.workflow-step-connector{
+    width:28px;
+    height:2px;
+    background:#e5e7eb;
+    margin:0 5px;
+    flex-shrink:0;
+}
+
+.workflow-step-done .workflow-step-number{
+    background:#dcfce7;
+    color:#166534;
+    border-color:#86efac;
+}
+
+.workflow-step-done .workflow-step-connector{
+    background:#86efac;
+}
+
+.workflow-step-now .workflow-step-number{
+    background:var(--orange);
+    color:#fff;
+    border-color:var(--orange);
+}
+
+.workflow-step-now .workflow-step-name{
+    color:var(--deep);
 }
 
 
 /* ====================================
-   WORKFLOW TABS
+   WORKFLOW TABS (matches wireframe .tabs button)
 ==================================== */
 
 .workflow-tabs{
     display:flex;
     flex-wrap:wrap;
-    gap:10px;
+    gap:6px;
+    margin:0 0 4px;
 }
 
 .workflow-tab{
-    padding:10px 18px;
-    border:none;
-    border-radius:6px;
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:999px;
+    padding:6px 12px;
+    font-weight:800;
     cursor:pointer;
-    background:#e5e5e5;
+    font-size:12px;
+    color:#374151;
 }
 
 .workflow-tab-active{
-    background:#1976d2;
-    color:#ffffff;
+    background:var(--deep);
+    color:#fff;
+    border-color:var(--deep);
 }
 
 

@@ -57,7 +57,7 @@ def _get_enquiry(
 
     db,
 
-    customer_request_id
+    enquiry_id
 
 ):
 
@@ -71,7 +71,7 @@ def _get_enquiry(
 
         .filter(
 
-            Enquiry.customer_request_id == customer_request_id
+            Enquiry.id == enquiry_id
 
         )
 
@@ -100,7 +100,7 @@ def update_stage(
 
     db,
 
-    customer_request_id,
+    enquiry_id,
 
     stage
 
@@ -108,14 +108,14 @@ def update_stage(
 
     print("\n========================================")
     print("[WORKFLOW] UPDATE STAGE")
-    print(f"[WORKFLOW] Customer Request : {customer_request_id}")
+    print(f"[WORKFLOW] Enquiry ID       : {enquiry_id}")
     print(f"[WORKFLOW] New Stage        : {stage}")
 
     enquiry = _get_enquiry(
 
         db,
 
-        customer_request_id
+        enquiry_id
 
     )
 
@@ -143,7 +143,7 @@ def advance_to_next_stage(
 
     db,
 
-    customer_request_id
+    enquiry_id
 
 ):
 
@@ -151,7 +151,7 @@ def advance_to_next_stage(
 
         db,
 
-        customer_request_id
+        enquiry_id
 
     )
 
@@ -191,7 +191,7 @@ def advance_to_next_stage(
 
         db,
 
-        customer_request_id,
+        enquiry_id,
 
         next_stage
 
