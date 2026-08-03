@@ -35,6 +35,8 @@ import EnquiryPage from "./pages/EnquiryPage";
 
 import EnquiryWorkspace from "./pages/EnquiryWorkspace";
 
+import QuotesModule from "./pages/QuotesModule";
+
 import Analytics from "./pages/Analytics";
 
 
@@ -84,6 +86,8 @@ function App() {
           <Route path="dewatering-gate" element={<DewateringGate />} />
 
           <Route path="quote" element={<TechnoCommercialQuote />} />
+
+          <Route path="quotes" element={<QuotesModule />} />
 
           <Route
               path="approval"

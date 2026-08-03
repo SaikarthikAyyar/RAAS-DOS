@@ -16,7 +16,8 @@ from backend.schemas.techno_commercial_quote_schema import (
     InternalExtraSchema,
     ValidTillSchema,
     ReleaseQuoteSchema,
-    RequestRevisionFlagSchema
+    RequestRevisionFlagSchema,
+    QuoteListResponse
 )
 
 from backend.services.techno_commercial_quote_service import (
@@ -29,7 +30,8 @@ from backend.services.techno_commercial_quote_service import (
     update_internal_extra_request,
     update_valid_till_request,
     release_quote_request,
-    flag_quote_revision_requested_request
+    flag_quote_revision_requested_request,
+    list_quotes_request
 )
 
 from backend.services.techno_commercial_quote_service import (
@@ -455,3 +457,55 @@ def post_request_revision_flag(
     except ValueError as e:
 
         raise HTTPException(status_code=404, detail=str(e))
+
+
+# ====================================
+# QUOTES MODULE
+# ====================================
+
+@router.get(
+
+    "/quotes",
+
+    response_model=QuoteListResponse
+
+)
+def get_quotes_list(
+
+    status: str | None = None,
+
+    search: str | None = None,
+
+    page: int = 1,
+
+    page_size: int = 20,
+
+    db: Session = Depends(get_db)
+
+):
+
+    items, total = list_quotes_request(
+
+        db,
+
+        status,
+
+        search,
+
+        page,
+
+        page_size
+
+    )
+
+    return {
+
+        "items": items,
+
+        "total": total,
+
+        "page": page,
+
+        "page_size": page_size
+
+    }

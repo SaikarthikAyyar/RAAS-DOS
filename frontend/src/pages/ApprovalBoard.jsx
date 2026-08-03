@@ -45,7 +45,7 @@ export default function ApprovalBoard(){
             <div
                 style={{
                     padding: "40px",
-                    color: "#ffffff",
+                    color: "#000000",
                     textAlign: "center"
                 }}
             >

@@ -8,7 +8,11 @@ from backend.models.techno_commercial_quote import Quote
 
 from backend.models.ops_selector import OpsSelection
 
-from sqlalchemy import func
+from backend.models.customer_requests import CustomerRequest
+
+from backend.models.enquiry import Enquiry
+
+from sqlalchemy import func, or_, and_, cast, String
 
 
 logger = logging.getLogger(__name__)
@@ -530,4 +534,158 @@ def flag_revision_requested(
     db.refresh(quote)
 
     return quote
+
+
+# ====================================
+# QUOTES MODULE
+# One row per ops_selection_id - the
+# latest revision only, matching the
+# wireframe's "one row per case" list.
+# ====================================
+
+def list_quotes(
+
+    db,
+
+    status,
+
+    search,
+
+    page,
+
+    page_size
+
+):
+
+    latest_ids_subq = (
+
+        db.query(
+
+            func.max(Quote.id)
+
+        )
+
+        .group_by(Quote.ops_selection_id)
+
+        .subquery()
+
+    )
+
+    enquiry_link_subq = (
+
+        db.query(
+
+            Enquiry.quote_id.label("quote_id"),
+
+            func.min(Enquiry.id).label("enquiry_id")
+
+        )
+
+        .filter(Enquiry.quote_id.isnot(None))
+
+        .group_by(Enquiry.quote_id)
+
+        .subquery()
+
+    )
+
+    query = (
+
+        db.query(
+
+            Quote,
+
+            CustomerRequest.company_name,
+
+            enquiry_link_subq.c.enquiry_id
+
+        )
+
+        .filter(Quote.id.in_(latest_ids_subq))
+
+        .outerjoin(
+
+            CustomerRequest,
+
+            Quote.customer_request_id == CustomerRequest.id
+
+        )
+
+        .outerjoin(
+
+            enquiry_link_subq,
+
+            enquiry_link_subq.c.quote_id == Quote.id
+
+        )
+
+    )
+
+    if status == "Approved":
+
+        query = query.filter(
+
+            Quote.revision_requested.is_(False),
+
+            Quote.workflow_status == "APPROVAL_COMPLETED"
+
+        )
+
+    elif status == "Active":
+
+        query = query.filter(
+
+            or_(
+
+                Quote.revision_requested.is_(True),
+
+                and_(
+
+                    Quote.workflow_status != "APPROVAL_COMPLETED",
+
+                    Quote.workflow_status != "REJECTED"
+
+                )
+
+            )
+
+        )
+
+    # "All" -> no status filter
+
+    if search:
+
+        search_like = f"%{search}%"
+
+        query = query.filter(
+
+            or_(
+
+                CustomerRequest.company_name.ilike(search_like),
+
+                cast(Quote.id, String).ilike(search_like),
+
+                cast(Quote.customer_request_id, String).ilike(search_like)
+
+            )
+
+        )
+
+    total = query.count()
+
+    rows = (
+
+        query
+
+        .order_by(Quote.id.desc())
+
+        .offset((page - 1) * page_size)
+
+        .limit(page_size)
+
+        .all()
+
+    )
+
+    return rows, total
 

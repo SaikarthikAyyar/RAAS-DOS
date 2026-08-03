@@ -41,11 +41,11 @@ export default function DewateringGate(){
 
  <div>
 
-<h1 style={{ color: "#ffffff" }}>
+<h1 style={{ color: "#000000" }}>
   Dewatering Gate
 </h1>
 
-<p style={{ color: "#ffffff", marginBottom: "20px" }}>
+<p style={{ color: "#000000", marginBottom: "20px" }}>
     This module is reserved for future integration. The dewatering workflow will be implemented after the core project workflow has been completed and validated.
 </p>
 

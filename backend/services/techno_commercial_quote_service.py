@@ -881,3 +881,91 @@ def flag_quote_revision_requested_request(
         date.today().isoformat()
 
     )
+
+
+# ====================================
+# QUOTES MODULE
+# ====================================
+
+def _status_label(quote):
+
+    if quote.revision_requested:
+
+        return "Revision Requested"
+
+    if quote.workflow_status == "APPROVAL_COMPLETED":
+
+        return "Approved"
+
+    if quote.workflow_status == "REJECTED":
+
+        return "Rejected"
+
+    return quote.workflow_status or "Draft"
+
+
+def list_quotes_request(
+
+    db,
+
+    status,
+
+    search,
+
+    page,
+
+    page_size
+
+):
+
+    from backend.repositories.techno_commercial_quote_repository import (
+        list_quotes
+    )
+
+    rows, total = list_quotes(
+
+        db,
+
+        status,
+
+        search,
+
+        page,
+
+        page_size
+
+    )
+
+    items = []
+
+    for quote, company_name, enquiry_id in rows:
+
+        items.append({
+
+            "id": quote.id,
+
+            "ops_selection_id": quote.ops_selection_id,
+
+            "customer_request_id": quote.customer_request_id,
+
+            "customer_name": company_name,
+
+            "enquiry_id": enquiry_id,
+
+            "revision_number": quote.revision_number,
+
+            "workflow_status": quote.workflow_status,
+
+            "status_label": _status_label(quote),
+
+            "revision_requested": quote.revision_requested,
+
+            "combined_budgetary_value_min": quote.combined_budgetary_value_min,
+
+            "combined_budgetary_value_max": quote.combined_budgetary_value_max,
+
+            "created_on": quote.created_on
+
+        })
+
+    return items, total

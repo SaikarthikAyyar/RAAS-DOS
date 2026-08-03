@@ -4,7 +4,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import or_
+from sqlalchemy import or_, cast, String
 
 from backend.models.enquiry import Enquiry
 from backend.models.customer_requests import CustomerRequest
@@ -85,7 +85,7 @@ def get_enquiries(
 
                     Enquiry.owner_role.ilike(search),
 
-                    Enquiry.id.cast(str).ilike(search)
+                    cast(Enquiry.id, String).ilike(search)
 
                 )
 
@@ -188,7 +188,7 @@ def count_enquiries(
 
                     Enquiry.owner_role.ilike(search),
 
-                    Enquiry.id.cast(str).ilike(search)
+                    cast(Enquiry.id, String).ilike(search)
 
                 )
 

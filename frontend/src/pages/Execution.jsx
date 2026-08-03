@@ -311,7 +311,7 @@ export default function Execution(){
 
     <div>
 
-        <h1 style={{ color: "#ffffff" }}>
+        <h1 style={{ color: "#000000" }}>
 
             Execution
 

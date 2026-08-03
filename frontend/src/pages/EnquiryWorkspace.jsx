@@ -8,7 +8,9 @@ import {
 
 import {
 
-    useParams
+    useParams,
+
+    useLocation
 
 } from "react-router-dom";
 
@@ -66,6 +68,8 @@ export default function EnquiryWorkspace() {
         enquiryId
 
     } = useParams();
+
+    const location = useLocation();
 
     console.log(
 
@@ -227,7 +231,11 @@ export default function EnquiryWorkspace() {
 
     );
 
-    const [activeTab, setActiveTab] = useState("survey");
+    const [activeTab, setActiveTab] = useState(
+
+        location.state?.initialTab || "survey"
+
+    );
 
     if(
 

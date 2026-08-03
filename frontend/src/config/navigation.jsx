@@ -65,6 +65,8 @@ admin:[
 
 {title:"Quote",path:"/quote",icon:<Calculator size={18}/>},
 
+{title:"Quotes",path:"/quotes",icon:<FileText size={18}/>},
+
 {title:"Approval",path:"/approval",icon:<CheckCircle size={18}/>},
 
 {title:"Job Creation",path:"/job-creation",icon:<Briefcase size={18}/>},
@@ -95,7 +97,9 @@ sales:[
 
 {title:"Sales Survey",path:"/sales-survey",icon:<ClipboardCheck size={18}/>},
 
-{title:"Quote",path:"/quote",icon:<Calculator size={18}/>}
+{title:"Quote",path:"/quote",icon:<Calculator size={18}/>},
+
+{title:"Quotes",path:"/quotes",icon:<FileText size={18}/>}
 
 ],
 
