@@ -5,6 +5,8 @@ import SurveyWorkspace from "./SurveyWorkspace";
 import OpsReviewSummary from "./OpsReviewSummary";
 
 import TechnoCommercialApprovalSummary from "./TechnoCommercialApprovalSummary";
+
+import QuoteCommercialSummary from "./QuoteCommercialSummary";
 // ====================================
 // COMPONENT
 // ====================================
@@ -12,6 +14,8 @@ import TechnoCommercialApprovalSummary from "./TechnoCommercialApprovalSummary";
 export default function WorkspaceContent({
 
     activeTab,
+
+    onTabChange,
 
     enquiry,
 
@@ -87,11 +91,15 @@ export default function WorkspaceContent({
 
             return(
 
-                <div>
+                <QuoteCommercialSummary
 
-                    Quote & Commercial Placeholder
+                    enquiry={enquiry}
 
-                </div>
+                    quote={quote}
+
+                    onTabChange={onTabChange}
+
+                />
 
             );
 

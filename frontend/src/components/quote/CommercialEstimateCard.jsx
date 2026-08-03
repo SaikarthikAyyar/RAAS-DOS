@@ -1,8 +1,34 @@
+import { useState } from "react";
+
 import {
 
     saveQuote
 
 } from "../../services/technoCommercialQuoteService";
+
+const MIN_MAX_FIELDS = [
+
+    { label:"Mobilisation", min:"mobilisation_cost_min", max:"mobilisation_cost_max" },
+    { label:"Setup / Access", min:"setup_cost_min", max:"setup_cost_max" },
+    { label:"Execution (machine)", min:"execution_cost_min", max:"execution_cost_max" },
+    { label:"Pump Addon", min:"pump_addon_cost_min", max:"pump_addon_cost_max" },
+    { label:"Direct Cost Subtotal", min:"direct_cost_min", max:"direct_cost_max" },
+    { label:"Overhead", min:"overhead_cost_min", max:"overhead_cost_max" },
+    { label:"Contingency", min:"contingency_cost_min", max:"contingency_cost_max" },
+    { label:"Margin Value", min:"margin_value_min", max:"margin_value_max" },
+    { label:"Cleaning Quote", min:"cleaning_quote_min", max:"cleaning_quote_max" },
+    { label:"Dewatering Add-on", min:"dewatering_addon_min", max:"dewatering_addon_max" },
+    { label:"Combined Budgetary Value", min:"combined_budgetary_value_min", max:"combined_budgetary_value_max" }
+
+];
+
+const SINGLE_FIELDS = [
+
+    { label:"Documentation Buffer", key:"documentation_buffer" },
+    { label:"Access Support Buffer", key:"access_support_buffer" },
+    { label:"Margin %", key:"margin_percentage" }
+
+];
 
 export default function CommercialEstimateCard({
 
@@ -14,6 +40,16 @@ export default function CommercialEstimateCard({
 
 }){
 
+const [createdBy, setCreatedBy] = useState("");
+
+function updateField(key, value){
+
+    setQuote({
+        ...quote,
+        [key]: value==="" ? "" : Number(value)
+    });
+
+}
 
 async function handleSave(){
 
@@ -33,28 +69,41 @@ async function handleSave(){
 
     }
 
+    if(!createdBy.trim()){
+
+        alert("Enter your name before saving the quote.");
+        return;
+
+    }
+
     try{
+
+        const payload = {
+
+            ops_selection_id: Number(selectedOps),
+
+            created_by: createdBy,
+
+            reason: "Manually saved from Quote page"
+
+        };
+
+        MIN_MAX_FIELDS.forEach(field=>{
+
+            payload[field.min] = quote[field.min]===""||quote[field.min]===undefined ? null : quote[field.min];
+            payload[field.max] = quote[field.max]===""||quote[field.max]===undefined ? null : quote[field.max];
+
+        });
+
+        SINGLE_FIELDS.forEach(field=>{
+
+            payload[field.key] = quote[field.key]===""||quote[field.key]===undefined ? null : quote[field.key];
+
+        });
 
         const savedQuote =
 
-            await saveQuote({
-
-                ops_selection_id: Number(
-
-                    selectedOps
-
-                ),
-
-                cleaning_quote:
-                    quote.cleaning_quote,
-
-                dewatering_addon:
-                    quote.dewatering_addon,
-
-                combined_budgetary_value:
-                    quote.combined_budgetary_value
-
-            });
+            await saveQuote(payload);
 
         console.log(
 
@@ -107,99 +156,79 @@ Commercial Estimate
 
 <div className="quote-table">
 
-<div className="quote-table-header">
+<div className="quote-table-header-3">
 
-<div>
-
-Line Item
-
-</div>
-
-<div>
-
-INR Value
+<div>Line Item</div>
+<div style={{textAlign:"right"}}>Min (INR)</div>
+<div style={{textAlign:"right"}}>Max (INR)</div>
 
 </div>
 
-</div>
+{
 
+    MIN_MAX_FIELDS.map(field=>(
 
-<div className="quote-table-row">
+        <div className="quote-table-row-3" key={field.label}>
 
-    <div className="quote-label">
-        Cleaning Quote
-    </div>
+            <div className="quote-label">{field.label}</div>
 
-    <div style={{textAlign:"right"}}>
+            <input
+                type="number"
+                className="quote-input"
+                value={quote[field.min] ?? ""}
+                onChange={e=>updateField(field.min, e.target.value)}
+            />
 
-        <input
-            type="number"
-            className="quote-input"
-            value={quote.cleaning_quote ?? ""}
-            onChange={(e)=>
-                setQuote({
-                    ...quote,
-                    cleaning_quote:Number(e.target.value)
-                })
-            }
-        />
+            <input
+                type="number"
+                className="quote-input"
+                value={quote[field.max] ?? ""}
+                onChange={e=>updateField(field.max, e.target.value)}
+            />
 
-    </div>
+        </div>
 
-</div>
+    ))
 
-<div className="quote-table-row">
+}
 
-    <div className="quote-label">
-        Dewatering Add-on
-    </div>
+{
 
-    <div style={{textAlign:"right"}}>
+    SINGLE_FIELDS.map(field=>(
 
-        <input
-            type="number"
-            className="quote-input"
-            value={quote.dewatering_addon ?? ""}
-            onChange={(e)=>
-                setQuote({
-                    ...quote,
-                    dewatering_addon:Number(e.target.value)
-                })
-            }
-        />
+        <div className="quote-table-row" key={field.label}>
 
-    </div>
+            <div className="quote-label">{field.label}</div>
 
-</div>
+            <div style={{textAlign:"right"}}>
 
-<div className="quote-table-row">
+                <input
+                    type="number"
+                    className="quote-input"
+                    value={quote[field.key] ?? ""}
+                    onChange={e=>updateField(field.key, e.target.value)}
+                />
 
-    <div className="quote-label">
-        Combined Budgetary Value
-    </div>
+            </div>
 
-    <div style={{textAlign:"right"}}>
+        </div>
 
-        <input
-            type="number"
-            className="quote-input"
-            value={quote.combined_budgetary_value ?? ""}
+    ))
 
-            onChange={(e)=>
-                setQuote({
-                    ...quote,
-                    combined_budgetary_value:Number(e.target.value)
-                })
-            }
-        />
-
-    </div>
-
-</div>
+}
 
 </div>
 
 <div className="quote-actions">
+
+<input
+    type="text"
+    className="quote-input"
+    placeholder="Your name"
+    value={createdBy}
+    onChange={e=>setCreatedBy(e.target.value)}
+    style={{marginRight:8}}
+/>
 
 <button
 

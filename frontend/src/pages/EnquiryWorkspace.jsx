@@ -292,6 +292,8 @@ export default function EnquiryWorkspace() {
 
                 activeTab={activeTab}
 
+                onTabChange={setActiveTab}
+
                 enquiry={enquiry}
 
                 customer={customer}

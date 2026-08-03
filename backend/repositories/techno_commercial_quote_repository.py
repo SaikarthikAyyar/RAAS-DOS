@@ -9,7 +9,6 @@ from backend.models.techno_commercial_quote import Quote
 from backend.models.ops_selector import OpsSelection
 
 from sqlalchemy import func
-from backend.models.enquiry import Enquiry
 
 
 logger = logging.getLogger(__name__)
@@ -210,6 +209,18 @@ def create_quote(
 
     )
 
+    quote.created_by = (
+
+        payload["created_by"]
+
+    )
+
+    quote.revision_reason = (
+
+        payload["revision_reason"]
+
+    )
+
     quote.workflow_status = (
 
         payload["workflow_status"]
@@ -375,22 +386,148 @@ from sqlalchemy import func
 
 def get_next_revision_number(
     db,
-    customer_request_id,
-    sales_survey_id
+    ops_selection_id
 ):
     count = (
-        db.query(func.count(Enquiry.id))
+        db.query(func.count(Quote.id))
         .filter(
-            Enquiry.customer_request_id == customer_request_id
-        )
-        .filter(
-            Enquiry.sales_survey_id == sales_survey_id
-        )
-        .filter(
-            Enquiry.requested_task == "QUOTE_REVIEW"
+            Quote.ops_selection_id == ops_selection_id
         )
         .scalar()
     )
 
     return count + 1
+
+
+# ====================================
+# QUOTE & COMMERCIAL TAB
+# ====================================
+
+def get_quote_history(
+
+    db,
+
+    ops_selection_id
+
+):
+
+    return (
+
+        db.query(
+
+            Quote
+
+        )
+
+        .filter(
+
+            Quote.ops_selection_id == ops_selection_id
+
+        )
+
+        .order_by(
+
+            Quote.revision_number.asc()
+
+        )
+
+        .all()
+
+    )
+
+
+def update_internal_extra(
+
+    db,
+
+    quote,
+
+    enabled,
+
+    amount,
+
+    note
+
+):
+
+    quote.internal_extra_enabled = enabled
+
+    quote.internal_extra_amount = amount
+
+    quote.internal_extra_note = note
+
+    db.commit()
+
+    db.refresh(quote)
+
+    return quote
+
+
+def update_valid_till(
+
+    db,
+
+    quote,
+
+    valid_till
+
+):
+
+    quote.valid_till = valid_till
+
+    db.commit()
+
+    db.refresh(quote)
+
+    return quote
+
+
+def release_quote(
+
+    db,
+
+    quote,
+
+    released_by,
+
+    released_date
+
+):
+
+    quote.released = True
+
+    quote.released_by = released_by
+
+    quote.released_date = released_date
+
+    db.commit()
+
+    db.refresh(quote)
+
+    return quote
+
+
+def flag_revision_requested(
+
+    db,
+
+    quote,
+
+    requested_by,
+
+    requested_date
+
+):
+
+    quote.revision_requested = True
+
+    quote.revision_requested_by = requested_by
+
+    quote.revision_requested_date = requested_date
+
+    db.commit()
+
+    db.refresh(quote)
+
+    return quote
 

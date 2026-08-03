@@ -80,6 +80,8 @@ export default function DeploymentPlanCard({
 
     const [error, setError] = useState("");
 
+    const [createdBy, setCreatedBy] = useState("");
+
     function updateCrewField(index, field, value){
 
         setCrewPlan(prev=>
@@ -128,6 +130,13 @@ export default function DeploymentPlanCard({
 
     async function handleSaveAndGenerateQuote(){
 
+        if(!createdBy.trim()){
+
+            setError("Enter your name before saving.");
+            return;
+
+        }
+
         setSaving(true);
 
         setError("");
@@ -170,7 +179,11 @@ export default function DeploymentPlanCard({
 
             await saveQuote({
 
-                ops_selection_id:opsSelection.id
+                ops_selection_id:opsSelection.id,
+
+                created_by:createdBy,
+
+                reason:"Generated from Ops Deployment Plan"
 
             });
 
@@ -392,6 +405,13 @@ export default function DeploymentPlanCard({
                 </label>
 
             </div>
+
+            <input
+                placeholder="Your name"
+                value={createdBy}
+                onChange={e=>setCreatedBy(e.target.value)}
+                style={{marginTop:12}}
+            />
 
             {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
 

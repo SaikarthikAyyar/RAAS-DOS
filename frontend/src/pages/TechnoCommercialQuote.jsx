@@ -18,6 +18,8 @@ useCallback
 
 from "react";
 
+import { useLocation } from "react-router-dom";
+
 import "../components/quote/TechnoCommercialQuote.css";
 
 import TechnicalSummaryCard
@@ -47,9 +49,15 @@ export default function TechnoCommercialQuote() {
     // STATE DECLARATIONS
     // ====================================
 
+    const location = useLocation();
+
+    const preselectedOps = location.state?.opsSelectionId;
+
     const [opsList,setOpsList]=useState([]);
 
-    const [selectedOps,setSelectedOps]=useState("");
+    const [selectedOps,setSelectedOps]=useState(
+        preselectedOps ? String(preselectedOps) : ""
+    );
 
     const [quote,setQuote]=useState(null);
 
@@ -117,6 +125,17 @@ export default function TechnoCommercialQuote() {
         );
 
     }
+
+    useEffect(()=>{
+
+        if(preselectedOps){
+
+            loadQuote(preselectedOps);
+
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[preselectedOps]);
 
 
 

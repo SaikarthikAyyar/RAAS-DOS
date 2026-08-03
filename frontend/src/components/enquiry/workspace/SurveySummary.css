@@ -74,6 +74,21 @@
     }
 }
 
+/* Quote & Commercial tab - true 50/50 split, matching the
+   wireframe's "grid cols2" (unlike Ops Review's 2:1 split above). */
+.quote-commercial-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+    margin-top:16px;
+}
+
+@media (max-width:900px){
+    .quote-commercial-grid{
+        grid-template-columns:minmax(0, 1fr);
+    }
+}
+
 .ops-subheading{
     margin:16px 0 8px;
     font-size:12px;

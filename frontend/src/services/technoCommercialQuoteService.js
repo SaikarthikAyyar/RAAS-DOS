@@ -288,3 +288,190 @@ export async function requestQuoteRevision(
     return data;
 
 }
+
+
+// ====================================
+// QUOTE & COMMERCIAL TAB
+// ====================================
+
+export async function getQuoteHistory(
+
+    opsSelectionId
+
+){
+
+    const response = await fetch(
+
+        `${API}/quote/history/${opsSelectionId}`
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+export async function updateInternalExtra(
+
+    quoteId,
+
+    enabled,
+
+    amount,
+
+    note
+
+){
+
+    const response = await fetch(
+
+        `${API}/quote/${quoteId}/internal-extra`,
+
+        {
+
+            method:"PUT",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({enabled, amount, note})
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+export async function updateValidTill(
+
+    quoteId,
+
+    validTill
+
+){
+
+    const response = await fetch(
+
+        `${API}/quote/${quoteId}/valid-till`,
+
+        {
+
+            method:"PUT",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({valid_till:validTill})
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+export async function releaseQuoteToClient(
+
+    quoteId,
+
+    releasedBy
+
+){
+
+    const response = await fetch(
+
+        `${API}/quote/${quoteId}/release`,
+
+        {
+
+            method:"POST",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({released_by:releasedBy})
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// FLAG QUOTE REVISION REQUESTED
+// (blocks Proceed to Commercial Approval
+// until a fresh quote version is saved)
+// ====================================
+
+export async function flagQuoteRevisionRequested(
+
+    quoteId,
+
+    requestedBy
+
+){
+
+    const response = await fetch(
+
+        `${API}/quote/${quoteId}/request-revision`,
+
+        {
+
+            method:"POST",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({requested_by:requestedBy})
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}

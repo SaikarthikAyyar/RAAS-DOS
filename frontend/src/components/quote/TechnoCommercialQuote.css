@@ -441,3 +441,69 @@ background:white;
     -moz-appearance: textfield;
 
 }
+
+
+/* ====================================
+   MIN/MAX EDITABLE ROWS
+   (Commercial Estimate card - every
+   quote line, not just the original 3)
+==================================== */
+
+.quote-table-header-3,
+.quote-table-row-3{
+
+    display:grid;
+
+    grid-template-columns:1.4fr 1fr 1fr;
+
+    align-items:center;
+
+    padding:0 22px;
+
+}
+
+.quote-table-header-3{
+
+    font-size:15px;
+
+    font-weight:700;
+
+    color:#475569;
+
+}
+
+.quote-table-row-3{
+
+    min-height:64px;
+
+    border-radius:18px;
+
+    background:white;
+
+    border:1px solid var(--line);
+
+}
+
+.quote-table-row-3 .quote-input{
+
+    width:100%;
+
+    font-size:16px;
+
+    padding:8px 12px;
+
+}
+
+@media(max-width:768px){
+
+    .quote-table-header-3{
+        display:none;
+    }
+
+    .quote-table-row-3{
+        grid-template-columns:1fr;
+        gap:8px;
+        padding:14px;
+    }
+
+}

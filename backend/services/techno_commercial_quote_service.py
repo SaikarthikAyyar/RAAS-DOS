@@ -37,6 +37,10 @@ from backend.services.status_service import update_customer_request_status
 
 from backend.services.enquiry_service import EnquiryService
 
+from backend.models.enquiry import Enquiry
+
+from backend.services.enquiry_consolidated_service import update_module_reference
+
 
 def create_quote_request(
 
@@ -71,8 +75,7 @@ def create_quote_request(
 
     revision_number = get_next_revision_number(
         db,
-        ops.customer_request_id,
-        ops.sales_survey_id
+        payload.ops_selection_id
     )
 
     workflow_status = "CUSTOMER_REVIEW"
@@ -95,6 +98,8 @@ def create_quote_request(
     # BUILD PAYLOAD
     # ====================================
 
+    revision_reason = payload.reason or "Quote generated"
+
     quote_data = {
 
         "ops_selection_id":
@@ -108,6 +113,12 @@ def create_quote_request(
 
         "workflow_status":
             workflow_status,
+
+        "created_by":
+            payload.created_by,
+
+        "revision_reason":
+            revision_reason,
 
         "dewatering_assessment_id":
             payload.dewatering_assessment_id,
@@ -128,93 +139,43 @@ def create_quote_request(
         "approval_gate":
             quote["approval_gate"],
 
-        "mobilisation_cost_min":
-            quote["mobilisation_cost_min"],
-        "mobilisation_cost_max":
-            quote["mobilisation_cost_max"],
-
-        "setup_cost_min":
-            quote["setup_cost_min"],
-        "setup_cost_max":
-            quote["setup_cost_max"],
-
-        "execution_cost_min":
-            quote["execution_cost_min"],
-        "execution_cost_max":
-            quote["execution_cost_max"],
-
-        "pump_addon_cost_min":
-            quote["pump_addon_cost_min"],
-        "pump_addon_cost_max":
-            quote["pump_addon_cost_max"],
-
-        "documentation_buffer":
-            quote["documentation_buffer"],
-
-        "access_support_buffer":
-            quote["access_support_buffer"],
-
-        "direct_cost_min":
-            quote["direct_cost_min"],
-        "direct_cost_max":
-            quote["direct_cost_max"],
-
-        "overhead_cost_min":
-            quote["overhead_cost_min"],
-        "overhead_cost_max":
-            quote["overhead_cost_max"],
-
-        "contingency_cost_min":
-            quote["contingency_cost_min"],
-        "contingency_cost_max":
-            quote["contingency_cost_max"],
-
-        "margin_percentage":
-            quote["margin_percentage"],
-
-        "margin_value_min":
-            quote["margin_value_min"],
-        "margin_value_max":
-            quote["margin_value_max"],
-
         "dewatering_method":
             quote["dewatering_method"],
 
         # --------------------------------
-        # User editable fields
+        # User editable fields - every
+        # commercial line accepts an
+        # override, falling back to the
+        # engine-computed value when the
+        # user leaves it blank.
         # --------------------------------
 
-        "cleaning_quote_min":
-            payload.cleaning_quote_min
-            if payload.cleaning_quote_min is not None
-            else quote["cleaning_quote_min"],
-
-        "cleaning_quote_max":
-            payload.cleaning_quote_max
-            if payload.cleaning_quote_max is not None
-            else quote["cleaning_quote_max"],
-
-        "dewatering_addon_min":
-            payload.dewatering_addon_min
-            if payload.dewatering_addon_min is not None
-            else quote["dewatering_addon_min"],
-
-        "dewatering_addon_max":
-            payload.dewatering_addon_max
-            if payload.dewatering_addon_max is not None
-            else quote["dewatering_addon_max"],
-
-        "combined_budgetary_value_min":
-            payload.combined_budgetary_value_min
-            if payload.combined_budgetary_value_min is not None
-            else quote["combined_budgetary_value_min"],
-
-        "combined_budgetary_value_max":
-            payload.combined_budgetary_value_max
-            if payload.combined_budgetary_value_max is not None
-            else quote["combined_budgetary_value_max"]
-
     }
+
+    EDITABLE_FIELDS = [
+
+        "mobilisation_cost_min", "mobilisation_cost_max",
+        "setup_cost_min", "setup_cost_max",
+        "execution_cost_min", "execution_cost_max",
+        "pump_addon_cost_min", "pump_addon_cost_max",
+        "documentation_buffer",
+        "access_support_buffer",
+        "direct_cost_min", "direct_cost_max",
+        "overhead_cost_min", "overhead_cost_max",
+        "contingency_cost_min", "contingency_cost_max",
+        "margin_percentage",
+        "margin_value_min", "margin_value_max",
+        "cleaning_quote_min", "cleaning_quote_max",
+        "dewatering_addon_min", "dewatering_addon_max",
+        "combined_budgetary_value_min", "combined_budgetary_value_max"
+
+    ]
+
+    for field in EDITABLE_FIELDS:
+
+        override = getattr(payload, field, None)
+
+        quote_data[field] = override if override is not None else quote[field]
 
 
 
@@ -249,29 +210,40 @@ def create_quote_request(
 
     print("[Workflow] Customer Status -> AWAITING_CUSTOMER_REVIEW")
 
-    print("[Workflow] Creating Customer Review enquiry")
+    print("[Workflow] Updating consolidated Enquiry")
 
-    EnquiryService.create_customer_quote_review_enquiry(
+    target_enquiry = (
 
-        db,
+        db.query(Enquiry)
 
-        ops.customer_request_id,
+        .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
 
-        ops.sales_survey_id,
+        .order_by(Enquiry.id.desc())
 
-        quote.id,
-
-        {
-            "customer_request_id": ops.customer_request_id,
-            "sales_survey_id": ops.sales_survey_id,
-            "ops_selector_id": quote.ops_selection_id,
-            "quote_id": quote.id,
-            "revision": quote.revision_number
-        }
+        .first()
 
     )
 
-    print("[Workflow] Customer Review enquiry created")
+    if target_enquiry:
+
+        update_module_reference(
+
+            db,
+
+            target_enquiry.id,
+
+            "quote_id",
+
+            quote.id
+
+        )
+
+        print(f"[Workflow] Enquiry {target_enquiry.id} -> quote_id={quote.id}")
+
+    else:
+
+        print("[Workflow] WARNING: No consolidated Enquiry found for this sales_survey_id")
+
     print("[Workflow] Waiting for Customer Decision")
 
     print("========== QUOTE WORKFLOW COMPLETE ==========\n")
@@ -697,3 +669,197 @@ def save_techno_approval_decision(
     )
 
     return quote
+
+
+# ====================================
+# QUOTE & COMMERCIAL TAB
+# ====================================
+
+def get_quote_history_request(
+
+    db,
+
+    ops_selection_id
+
+):
+
+    from backend.repositories.techno_commercial_quote_repository import (
+        get_quote_history
+    )
+
+    return get_quote_history(
+
+        db,
+
+        ops_selection_id
+
+    )
+
+
+def update_internal_extra_request(
+
+    db,
+
+    quote_id,
+
+    enabled,
+
+    amount,
+
+    note
+
+):
+
+    from backend.repositories.techno_commercial_quote_repository import (
+        update_internal_extra
+    )
+
+    quote = get_quote(
+
+        db,
+
+        quote_id
+
+    )
+
+    if quote is None:
+
+        raise ValueError("Quote not found.")
+
+    return update_internal_extra(
+
+        db,
+
+        quote,
+
+        enabled,
+
+        amount,
+
+        note
+
+    )
+
+
+def update_valid_till_request(
+
+    db,
+
+    quote_id,
+
+    valid_till
+
+):
+
+    from backend.repositories.techno_commercial_quote_repository import (
+        update_valid_till
+    )
+
+    quote = get_quote(
+
+        db,
+
+        quote_id
+
+    )
+
+    if quote is None:
+
+        raise ValueError("Quote not found.")
+
+    return update_valid_till(
+
+        db,
+
+        quote,
+
+        valid_till
+
+    )
+
+
+def release_quote_request(
+
+    db,
+
+    quote_id,
+
+    released_by
+
+):
+
+    from backend.repositories.techno_commercial_quote_repository import (
+        release_quote
+    )
+
+    quote = get_quote(
+
+        db,
+
+        quote_id
+
+    )
+
+    if quote is None:
+
+        raise ValueError("Quote not found.")
+
+    if quote.techno_status != "Approved":
+
+        raise ValueError(
+
+            "Quote must be Techno-Commercial Approved before it can be "
+            "released to the client."
+
+        )
+
+    return release_quote(
+
+        db,
+
+        quote,
+
+        released_by,
+
+        date.today().isoformat()
+
+    )
+
+
+def flag_quote_revision_requested_request(
+
+    db,
+
+    quote_id,
+
+    requested_by
+
+):
+
+    from backend.repositories.techno_commercial_quote_repository import (
+        flag_revision_requested
+    )
+
+    quote = get_quote(
+
+        db,
+
+        quote_id
+
+    )
+
+    if quote is None:
+
+        raise ValueError("Quote not found.")
+
+    return flag_revision_requested(
+
+        db,
+
+        quote,
+
+        requested_by,
+
+        date.today().isoformat()
+
+    )

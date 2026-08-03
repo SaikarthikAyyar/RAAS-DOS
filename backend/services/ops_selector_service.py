@@ -34,6 +34,12 @@ from backend.services.status_service import update_customer_request_status
 
 from backend.services.enquiry_service import EnquiryService
 
+from backend.models.enquiry import Enquiry
+
+from backend.services.enquiry_consolidated_service import update_module_reference
+
+from backend.services.workflow_service import update_stage, WorkflowStage
+
 
 
 
@@ -317,39 +323,52 @@ def create_ops_selection_request(
         )
 
     
-    print("[Workflow] Creating Quote Enquiry")
+    print("[Workflow] Updating consolidated Enquiry")
 
-    payload = {
+    target_enquiry = (
 
-        "customer_request_id":
+        db.query(Enquiry)
 
-            survey.customer_request_id,
+        .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
 
-        "sales_survey_id":
+        .order_by(Enquiry.id.desc())
 
-            ops.sales_survey_id,
-
-        "ops_selector_id":
-
-            ops.id
-
-    }
-
-    EnquiryService.create_quote_enquiry(
-
-        db,
-
-        survey.customer_request_id,
-
-        ops.sales_survey_id,
-
-        ops.id,
-
-        payload
+        .first()
 
     )
 
-    print("[Workflow] Quote enquiry created")
+    if target_enquiry:
+
+        update_module_reference(
+
+            db,
+
+            target_enquiry.id,
+
+            "ops_selector_id",
+
+            ops.id
+
+        )
+
+        update_stage(
+
+            db,
+
+            target_enquiry.id,
+
+            WorkflowStage.TECHNO_COMMERCIAL_APPROVAL.value
+
+        )
+
+        print(
+            f"[Workflow] Enquiry {target_enquiry.id} -> "
+            f"ops_selector_id={ops.id}, stage=TECHNO_COMMERCIAL_APPROVAL"
+        )
+
+    else:
+
+        print("[Workflow] WARNING: No consolidated Enquiry found for this sales_survey_id")
 
     print("[Workflow] Customer Status Updated -> OPS_COMPLETED")
 

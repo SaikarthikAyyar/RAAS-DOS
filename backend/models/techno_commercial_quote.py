@@ -100,6 +100,14 @@ class Quote(Base):
 
     )
 
+    created_by = Column(
+        String(100)
+    )
+
+    revision_reason = Column(
+        String(255)
+    )
+
 
     dewatering_assessment_id = Column(
 
@@ -301,6 +309,54 @@ class Quote(Base):
 
     techno_note = Column(
         String(500)
+    )
+
+
+    # ====================================
+    # QUOTE & COMMERCIAL TAB
+    # (internal-only addition and release-
+    # to-client tracking - wireframe parity)
+    # ====================================
+
+    internal_extra_enabled = Column(
+        Boolean,
+        default=False
+    )
+
+    internal_extra_amount = Column(Float)
+
+    internal_extra_note = Column(
+        String(500)
+    )
+
+    valid_till = Column(
+        String(20)
+    )
+
+    released = Column(
+        Boolean,
+        default=False
+    )
+
+    released_by = Column(
+        String(100)
+    )
+
+    released_date = Column(
+        String(20)
+    )
+
+    revision_requested = Column(
+        Boolean,
+        default=False
+    )
+
+    revision_requested_by = Column(
+        String(100)
+    )
+
+    revision_requested_date = Column(
+        String(20)
     )
 
 

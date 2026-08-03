@@ -88,30 +88,6 @@ def create_ops_approval_request(
 
         print("[Service] Job Approved")
 
-        print("[Service] Creating OPS Selection enquiry")
-
-        EnquiryService.create_ops_selection_enquiry(
-
-            db,
-
-            approval.customer_request_id,
-
-            approval.sales_survey_id,
-
-            approval.id,
-
-            {
-
-                "customer_request_id": approval.customer_request_id,
-
-                "sales_survey_id": approval.sales_survey_id,
-
-                "ops_approval_id": approval.id
-
-            }
-
-        )
-
         update_customer_request_status(
 
             db,
