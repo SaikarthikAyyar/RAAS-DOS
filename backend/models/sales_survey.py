@@ -174,6 +174,10 @@ class SalesSurvey(Base):
         Float
     )
 
+    opening_height = Column(
+        Float
+    )
+
     height_from_ground = Column(
         Float
     )
@@ -353,3 +357,33 @@ class SalesSurvey(Base):
     status = Column(
         String(50)
     )
+
+
+    # ====================================
+    # MISSING FIELDS FIX
+    # (fields that exist in the Sales Survey
+    # form UI but had nowhere to be stored)
+    # ====================================
+
+    # Section A
+    nearest_hub = Column(String(100))
+    urgency = Column(String(100))
+
+    # Section C
+    access_type = Column(String(100))
+    equipment_nearby = Column(String(100))
+
+    # Section D
+    power_distance = Column(Float)
+
+    # Section E
+    target_flow = Column(Float)
+    suction_depth = Column(Float)
+    discharge_distance = Column(Float)
+    discharge_height = Column(Float)
+
+    # Section F
+    dewatering_required = Column(String(20))
+    dewatering_volume = Column(Float)
+    inlet_moisture = Column(Float)
+    visible_free_water = Column(String(20))

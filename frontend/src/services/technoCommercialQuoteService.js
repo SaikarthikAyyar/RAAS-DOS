@@ -103,6 +103,67 @@ return response.json();
 
 
 // ====================================
+// SAVE TECHNO-COMMERCIAL APPROVAL DECISION
+// ====================================
+
+export async function saveTechnoApproval(
+
+quoteId,
+
+status,
+
+approvedBy,
+
+note
+
+){
+
+const response = await fetch(
+
+`${API}/quote/${quoteId}/techno-approval`,
+
+{
+
+method:"PUT",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+status,
+
+approved_by:approvedBy,
+
+note
+
+})
+
+}
+
+);
+
+const data = await response.json();
+
+if(
+
+!response.ok
+
+){
+
+throw data;
+
+}
+
+return data;
+
+}
+
+
+// ====================================
 // GET OPS LIST
 // ====================================
 

@@ -55,180 +55,74 @@ E. Pump Selection Inputs
 <div className="survey-grid">
 
 
-<div className="survey-field">
-
-<label>
-
-Target Flow
-
-</label>
-
-<input/>
-
-</div>
-
-
-<div className="survey-field">
-
-<label>
-
-Suction Depth
-
-</label>
-
-<input/>
-
-</div>
-
-
-<div className="survey-field">
-
-<label>
-
-Discharge Distance
-
-</label>
-
-<input/>
-
-</div>
-
-
-<div className="survey-field">
-
-<label>
-
-Discharge Height
-
-</label>
-
-<input/>
-
-</div>
-
-
-<div className="survey-field">
-
-<label>
-
-Debris / Fibers Present?
-
-</label>
-
-<select>
-
-{
-
-debrisOptions.map(
-
-item=>(
-
-<option
-
-key={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-</div>
-
-
-<div className="survey-field">
-
-<label>
-
-pH / Corrosiveness
-
-</label>
-
-<select>
-
-{
-
-phOptions.map(
-
-item=>(
-
-<option
-
-key={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-</div>
-
-
-<div className="survey-field">
-
-<label>
-
-Temperature
-
-</label>
-
-<input/>
-
-</div>
-
-
-<div className="survey-field">
-
-<label>
-
-Power Source for Pump
-
-</label>
-
-<select>
-
-{
-
-pumpPowerOptions.map(
-
-item=>(
-
-<option
-
-key={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-</div>
+<FieldInput
+label="Target Flow (m³/hr)"
+value={pump.target_flow}
+section="pump"
+field="target_flow"
+unit="m³/hr"
+updateSection={updateSection}
+/>
+
+
+<FieldInput
+label="Suction Depth (m)"
+value={pump.suction_depth}
+section="pump"
+field="suction_depth"
+unit="m"
+updateSection={updateSection}
+/>
+
+
+<FieldInput
+label="Discharge Distance (m)"
+value={pump.discharge_distance}
+section="pump"
+field="discharge_distance"
+unit="m"
+updateSection={updateSection}
+/>
+
+
+<FieldInput
+label="Discharge Height (m)"
+value={pump.discharge_height}
+section="pump"
+field="discharge_height"
+unit="m"
+updateSection={updateSection}
+/>
+
+
+<FieldSelect
+label="Debris / Fibers Present?"
+value={pump.debris_present}
+section="pump"
+field="debris_present"
+options={debrisOptions}
+updateSection={updateSection}
+/>
+
+
+<FieldSelect
+label="pH / Corrosiveness"
+value={pump.ph_condition}
+section="pump"
+field="ph_condition"
+options={phOptions}
+updateSection={updateSection}
+/>
+
+
+<FieldSelect
+label="Power Source for Pump"
+value={pump.pump_power_source}
+section="pump"
+field="pump_power_source"
+options={pumpPowerOptions}
+updateSection={updateSection}
+/>
 
 <FieldInput
 

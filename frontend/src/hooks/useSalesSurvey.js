@@ -79,6 +79,50 @@ previous=>(
 
 
 // ====================================
+// UPDATE MEDIA FILES
+// (files selected in Section G's
+// "Photos / Videos" picker, held here
+// until submit uploads them)
+// ====================================
+
+const updateMediaFiles=(
+
+files
+
+)=>{
+
+setSurveyData(
+
+previous=>(
+
+{
+
+...previous,
+
+insights:{
+
+...previous.insights,
+
+mediaFiles:[
+
+...(previous.insights?.mediaFiles || []),
+
+...files
+
+]
+
+}
+
+}
+
+)
+
+);
+
+};
+
+
+// ====================================
 // REFERENCES
 // ====================================
 
@@ -481,7 +525,12 @@ const SURVEY_STRUCTURE = {
         "hose_distance",
         "access_path_width",
         "access_support",
-        "customer_support"
+        "customer_support",
+        "access_type",
+        "equipment_nearby",
+        "scaffolding_needed",
+        "crane_available",
+        "opening_height"
 
     ],
 
@@ -685,6 +734,8 @@ surveyData,
 setSurveyData,
 
 updateSection,
+
+updateMediaFiles,
 
 metrics,
 

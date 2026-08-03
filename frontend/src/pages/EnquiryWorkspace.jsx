@@ -44,6 +44,12 @@ import {
 
 } from "../services/dewateringService";
 
+import {
+
+    getQuote
+
+} from "../services/technoCommercialQuoteService";
+
 import "../components/enquiry/workspace/EnquiryWorkspace.css";
 
 import WorkspaceHeader from "../components/enquiry/workspace/WorkspaceHeader";
@@ -82,6 +88,8 @@ export default function EnquiryWorkspace() {
     const [opsScoring, setOpsScoring] = useState([]);
 
     const [dewatering, setDewatering] = useState(null);
+
+    const [quote, setQuote] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -168,6 +176,12 @@ export default function EnquiryWorkspace() {
                         );
 
                         setDewatering(dewateringData);
+
+                        const quoteData = await getQuote(
+                            response.ops_selector_id
+                        );
+
+                        setQuote(quoteData?.id ? quoteData : null);
 
                     }
 
@@ -289,6 +303,8 @@ export default function EnquiryWorkspace() {
                 opsScoring={opsScoring}
 
                 dewatering={dewatering}
+
+                quote={quote}
 
             />
 

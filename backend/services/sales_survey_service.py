@@ -189,10 +189,14 @@ def get_customer_survey_request(
 
             "nearest_hub":
 
+            survey.nearest_hub
+            or
             customer.nearest_city_hub,
 
             "urgency":
 
+            survey.urgency
+            or
             customer.urgency,
 
             "survey_date":
@@ -347,7 +351,27 @@ def get_customer_survey_request(
 
             "customer_support":
 
-            survey.customer_support
+            survey.customer_support,
+
+            "access_type":
+
+            survey.access_type,
+
+            "equipment_nearby":
+
+            survey.equipment_nearby,
+
+            "scaffolding_needed":
+
+            "Yes" if survey.scaffolding_needed else "No",
+
+            "crane_available":
+
+            "Yes" if survey.crane_available else "No",
+
+            "opening_height":
+
+            survey.opening_height
 
         },
 
@@ -386,7 +410,9 @@ def get_customer_survey_request(
 
             survey.ehs_restriction,
 
+            "power_distance":
 
+            survey.power_distance,
 
         },
 
@@ -419,7 +445,35 @@ def get_customer_survey_request(
 
             "hose_route_bends":
 
-            survey.hose_route_bends
+            survey.hose_route_bends,
+
+            "target_flow":
+
+            survey.target_flow,
+
+            "suction_depth":
+
+            survey.suction_depth,
+
+            "discharge_distance":
+
+            survey.discharge_distance,
+
+            "discharge_height":
+
+            survey.discharge_height,
+
+            "debris_present":
+
+            "Yes" if survey.debris_present else "No",
+
+            "ph_condition":
+
+            survey.ph_condition,
+
+            "pump_power_source":
+
+            survey.pump_power_source
 
         },
 
@@ -430,6 +484,53 @@ def get_customer_survey_request(
 
         "dewatering":{
 
+            "dewatering_required":
+
+            survey.dewatering_required,
+
+            "dewatering_volume":
+
+            survey.dewatering_volume,
+
+            "inlet_moisture":
+
+            survey.inlet_moisture,
+
+            "target_final_moisture":
+
+            survey.target_final_moisture,
+
+            "expected_final_form":
+
+            survey.expected_final_form,
+
+            "visible_free_water":
+
+            survey.visible_free_water,
+
+            "natural_settling":
+
+            survey.natural_settling,
+
+            "oily_emulsified":
+
+            "Yes" if survey.oily_emulsified else "No",
+
+            "space_available":
+
+            survey.space_available,
+
+            "filtrate_route":
+
+            "Yes" if survey.filtrate_route else "No",
+
+            "moisture_guarantee":
+
+            "Yes" if survey.moisture_guarantee else "No",
+
+            "cake_handling_scope":
+
+            survey.cake_handling_scope
 
         },
 
@@ -442,7 +543,17 @@ def get_customer_survey_request(
 
             "customer_pain":
 
-            survey.customer_pain_point
+            survey.customer_pain_point,
+
+            "shutdown_window":
+
+            survey.shutdown_window,
+
+            "completion_deadline":
+
+            survey.completion_deadline.isoformat()
+            if survey.completion_deadline
+            else None
 
         }
 

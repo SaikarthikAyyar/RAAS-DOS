@@ -2,6 +2,8 @@
 // WORKFLOW TABS
 // ====================================
 
+// Order and labels match the RAAS DOS wireframe's TABS array
+// exactly (opsReviewTab()'s [id].js source).
 const WORKFLOW_TABS = [
 
     {
@@ -15,8 +17,13 @@ const WORKFLOW_TABS = [
     },
 
     {
-        id: "techno-commercial",
-        label: "Techno Commercial"
+        id: "techno-commercial-approval",
+        label: "Techno-Commercial Approval"
+    },
+
+    {
+        id: "quote-commercial",
+        label: "Quote & Commercial"
     },
 
     {
@@ -25,18 +32,18 @@ const WORKFLOW_TABS = [
     },
 
     {
-        id: "purchase-order",
-        label: "Purchase Order"
+        id: "po",
+        label: "PO"
     },
 
     {
-        id: "job",
-        label: "Job"
+        id: "job-created",
+        label: "Job Created"
     },
 
     {
         id: "execution",
-        label: "Execution"
+        label: "Execution / Job"
     },
 
     {

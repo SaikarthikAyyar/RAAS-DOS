@@ -152,7 +152,7 @@ export default function SectionG_Insights({
 
                         value={
 
-                            insights.shutdownWindow
+                            insights.shutdown_window
 
                             || ""
 
@@ -164,7 +164,7 @@ export default function SectionG_Insights({
 
                                 "insights",
 
-                                "shutdownWindow",
+                                "shutdown_window",
 
                                 e.target.value
 
@@ -226,7 +226,7 @@ export default function SectionG_Insights({
 
                         value={
 
-                            insights.deadline
+                            insights.completion_deadline
 
                             || ""
 
@@ -238,7 +238,7 @@ export default function SectionG_Insights({
 
                                 "insights",
 
-                                "deadline",
+                                "completion_deadline",
 
                                 e.target.value
 

@@ -59,6 +59,10 @@ def create_sales_survey(
 
         payload.plant_site_location,
 
+        nearest_hub=payload.nearest_hub,
+
+        urgency=payload.urgency,
+
 
         # ====================================
         # SECTION B
@@ -210,6 +214,15 @@ def create_sales_survey(
         customer_support=
         payload.customer_support,
 
+        opening_height=
+        payload.opening_height,
+
+        access_type=
+        payload.access_type,
+
+        equipment_nearby=
+        payload.equipment_nearby,
+
 
         # ====================================
         # SECTION D
@@ -247,9 +260,12 @@ def create_sales_survey(
 
         payload.ehs_restriction,
 
+        power_distance=
+        payload.power_distance,
+
         # ====================================
         # SECTION E
-        # ====================================        
+        # ====================================
 
         discharge_pit_dimension=
 
@@ -270,6 +286,68 @@ def create_sales_survey(
         hose_route_bends=
         payload.hose_route_bends,
 
+        target_flow=
+        payload.target_flow,
+
+        suction_depth=
+        payload.suction_depth,
+
+        discharge_distance=
+        payload.discharge_distance,
+
+        discharge_height=
+        payload.discharge_height,
+
+        debris_present=
+        payload.debris_present=="Yes",
+
+        ph_condition=
+        payload.ph_condition,
+
+        pump_power_source=
+        payload.pump_power_source,
+
+
+        # ====================================
+        # SECTION F
+        # ====================================
+
+        dewatering_required=
+        payload.dewatering_required,
+
+        dewatering_volume=
+        payload.dewatering_volume,
+
+        inlet_moisture=
+        payload.inlet_moisture,
+
+        target_final_moisture=
+        payload.target_final_moisture,
+
+        expected_final_form=
+        payload.expected_final_form,
+
+        visible_free_water=
+        payload.visible_free_water,
+
+        natural_settling=
+        payload.natural_settling,
+
+        oily_emulsified=
+        payload.oily_emulsified=="Yes",
+
+        space_available=
+        payload.space_available,
+
+        filtrate_route=
+        payload.filtrate_route=="Yes",
+
+        moisture_guarantee=
+        payload.moisture_guarantee=="Yes",
+
+        cake_handling_scope=
+        payload.cake_handling_scope,
+
 
         # ====================================
         # SECTION G
@@ -278,6 +356,12 @@ def create_sales_survey(
         customer_pain_point=
 
         payload.customer_pain_point,
+
+        shutdown_window=
+        payload.shutdown_window,
+
+        completion_deadline=
+        payload.completion_deadline,
 
 
         # ====================================
@@ -353,6 +437,10 @@ def update_sales_survey(
     survey.survey_date = payload.survey_date
 
     survey.plant_site_location = payload.plant_site_location
+
+    survey.nearest_hub = payload.nearest_hub
+
+    survey.urgency = payload.urgency
 
 
     # ====================================
@@ -432,6 +520,12 @@ def update_sales_survey(
 
     survey.customer_support = payload.customer_support
 
+    survey.opening_height = payload.opening_height
+
+    survey.access_type = payload.access_type
+
+    survey.equipment_nearby = payload.equipment_nearby
+
 
     # ====================================
     # SECTION D
@@ -451,6 +545,8 @@ def update_sales_survey(
 
     survey.ehs_restriction = payload.ehs_restriction
 
+    survey.power_distance = payload.power_distance
+
 
     # ====================================
     # SECTION E
@@ -468,12 +564,59 @@ def update_sales_survey(
 
     survey.hose_route_bends = payload.hose_route_bends
 
+    survey.target_flow = payload.target_flow
+
+    survey.suction_depth = payload.suction_depth
+
+    survey.discharge_distance = payload.discharge_distance
+
+    survey.discharge_height = payload.discharge_height
+
+    survey.debris_present = payload.debris_present == "Yes"
+
+    survey.ph_condition = payload.ph_condition
+
+    survey.pump_power_source = payload.pump_power_source
+
+
+    # ====================================
+    # SECTION F
+    # ====================================
+
+    survey.dewatering_required = payload.dewatering_required
+
+    survey.dewatering_volume = payload.dewatering_volume
+
+    survey.inlet_moisture = payload.inlet_moisture
+
+    survey.target_final_moisture = payload.target_final_moisture
+
+    survey.expected_final_form = payload.expected_final_form
+
+    survey.visible_free_water = payload.visible_free_water
+
+    survey.natural_settling = payload.natural_settling
+
+    survey.oily_emulsified = payload.oily_emulsified == "Yes"
+
+    survey.space_available = payload.space_available
+
+    survey.filtrate_route = payload.filtrate_route == "Yes"
+
+    survey.moisture_guarantee = payload.moisture_guarantee == "Yes"
+
+    survey.cake_handling_scope = payload.cake_handling_scope
+
 
     # ====================================
     # SECTION G
     # ====================================
 
     survey.customer_pain_point = payload.customer_pain_point
+
+    survey.shutdown_window = payload.shutdown_window
+
+    survey.completion_deadline = payload.completion_deadline
 
 
     db.commit()

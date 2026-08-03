@@ -32,6 +32,10 @@ class SalesSurveySchema(BaseModel):
 
     plant_site_location: str
 
+    nearest_hub: Optional[str] = None
+
+    urgency: Optional[str] = None
+
 
     # ====================================
     # SECTION B
@@ -112,6 +116,10 @@ class SalesSurveySchema(BaseModel):
 
     customer_support: Optional[str] = None
 
+    access_type: Optional[str] = None
+
+    equipment_nearby: Optional[str] = None
+
 
     # ====================================
     # SECTION D
@@ -131,6 +139,7 @@ class SalesSurveySchema(BaseModel):
 
     ehs_restriction:Optional[str]=None
 
+    power_distance: Optional[float] = None
 
 
     # ====================================
@@ -149,12 +158,59 @@ class SalesSurveySchema(BaseModel):
 
     hose_route_bends: Optional[int] = None
 
+    target_flow: Optional[float] = None
+
+    suction_depth: Optional[float] = None
+
+    discharge_distance: Optional[float] = None
+
+    discharge_height: Optional[float] = None
+
+    debris_present: Optional[str] = None
+
+    ph_condition: Optional[str] = None
+
+    pump_power_source: Optional[str] = None
+
+
+    # ====================================
+    # SECTION F
+    # ====================================
+
+    dewatering_required: Optional[str] = None
+
+    dewatering_volume: Optional[float] = None
+
+    inlet_moisture: Optional[float] = None
+
+    target_final_moisture: Optional[float] = None
+
+    expected_final_form: Optional[str] = None
+
+    visible_free_water: Optional[str] = None
+
+    natural_settling: Optional[str] = None
+
+    oily_emulsified: Optional[str] = None
+
+    space_available: Optional[str] = None
+
+    filtrate_route: Optional[str] = None
+
+    moisture_guarantee: Optional[str] = None
+
+    cake_handling_scope: Optional[str] = None
+
 
     # ====================================
     # SECTION G
     # ====================================
 
     customer_pain_point:Optional[str]=None
+
+    shutdown_window: Optional[str] = None
+
+    completion_deadline: Optional[str] = None
 
 
     # ====================================
@@ -204,6 +260,7 @@ class GeometrySection(BaseModel):
     average_output: Optional[float]
     opening_length: Optional[float]
     opening_width: Optional[float]
+    opening_height: Optional[float]
     height_from_ground: Optional[float]
     drop_to_floor: Optional[float]
     setup_distance: Optional[float]
@@ -212,6 +269,10 @@ class GeometrySection(BaseModel):
     access_path_width: Optional[float]
     access_support: Optional[str]
     customer_support: Optional[str]
+    access_type: Optional[str]
+    equipment_nearby: Optional[str]
+    scaffolding_needed: Optional[str]
+    crane_available: Optional[str]
 
 
 class SafetySection(BaseModel):
@@ -222,6 +283,7 @@ class SafetySection(BaseModel):
     ventilation_required: Optional[str]
     gas_testing_required: Optional[str]
     ehs_restriction: Optional[str]
+    power_distance: Optional[float]
 
 
 
@@ -232,14 +294,34 @@ class PumpSection(BaseModel):
     disposal_responsibility: Optional[str]
     discharge_point_distance: Optional[float]
     hose_route_bends: Optional[int]
+    target_flow: Optional[float]
+    suction_depth: Optional[float]
+    discharge_distance: Optional[float]
+    discharge_height: Optional[float]
+    debris_present: Optional[str]
+    ph_condition: Optional[str]
+    pump_power_source: Optional[str]
 
 
 class DewateringSection(BaseModel):
-    pass
+    dewatering_required: Optional[str]
+    dewatering_volume: Optional[float]
+    inlet_moisture: Optional[float]
+    target_final_moisture: Optional[float]
+    expected_final_form: Optional[str]
+    visible_free_water: Optional[str]
+    natural_settling: Optional[str]
+    oily_emulsified: Optional[str]
+    space_available: Optional[str]
+    filtrate_route: Optional[str]
+    moisture_guarantee: Optional[str]
+    cake_handling_scope: Optional[str]
 
 
 class InsightSection(BaseModel):
     customer_pain: Optional[str]
+    shutdown_window: Optional[str]
+    completion_deadline: Optional[str]
 
 
 class SalesSurveyResponseSchema(BaseModel):

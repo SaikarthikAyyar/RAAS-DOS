@@ -3,6 +3,8 @@ import SurveySummary from "./SurveySummary";
 import SurveyWorkspace from "./SurveyWorkspace";
 
 import OpsReviewSummary from "./OpsReviewSummary";
+
+import TechnoCommercialApprovalSummary from "./TechnoCommercialApprovalSummary";
 // ====================================
 // COMPONENT
 // ====================================
@@ -21,7 +23,9 @@ export default function WorkspaceContent({
 
     opsScoring,
 
-    dewatering
+    dewatering,
+
+    quote
 
 }){
 
@@ -63,13 +67,29 @@ export default function WorkspaceContent({
 
             );
 
-        case "techno-commercial":
+        case "techno-commercial-approval":
+
+            return(
+
+                <TechnoCommercialApprovalSummary
+
+                    enquiry={enquiry}
+
+                    opsSelection={opsSelection}
+
+                    quote={quote}
+
+                />
+
+            );
+
+        case "quote-commercial":
 
             return(
 
                 <div>
 
-                    Techno Commercial Placeholder
+                    Quote & Commercial Placeholder
 
                 </div>
 
@@ -87,25 +107,25 @@ export default function WorkspaceContent({
 
             );
 
-        case "purchase-order":
+        case "po":
 
             return(
 
                 <div>
 
-                    Purchase Order Placeholder
+                    PO Placeholder
 
                 </div>
 
             );
 
-        case "job":
+        case "job-created":
 
             return(
 
                 <div>
 
-                    Job Placeholder
+                    Job Created Placeholder
 
                 </div>
 
@@ -117,7 +137,7 @@ export default function WorkspaceContent({
 
                 <div>
 
-                    Execution Placeholder
+                    Execution / Job Placeholder
 
                 </div>
 

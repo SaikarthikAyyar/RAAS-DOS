@@ -18,6 +18,14 @@ import {
 
 from "../../services/enquiryWorkspaceService";
 
+import {
+
+    uploadMedia
+
+}
+
+from "../../services/customerMediaService";
+
 // ====================================
 // COMPONENT
 // ====================================
@@ -65,21 +73,21 @@ salesSurveyId,
 
 survey_date:
 
+surveyData.customer?.survey_date
+||
 new Date()
-
 .toISOString()
-
-.slice(
-
-0,
-
-10
-
-),
+.slice(0, 10),
 
 plant_site_location:
 
 surveyData.customer?.plant_site_location,
+
+nearest_hub:
+surveyData.customer?.nearest_hub,
+
+urgency:
+surveyData.customer?.urgency,
 
 
 // ====================================
@@ -292,6 +300,17 @@ surveyData.geometry?.access_support,
 customer_support:
 surveyData.geometry?.customer_support,
 
+opening_height:
+Number(
+    surveyData.geometry?.opening_height
+) || null,
+
+access_type:
+surveyData.geometry?.access_type,
+
+equipment_nearby:
+surveyData.geometry?.equipment_nearby,
+
 
 // ====================================
 // SECTION D
@@ -361,6 +380,68 @@ Number(
     surveyData.pump?.hose_route_bends
 ) || null,
 
+target_flow:
+Number(surveyData.pump?.target_flow) || null,
+
+suction_depth:
+Number(surveyData.pump?.suction_depth) || null,
+
+discharge_distance:
+Number(surveyData.pump?.discharge_distance) || null,
+
+discharge_height:
+Number(surveyData.pump?.discharge_height) || null,
+
+debris_present:
+surveyData.pump?.debris_present,
+
+ph_condition:
+surveyData.pump?.ph_condition,
+
+pump_power_source:
+surveyData.pump?.pump_power_source,
+
+
+// ====================================
+// SECTION F
+// ====================================
+
+dewatering_required:
+surveyData.dewatering?.dewatering_required,
+
+dewatering_volume:
+Number(surveyData.dewatering?.dewatering_volume) || null,
+
+inlet_moisture:
+Number(surveyData.dewatering?.inlet_moisture) || null,
+
+target_final_moisture:
+Number(surveyData.dewatering?.target_final_moisture) || null,
+
+expected_final_form:
+surveyData.dewatering?.expected_final_form,
+
+visible_free_water:
+surveyData.dewatering?.visible_free_water,
+
+natural_settling:
+surveyData.dewatering?.natural_settling,
+
+oily_emulsified:
+surveyData.dewatering?.oily_emulsified,
+
+space_available:
+surveyData.dewatering?.space_available,
+
+filtrate_route:
+surveyData.dewatering?.filtrate_route,
+
+moisture_guarantee:
+surveyData.dewatering?.moisture_guarantee,
+
+cake_handling_scope:
+surveyData.dewatering?.cake_handling_scope,
+
 
 // ====================================
 // SECTION G
@@ -368,7 +449,13 @@ Number(
 
 customer_pain_point:
 
-surveyData.insights?.customer_pain
+surveyData.insights?.customer_pain,
+
+shutdown_window:
+surveyData.insights?.shutdown_window,
+
+completion_deadline:
+surveyData.insights?.completion_deadline
 
 };
 
@@ -393,6 +480,36 @@ if(
 
         survey.id
 
+    );
+
+}
+
+// ====================================
+// UPLOAD MEDIA
+// Files picked in Section G's "Photos /
+// Videos" uploader are held in state until
+// now. Uploaded against the same
+// customer_request_id the Enquiry
+// Workspace's Media card already reads from,
+// so they show up there automatically.
+// ====================================
+
+const mediaFiles =
+    surveyData.insights?.mediaFiles || [];
+
+if(mediaFiles.length){
+
+    const photos = mediaFiles.filter(
+        file => file.type.startsWith("image")
+    );
+
+    const videos = mediaFiles.filter(
+        file => file.type.startsWith("video")
+    );
+
+    await uploadMedia(
+        Number(customerRequestId),
+        { photos, videos }
     );
 
 }

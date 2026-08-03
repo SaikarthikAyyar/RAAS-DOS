@@ -8,7 +8,8 @@ accessTypeOptions,
 
 tankTypeOptions,
 accessSupportOptions,
-customerSupportOptions
+customerSupportOptions,
+yesNoUnknown
 
 }
 
@@ -382,6 +383,36 @@ value={geometry.customer_support}
 section="geometry"
 field="customer_support"
 options={customerSupportOptions}
+updateSection={updateSection}
+/>
+
+
+{/* ROW 7 */}
+
+<FieldSelect
+label="Scaffolding Needed?"
+value={geometry.scaffolding_needed}
+section="geometry"
+field="scaffolding_needed"
+options={yesNoUnknown}
+updateSection={updateSection}
+/>
+
+<FieldSelect
+label="Crane Available?"
+value={geometry.crane_available}
+section="geometry"
+field="crane_available"
+options={yesNoUnknown}
+updateSection={updateSection}
+/>
+
+<FieldInput
+label="Opening Height (mm)"
+value={geometry.opening_height}
+section="geometry"
+field="opening_height"
+unit="mm"
 updateSection={updateSection}
 />
 

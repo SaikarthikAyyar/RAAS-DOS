@@ -11,14 +11,16 @@ from backend.database.connection import get_db
 
 from backend.schemas.techno_commercial_quote_schema import (
     QuoteCreateSchema,
-    QuoteResponseSchema
+    QuoteResponseSchema,
+    TechnoApprovalDecisionSchema
 )
 
 from backend.services.techno_commercial_quote_service import (
     approve_quote_by_customer,
     create_quote_request,
     get_quote_preview_request,
-    request_quote_revision
+    request_quote_revision,
+    save_techno_approval_decision
 )
 
 from backend.services.techno_commercial_quote_service import (
@@ -220,3 +222,51 @@ def request_revision(
         quote_id
 
     )
+
+
+# ====================================
+# SAVE TECHNO-COMMERCIAL APPROVAL DECISION
+# ====================================
+
+@router.put(
+
+    "/quote/{quote_id}/techno-approval"
+
+)
+def put_techno_approval(
+
+    quote_id: int,
+
+    payload: TechnoApprovalDecisionSchema,
+
+    db: Session = Depends(get_db)
+
+):
+
+    try:
+
+        return save_techno_approval_decision(
+
+            db,
+
+            quote_id,
+
+            payload.status,
+
+            payload.approved_by,
+
+            payload.note
+
+        )
+
+    except ValueError as e:
+
+        from fastapi import HTTPException
+
+        raise HTTPException(
+
+            status_code=404,
+
+            detail=str(e)
+
+        )

@@ -2,6 +2,8 @@
 # CREATE QUOTE
 # ====================================
 
+from datetime import date
+
 from backend.services.quote_engine import (
 
     build_quote
@@ -83,6 +85,8 @@ def create_quote_request(
 
     quote = build_quote(
 
+        db,
+
         ops
 
     )
@@ -124,17 +128,25 @@ def create_quote_request(
         "approval_gate":
             quote["approval_gate"],
 
-        "mobilisation_cost":
-            quote["mobilisation_cost"],
+        "mobilisation_cost_min":
+            quote["mobilisation_cost_min"],
+        "mobilisation_cost_max":
+            quote["mobilisation_cost_max"],
 
-        "setup_cost":
-            quote["setup_cost"],
+        "setup_cost_min":
+            quote["setup_cost_min"],
+        "setup_cost_max":
+            quote["setup_cost_max"],
 
-        "execution_cost":
-            quote["execution_cost"],
+        "execution_cost_min":
+            quote["execution_cost_min"],
+        "execution_cost_max":
+            quote["execution_cost_max"],
 
-        "pump_addon_cost":
-            quote["pump_addon_cost"],
+        "pump_addon_cost_min":
+            quote["pump_addon_cost_min"],
+        "pump_addon_cost_max":
+            quote["pump_addon_cost_max"],
 
         "documentation_buffer":
             quote["documentation_buffer"],
@@ -142,17 +154,28 @@ def create_quote_request(
         "access_support_buffer":
             quote["access_support_buffer"],
 
-        "overhead_cost":
-            quote["overhead_cost"],
+        "direct_cost_min":
+            quote["direct_cost_min"],
+        "direct_cost_max":
+            quote["direct_cost_max"],
 
-        "contingency_cost":
-            quote["contingency_cost"],
+        "overhead_cost_min":
+            quote["overhead_cost_min"],
+        "overhead_cost_max":
+            quote["overhead_cost_max"],
+
+        "contingency_cost_min":
+            quote["contingency_cost_min"],
+        "contingency_cost_max":
+            quote["contingency_cost_max"],
 
         "margin_percentage":
             quote["margin_percentage"],
 
-        "margin_value":
-            quote["margin_value"],
+        "margin_value_min":
+            quote["margin_value_min"],
+        "margin_value_max":
+            quote["margin_value_max"],
 
         "dewatering_method":
             quote["dewatering_method"],
@@ -161,20 +184,35 @@ def create_quote_request(
         # User editable fields
         # --------------------------------
 
-        "cleaning_quote":
-            payload.cleaning_quote
-            if payload.cleaning_quote is not None
-            else quote["cleaning_quote"],
+        "cleaning_quote_min":
+            payload.cleaning_quote_min
+            if payload.cleaning_quote_min is not None
+            else quote["cleaning_quote_min"],
 
-        "dewatering_addon":
-            payload.dewatering_addon
-            if payload.dewatering_addon is not None
-            else quote["dewatering_addon"],
+        "cleaning_quote_max":
+            payload.cleaning_quote_max
+            if payload.cleaning_quote_max is not None
+            else quote["cleaning_quote_max"],
 
-        "combined_budgetary_value":
-            payload.combined_budgetary_value
-            if payload.combined_budgetary_value is not None
-            else quote["combined_budgetary_value"]
+        "dewatering_addon_min":
+            payload.dewatering_addon_min
+            if payload.dewatering_addon_min is not None
+            else quote["dewatering_addon_min"],
+
+        "dewatering_addon_max":
+            payload.dewatering_addon_max
+            if payload.dewatering_addon_max is not None
+            else quote["dewatering_addon_max"],
+
+        "combined_budgetary_value_min":
+            payload.combined_budgetary_value_min
+            if payload.combined_budgetary_value_min is not None
+            else quote["combined_budgetary_value_min"],
+
+        "combined_budgetary_value_max":
+            payload.combined_budgetary_value_max
+            if payload.combined_budgetary_value_max is not None
+            else quote["combined_budgetary_value_max"]
 
     }
 
@@ -323,7 +361,7 @@ def get_quote_preview_request(db, ops_selection_id):
     if ops is None:
         raise ValueError("OPS Selection not found.")
 
-    return build_quote(ops)
+    return build_quote(db, ops)
 
 
 def approve_quote_by_customer(
@@ -604,5 +642,58 @@ def request_quote_revision(
         )
 
         print("[Workflow] Revision returned to OPS Approval")
+
+    return quote
+
+
+# ====================================
+# SAVE TECHNO-COMMERCIAL APPROVAL DECISION
+# ====================================
+
+def save_techno_approval_decision(
+
+    db,
+
+    quote_id,
+
+    status,
+
+    approved_by,
+
+    note
+
+):
+
+    quote = get_quote(
+
+        db,
+
+        quote_id
+
+    )
+
+    if quote is None:
+
+        raise ValueError(
+
+            "Quote not found."
+
+        )
+
+    quote.techno_status = status
+
+    quote.techno_approved_by = approved_by
+
+    quote.techno_approved_date = date.today().isoformat()
+
+    quote.techno_note = note
+
+    db.commit()
+
+    db.refresh(
+
+        quote
+
+    )
 
     return quote

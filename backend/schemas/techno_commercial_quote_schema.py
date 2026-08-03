@@ -15,11 +15,17 @@ class QuoteCreateSchema(BaseModel):
 
     dewatering_assessment_id: int | None = None
 
-    cleaning_quote: float | None = None
+    cleaning_quote_min: float | None = None
 
-    dewatering_addon: float | None = None
+    cleaning_quote_max: float | None = None
 
-    combined_budgetary_value: float | None = None
+    dewatering_addon_min: float | None = None
+
+    dewatering_addon_max: float | None = None
+
+    combined_budgetary_value_min: float | None = None
+
+    combined_budgetary_value_max: float | None = None
 
 
 
@@ -50,36 +56,70 @@ class QuoteResponseSchema(
 
     approval_gate: str
 
-    mobilisation_cost: float
+    mobilisation_cost_min: float
+    mobilisation_cost_max: float
 
-    setup_cost: float
+    setup_cost_min: float
+    setup_cost_max: float
 
-    execution_cost: float
+    execution_cost_min: float
+    execution_cost_max: float
 
-    pump_addon_cost: float
+    pump_addon_cost_min: float
+    pump_addon_cost_max: float
 
     documentation_buffer: float
 
     access_support_buffer: float
 
-    overhead_cost: float
+    direct_cost_min: float
+    direct_cost_max: float
 
-    contingency_cost: float
+    overhead_cost_min: float
+    overhead_cost_max: float
+
+    contingency_cost_min: float
+    contingency_cost_max: float
 
     margin_percentage: float
 
-    margin_value: float
+    margin_value_min: float
+    margin_value_max: float
 
-    cleaning_quote: float
+    cleaning_quote_min: float
+    cleaning_quote_max: float
 
     dewatering_method: str
 
-    dewatering_addon: float
+    dewatering_addon_min: float
+    dewatering_addon_max: float
 
-    combined_budgetary_value: float
+    combined_budgetary_value_min: float
+    combined_budgetary_value_max: float
+
+    techno_status: str | None = None
+
+    techno_approved_by: str | None = None
+
+    techno_approved_date: str | None = None
+
+    techno_note: str | None = None
 
 
 
     class Config:
 
         from_attributes = True
+
+
+# ====================================
+# TECHNO-COMMERCIAL APPROVAL DECISION
+# ====================================
+
+class TechnoApprovalDecisionSchema(BaseModel):
+
+    status: str
+
+    approved_by: str
+
+    note: str | None = None

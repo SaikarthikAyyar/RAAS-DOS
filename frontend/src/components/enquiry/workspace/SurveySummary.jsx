@@ -1,4 +1,5 @@
 import SurveySummaryCard from "./SurveySummaryCard";
+import SurveyMediaCard from "./SurveyMediaCard";
 import "./SurveySummary.css";
 
 import { useNavigate } from "react-router-dom";
@@ -580,9 +581,271 @@ export default function SurveySummary({
 
                         value:survey.insights.customer_pain
 
+                    },
+
+                    {
+
+                        label:"Shutdown Window",
+
+                        value:survey.insights.shutdown_window
+
+                    },
+
+                    {
+
+                        label:"Completion Deadline",
+
+                        value:survey.insights.completion_deadline
+
                     }
 
                 ]}
+
+            />
+
+            <SurveySummaryCard
+
+                title="Geometry & Safety (Additional)"
+
+                fields={[
+
+                    {
+
+                        label:"Opening Height",
+
+                        value:survey.geometry.opening_height
+
+                    },
+
+                    {
+
+                        label:"Access Type",
+
+                        value:survey.geometry.access_type
+
+                    },
+
+                    {
+
+                        label:"Equipment Nearby",
+
+                        value:survey.geometry.equipment_nearby
+
+                    },
+
+                    {
+
+                        label:"Scaffolding Needed",
+
+                        value:survey.geometry.scaffolding_needed
+
+                    },
+
+                    {
+
+                        label:"Crane Available",
+
+                        value:survey.geometry.crane_available
+
+                    },
+
+                    {
+
+                        label:"Power Availability Distance",
+
+                        value:survey.safety.power_distance
+
+                    }
+
+                ]}
+
+            />
+
+            <SurveySummaryCard
+
+                title="Pump Details (Additional)"
+
+                fields={[
+
+                    {
+
+                        label:"Target Flow",
+
+                        value:survey.pump.target_flow
+
+                    },
+
+                    {
+
+                        label:"Suction Depth",
+
+                        value:survey.pump.suction_depth
+
+                    },
+
+                    {
+
+                        label:"Discharge Distance",
+
+                        value:survey.pump.discharge_distance
+
+                    },
+
+                    {
+
+                        label:"Discharge Height",
+
+                        value:survey.pump.discharge_height
+
+                    },
+
+                    {
+
+                        label:"Debris / Fibers Present",
+
+                        value:survey.pump.debris_present
+
+                    },
+
+                    {
+
+                        label:"pH / Corrosiveness",
+
+                        value:survey.pump.ph_condition
+
+                    },
+
+                    {
+
+                        label:"Pump Power Source",
+
+                        value:survey.pump.pump_power_source
+
+                    }
+
+                ]}
+
+            />
+
+            <SurveySummaryCard
+
+                title="Dewatering Details"
+
+                fields={[
+
+                    {
+
+                        label:"Dewatering Required",
+
+                        value:survey.dewatering.dewatering_required
+
+                    },
+
+                    {
+
+                        label:"Dewatering Volume",
+
+                        value:survey.dewatering.dewatering_volume
+
+                    },
+
+                    {
+
+                        label:"Inlet Moisture %",
+
+                        value:survey.dewatering.inlet_moisture
+
+                    },
+
+                    {
+
+                        label:"Target Final Moisture %",
+
+                        value:survey.dewatering.target_final_moisture
+
+                    },
+
+                    {
+
+                        label:"Expected Final Form",
+
+                        value:survey.dewatering.expected_final_form
+
+                    },
+
+                    {
+
+                        label:"Visible Free Water",
+
+                        value:survey.dewatering.visible_free_water
+
+                    },
+
+                    {
+
+                        label:"Natural Settling Ability",
+
+                        value:survey.dewatering.natural_settling
+
+                    },
+
+                    {
+
+                        label:"Oily / Emulsified",
+
+                        value:survey.dewatering.oily_emulsified
+
+                    },
+
+                    {
+
+                        label:"Space for Bags / Holding",
+
+                        value:survey.dewatering.space_available
+
+                    }
+
+                ]}
+
+            />
+
+            <SurveySummaryCard
+
+                title="Dewatering Details (cont.)"
+
+                fields={[
+
+                    {
+
+                        label:"Filtrate Route Available",
+
+                        value:survey.dewatering.filtrate_route
+
+                    },
+
+                    {
+
+                        label:"Final Moisture Guarantee",
+
+                        value:survey.dewatering.moisture_guarantee
+
+                    },
+
+                    {
+
+                        label:"Cake Handling Scope",
+
+                        value:survey.dewatering.cake_handling_scope
+
+                    }
+
+                ]}
+
+            />
+
+            <SurveyMediaCard
+
+                customerRequestId={enquiry.customer_request_id}
 
             />
                 </>

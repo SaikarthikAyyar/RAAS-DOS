@@ -252,29 +252,17 @@ def create_quote(
 
     )
 
-    quote.mobilisation_cost = (
+    quote.mobilisation_cost_min = payload["mobilisation_cost_min"]
+    quote.mobilisation_cost_max = payload["mobilisation_cost_max"]
 
-        payload["mobilisation_cost"]
+    quote.setup_cost_min = payload["setup_cost_min"]
+    quote.setup_cost_max = payload["setup_cost_max"]
 
-    )
+    quote.execution_cost_min = payload["execution_cost_min"]
+    quote.execution_cost_max = payload["execution_cost_max"]
 
-    quote.setup_cost = (
-
-        payload["setup_cost"]
-
-    )
-
-    quote.execution_cost = (
-
-        payload["execution_cost"]
-
-    )
-
-    quote.pump_addon_cost = (
-
-        payload["pump_addon_cost"]
-
-    )
+    quote.pump_addon_cost_min = payload["pump_addon_cost_min"]
+    quote.pump_addon_cost_max = payload["pump_addon_cost_max"]
 
     quote.documentation_buffer = (
 
@@ -288,17 +276,14 @@ def create_quote(
 
     )
 
-    quote.overhead_cost = (
+    quote.direct_cost_min = payload["direct_cost_min"]
+    quote.direct_cost_max = payload["direct_cost_max"]
 
-        payload["overhead_cost"]
+    quote.overhead_cost_min = payload["overhead_cost_min"]
+    quote.overhead_cost_max = payload["overhead_cost_max"]
 
-    )
-
-    quote.contingency_cost = (
-
-        payload["contingency_cost"]
-
-    )
+    quote.contingency_cost_min = payload["contingency_cost_min"]
+    quote.contingency_cost_max = payload["contingency_cost_max"]
 
     quote.margin_percentage = (
 
@@ -306,29 +291,17 @@ def create_quote(
 
     )
 
-    quote.margin_value = (
+    quote.margin_value_min = payload["margin_value_min"]
+    quote.margin_value_max = payload["margin_value_max"]
 
-        payload["margin_value"]
+    quote.cleaning_quote_min = payload["cleaning_quote_min"]
+    quote.cleaning_quote_max = payload["cleaning_quote_max"]
 
-    )
+    quote.dewatering_addon_min = payload["dewatering_addon_min"]
+    quote.dewatering_addon_max = payload["dewatering_addon_max"]
 
-    quote.cleaning_quote = (
-
-        payload["cleaning_quote"]
-
-    )
-
-    quote.dewatering_addon = (
-
-        payload["dewatering_addon"]
-
-    )
-
-    quote.combined_budgetary_value = (
-
-        payload["combined_budgetary_value"]
-
-    )
+    quote.combined_budgetary_value_min = payload["combined_budgetary_value_min"]
+    quote.combined_budgetary_value_max = payload["combined_budgetary_value_max"]
 
     db.commit()
 

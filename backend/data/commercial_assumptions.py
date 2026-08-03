@@ -50,3 +50,19 @@ PUMP_ADDON_RATE = 10000
 DOCUMENTATION_BUFFER = 15000
 
 ACCESS_SUPPORT_BUFFER = 25000
+
+
+# ====================================
+# DEWATERING (INR per m3 of survey volume)
+# The one genuine min/max driver in the quote
+# range - dewatering_method_min/max on OpsSelection
+# picks which rate applies to each bound.
+# ====================================
+
+DEWATERING_RATE = {
+
+    "FILTER_PRESS": 150,
+
+    "CENTRIFUGE": 220
+
+}

@@ -92,6 +92,8 @@ setSurveyData,
 
 updateSection,
 
+updateMediaFiles,
+
 metrics,
 
 canSubmit
@@ -368,6 +370,8 @@ updateSection={updateSection}
 surveyData={surveyData}
 
 updateSection={updateSection}
+
+updateMediaFiles={updateMediaFiles}
 
 />
 
