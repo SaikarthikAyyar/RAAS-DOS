@@ -27,15 +27,7 @@ export default function Topbar(){
 
             {/* Left Section */}
 
-
-
-
-
-
-
-            {/* Right Section */}
-
-            <div className="topbar-right">
+            <div className="topbar-left">
 
                 <div className="user-chip">
 
@@ -55,18 +47,6 @@ export default function Topbar(){
 
                 </div>
 
-                <Bell size={20}/>
-
-                <div className="topbar-left">
-
-                <span>
-
-                    Notifications
-
-                </span>
-
-                </div>
-
                 <button
 
                     className="logout-button-topbar"
@@ -78,6 +58,26 @@ export default function Topbar(){
                     Logout
 
                 </button>
+
+            </div>
+
+
+
+
+
+
+
+            {/* Right Section */}
+
+            <div className="topbar-right">
+
+                <Bell size={20}/>
+
+                <span>
+
+                    Notifications
+
+                </span>
 
             </div>
 
