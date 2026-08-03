@@ -165,6 +165,8 @@ def create_customer_request(
     print("Customer Request enquiry created")
     print("=============================\n")
 
+    db.refresh(customer_request)
+
     return customer_request
 
 

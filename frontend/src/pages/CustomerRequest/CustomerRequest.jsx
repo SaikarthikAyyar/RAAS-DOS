@@ -8,6 +8,8 @@ import "../../components/salesSurvey/SalesSurvey.css";
 
 
 
+import { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import useCustomerRequest from "../../hooks/useCustomerRequest";
@@ -31,6 +33,38 @@ from "../../components/customerRequest/Section3_Uploads";
 
 import CustomerActions
 from "../../components/customerRequest/CustomerActions";
+
+
+// ====================================
+// ERROR MESSAGE HELPER
+// ====================================
+
+function extractErrorMessage(error){
+
+  const detail = error?.detail;
+
+  if(typeof detail === "string"){
+    return detail;
+  }
+
+  if(detail?.message){
+    return detail.message;
+  }
+
+  if(Array.isArray(detail)){
+    return detail
+      .map(item => item.msg)
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  if(error?.message){
+    return error.message;
+  }
+
+  return "Something went wrong while submitting the request. Please try again.";
+
+}
 
 
 // ====================================
@@ -59,12 +93,20 @@ const{
 
 useCustomerRequest();
 
+  const [submitting, setSubmitting] = useState(false);
+
 
   // ====================================
   // SUBMIT
   // ====================================
 
 async function submit(){
+
+    if(submitting){
+      return;
+    }
+
+    setSubmitting(true);
 
     try{
 
@@ -130,8 +172,11 @@ async function submit(){
 
       if(!response?.id){
 
-        console.log(response.id);
-        console.log("Customer Request Creation Failed");
+        console.log("Customer Request Creation Failed", response);
+
+        alert(
+          "Customer request could not be created. Please check the form and try again."
+        );
 
         return;
 
@@ -150,7 +195,7 @@ async function submit(){
         uploads
       );
 
-      alert("Customer request has been created");
+      alert("Customer request has been created successfully.");
 
      navigate("/enquiry");
 
@@ -159,6 +204,16 @@ async function submit(){
     catch(error){
 
       console.error(error);
+
+      alert(
+        `Customer request could not be saved: ${extractErrorMessage(error)}`
+      );
+
+    }
+
+    finally{
+
+      setSubmitting(false);
 
     }
 
@@ -190,6 +245,7 @@ updateSection={updateSection}
 
       <CustomerActions
         submit={submit}
+        submitting={submitting}
       />
 
     </div>

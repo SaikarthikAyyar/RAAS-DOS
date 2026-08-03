@@ -1,6 +1,8 @@
 export default function CustomerActions({
 
-submit
+submit,
+
+submitting
 
 }){
 
@@ -15,14 +17,14 @@ className="survey-btn save-btn"
 
 onClick={
     submit
-    
+
 }
 
-
+disabled={submitting}
 
 >
 
-Submit Requirement
+{submitting ? "Submitting..." : "Submit Requirement"}
 
 
 
