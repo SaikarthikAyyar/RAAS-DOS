@@ -213,4 +213,65 @@ def advance_to_next_stage(
 
         next_stage
 
+
+    )
+
+
+# ====================================
+# ADVANCE, NEVER REGRESS
+# For callers that may run repeatedly on
+# an enquiry that has already moved past
+# their stage (e.g. re-saving Ops Selector
+# or re-approving a quote) - only moves the
+# stage forward, never backward.
+# ====================================
+
+def advance_stage_at_least(
+
+    db,
+
+    enquiry_id,
+
+    target_stage
+
+):
+
+    enquiry = _get_enquiry(
+
+        db,
+
+        enquiry_id
+
+    )
+
+    try:
+
+        current_index = WORKFLOW_ORDER.index(
+
+            enquiry.stage
+
+        )
+
+    except ValueError:
+
+        current_index = -1
+
+    target_index = WORKFLOW_ORDER.index(
+
+        target_stage
+
+    )
+
+    if target_index <= current_index:
+
+        return enquiry
+
+    return update_stage(
+
+        db,
+
+        enquiry_id,
+
+        target_stage
+
     )

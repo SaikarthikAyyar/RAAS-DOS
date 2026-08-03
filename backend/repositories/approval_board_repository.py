@@ -316,3 +316,84 @@ def get_approval_board_by_quote(
         "flag": ops.approval_gate
 
     }
+
+
+# ====================================
+# COMMERCIAL APPROVAL TAB
+# (distinct from approve_quote() above,
+# which backs the older standalone
+# Approval Board page - left untouched)
+# ====================================
+
+def record_commercial_approval_decision(
+
+    db,
+
+    quote_id,
+
+    approval_status,
+
+    approved_by,
+
+    note
+
+):
+
+    approval = ApprovalBoard(
+
+        quote_id=quote_id,
+
+        approval_status=approval_status,
+
+        approved_by=approved_by,
+
+        note=note,
+
+        approval_date=func.now()
+
+    )
+
+    db.add(approval)
+
+    db.commit()
+
+    db.refresh(approval)
+
+    return approval
+
+
+def get_approval_history(
+
+    db,
+
+    ops_selection_id
+
+):
+
+    return (
+
+        db.query(ApprovalBoard)
+
+        .join(
+
+            Quote,
+
+            ApprovalBoard.quote_id == Quote.id
+
+        )
+
+        .filter(
+
+            Quote.ops_selection_id == ops_selection_id
+
+        )
+
+        .order_by(
+
+            ApprovalBoard.id.asc()
+
+        )
+
+        .all()
+
+    )

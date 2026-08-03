@@ -333,3 +333,23 @@ def set_stage(
         enquiry_id,
         payload.stage
     )
+
+
+# ====================================
+# ADVANCE TO AT LEAST
+# ====================================
+
+@router.put(
+    "/{enquiry_id}/stage-at-least"
+)
+def advance_to_stage_at_least(
+    enquiry_id: int,
+    payload: SetStageRequest,
+    db: Session = Depends(get_db)
+):
+
+    return service.advance_to_stage_at_least(
+        db,
+        enquiry_id,
+        payload.stage
+    )

@@ -406,6 +406,8 @@ export default function OpsReviewSummary({
 
             <DeploymentPlanCard
 
+                enquiry={enquiry}
+
                 opsSelection={opsSelection}
 
                 opsScoring={opsScoring}

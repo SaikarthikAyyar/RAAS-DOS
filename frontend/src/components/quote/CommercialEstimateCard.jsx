@@ -36,7 +36,9 @@ export default function CommercialEstimateCard({
 
     setQuote,
 
-    selectedOps
+    selectedOps,
+
+    enquiryId
 
 }){
 
@@ -81,6 +83,8 @@ async function handleSave(){
         const payload = {
 
             ops_selection_id: Number(selectedOps),
+
+            enquiry_id: enquiryId,
 
             created_by: createdBy,
 

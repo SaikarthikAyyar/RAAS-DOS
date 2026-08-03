@@ -27,6 +27,17 @@ from backend.repositories.approval_board_repository import (
     get_approval_board_by_quote
 )
 
+from backend.repositories.approval_board_repository import (
+    record_commercial_approval_decision,
+    get_approval_history
+)
+
+from backend.models.enquiry import Enquiry
+
+from backend.services.enquiry_consolidated_service import update_module_reference
+
+from backend.services.workflow_service import advance_stage_at_least, WorkflowStage
+
 
 
 # ====================================
@@ -301,5 +312,181 @@ def get_approval_board_by_quote_request(
     print(approval)
 
     print("======================================\n")
+
+    return approval
+
+
+# ====================================
+# COMMERCIAL APPROVAL TAB
+# ====================================
+
+def get_approval_history_request(
+
+    db,
+
+    ops_selection_id
+
+):
+
+    return get_approval_history(
+
+        db,
+
+        ops_selection_id
+
+    )
+
+
+def record_commercial_approval_decision_request(
+
+    db,
+
+    quote_id,
+
+    decision,
+
+    approved_by,
+
+    note,
+
+    final_approved_value,
+
+    enquiry_id=None
+
+):
+
+    if decision not in ("APPROVED", "REJECTED"):
+
+        raise ValueError(
+
+            "Decision must be APPROVED or REJECTED."
+
+        )
+
+    quote = get_quote(db, quote_id)
+
+    if quote is None:
+
+        raise ValueError("Quote not found.")
+
+    if quote.techno_status != "Approved":
+
+        raise ValueError(
+
+            "Quote must be Techno-Commercial Approved before it can go "
+            "through Commercial Approval."
+
+        )
+
+    if quote.revision_requested:
+
+        raise ValueError(
+
+            "A revision has been requested on this quote - save a new "
+            "version before recording a Commercial Approval decision."
+
+        )
+
+    approval = record_commercial_approval_decision(
+
+        db,
+
+        quote_id,
+
+        decision,
+
+        approved_by,
+
+        note
+
+    )
+
+    ops = get_ops_selection(db, quote.ops_selection_id)
+
+    if enquiry_id is not None:
+
+        target_enquiry = (
+
+            db.query(Enquiry)
+
+            .filter(Enquiry.id == enquiry_id)
+
+            .first()
+
+        )
+
+    else:
+
+        # Fallback for callers that don't know their enquiry_id yet.
+        # Ambiguous when historical duplicate rows share a
+        # sales_survey_id (pre-dates the consolidated-enquiry fix) -
+        # callers that have an enquiry_id in hand should always pass it.
+        target_enquiry = (
+
+            db.query(Enquiry)
+
+            .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+
+            .order_by(Enquiry.id.desc())
+
+            .first()
+
+        )
+
+    if decision == "APPROVED":
+
+        quote.final_approved_value = final_approved_value
+
+        quote.workflow_status = "APPROVAL_COMPLETED"
+
+        db.commit()
+
+        db.refresh(quote)
+
+        if target_enquiry:
+
+            update_module_reference(
+
+                db,
+
+                target_enquiry.id,
+
+                "approval_board_id",
+
+                approval.id
+
+            )
+
+            advance_stage_at_least(
+
+                db,
+
+                target_enquiry.id,
+
+                WorkflowStage.QUOTE_RELEASED.value
+
+            )
+
+    else:
+
+        quote.workflow_status = "REJECTED"
+
+        db.commit()
+
+        db.refresh(quote)
+
+        if target_enquiry:
+
+            update_module_reference(
+
+                db,
+
+                target_enquiry.id,
+
+                "approval_board_id",
+
+                approval.id
+
+            )
 
     return approval

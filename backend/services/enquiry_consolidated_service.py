@@ -20,7 +20,8 @@ from backend.services.enquiry_service import EnquiryService
 
 from backend.services.workflow_service import (
     advance_to_next_stage,
-    update_stage
+    update_stage,
+    advance_stage_at_least
 )
 
 # ====================================
@@ -285,6 +286,28 @@ def set_stage(
 ):
 
     return update_stage(
+        db,
+        enquiry_id,
+        stage.value if hasattr(stage, "value") else stage
+    )
+
+
+# ====================================
+# ADVANCE TO AT LEAST
+# (used by "Approve & Send to X" actions
+# that may be triggered on an enquiry that
+# has already moved further than X - moves
+# forward only, never backward, unlike
+# set_stage above)
+# ====================================
+
+def advance_to_stage_at_least(
+    db,
+    enquiry_id,
+    stage
+):
+
+    return advance_stage_at_least(
         db,
         enquiry_id,
         stage.value if hasattr(stage, "value") else stage

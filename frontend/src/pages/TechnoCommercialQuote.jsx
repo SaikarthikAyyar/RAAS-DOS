@@ -53,6 +53,8 @@ export default function TechnoCommercialQuote() {
 
     const preselectedOps = location.state?.opsSelectionId;
 
+    const enquiryId = location.state?.enquiryId;
+
     const [opsList,setOpsList]=useState([]);
 
     const [selectedOps,setSelectedOps]=useState(
@@ -270,6 +272,11 @@ export default function TechnoCommercialQuote() {
                     quote={quote}
                     setQuote={setQuote}
                     selectedOps={selectedOps}
+                    enquiryId={
+                        preselectedOps && selectedOps===String(preselectedOps)
+                            ? enquiryId
+                            : undefined
+                    }
                     onSubmitApproval={handleSubmitApproval}
                 />
 

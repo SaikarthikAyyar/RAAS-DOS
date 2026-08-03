@@ -40,6 +40,8 @@ function defaultAccessoriesPlan(finalMachine, opsScoring){
 
 export default function DeploymentPlanCard({
 
+    enquiry,
+
     opsSelection,
 
     opsScoring = [],
@@ -180,6 +182,8 @@ export default function DeploymentPlanCard({
             await saveQuote({
 
                 ops_selection_id:opsSelection.id,
+
+                enquiry_id:enquiry?.id,
 
                 created_by:createdBy,
 

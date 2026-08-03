@@ -164,3 +164,87 @@ export async function getApprovalBoardByQuote(
     return data;
 
 }
+
+
+// ====================================
+// COMMERCIAL APPROVAL TAB
+// ====================================
+
+export async function getApprovalHistory(
+
+    opsSelectionId
+
+){
+
+    const response = await fetch(
+
+        `${API}/approval-board/history/${opsSelectionId}`
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+export async function recordCommercialApprovalDecision(
+
+    quoteId,
+
+    decision,
+
+    approvedBy,
+
+    note,
+
+    finalApprovedValue,
+
+    enquiryId
+
+){
+
+    const response = await fetch(
+
+        `${API}/approval-board/decision/${quoteId}/${decision}`,
+
+        {
+
+            method:"POST",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({
+
+                approved_by:approvedBy,
+
+                note,
+
+                final_approved_value:finalApprovedValue,
+
+                enquiry_id:enquiryId
+
+            })
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}

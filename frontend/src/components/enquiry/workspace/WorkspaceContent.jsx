@@ -7,6 +7,8 @@ import OpsReviewSummary from "./OpsReviewSummary";
 import TechnoCommercialApprovalSummary from "./TechnoCommercialApprovalSummary";
 
 import QuoteCommercialSummary from "./QuoteCommercialSummary";
+
+import CommercialApprovalSummary from "./CommercialApprovalSummary";
 // ====================================
 // COMPONENT
 // ====================================
@@ -107,11 +109,19 @@ export default function WorkspaceContent({
 
             return(
 
-                <div>
+                <CommercialApprovalSummary
 
-                    Commercial Approval Placeholder
+                    enquiry={enquiry}
 
-                </div>
+                    survey={survey}
+
+                    opsSelection={opsSelection}
+
+                    quote={quote}
+
+                    onTabChange={onTabChange}
+
+                />
 
             );
 

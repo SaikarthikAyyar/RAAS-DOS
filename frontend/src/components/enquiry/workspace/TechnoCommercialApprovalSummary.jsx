@@ -5,7 +5,7 @@ import {
 } from "../../../services/technoCommercialQuoteService";
 
 import {
-    requestOpsReview,
+    advanceStageAtLeast,
     setEnquiryStage
 } from "../../../services/enquiryWorkspaceService";
 
@@ -92,7 +92,7 @@ export default function TechnoCommercialApprovalSummary({
 
             if(status==="Approved"){
 
-                await requestOpsReview(enquiry.id);
+                await advanceStageAtLeast(enquiry.id, "COMMERCIAL_APPROVAL");
 
             }
             else{

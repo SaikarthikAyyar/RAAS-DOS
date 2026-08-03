@@ -212,17 +212,35 @@ def create_quote_request(
 
     print("[Workflow] Updating consolidated Enquiry")
 
-    target_enquiry = (
+    if getattr(payload, "enquiry_id", None):
 
-        db.query(Enquiry)
+        target_enquiry = (
 
-        .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+            db.query(Enquiry)
 
-        .order_by(Enquiry.id.desc())
+            .filter(Enquiry.id == payload.enquiry_id)
 
-        .first()
+            .first()
 
-    )
+        )
+
+    else:
+
+        # Fallback when the caller doesn't know its enquiry_id (e.g. the
+        # standalone Quotes Module opened without workspace context).
+        # Ambiguous when historical duplicate rows share a sales_survey_id
+        # (pre-dates the consolidated-enquiry fix).
+        target_enquiry = (
+
+            db.query(Enquiry)
+
+            .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+
+            .order_by(Enquiry.id.desc())
+
+            .first()
+
+        )
 
     if target_enquiry:
 

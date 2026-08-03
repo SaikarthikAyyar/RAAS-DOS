@@ -19,6 +19,8 @@ class QuoteCreateSchema(BaseModel):
 
     reason: str | None = None
 
+    enquiry_id: int | None = None
+
     dewatering_assessment_id: int | None = None
 
     mobilisation_cost_min: float | None = None
@@ -171,6 +173,8 @@ class QuoteResponseSchema(
 
     revision_requested_date: str | None = None
 
+    final_approved_value: float | None = None
+
 
 
     class Config:
@@ -217,3 +221,49 @@ class ReleaseQuoteSchema(BaseModel):
 class RequestRevisionFlagSchema(BaseModel):
 
     requested_by: str
+
+
+# ====================================
+# QUOTES MODULE (list all quotes)
+# ====================================
+
+class QuoteListItemSchema(BaseModel):
+
+    id: int
+
+    ops_selection_id: int
+
+    customer_request_id: int
+
+    customer_name: str | None = None
+
+    enquiry_id: int | None = None
+
+    revision_number: int | None = None
+
+    workflow_status: str | None = None
+
+    status_label: str
+
+    revision_requested: bool | None = None
+
+    combined_budgetary_value_min: float | None = None
+
+    combined_budgetary_value_max: float | None = None
+
+    created_on: datetime | None = None
+
+    class Config:
+
+        from_attributes = True
+
+
+class QuoteListResponse(BaseModel):
+
+    items: list[QuoteListItemSchema]
+
+    total: int
+
+    page: int
+
+    page_size: int

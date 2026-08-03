@@ -98,3 +98,7 @@ class ApprovalBoard(
         )
 
     )
+
+    note = Column(
+        String(500)
+    )

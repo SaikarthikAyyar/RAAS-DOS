@@ -9,7 +9,7 @@ import {
 } from "../../../services/enquiryWorkspaceService";
 
 import {
-    requestOpsReview
+    advanceStageAtLeast
 }
 from "../../../services/enquiryWorkspaceService";
 
@@ -66,9 +66,11 @@ export default function SurveySummary({
 
     async function handleRequestOpsReview(){
 
-        await requestOpsReview(
+        await advanceStageAtLeast(
 
-            enquiry.id
+            enquiry.id,
+
+            "OPS_REVIEW"
 
         );
 

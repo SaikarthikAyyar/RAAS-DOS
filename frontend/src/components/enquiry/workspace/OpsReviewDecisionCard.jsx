@@ -11,7 +11,7 @@ import {
 } from "../../../services/technoCommercialQuoteService";
 
 import {
-    requestOpsReview,
+    advanceStageAtLeast,
     setEnquiryStage
 } from "../../../services/enquiryWorkspaceService";
 
@@ -123,7 +123,7 @@ export default function OpsReviewDecisionCard({
 
             if(status==="Approved"){
 
-                await requestOpsReview(enquiry.id);
+                await advanceStageAtLeast(enquiry.id, "TECHNO_COMMERCIAL_APPROVAL");
 
             }
             else{

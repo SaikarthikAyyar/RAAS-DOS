@@ -174,3 +174,32 @@ export async function setEnquiryStage(
     return data;
 
 }
+
+export async function advanceStageAtLeast(
+    enquiryId,
+    stage
+){
+
+    const response = await fetch(
+
+        `${API}/enquiry-consolidated/${enquiryId}/stage-at-least`,
+
+        {
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({ stage })
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}

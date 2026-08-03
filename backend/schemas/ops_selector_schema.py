@@ -19,6 +19,8 @@ class OpsSelectorSchema(BaseModel):
 
     sales_survey_id: int
 
+    enquiry_id: Optional[int] = None
+
     ops_engine_version: Optional[str] = None
 
     doability: Optional[str] = None

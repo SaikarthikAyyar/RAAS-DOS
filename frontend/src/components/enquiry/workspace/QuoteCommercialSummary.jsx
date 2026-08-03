@@ -221,7 +221,10 @@ export default function QuoteCommercialSummary({
     function handleOpenQuotesModule(){
 
         navigate("/quote", {
-            state:{ opsSelectionId: quote.ops_selection_id }
+            state:{
+                opsSelectionId: quote.ops_selection_id,
+                enquiryId: enquiry?.id
+            }
         });
 
     }

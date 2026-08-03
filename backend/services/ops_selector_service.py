@@ -38,7 +38,7 @@ from backend.models.enquiry import Enquiry
 
 from backend.services.enquiry_consolidated_service import update_module_reference
 
-from backend.services.workflow_service import update_stage, WorkflowStage
+from backend.services.workflow_service import advance_stage_at_least, WorkflowStage
 
 
 
@@ -325,17 +325,35 @@ def create_ops_selection_request(
     
     print("[Workflow] Updating consolidated Enquiry")
 
-    target_enquiry = (
+    if getattr(payload, "enquiry_id", None):
 
-        db.query(Enquiry)
+        target_enquiry = (
 
-        .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+            db.query(Enquiry)
 
-        .order_by(Enquiry.id.desc())
+            .filter(Enquiry.id == payload.enquiry_id)
 
-        .first()
+            .first()
 
-    )
+        )
+
+    else:
+
+        # Fallback when the caller doesn't know its enquiry_id (e.g. the
+        # standalone Ops Selector page opened without workspace context).
+        # Ambiguous when historical duplicate rows share a sales_survey_id
+        # (pre-dates the consolidated-enquiry fix).
+        target_enquiry = (
+
+            db.query(Enquiry)
+
+            .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+
+            .order_by(Enquiry.id.desc())
+
+            .first()
+
+        )
 
     if target_enquiry:
 
@@ -351,7 +369,7 @@ def create_ops_selection_request(
 
         )
 
-        update_stage(
+        advance_stage_at_least(
 
             db,
 

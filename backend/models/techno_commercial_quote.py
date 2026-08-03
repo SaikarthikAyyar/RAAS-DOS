@@ -359,6 +359,8 @@ class Quote(Base):
         String(20)
     )
 
+    final_approved_value = Column(Float)
+
 
 
 
