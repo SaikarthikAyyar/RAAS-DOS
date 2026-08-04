@@ -37,6 +37,8 @@ import EnquiryWorkspace from "./pages/EnquiryWorkspace";
 
 import QuotesModule from "./pages/QuotesModule";
 
+import BusinessMastersModule from "./pages/BusinessMastersModule";
+
 import Analytics from "./pages/Analytics";
 
 
@@ -88,6 +90,8 @@ function App() {
           <Route path="quote" element={<TechnoCommercialQuote />} />
 
           <Route path="quotes" element={<QuotesModule />} />
+
+          <Route path="business-master" element={<BusinessMastersModule />} />
 
           <Route
               path="approval"

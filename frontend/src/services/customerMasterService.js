@@ -1,0 +1,194 @@
+// ====================================
+// API
+// ====================================
+
+const API = import.meta.env.VITE_API_URL;
+
+
+// ====================================
+// LIST CUSTOMERS
+// ====================================
+
+export async function getCustomers(){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers`
+
+    );
+
+    return response.json();
+
+}
+
+
+// ====================================
+// LIST A CUSTOMER'S ASSETS
+// For the "Existing asset" dropdown on Customer Request.
+// ====================================
+
+export async function getCustomerAssets(
+
+    customerId
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers/${customerId}/assets`
+
+    );
+
+    return response.json();
+
+}
+
+
+// ====================================
+// CREATE CUSTOMER
+// ====================================
+
+export async function createCustomer(
+
+    payload
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers`,
+
+        {
+
+            method:"POST",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify(payload)
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// CUSTOMER DETAIL (360)
+// ====================================
+
+export async function getCustomerDetail(
+
+    customerId
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers/${customerId}`
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// ADD CONTACT
+// ====================================
+
+export async function addContact(
+
+    customerId,
+
+    payload
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers/${customerId}/contacts`,
+
+        {
+
+            method:"POST",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify(payload)
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// SET / UPDATE NEXT FOLLOW-UP
+// ====================================
+
+export async function setFollowUp(
+
+    customerId,
+
+    payload
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers/${customerId}/follow-up`,
+
+        {
+
+            method:"PUT",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify(payload)
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}

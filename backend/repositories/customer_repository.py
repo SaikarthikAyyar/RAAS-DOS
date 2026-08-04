@@ -129,6 +129,8 @@ def create_customer(
 
         cleaning_frequency=payload.cleaning_frequency,
 
+        nature_of_job=payload.nature_of_job,
+
 
         status=
 

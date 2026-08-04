@@ -224,6 +224,11 @@ class CustomerRequest(Base):
         nullable=True
     )
 
+    nature_of_job = Column(
+        String(50),
+        nullable=True
+    )
+
 
     # ====================================
     # MEDIA COUNTS

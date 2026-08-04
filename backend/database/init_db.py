@@ -40,6 +40,9 @@ from backend.models.execution import Execution
 
 from backend.models.partners import Partner
 
+from backend.models.customer_master import Customer, CustomerContact
+from backend.models.asset import Asset
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel

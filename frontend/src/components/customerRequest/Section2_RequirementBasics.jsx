@@ -29,6 +29,8 @@ const requirement=
 
 customerData.requirement || {};
 
+const hasExistingAsset = Boolean(customerData.customer?.existing_asset_id);
+
 
 return(
 
@@ -133,6 +135,8 @@ updateSection={updateSection}
 
 label="Approx. length / diameter"
 
+type="number"
+
 value={requirement.approx_length_dia}
 
 section="requirement"
@@ -148,6 +152,8 @@ updateSection={updateSection}
 
 label="Approx. width"
 
+type="number"
+
 value={requirement.approx_width}
 
 section="requirement"
@@ -162,6 +168,8 @@ updateSection={updateSection}
 <FieldInput
 
 label="Approx. sludge depth"
+
+type="number"
 
 value={requirement.approx_depth}
 
@@ -258,6 +266,12 @@ updateSection={updateSection}
 
 />
 
+{
+
+!hasExistingAsset && (
+
+<>
+
 <FieldInput
 
 label="Asset Name"
@@ -287,6 +301,12 @@ options={assetTypeOptions}
 updateSection={updateSection}
 
 />
+
+</>
+
+)
+
+}
 
 <FieldInput
 

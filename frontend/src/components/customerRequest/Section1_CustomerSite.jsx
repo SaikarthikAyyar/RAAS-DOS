@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import {
 
 nearestHubs,
@@ -10,24 +12,98 @@ leadSourceOptions
 
 from "../../data/salesSurveyOptions";
 
+import {
+
+natureOfJobOptions
+
+}
+
+from "../../data/customerMasterOptions";
+
+import {
+
+getCustomers,
+
+getCustomerAssets
+
+}
+
+from "../../services/customerMasterService";
+
+
+// ====================================
+// COMPONENT
+// Company field matches the wireframe's openNewEnquiryModal():
+// datalist-backed input (existing customer autocomplete, or type a
+// new one), an "Existing asset" dropdown scoped to whichever
+// customer resolves, driving whether NewSiteFields shows below.
+// ====================================
 
 export default function Section1_CustomerSite({
 
 customerData,
 
-updateSection,
-
-checkExistingCustomer,
-
-duplicateCustomer,
-
-checking
+updateSection
 
 }){
 
 const customer=
 
 customerData.customer || {};
+
+const [allCustomers, setAllCustomers] = useState([]);
+
+const [assetOptions, setAssetOptions] = useState([]);
+
+useEffect(()=>{
+
+    getCustomers()
+
+        .then(response=>setAllCustomers(response.items || []))
+
+        .catch(err=>console.error(err));
+
+}, []);
+
+useEffect(()=>{
+
+    if(!customer.customer_id){
+
+        setAssetOptions([]);
+
+        return;
+
+    }
+
+    getCustomerAssets(customer.customer_id)
+
+        .then(response=>setAssetOptions(response.items || []))
+
+        .catch(err=>console.error(err));
+
+}, [customer.customer_id]);
+
+function handleCompanyNameChange(value){
+
+    updateSection("customer", "company_name", value);
+
+    const match = allCustomers.find(
+
+        c=>c.company_name.toLowerCase()===value.trim().toLowerCase()
+
+    );
+
+    updateSection("customer", "customer_id", match ? match.id : null);
+
+    updateSection("customer", "existing_asset_id", null);
+
+}
+
+function handleAssetChange(value){
+
+    updateSection("customer", "existing_asset_id", value ? Number(value) : null);
+
+}
 
 
 return(
@@ -55,25 +131,35 @@ Required
 <div className="survey-grid">
 
 
-<FieldInput
+<div className="survey-field">
 
-label="*Company Name"
+<label>
 
-value={customer.company_name}
+*Company Name
 
-section="customer"
+</label>
 
-field="company_name"
+<input
 
-updateSection={updateSection}
+    value={customer.company_name || ""}
 
-checkExistingCustomer={checkExistingCustomer}
+    list="crCustomerList"
 
-duplicateCustomer={duplicateCustomer}
-
-checking={checking}
+    onChange={e=>handleCompanyNameChange(e.target.value)}
 
 />
+
+<datalist id="crCustomerList">
+
+    {allCustomers.map(c=>(
+
+        <option key={c.id} value={c.company_name} />
+
+    ))}
+
+</datalist>
+
+</div>
 
 
 <FieldInput
@@ -154,6 +240,22 @@ updateSection={updateSection}
 
 />
 
+<FieldSelect
+
+label="*Nature of Job"
+
+value={customer.nature_of_job}
+
+section="customer"
+
+field="nature_of_job"
+
+options={natureOfJobOptions}
+
+updateSection={updateSection}
+
+/>
+
 <FieldInput
 label="Client Contact Email"
 value={customer.client_contact_email}
@@ -162,29 +264,50 @@ field="client_contact_email"
 updateSection={updateSection}
 />
 
-<FieldInput
-label="Division"
-value={customer.division}
-section="customer"
-field="division"
-updateSection={updateSection}
-/>
+<div className="survey-field">
 
-<FieldInput
-label="Department"
-value={customer.department}
-section="customer"
-field="department"
-updateSection={updateSection}
-/>
+<label>
+
+Existing asset (optional)
+
+</label>
+
+<select
+
+    value={customer.existing_asset_id || ""}
+
+    disabled={!customer.customer_id}
+
+    onChange={e=>handleAssetChange(e.target.value)}
+
+>
+
+    <option value="">— New site, no existing asset —</option>
+
+    {assetOptions.map(a=>(
+
+        <option key={a.id} value={a.id}>{a.label}</option>
+
+    ))}
+
+</select>
+
+</div>
 
 <FieldSelect
+
 label="Lead Source"
+
 value={customer.lead_source}
+
 section="customer"
+
 field="lead_source"
+
 options={leadSourceOptions}
+
 updateSection={updateSection}
+
 />
 
 </div>
@@ -210,17 +333,9 @@ section,
 
 field,
 
-updateSection,
-
-checkExistingCustomer,
-
-duplicateCustomer,
-
-checking
+updateSection
 
 }){
-
-const isCompanyField = field==="company_name";
 
 return(
 
@@ -236,7 +351,7 @@ return(
 
 value={value || ""}
 
-onChange={(e)=>{
+onChange={(e)=>
 
 updateSection(
 
@@ -246,116 +361,15 @@ field,
 
 e.target.value
 
-);
+)
 
-if (
-    isCompanyField &&
-    checkExistingCustomer
-){
-    checkExistingCustomer(
-        e.target.value
-    );
 }
-
-}}
 
 />
 
-{
-
-isCompanyField && checking && (
-
-<div
-
-style={{
-
-fontSize:"12px",
-
-color:"#666",
-
-marginTop:"5px"
-
-}}
-
->
-
-Checking customer...
-
 </div>
 
 )
-
-}
-
-{
-
-isCompanyField && duplicateCustomer && (
-
-<div
-
-style={{
-
-marginTop:"8px",
-
-padding:"10px",
-
-background:"#fff4e5",
-
-border:"1px solid #ff9800",
-
-borderRadius:"6px",
-
-fontSize:"13px"
-
-}}
-
->
-
-<div>
-
-<strong>
-
-Customer already exists
-
-</strong>
-
-</div>
-
-<div>
-
-Request ID :
-
-{" "}
-
-{duplicateCustomer.customer_request_id}
-
-</div>
-
-<div>
-
-Status :
-
-{" "}
-
-{duplicateCustomer.status}
-
-</div>
-
-<div>
-
-Submission is disabled until this request is completed.
-
-</div>
-
-</div>
-
-)
-
-}
-
-</div>
-
-);
 
 }
 
@@ -447,3 +461,4 @@ value={item}
 )
 
 }
+

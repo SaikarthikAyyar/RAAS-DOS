@@ -34,6 +34,8 @@ from backend.api.auth_api import (
 
 from backend.api.enquiry_consolidated_api import router as enquiry_consolidated_router
 
+from backend.api.customer_master_api import router as customer_master_router
+
 from backend.api.administrationRoles_api import api as administration_roles_api
 
 from backend.api.administrationUsers_api import api as administrationUsers_api
@@ -242,6 +244,10 @@ app.include_router(
 
 app.include_router(
     enquiry_consolidated_router
+)
+
+app.include_router(
+    customer_master_router
 )
 
 print("\n========== ROUTES ==========")

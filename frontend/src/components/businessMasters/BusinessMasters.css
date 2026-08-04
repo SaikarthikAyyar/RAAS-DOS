@@ -1,0 +1,389 @@
+/* ====================================
+   BUSINESS MASTERS
+   Visual language ported from the RAAS DOS HTML wireframe
+   (RAAS_DOS_Final_Demo.html) — renderMasters()/mastersCustomers()/
+   customerDetail(). Same base scale as EnquiryWorkspace.css /
+   SurveySummary.css so headings and body text stay consistent
+   across modules. Matches the wireframe's .title/.tabs/.card/.btn/
+   .fieldRow/.grid.cols2 structure and sizing as closely as this
+   codebase's CSS conventions allow — see the "perfect match" note
+   in feedback_wireframe_fidelity memory before changing this file.
+==================================== */
+
+.bm-module{
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
+
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+    max-width:1520px;
+    margin:0 auto;
+    font-family:Inter,"Segoe UI",Arial,sans-serif;
+    color:var(--ink);
+    font-size:14px;
+}
+
+
+/* ====================================
+   TITLE (matches wireframe .title)
+==================================== */
+
+.bm-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+}
+
+.bm-title h1{
+    font-size:21px;
+    margin:0;
+    font-weight:800;
+}
+
+.bm-title p{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:13px;
+}
+
+
+/* ====================================
+   TABS (matches wireframe .tabs)
+==================================== */
+
+.bm-tabs{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin:0 0 14px;
+}
+
+.bm-tabs button{
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:999px;
+    padding:6px 12px;
+    font-weight:800;
+    cursor:pointer;
+    font-size:12px;
+    color:#374151;
+}
+
+.bm-tabs button.active{
+    background:var(--deep);
+    color:#fff;
+    border-color:var(--deep);
+}
+
+
+/* ====================================
+   CARD (matches wireframe .card / .card h3 / .card h4)
+==================================== */
+
+.bm-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+    overflow-x:auto;
+}
+
+.bm-card h3{
+    margin:0 0 12px;
+    font-size:14.5px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    color:#111827;
+}
+
+.bm-card h4{
+    margin:14px 0 8px;
+    font-size:12px;
+    font-weight:800;
+    color:#374151;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+/* Pushes a button/pill to the far right of a .card h3/h4 row,
+   matching the wireframe's inline "style=margin-left:auto" trick. */
+.bm-push-right{
+    margin-left:auto;
+}
+
+
+/* ====================================
+   FIELD ROW (matches wireframe .fieldRow)
+==================================== */
+
+.bm-field-row{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:12.5px;
+    gap:10px;
+}
+
+.bm-field-row:last-of-type{
+    border-bottom:none;
+}
+
+.bm-field-row span:first-child{
+    color:#374151;
+}
+
+.bm-field-row b{
+    text-align:right;
+    color:#111827;
+    font-weight:800;
+}
+
+.bm-muted{
+    color:var(--muted);
+    font-size:12.5px;
+}
+
+
+/* ====================================
+   TABLE (matches wireframe plain table styling)
+==================================== */
+
+.bm-card table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    font-size:12.5px;
+}
+
+.bm-card th,
+.bm-card td{
+    text-align:left;
+    border-bottom:1px solid var(--line);
+    padding:8px 9px;
+    vertical-align:top;
+}
+
+.bm-card th{
+    color:#475569;
+    background:#f8fafc;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-weight:800;
+}
+
+.bm-card tr:hover td{
+    background:#fffaf3;
+}
+
+
+/* ====================================
+   PILLS (matches wireframe .pill/.pill.red/.amber/.gray)
+==================================== */
+
+.bm-pill{
+    display:inline-flex;
+    align-items:center;
+    border-radius:999px;
+    padding:3px 10px;
+    font-size:11px;
+    font-weight:800;
+    border:1px solid var(--line);
+    background:#fff;
+    white-space:nowrap;
+}
+
+.bm-pill-red{
+    color:#991b1b;
+    background:#fee2e2;
+    border-color:#fecaca;
+}
+
+.bm-pill-amber{
+    color:#92400e;
+    background:#fef3c7;
+    border-color:#fde68a;
+}
+
+.bm-pill-gray{
+    color:#475569;
+    background:#f1f5f9;
+}
+
+
+/* ====================================
+   BUTTONS (matches wireframe .btn/.btn.primary/.btn.ok/
+   .btn.danger/.btn.xs/.btn.ghost)
+==================================== */
+
+.bm-btn{
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:9px;
+    padding:7px 12px;
+    cursor:pointer;
+    font-weight:750;
+    font-size:12px;
+    color:#374151;
+}
+
+.bm-btn:hover{
+    opacity:.85;
+}
+
+.bm-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.bm-btn-primary{
+    background:var(--orange);
+    border-color:var(--orange);
+    color:#fff;
+}
+
+.bm-btn-ghost{
+    background:#fff;
+}
+
+.bm-btn-xs{
+    padding:4px 8px;
+    font-size:11px;
+}
+
+.bm-backlink{
+    font-size:12px;
+    font-weight:800;
+    color:var(--orange);
+    cursor:pointer;
+    background:none;
+    border:none;
+    padding:0;
+}
+
+
+/* ====================================
+   360 DETAIL VIEW (matches wireframe
+   <div class="grid cols2"> — 1.3fr / .7fr, not an even split)
+==================================== */
+
+.bm-detail-grid{
+    display:grid;
+    grid-template-columns:1.3fr .7fr;
+    gap:14px;
+    margin-top:10px;
+}
+
+@media (max-width:1000px){
+    .bm-detail-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+
+/* ====================================
+   MODAL
+==================================== */
+
+.bm-modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:200;
+    padding:20px;
+}
+
+.bm-modal-box{
+    background:#fff;
+    border-radius:14px;
+    padding:20px;
+    width:100%;
+    max-width:460px;
+    max-height:85vh;
+    overflow-y:auto;
+    box-shadow:0 20px 45px rgba(0,0,0,.25);
+}
+
+.bm-modal-box h3{
+    margin:0 0 4px;
+    font-size:14.5px;
+    font-weight:800;
+}
+
+.bm-modal-hint{
+    margin:0 0 14px;
+    font-size:12px;
+    color:var(--muted);
+}
+
+.bm-formgrid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:10px;
+}
+
+.bm-formgrid.single{
+    grid-template-columns:1fr;
+}
+
+.bm-formgrid label{
+    font-size:11px;
+    color:#475569;
+    font-weight:800;
+    display:block;
+    margin-bottom:4px;
+}
+
+.bm-formgrid input,
+.bm-formgrid select,
+.bm-formgrid textarea{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:7px 8px;
+    background:#fff;
+    font:inherit;
+    font-size:12.5px;
+}
+
+.bm-formgrid textarea{
+    resize:vertical;
+    min-height:70px;
+}
+
+.bm-modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:16px;
+}
+
+
+/* ====================================
+   PLACEHOLDER TABS (not built yet)
+==================================== */
+
+.bm-placeholder{
+    color:var(--muted);
+    font-size:12.5px;
+}

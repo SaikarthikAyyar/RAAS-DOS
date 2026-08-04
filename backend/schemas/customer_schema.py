@@ -65,6 +65,20 @@ class CustomerRequestSchema(BaseModel):
 
     asset_type: Optional[str] = None
 
+    nature_of_job: str
+
+    # ====================================
+    # BUSINESS MASTER LINKAGE
+    # Set when the frontend resolved an existing Customer/Asset via
+    # the datalist/dropdown - matches submitNewEnquiry()'s customer
+    # and existing-asset picks. Left null for a brand new
+    # customer/asset, which gets auto-created server-side.
+    # ====================================
+
+    customer_id: Optional[int] = None
+
+    asset_id: Optional[int] = None
+
 
     # ====================================
     # DIMENSIONS

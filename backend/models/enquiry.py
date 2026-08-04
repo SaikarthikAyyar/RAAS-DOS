@@ -66,6 +66,30 @@ class Enquiry(Base):
     )
 
     # ====================================
+    # BUSINESS MASTER LINKAGE
+    # ====================================
+
+    customer_id = Column(
+        Integer,
+        nullable=True
+    )
+
+    asset_id = Column(
+        Integer,
+        nullable=True
+    )
+
+    customer_name = Column(
+        String(150),
+        nullable=True
+    )
+
+    nature = Column(
+        String(50),
+        nullable=True
+    )
+
+    # ====================================
     # ROUTING
     # ====================================
 

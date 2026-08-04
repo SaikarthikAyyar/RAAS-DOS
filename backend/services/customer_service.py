@@ -17,11 +17,20 @@ from backend.models.customer_requests import (
 
 from backend.services.enquiry_service import EnquiryService
 
-from fastapi import HTTPException
+from backend.services.customer_master_service import (
+
+    resolve_or_create_customer,
+
+    resolve_or_create_asset
+
+)
 
 
 # ====================================
 # CREATE CUSTOMER REQUEST
+# No duplicate-active-request guard - matches submitNewEnquiry() in
+# the wireframe, which places no restriction on how many enquiries a
+# customer (or asset) can have open at once.
 # ====================================
 
 status="REQUEST_CREATED"
@@ -34,47 +43,43 @@ def create_customer_request(
 
 ):
 
-    existing = (
-
-        db.query(
-
-            CustomerRequest
-
-        ).filter(
-
-            CustomerRequest.company_name == payload.company_name,
-
-            CustomerRequest.status != "COMPLETED"
-
-        ).first()
-
-    )
-
-    if existing:
-
-        raise HTTPException(
-
-            status_code=409,
-
-            detail={
-
-                "message": "An active Customer Request already exists.",
-
-                "customer_request_id": existing.id,
-
-                "company_name": existing.company_name,
-
-                "status": existing.status
-
-            }
-
-        )
-
     customer_request = create_customer(
 
         db,
 
         payload
+
+    )
+
+    customer = resolve_or_create_customer(
+
+        db,
+
+        payload.customer_id,
+
+        payload.company_name
+
+    )
+
+    asset = resolve_or_create_asset(
+
+        db,
+
+        customer.id,
+
+        payload.asset_id,
+
+        payload.division,
+
+        payload.plant_site_location,
+
+        payload.department,
+
+        payload.asset_name,
+
+        payload.asset_type,
+
+        payload.cleaning_frequency
 
     )
 
@@ -158,7 +163,15 @@ def create_customer_request(
 
         customer_request_id=customer_request.id,
 
-        payload=enquiry_payload
+        payload=enquiry_payload,
+
+        customer_id=customer.id,
+
+        asset_id=asset.id if asset else None,
+
+        customer_name=customer.company_name,
+
+        nature=payload.nature_of_job
 
     )
 

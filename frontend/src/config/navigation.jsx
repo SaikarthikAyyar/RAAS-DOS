@@ -32,7 +32,9 @@ UserCircle,
 
 BarChart3,
 
-FolderOpen
+FolderOpen,
+
+Users
 
 }
 
@@ -50,6 +52,8 @@ admin:[
 {title:"Dashboard",path:"/dashboard",icon:<Home size={18}/>},
 
 {title:"Administration",path:"/administration",icon:<ShieldCheck size={18}/>},
+
+{title:"Business Masters",path:"/business-master",icon:<Users size={18}/>},
 
 {title:"Enquiries",path:"/enquiry",icon:<FolderOpen size={18}/>},
 
@@ -94,6 +98,8 @@ customer:[
 sales:[
 
 {title:"Dashboard",path:"/dashboard",icon:<Home size={18}/>},
+
+{title:"Business Masters",path:"/business-master",icon:<Users size={18}/>},
 
 {title:"Sales Survey",path:"/sales-survey",icon:<ClipboardCheck size={18}/>},
 

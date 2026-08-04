@@ -1,0 +1,515 @@
+import {
+
+    useState,
+
+    useEffect,
+
+    useCallback
+
+} from "react";
+
+import "../components/businessMasters/BusinessMasters.css";
+
+import { businessMastersTabs } from "../data/businessMastersTabs";
+
+import CustomerListView from "../components/businessMasters/customers/CustomerListView";
+import CustomerDetailView from "../components/businessMasters/customers/CustomerDetailView";
+import NewCustomerModal from "../components/businessMasters/customers/NewCustomerModal";
+import AddContactModal from "../components/businessMasters/customers/AddContactModal";
+import SetFollowUpModal from "../components/businessMasters/customers/SetFollowUpModal";
+import SendReminderModal from "../components/businessMasters/customers/SendReminderModal";
+
+import {
+
+    getCustomers,
+
+    createCustomer,
+
+    getCustomerDetail,
+
+    addContact,
+
+    setFollowUp
+
+} from "../services/customerMasterService";
+
+
+// ====================================
+// CUSTOMERS TAB
+// Holds its own selectedCustomerId (list <-> 360) exactly like the
+// wireframe's mastersCustomers()/customerDetail() toggle.
+// ====================================
+
+function CustomersTab({
+
+    customers,
+
+    loading,
+
+    error,
+
+    onReload
+
+}){
+
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+
+    const [detail, setDetail] = useState(null);
+
+    const [detailLoading, setDetailLoading] = useState(false);
+
+    const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
+
+    const [showAddContactModal, setShowAddContactModal] = useState(false);
+
+    const [showFollowUpModal, setShowFollowUpModal] = useState(false);
+
+    const [showReminderModal, setShowReminderModal] = useState(false);
+
+    const loadDetail = useCallback(async(id)=>{
+
+        setDetailLoading(true);
+
+        try{
+
+            const data = await getCustomerDetail(id);
+
+            setDetail(data);
+
+        }
+
+        catch(err){
+
+            console.error(err);
+
+        }
+
+        finally{
+
+            setDetailLoading(false);
+
+        }
+
+    }, []);
+
+    useEffect(()=>{
+
+        if(selectedCustomerId){
+
+            loadDetail(selectedCustomerId);
+
+        }
+
+    }, [selectedCustomerId, loadDetail]);
+
+    function handleOpenDetail(id){
+
+        setDetail(null);
+
+        setSelectedCustomerId(id);
+
+    }
+
+    function handleBack(){
+
+        setSelectedCustomerId(null);
+
+        setDetail(null);
+
+    }
+
+    async function handleCreateCustomer(payload){
+
+        await createCustomer(payload);
+
+        setShowNewCustomerModal(false);
+
+        onReload();
+
+    }
+
+    async function handleAddContact(payload){
+
+        await addContact(selectedCustomerId, payload);
+
+        setShowAddContactModal(false);
+
+        loadDetail(selectedCustomerId);
+
+    }
+
+    async function handleSetFollowUp(payload){
+
+        await setFollowUp(selectedCustomerId, payload);
+
+        setShowFollowUpModal(false);
+
+        loadDetail(selectedCustomerId);
+
+        onReload();
+
+    }
+
+    return(
+
+        <>
+
+            {
+
+                selectedCustomerId ? (
+
+                    <CustomerDetailView
+
+                        detail={detail}
+
+                        loading={detailLoading}
+
+                        onBack={handleBack}
+
+                        onAddContact={()=>setShowAddContactModal(true)}
+
+                        onSetFollowUp={()=>setShowFollowUpModal(true)}
+
+                        onSendReminder={()=>setShowReminderModal(true)}
+
+                    />
+
+                ) : (
+
+                    <CustomerListView
+
+                        customers={customers}
+
+                        loading={loading}
+
+                        error={error}
+
+                        onOpenDetail={handleOpenDetail}
+
+                        onNewCustomer={()=>setShowNewCustomerModal(true)}
+
+                    />
+
+                )
+
+            }
+
+            {
+
+                showNewCustomerModal && (
+
+                    <NewCustomerModal
+
+                        onClose={()=>setShowNewCustomerModal(false)}
+
+                        onCreate={handleCreateCustomer}
+
+                    />
+
+                )
+
+            }
+
+            {
+
+                showAddContactModal && (
+
+                    <AddContactModal
+
+                        onClose={()=>setShowAddContactModal(false)}
+
+                        onAdd={handleAddContact}
+
+                    />
+
+                )
+
+            }
+
+            {
+
+                showFollowUpModal && (
+
+                    <SetFollowUpModal
+
+                        initialDate={detail?.next_follow_up_date}
+
+                        initialOwner={detail?.next_follow_up_owner}
+
+                        initialNote={detail?.next_follow_up_note}
+
+                        onClose={()=>setShowFollowUpModal(false)}
+
+                        onSave={handleSetFollowUp}
+
+                    />
+
+                )
+
+            }
+
+            {
+
+                showReminderModal && detail && (
+
+                    <SendReminderModal
+
+                        detail={detail}
+
+                        onClose={()=>setShowReminderModal(false)}
+
+                        onSent={()=>{
+
+                            setShowReminderModal(false);
+
+                            alert(`Reminder email sent regarding ${detail.company_name}.`);
+
+                        }}
+
+                    />
+
+                )
+
+            }
+
+        </>
+
+    );
+
+}
+
+
+// ====================================
+// PLACEHOLDER TAB
+// Honest "not built yet" - same pattern used for unbuilt Enquiry
+// Workspace tabs (PO / Job Created / Execution / Audit Trail).
+// ====================================
+
+function PlaceholderTab({ label }){
+
+    return(
+
+        <div className="bm-card">
+
+            <h3>{label}</h3>
+
+            <p className="bm-placeholder">Not built yet.</p>
+
+        </div>
+
+    );
+
+}
+
+
+// ====================================
+// CSV EXPORT (client-side, matches wireframe's exportCSV())
+// ====================================
+
+function downloadCSV(filename, headers, rows){
+
+    const escapeCell = value=>{
+
+        const text = value===null || value===undefined ? "" : String(value);
+
+        return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+
+    };
+
+    const csv = [
+
+        headers.map(escapeCell).join(","),
+
+        ...rows.map(row=>row.map(escapeCell).join(","))
+
+    ].join("\n");
+
+    const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download = filename;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+// ====================================
+// PAGE
+// Matches renderMasters(): .title + .tabs + tab body.
+// ====================================
+
+export default function BusinessMastersModule(){
+
+    const [activeTab, setActiveTab] = useState("customers");
+
+    const [customers, setCustomers] = useState([]);
+
+    const [customersLoading, setCustomersLoading] = useState(true);
+
+    const [customersError, setCustomersError] = useState("");
+
+    const loadCustomers = useCallback(async()=>{
+
+        setCustomersLoading(true);
+
+        setCustomersError("");
+
+        try{
+
+            const response = await getCustomers();
+
+            setCustomers(response.items ?? []);
+
+        }
+
+        catch(err){
+
+            console.error(err);
+
+            setCustomersError("Unable to load customers.");
+
+        }
+
+        finally{
+
+            setCustomersLoading(false);
+
+        }
+
+    }, []);
+
+    useEffect(()=>{
+
+        loadCustomers();
+
+    }, [loadCustomers]);
+
+    function handleExportCurrentTab(){
+
+        if(activeTab==="customers"){
+
+            downloadCSV(
+
+                "Customers.csv",
+
+                ["Company","Category","Owner"],
+
+                customers.map(c=>[c.company_name, c.category, c.owner])
+
+            );
+
+            return;
+
+        }
+
+        downloadCSV(
+
+            "Export.csv",
+
+            ["Note"],
+
+            [["Use the tab-specific export for full detail."]]
+
+        );
+
+    }
+
+    return(
+
+        <div className="bm-module">
+
+            <div className="bm-title">
+
+                <div>
+
+                    <h1>Business masters</h1>
+
+                    <p>Every dropdown option in the system lives in Lookup Lists — nothing hardcoded inline.</p>
+
+                </div>
+
+                <button
+
+                    className="bm-btn bm-btn-ghost"
+
+                    onClick={handleExportCurrentTab}
+
+                >
+
+                    ⬇ Export current tab
+
+                </button>
+
+            </div>
+
+            <div className="bm-tabs">
+
+                {
+
+                    businessMastersTabs.map(([key, label])=>(
+
+                        <button
+
+                            key={key}
+
+                            className={activeTab===key ? "active" : ""}
+
+                            onClick={()=>setActiveTab(key)}
+
+                        >
+
+                            {label}
+
+                        </button>
+
+                    ))
+
+                }
+
+            </div>
+
+            {
+
+                activeTab==="customers" ? (
+
+                    <CustomersTab
+
+                        customers={customers}
+
+                        loading={customersLoading}
+
+                        error={customersError}
+
+                        onReload={loadCustomers}
+
+                    />
+
+                ) : (
+
+                    <PlaceholderTab
+
+                        label={businessMastersTabs.find(([key])=>key===activeTab)?.[1]}
+
+                    />
+
+                )
+
+            }
+
+        </div>
+
+    );
+
+}

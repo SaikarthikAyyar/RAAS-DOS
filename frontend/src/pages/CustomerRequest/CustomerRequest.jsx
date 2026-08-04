@@ -25,6 +25,9 @@ import {
 import Section1_CustomerSite
 from "../../components/customerRequest/Section1_CustomerSite";
 
+import NewSiteFields
+from "../../components/customerRequest/NewSiteFields";
+
 import Section2_RequirementBasics
 from "../../components/customerRequest/Section2_RequirementBasics";
 
@@ -119,6 +122,18 @@ async function submit(){
       const uploads =
         customerData.uploads || {};
 
+      if(!customer.company_name){
+        alert("Company Name is required.");
+        return;
+      }
+
+      if(!customer.nature_of_job){
+        alert("Nature of Job is required.");
+        return;
+      }
+
+      const hasExistingAsset = Boolean(customer.existing_asset_id);
+
       const payload = {
 
           company_name: customer.company_name,
@@ -127,13 +142,18 @@ async function submit(){
           contact_number: customer.contact_number,
           nearest_city_hub: customer.nearest_city_hub,
           urgency: customer.urgency,
+          nature_of_job: customer.nature_of_job,
           client_contact_email: customer.client_contact_email,
           lead_source: customer.lead_source,
-          division: customer.division,
-          department: customer.department,
 
-          asset_name: requirement.asset_name,
-          asset_type: requirement.asset_type,
+          customer_id: customer.customer_id || null,
+          asset_id: customer.existing_asset_id || null,
+
+          division: hasExistingAsset ? null : customer.division,
+          department: hasExistingAsset ? null : customer.department,
+
+          asset_name: hasExistingAsset ? null : requirement.asset_name,
+          asset_type: hasExistingAsset ? null : requirement.asset_type,
           estimated_volume: Number(requirement.estimated_volume) || null,
 
           service_requirement_type: requirement.service_requirement_type,
@@ -235,6 +255,22 @@ customerData={customerData}
 updateSection={updateSection}
 
 />
+
+      {
+
+        !customerData.customer?.existing_asset_id && (
+
+          <NewSiteFields
+
+            customerData={customerData}
+
+            updateSection={updateSection}
+
+          />
+
+        )
+
+      }
 
       <Section2_RequirementBasics
         customerData={customerData}

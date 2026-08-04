@@ -9,7 +9,11 @@ class EnquiryService:
     def create_customer_request_enquiry(
         db,
         customer_request_id,
-        payload
+        payload,
+        customer_id=None,
+        asset_id=None,
+        customer_name=None,
+        nature=None
     ):
 
         enquiry = Enquiry(
@@ -29,6 +33,14 @@ class EnquiryService:
             job_creation_id=None,
 
             execution_id=None,
+
+            customer_id=customer_id,
+
+            asset_id=asset_id,
+
+            customer_name=customer_name,
+
+            nature=nature,
 
             sender_role="CUSTOMER",
 
