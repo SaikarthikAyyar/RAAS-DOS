@@ -25,9 +25,6 @@ import {
 import Section1_CustomerSite
 from "../../components/customerRequest/Section1_CustomerSite";
 
-import NewSiteFields
-from "../../components/customerRequest/NewSiteFields";
-
 import Section2_RequirementBasics
 from "../../components/customerRequest/Section2_RequirementBasics";
 
@@ -158,12 +155,6 @@ async function submit(){
 
           service_requirement_type: requirement.service_requirement_type,
           observed_material: requirement.observed_material,
-          estimated_quantity_known: requirement.estimated_quantity_known,
-          tank_type: requirement.tank_type,
-
-          approx_length_dia: Number(requirement.approx_length_dia) || null,
-          approx_width: Number(requirement.approx_width) || null,
-          approx_depth: Number(requirement.approx_depth) || null,
 
           access_opening_type: requirement.access_opening_type,
           can_place_equipment_nearby:
@@ -255,22 +246,6 @@ customerData={customerData}
 updateSection={updateSection}
 
 />
-
-      {
-
-        !customerData.customer?.existing_asset_id && (
-
-          <NewSiteFields
-
-            customerData={customerData}
-
-            updateSection={updateSection}
-
-          />
-
-        )
-
-      }
 
       <Section2_RequirementBasics
         customerData={customerData}

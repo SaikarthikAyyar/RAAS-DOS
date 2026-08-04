@@ -6,7 +6,9 @@ nearestHubs,
 
 urgencyOptions,
 
-leadSourceOptions
+leadSourceOptions,
+
+jobTypes
 
 }
 
@@ -50,6 +52,10 @@ updateSection
 const customer=
 
 customerData.customer || {};
+
+const requirement=
+
+customerData.requirement || {};
 
 const [allCustomers, setAllCustomers] = useState([]);
 
@@ -162,15 +168,17 @@ Required
 </div>
 
 
-<FieldInput
+<FieldSelect
 
-label="*Plant / Site Location"
+label="Job Type"
 
-value={customer.plant_site_location}
+value={requirement.service_requirement_type}
 
-section="customer"
+section="requirement"
 
-field="plant_site_location"
+field="service_requirement_type"
+
+options={jobTypes}
 
 updateSection={updateSection}
 
@@ -310,6 +318,22 @@ updateSection={updateSection}
 
 />
 
+<FieldInput
+
+label="Estimated Volume (m³)"
+
+type="number"
+
+value={requirement.estimated_volume}
+
+section="requirement"
+
+field="estimated_volume"
+
+updateSection={updateSection}
+
+/>
+
 </div>
 
 </div>
@@ -328,6 +352,8 @@ function FieldInput({
 label,
 
 value,
+
+type,
 
 section,
 
@@ -348,6 +374,8 @@ return(
 </label>
 
 <input
+
+type={type || "text"}
 
 value={value || ""}
 

@@ -27,21 +27,37 @@ box-sizing:border-box;
 
 /* ===================================
    PAGE
+   Resized to the same scale as EnquiryWorkspace.css /
+   SurveySummary.css / BusinessMasters.css - this file used to run
+   much larger than the rest of the app (52px headings, 64px tall
+   inputs), which is what made Customer Request / Sales Survey look
+   like they belonged to a different product.
 =================================== */
 
 .sales-survey-page{
+
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
 
 width:100%;
 
 min-height:100vh;
 
-padding:20px 40px;
-
-/* GREEN BACKGROUND */
+padding:20px;
 
 background:var(--bg);
 
 overflow-y:auto;
+
+font-family:Inter,"Segoe UI",Arial,sans-serif;
+
+color:var(--ink);
+
+font-size:14px;
 
 }
 
@@ -58,11 +74,15 @@ justify-content:space-between;
 
 align-items:flex-start;
 
-margin-bottom:35px;
+margin-bottom:16px;
 
-padding:10px 10px 30px;
+padding:0;
 
 width:100%;
+
+gap:16px;
+
+flex-wrap:wrap;
 
 }
 
@@ -84,15 +104,17 @@ align-items:flex-start;
 
 .survey-sheet-title{
 
-font-size:18px;
+font-size:11px;
 
 font-weight:800;
 
-letter-spacing:3px;
+letter-spacing:1.5px;
 
 color:var(--orange);
 
-margin-bottom:14px;
+margin-bottom:6px;
+
+text-transform:uppercase;
 
 }
 
@@ -103,26 +125,24 @@ margin-bottom:14px;
 
 .survey-progress-left h1{
 
-font-size:52px;
+font-size:21px;
 
 font-weight:800;
 
-/* FIX TITLE */
-
 color:var(--ink);
 
-line-height:1.05;
+line-height:1.2;
 
-margin:0 0 25px 0;
+margin:0 0 6px 0;
 
 }
 
 
 .survey-progress-left p{
 
-font-size:18px;
+font-size:13px;
 
-line-height:1.7;
+line-height:1.5;
 
 color:var(--muted);
 
@@ -130,7 +150,7 @@ max-width:none;
 
 text-align:left;
 
-margin-top:10px;
+margin-top:0;
 
 }
 
@@ -141,11 +161,11 @@ margin-top:10px;
 
 .survey-completion-card{
 
-width:320px;
+width:auto;
 
-height:80px;
+height:44px;
 
-border-radius:60px;
+border-radius:999px;
 
 border:1px solid var(--line);
 
@@ -159,42 +179,31 @@ align-items:center;
 
 justify-content:space-between;
 
-padding:0 30px;
+padding:0 18px;
 
-font-size:18px;
+gap:10px;
+
+font-size:12.5px;
 
 font-weight:700;
 
-color:var(--ink);;
+color:var(--ink);
 
 flex-shrink:0;
 
-position:fixed;
-
-top: 100px;
-
-right: 30px;
-
-z-index:999;
+position:static;
 
 }
 
 .survey-completion-card span {
 
-font-size: 18px;
+font-size: 12px;
 
 }
 
 .survey-completion-card strong{
 
-font-size:24px;
-
-}
-
-
-.survey-completion-card strong{
-
-font-size:24px;
+font-size:14.5px;
 
 }
 
@@ -211,11 +220,11 @@ background:var(--card);
 
 border:1px solid var(--line);
 
-border-radius:28px;
+border-radius:14px;
 
-padding:28px;
+padding:16px;
 
-margin-bottom:22px;
+margin-bottom:14px;
 
 box-shadow:0 4px 14px rgba(17,24,39,.04);
 
@@ -234,14 +243,18 @@ justify-content:space-between;
 
 align-items:center;
 
-margin-bottom:30px;
+margin-bottom:14px;
+
+flex-wrap:wrap;
+
+gap:8px;
 
 }
 
 
 .survey-header h2{
 
-font-size:24px;
+font-size:14.5px;
 
 font-weight:800;
 
@@ -254,7 +267,7 @@ margin:0;
 
 .survey-header span{
 
-font-size:18px;
+font-size:12px;
 
 color:var(--muted);
 
@@ -273,7 +286,7 @@ display:grid;
 
 grid-template-columns:repeat(3,minmax(0,1fr));
 
-gap:28px;
+gap:14px;
 
 width:100%;
 
@@ -303,21 +316,24 @@ min-width:0;
 
 .survey-field label{
 
-font-size:16px;
+font-size:11px;
 
-font-weight:700;
+font-weight:800;
 
-color:var(--muted);
+color:#475569;
 
-margin-bottom:10px;
+margin-bottom:4px;
 
-text-align:center;
+text-align:left;
 
 }
 
 
 /* ===================================
    INPUTS
+   Permanent visible orange border (not focus-only) - fields were
+   getting lost against the page because the resting border was
+   almost invisible (rgba(255,255,255,.12) on a light background).
 =================================== */
 
 .survey-field input,
@@ -326,17 +342,19 @@ text-align:center;
 
 width:100%;
 
-height:64px;
+height:auto;
 
-border:1px solid rgba(255,255,255,0.12);
+border:1.5px solid var(--orange);
 
-border-radius:22px;
+border-radius:8px;
 
-padding:0 22px;
+padding:7px 10px;
 
-font-size:16px;
+font-size:12.5px;
 
-background:rgba(255,255,255,0.08);
+font-family:inherit;
+
+background:#fff;
 
 color:var(--ink);
 
@@ -366,6 +384,8 @@ opacity:1;
 
 border-color:var(--orange);
 
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
 }
 
 
@@ -385,7 +405,9 @@ cursor:text;
 
 .survey-field input[readonly]{
 
-background:rgba(255,255,255,0.05);
+background:#f8fafc;
+
+border-color:var(--line);
 
 cursor:not-allowed;
 
@@ -401,7 +423,9 @@ cursor:not-allowed;
 
 .survey-field.disabled select {
 
-    background: rgba(255,255,255,0.05);
+    background: #f8fafc;
+
+    border-color:var(--line);
 
     cursor: not-allowed;
 
@@ -414,27 +438,29 @@ cursor:not-allowed;
 
 .media-upload-box{
 
-height:72px;
+height:auto;
 
-border:1px solid rgba(255,255,255,0.12);
+min-height:44px;
 
-border-radius:24px;
+border:1.5px dashed var(--orange);
+
+border-radius:10px;
 
 display:flex;
 
 align-items:center;
 
-padding:0 24px;
+padding:0 14px;
 
-font-size:22px;
+font-size:12.5px;
 
 cursor:pointer;
 
-background:rgba(255,255,255,0.08);
+background:#fff;
 
 transition:0.2s;
 
-color:#ffffff;
+color:var(--ink);
 
 }
 
@@ -442,6 +468,8 @@ color:#ffffff;
 .media-upload-box:hover{
 
 border-color:var(--orange);
+
+background:#fff7ed;
 
 }
 
@@ -456,9 +484,9 @@ display:flex;
 
 justify-content:flex-start;
 
-gap:22px;
+gap:8px;
 
-padding:30px 0 60px;
+padding:16px 0 30px;
 
 flex-wrap:wrap;
 
@@ -467,19 +495,19 @@ flex-wrap:wrap;
 
 .survey-btn{
 
-border:none;
+border:1px solid var(--line);
 
 cursor:pointer;
 
-height:90px;
+height:auto;
 
-padding:0 36px;
+padding:8px 16px;
 
-border-radius:30px;
+border-radius:9px;
 
-font-size:22px;
+font-size:12px;
 
-font-weight:800;
+font-weight:750;
 
 }
 
@@ -487,6 +515,8 @@ font-weight:800;
 .save-btn{
 
 background:var(--orange);
+
+border-color:var(--orange);
 
 color:white;
 
@@ -496,6 +526,8 @@ color:white;
 .ops-btn{
 
 background:var(--deep);
+
+border-color:var(--deep);
 
 color:white;
 
@@ -531,19 +563,15 @@ grid-template-columns:repeat(2,1fr);
 
 flex-direction:column;
 
-gap:30px;
-
-}
-
-.survey-progress-left h1{
-
-font-size:42px;
+gap:12px;
 
 }
 
 .survey-completion-card{
 
 width:100%;
+
+justify-content:center;
 
 }
 
@@ -564,9 +592,9 @@ MEDIA CONTAINER
 
 display:flex;
 
-gap:25px;
+gap:16px;
 
-margin-top:20px;
+margin-top:14px;
 
 align-items:flex-start;
 
@@ -579,15 +607,15 @@ SELECTOR
 
 .media-selector{
 
-width:280px;
+width:220px;
 
 display:flex;
 
 flex-direction:column;
 
-gap:10px;
+gap:6px;
 
-max-height:320px;
+max-height:280px;
 
 overflow-y:auto;
 
@@ -600,9 +628,9 @@ BUTTONS
 
 .media-item{
 
-padding:10px;
+padding:7px 10px;
 
-border:none;
+border:1px solid var(--line);
 
 cursor:pointer;
 
@@ -610,12 +638,20 @@ text-align:left;
 
 border-radius:8px;
 
+font-size:12.5px;
+
+background:#fff;
+
 }
 
 
 .media-item.active{
 
-font-weight:bold;
+font-weight:800;
+
+border-color:var(--orange);
+
+color:var(--orange);
 
 }
 
@@ -634,11 +670,15 @@ justify-content:center;
 
 align-items:center;
 
-height:320px;
+height:260px;
 
-border-radius:12px;
+border-radius:10px;
 
 overflow:hidden;
+
+background:#f8fafc;
+
+border:1px solid var(--line);
 
 }
 
@@ -649,9 +689,9 @@ IMAGE
 
 .preview-image{
 
-max-width:450px;
+max-width:400px;
 
-max-height:280px;
+max-height:240px;
 
 width:auto;
 
@@ -659,7 +699,7 @@ height:auto;
 
 object-fit:contain;
 
-border-radius:10px;
+border-radius:8px;
 
 }
 
@@ -670,11 +710,11 @@ VIDEO
 
 .preview-video{
 
-width:450px;
+width:400px;
 
-height:280px;
+height:240px;
 
-border-radius:10px;
+border-radius:8px;
 
 background:black;
 
@@ -693,35 +733,55 @@ justify-content:center;
 
 align-items:center;
 
-height:320px;
+height:260px;
+
+color:var(--muted);
+
+font-size:12.5px;
 
 }
 
 .customer-select{
 
-    height:42px;
-
-}
-
-.survey-header{
-
-    position:relative;
+    height:auto;
 
 }
 
 .survey-id{
 
-    position:absolute;
+    font-weight:700;
 
-    left:50%;
-
-    transform:translateX(-50%);
-
-    font-weight:600;
-
-    font-size:15px;
+    font-size:11px;
 
     color:var(--muted);
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+}
+
+.survey-id label{
+
+    font-size:11px;
+
+    font-weight:700;
+
+}
+
+.survey-id select{
+
+    height:auto;
+
+    padding:4px 8px;
+
+    font-size:11px;
+
+    border:1.5px solid var(--orange);
+
+    border-radius:6px;
 
 }
 
@@ -731,4 +791,3 @@ height:320px;
     cursor:not-allowed;
 
 }
-

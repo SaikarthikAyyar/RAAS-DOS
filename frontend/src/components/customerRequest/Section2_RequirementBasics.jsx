@@ -1,14 +1,8 @@
 import {
 
-jobTypes,
-
 materialCategories,
 
 accessTypeOptions,
-
-tankTypeOptions,
-
-leadSourceOptions,
 
 assetTypeOptions
 
@@ -16,6 +10,14 @@ assetTypeOptions
 
 from "../../data/salesSurveyOptions";
 
+
+// ====================================
+// COMPONENT
+// Merged "New site" (Division/Department, matches the wireframe's
+// #newSiteFields block minus Plant, which lives here too now via
+// Plant / Site Location) with "Requirement Basics" into one section,
+// per the 2026-08-04 restructure.
+// ====================================
 
 export default function Section2_RequirementBasics({
 
@@ -25,11 +27,15 @@ updateSection
 
 }){
 
+const customer=
+
+customerData.customer || {};
+
 const requirement=
 
 customerData.requirement || {};
 
-const hasExistingAsset = Boolean(customerData.customer?.existing_asset_id);
+const hasExistingAsset = Boolean(customer.existing_asset_id);
 
 
 return(
@@ -41,7 +47,7 @@ return(
 
 <h2>
 
-2. Requirement Basics
+2. New Site & Requirements
 
 </h2>
 
@@ -57,22 +63,71 @@ Customer can answer from observation
 <div className="survey-grid">
 
 
-<FieldSelect
+<FieldInput
 
-label="What needs cleaning?"
+label="*Plant / Site Location"
 
-value={requirement.service_requirement_type}
+value={customer.plant_site_location}
 
-section="requirement"
+section="customer"
 
-field="service_requirement_type"
-
-options={jobTypes}
+field="plant_site_location"
 
 updateSection={updateSection}
 
 />
 
+{
+
+!hasExistingAsset && (
+
+<>
+
+<div className="survey-field">
+
+<label>
+
+Division / Subsidiary
+
+</label>
+
+<input
+
+    value={customer.division || ""}
+
+    placeholder="e.g. Long Products (leave blank for 'Main')"
+
+    onChange={e=>updateSection("customer", "division", e.target.value)}
+
+/>
+
+</div>
+
+<div className="survey-field">
+
+<label>
+
+Department
+
+</label>
+
+<input
+
+    value={customer.department || ""}
+
+    placeholder="e.g. Tin Plant (leave blank for 'General')"
+
+    onChange={e=>updateSection("customer", "department", e.target.value)}
+
+/>
+
+</div>
+
+</>
+
+)
+
+}
 
 <FieldSelect
 
@@ -85,97 +140,6 @@ section="requirement"
 field="observed_material"
 
 options={materialCategories}
-
-updateSection={updateSection}
-
-/>
-
-
-<FieldSelect
-
-label="Estimated quantity known?"
-
-value={requirement.estimated_quantity_known}
-
-section="requirement"
-
-field="estimated_quantity_known"
-
-options={[
-
-"Yes, approximate",
-
-"No"
-
-]}
-
-updateSection={updateSection}
-
-/>
-
-
-<FieldSelect
-
-label="Tank Type"
-
-value={requirement.tank_type}
-
-section="requirement"
-
-field="tank_type"
-
-options={tankTypeOptions}
-
-updateSection={updateSection}
-
-/>
-
-
-<FieldInput
-
-label="Approx. length / diameter"
-
-type="number"
-
-value={requirement.approx_length_dia}
-
-section="requirement"
-
-field="approx_length_dia"
-
-updateSection={updateSection}
-
-/>
-
-
-<FieldInput
-
-label="Approx. width"
-
-type="number"
-
-value={requirement.approx_width}
-
-section="requirement"
-
-field="approx_width"
-
-updateSection={updateSection}
-
-/>
-
-
-<FieldInput
-
-label="Approx. sludge depth"
-
-type="number"
-
-value={requirement.approx_depth}
-
-section="requirement"
-
-field="approx_depth"
 
 updateSection={updateSection}
 
@@ -250,22 +214,6 @@ updateSection={updateSection}
     updateSection={updateSection}
 />
 
-<FieldSelect
-
-label="Lead Source"
-
-value={requirement.lead_source}
-
-section="requirement"
-
-field="lead_source"
-
-options={leadSourceOptions}
-
-updateSection={updateSection}
-
-/>
-
 {
 
 !hasExistingAsset && (
@@ -307,23 +255,6 @@ updateSection={updateSection}
 )
 
 }
-
-<FieldInput
-
-label="Estimated Volume (m³)"
-
-type="number"
-
-value={requirement.estimated_volume}
-
-section="requirement"
-
-field="estimated_volume"
-
-updateSection={updateSection}
-
-/>
-
 
 <div
 
