@@ -2,6 +2,8 @@
 // WORKFLOW TABS
 // ====================================
 
+import { useAuth } from "../../../contexts/AuthContext";
+
 // Order and labels match the RAAS DOS wireframe's TABS array
 // exactly (opsReviewTab()'s [id].js source).
 const WORKFLOW_TABS = [
@@ -66,13 +68,24 @@ export default function WorkflowTabs({
 
 }){
 
+    const { permissions } = useAuth();
+
+    // Falls back to "all tabs" when permissions haven't loaded yet
+    // (e.g. still fetching right after login) - avoids a flash of an
+    // empty tab bar for roles that have full access anyway.
+    const allowedTabs = permissions?.workspaceTabs?.length
+        ? WORKFLOW_TABS.filter(
+            tab=>permissions.workspaceTabs.includes(`enquiry-tab-${tab.id}`)
+        )
+        : WORKFLOW_TABS;
+
     return(
 
         <div className="workflow-tabs">
 
             {
 
-                WORKFLOW_TABS.map(
+                allowedTabs.map(
 
                     tab=>(
 

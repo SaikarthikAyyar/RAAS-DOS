@@ -3,7 +3,6 @@ import { Bell, UserCircle } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../contexts/AuthContext";
-import { ROLE_MODULES } from "../../config/navigation";
 
 export default function Topbar(){
 
@@ -18,8 +17,6 @@ export default function Topbar(){
         navigate("/");
 
     }
-
-    const menu = ROLE_MODULES[user?.role] || [];
 
     return(
 

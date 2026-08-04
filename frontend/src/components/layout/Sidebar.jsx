@@ -1,15 +1,17 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/JanyutechLogo.jpg";
-import { ROLE_MODULES } from "../../config/navigation";
+import { MODULE_META } from "../../config/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function Sidebar(){
 
-    const { user, logout } = useAuth();
+    const { permissions, logout } = useAuth();
 
     const navigate = useNavigate();
 
-    const menu = ROLE_MODULES[user?.role] || [];
+    const menu = (permissions?.navModules || [])
+        .map(path=>MODULE_META[path])
+        .filter(Boolean);
 
     function handleLogout(){
 

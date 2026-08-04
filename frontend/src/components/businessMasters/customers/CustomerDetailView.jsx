@@ -112,6 +112,14 @@ export default function CustomerDetailView({
 
     function handleExportAssets(){
 
+        if(!detail.assets || detail.assets.length===0){
+
+            alert("No assets on file for this customer yet — nothing to export.");
+
+            return;
+
+        }
+
         const rows = detail.assets.map(a=>[
 
             detail.company_name,
@@ -274,7 +282,7 @@ export default function CustomerDetailView({
 
                 >
 
-                    ⬇ Export this customer
+                    ⬇ Export customer assets
 
                 </button>
 

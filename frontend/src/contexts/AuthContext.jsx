@@ -8,7 +8,9 @@ import {
 
     useContext,
 
-    useState
+    useState,
+
+    useEffect
 
 }
 
@@ -22,12 +24,51 @@ import {
 
 from "../services/authService";
 
+import {
+
+    getRolePermissions
+
+}
+
+from "../services/rolePermissionsService";
+
 
 // ====================================
 // CONTEXT
 // ====================================
 
 const AuthContext = createContext();
+
+
+// ====================================
+// REHYDRATE FROM LOCALSTORAGE
+// Without this, user (and therefore user.role) is null after any
+// page reload despite the localStorage keys still being set - a
+// pre-existing bug that becomes load-bearing now that the sidebar/
+// workspace tabs depend on user.role to fetch permissions.
+// ====================================
+
+function readStoredUser(){
+
+    const id = localStorage.getItem("userId");
+
+    if(!id){
+        return null;
+    }
+
+    return {
+
+        id,
+
+        role: localStorage.getItem("userRole"),
+
+        name: localStorage.getItem("userName"),
+
+        email: localStorage.getItem("userEmail")
+
+    };
+
+}
 
 
 // ====================================
@@ -48,9 +89,50 @@ export function AuthProvider({
 
     ] = useState(
 
-        null
+        readStoredUser
 
     );
+
+    const [
+
+        permissions,
+
+        setPermissions
+
+    ] = useState(
+
+        { navModules:[], workspaceTabs:[] }
+
+    );
+
+    async function loadPermissions(role){
+
+        if(!role){
+            setPermissions({ navModules:[], workspaceTabs:[] });
+            return;
+        }
+
+        const response = await getRolePermissions(role);
+
+        setPermissions({
+
+            navModules: (response.nav_modules || []).map(m=>m.module_key),
+
+            workspaceTabs: (response.workspace_tabs || []).map(m=>m.module_key)
+
+        });
+
+    }
+
+    // Rehydrate permissions on mount if a user was already stored.
+    useEffect(()=>{
+
+        if(user?.role){
+            loadPermissions(user.role);
+        }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
 
     async function login(
@@ -111,6 +193,8 @@ export function AuthProvider({
 
         );
 
+        await loadPermissions(loggedUser.role);
+
         return loggedUser;
 
     }
@@ -121,6 +205,12 @@ export function AuthProvider({
         setUser(
 
             null
+
+        );
+
+        setPermissions(
+
+            { navModules:[], workspaceTabs:[] }
 
         );
 
@@ -158,6 +248,8 @@ export function AuthProvider({
             value={{
 
                 user,
+
+                permissions,
 
                 login,
 

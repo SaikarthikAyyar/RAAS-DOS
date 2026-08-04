@@ -15,6 +15,11 @@ import logo from "../assets/JanyutechLogo.jpg";
 // DEVELOPMENT USERS
 // ====================================
 
+// Trimmed to Admin + Sales Executive per direct instruction - the
+// other roles (management/sales/ops/customer) stay fully "linked"
+// (real roles, real role_permissions rows, real User accounts,
+// still work via manual email/password login) but no longer get a
+// one-click dropdown prefill.
 const developmentUsers = {
 
     admin:{
@@ -25,35 +30,11 @@ const developmentUsers = {
 
     },
 
-    management:{
+    sales_executive:{
 
-        email:"manager@raasdos.com",
+        email:"salesexec@raasdos.com",
 
-        password:"manager123"
-
-    },
-
-    sales:{
-
-        email:"sales@raasdos.com",
-
-        password:"sales123"
-
-    },
-
-    ops:{
-
-        email:"ops@raasdos.com",
-
-        password:"ops123"
-
-    },
-
-    customer:{
-
-        email:"customer@raasdos.com",
-
-        password:"cust123"
+        password:"salesexec123"
 
     }
 
@@ -245,27 +226,9 @@ function Login(){
 
     </option>
 
-    <option value="management">
+    <option value="sales_executive">
 
-    Management
-
-    </option>
-
-    <option value="sales">
-
-    Sales
-
-    </option>
-
-    <option value="ops">
-
-    Operations
-
-    </option>
-
-    <option value="customer">
-
-    Customer
+    Sales Executive
 
     </option>
 

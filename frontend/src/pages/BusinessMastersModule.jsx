@@ -400,6 +400,22 @@ export default function BusinessMastersModule(){
 
         if(activeTab==="customers"){
 
+            if(customersLoading){
+
+                alert("Customers are still loading — try again in a moment.");
+
+                return;
+
+            }
+
+            if(customers.length===0){
+
+                alert("No customers to export yet.");
+
+                return;
+
+            }
+
             downloadCSV(
 
                 "Customers.csv",
@@ -445,6 +461,8 @@ export default function BusinessMastersModule(){
                     className="bm-btn bm-btn-ghost"
 
                     onClick={handleExportCurrentTab}
+
+                    disabled={activeTab==="customers" && customersLoading}
 
                 >
 

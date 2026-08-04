@@ -48,6 +48,10 @@ from backend.repositories.allocation_repository import (
     seed_personnel
 )
 
+from backend.repositories.role_permissions_repository import (
+    seed_roles_modules_permissions
+)
+
 from backend.database.connection import SessionLocal
 
 def create_tables():
@@ -63,6 +67,8 @@ def create_tables():
         seed_machine_inventory(db)
 
         seed_personnel(db)
+
+        seed_roles_modules_permissions(db)
 
     finally:
 
