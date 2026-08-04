@@ -50,9 +50,9 @@ function App() {
 
       <Routes>
 
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/" element={<Login />} />
 
-          <Route index element={<Login />} />
+        <Route element={<MainLayout />}>
 
           <Route path="dashboard" element={<Dashboard />} />
 

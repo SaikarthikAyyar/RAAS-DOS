@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../contexts/AuthContext";
 
+import logo from "../assets/JanyutechLogo.jpg";
+
 
 // ====================================
 // DEVELOPMENT USERS
@@ -192,6 +194,12 @@ function Login(){
     return(
 
     <div className="login-page">
+
+    <div className="login-brand-corner">
+
+    <img src={logo} alt="Janyutech" className="login-brand-logo"/>
+
+    </div>
 
     <div className="login-card">
 
