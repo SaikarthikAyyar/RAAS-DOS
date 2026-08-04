@@ -283,23 +283,13 @@ def get_quote_request(
 
 ):
 
-    quote = get_quote_by_ops_selection(
+    return get_quote_by_ops_selection(
 
         db,
 
         ops_selection_id
 
     )
-
-    if quote is None:
-
-        raise ValueError(
-
-            "Quote not found."
-
-        )
-
-    return quote
 
 
 # ====================================

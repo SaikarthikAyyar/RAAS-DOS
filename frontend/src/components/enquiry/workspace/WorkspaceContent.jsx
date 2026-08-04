@@ -19,6 +19,8 @@ export default function WorkspaceContent({
 
     onTabChange,
 
+    reload,
+
     enquiry,
 
     customer,
@@ -51,6 +53,8 @@ export default function WorkspaceContent({
 
                     survey={survey}
 
+                    reload={reload}
+
                 />
 
             );
@@ -69,6 +73,8 @@ export default function WorkspaceContent({
 
                     dewatering={dewatering}
 
+                    reload={reload}
+
                 />
 
             );
@@ -85,6 +91,8 @@ export default function WorkspaceContent({
 
                     quote={quote}
 
+                    reload={reload}
+
                 />
 
             );
@@ -100,6 +108,8 @@ export default function WorkspaceContent({
                     quote={quote}
 
                     onTabChange={onTabChange}
+
+                    reload={reload}
 
                 />
 
@@ -120,6 +130,8 @@ export default function WorkspaceContent({
                     quote={quote}
 
                     onTabChange={onTabChange}
+
+                    reload={reload}
 
                 />
 

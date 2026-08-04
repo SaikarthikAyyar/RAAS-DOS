@@ -23,7 +23,9 @@ export default function TechnoCommercialApprovalSummary({
 
     opsSelection,
 
-    quote
+    quote,
+
+    reload
 
 }){
 
@@ -101,7 +103,7 @@ export default function TechnoCommercialApprovalSummary({
 
             }
 
-            window.location.reload();
+            reload();
 
         }
 

@@ -40,7 +40,9 @@ export default function CommercialApprovalSummary({
 
     quote,
 
-    onTabChange
+    onTabChange,
+
+    reload
 
 }){
 
@@ -182,7 +184,7 @@ export default function CommercialApprovalSummary({
 
             );
 
-            window.location.reload();
+            reload();
 
         }
 

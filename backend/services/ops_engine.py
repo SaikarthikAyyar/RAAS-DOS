@@ -506,8 +506,11 @@ def score_volume(
 
 ):
     
-    estimated_volume = engineering_inputs.get(
-                            "estimated_volume"
+    estimated_volume = (
+                            engineering_inputs.get(
+                                "estimated_volume"
+                            )
+                            or 0
                         )
 
     max_volume = machine.get(
@@ -786,11 +789,15 @@ def calculate_duration(
     # ENGINEERING INPUTS
     # ====================================
 
-    estimated_volume = engineering_inputs.get(
+    estimated_volume = (
 
-        "estimated_volume",
+        engineering_inputs.get(
 
-        0
+            "estimated_volume"
+
+        )
+
+        or 0
 
     )
 

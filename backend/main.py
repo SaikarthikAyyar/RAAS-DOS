@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 from fastapi.middleware.cors import CORSMiddleware
+
+from fastapi.responses import JSONResponse
 
 from fastapi.staticfiles import StaticFiles
 
@@ -69,6 +71,25 @@ import os
 app = FastAPI()
 
 
+# ====================================
+# GLOBAL EXCEPTION HANDLER
+# ====================================
+# Unhandled exceptions otherwise bypass CORSMiddleware's response
+# processing, so the resulting 500 has no Access-Control-Allow-Origin
+# header - the browser then reports the request to the frontend as a
+# generic "Failed to fetch" instead of surfacing the real error.
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+
+    import traceback
+
+    traceback.print_exc()
+
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc)}
+    )
 
 
 

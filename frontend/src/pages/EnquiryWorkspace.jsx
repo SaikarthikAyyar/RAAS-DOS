@@ -1,5 +1,7 @@
 import {
 
+    useCallback,
+
     useEffect,
 
     useState
@@ -102,11 +104,9 @@ export default function EnquiryWorkspace() {
 
 
 
-    useEffect(
+    const loadEnquiry = useCallback(
 
-        ()=>{
-
-            async function loadEnquiry(){
+        async()=>{
 
                 console.log(
 
@@ -217,7 +217,19 @@ export default function EnquiryWorkspace() {
 
                 }
 
-            }
+        },
+
+        [
+
+            enquiryId
+
+        ]
+
+    );
+
+    useEffect(
+
+        ()=>{
 
             loadEnquiry();
 
@@ -225,7 +237,7 @@ export default function EnquiryWorkspace() {
 
         [
 
-            enquiryId
+            loadEnquiry
 
         ]
 
@@ -301,6 +313,8 @@ export default function EnquiryWorkspace() {
                 activeTab={activeTab}
 
                 onTabChange={setActiveTab}
+
+                reload={loadEnquiry}
 
                 enquiry={enquiry}
 

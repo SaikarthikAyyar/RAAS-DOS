@@ -24,7 +24,9 @@ export default function OpsReviewSummary({
 
     opsScoring = [],
 
-    dewatering
+    dewatering,
+
+    reload
 
 }){
 
@@ -98,7 +100,7 @@ export default function OpsReviewSummary({
 
             );
 
-            window.location.reload();
+            reload();
 
         }
 
@@ -414,6 +416,8 @@ export default function OpsReviewSummary({
 
                 finalMachine={finalMachine}
 
+                reload={reload}
+
             />
 
             <OpsReviewDecisionCard
@@ -421,6 +425,8 @@ export default function OpsReviewSummary({
                 enquiry={enquiry}
 
                 opsSelection={opsSelection}
+
+                reload={reload}
 
             />
 

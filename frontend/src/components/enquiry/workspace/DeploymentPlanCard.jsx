@@ -46,7 +46,9 @@ export default function DeploymentPlanCard({
 
     opsScoring = [],
 
-    finalMachine
+    finalMachine,
+
+    reload
 
 }){
 
@@ -191,7 +193,7 @@ export default function DeploymentPlanCard({
 
             });
 
-            window.location.reload();
+            reload();
 
         }
 

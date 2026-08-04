@@ -5,6 +5,8 @@
 from fastapi import APIRouter
 from fastapi import Depends
 
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
@@ -130,7 +132,7 @@ def create_quote(
 
     "/quote/by-ops/{ops_selection_id}",
 
-    response_model=QuoteResponseSchema
+    response_model=Optional[QuoteResponseSchema]
 
 )
 

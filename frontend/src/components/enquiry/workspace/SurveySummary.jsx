@@ -17,7 +17,9 @@ export default function SurveySummary({
 
     enquiry,
 
-    survey
+    survey,
+
+    reload
 
 }){
     const navigate = useNavigate();
@@ -74,7 +76,7 @@ export default function SurveySummary({
 
         );
 
-        window.location.reload();
+        reload();
 
     }
 

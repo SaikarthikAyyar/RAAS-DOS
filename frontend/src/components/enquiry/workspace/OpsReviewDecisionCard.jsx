@@ -19,7 +19,9 @@ export default function OpsReviewDecisionCard({
 
     enquiry,
 
-    opsSelection
+    opsSelection,
+
+    reload
 
 }){
 
@@ -132,7 +134,7 @@ export default function OpsReviewDecisionCard({
 
             }
 
-            window.location.reload();
+            reload();
 
         }
 

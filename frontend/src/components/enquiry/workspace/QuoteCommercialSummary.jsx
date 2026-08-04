@@ -32,7 +32,9 @@ export default function QuoteCommercialSummary({
 
     quote,
 
-    onTabChange
+    onTabChange,
+
+    reload
 
 }){
 
@@ -136,7 +138,7 @@ export default function QuoteCommercialSummary({
                 extraEnabled ? extraNote : null
             );
 
-            window.location.reload();
+            reload();
 
         }
 
@@ -164,7 +166,7 @@ export default function QuoteCommercialSummary({
 
             await updateValidTill(quote.id, validTill || null);
 
-            window.location.reload();
+            reload();
 
         }
 
@@ -199,7 +201,7 @@ export default function QuoteCommercialSummary({
 
             await releaseQuoteToClient(quote.id, releasedBy);
 
-            window.location.reload();
+            reload();
 
         }
 
@@ -245,7 +247,7 @@ export default function QuoteCommercialSummary({
 
             await flagQuoteRevisionRequested(quote.id, revisionRequestedBy);
 
-            window.location.reload();
+            reload();
 
         }
 
