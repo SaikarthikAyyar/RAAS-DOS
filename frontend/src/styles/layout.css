@@ -434,7 +434,7 @@ font-weight:600;
 
     background:
         linear-gradient(180deg,rgba(8,10,15,.62) 0%,rgba(8,10,15,.42) 45%,rgba(8,10,15,.75) 100%),
-        url("../assets/login-bg.png");
+        url("../assets/Login-bg.png");
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
