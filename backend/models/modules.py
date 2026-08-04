@@ -28,6 +28,12 @@ class Module(Base):
         nullable=False
     )
 
+    module_type = Column(
+        String(30),
+        nullable=False,
+        default="nav"
+    )
+
     created_at = Column(
         DateTime,
         server_default=func.now()

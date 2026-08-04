@@ -36,6 +36,8 @@ from backend.api.enquiry_consolidated_api import router as enquiry_consolidated_
 
 from backend.api.customer_master_api import router as customer_master_router
 
+from backend.api.role_permissions_api import router as role_permissions_router
+
 from backend.api.administrationRoles_api import api as administration_roles_api
 
 from backend.api.administrationUsers_api import api as administrationUsers_api
@@ -248,6 +250,10 @@ app.include_router(
 
 app.include_router(
     customer_master_router
+)
+
+app.include_router(
+    role_permissions_router
 )
 
 print("\n========== ROUTES ==========")
