@@ -425,19 +425,22 @@ font-weight:600;
 
 .login-page{
     position:relative;
-    width:100vw;
-    height:100vh;
+    width:100%;
+    min-height:100vh;
+    min-height:100dvh;
     display:flex;
     justify-content:center;
     align-items:center;
     padding:40px;
+    overflow-y:auto;
 
     background:
         linear-gradient(180deg,rgba(8,10,15,.62) 0%,rgba(8,10,15,.42) 45%,rgba(8,10,15,.75) 100%),
-        url("../assets/login-bg.png");
+        url("../assets/Login-bg.png");
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
+    background-attachment:scroll;
 }
 
 .login-brand-corner{
@@ -666,6 +669,113 @@ height:auto;
 
 padding:16px;
 
+}
+
+}
+
+/* ====================================
+   LOGIN PAGE - MOBILE
+==================================== */
+
+@media(max-width:600px){
+
+.login-page{
+    padding:20px;
+    align-items:flex-start;
+    padding-top:96px;
+}
+
+.login-card{
+    width:100%;
+    max-width:420px;
+    padding:32px 24px;
+    border-radius:22px;
+}
+
+.login-card h1,
+.login-title{
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.login-card p,
+.login-subtitle{
+    font-size:14px;
+    margin-bottom:26px;
+}
+
+.login-form{
+    gap:14px;
+}
+
+.login-form input,
+.login-form select{
+    height:50px;
+    padding:0 16px;
+    border-radius:12px;
+    font-size:16px;
+}
+
+.primary-button{
+    height:50px;
+    border-radius:12px;
+    font-size:16px;
+    margin-top:2px;
+}
+
+.login-brand-corner{
+    top:20px;
+    left:20px;
+}
+
+.login-brand-logo{
+    width:120px;
+}
+
+}
+
+@media(max-width:380px){
+
+.login-page{
+    padding:14px;
+    padding-top:86px;
+}
+
+.login-card{
+    padding:26px 18px;
+    border-radius:18px;
+}
+
+.login-card h1,
+.login-title{
+    font-size:28px;
+}
+
+.login-brand-logo{
+    width:104px;
+}
+
+.login-brand-corner{
+    top:16px;
+    left:16px;
+}
+
+}
+
+@media(max-height:480px) and (orientation:landscape){
+
+.login-page{
+    align-items:flex-start;
+    padding-top:88px;
+    padding-bottom:24px;
+}
+
+.login-brand-logo{
+    width:96px;
+}
+
+.login-card{
+    padding:24px 22px;
 }
 
 }
