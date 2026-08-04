@@ -2,6 +2,8 @@ export default function EnquiryToolbar({
 
     onExport,
 
+    exporting,
+
     onNewEnquiry
 
 }){
@@ -17,8 +19,9 @@ export default function EnquiryToolbar({
                 <button
                     className="enquiry-export-button"
                     onClick={onExport}
+                    disabled={exporting}
                 >
-                    ↓ Export to Excel
+                    {exporting ? "Exporting..." : "↓ Export to Excel"}
                 </button>
 
                 <button

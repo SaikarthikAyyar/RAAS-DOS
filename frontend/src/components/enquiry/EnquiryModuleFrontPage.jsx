@@ -46,6 +46,50 @@ import {
 
 
 // ====================================
+// CSV EXPORT (client-side, same pattern as QuotesModule/
+// BusinessMastersModule)
+// ====================================
+
+function downloadCSV(filename, headers, rows){
+
+    const escapeCell = value=>{
+
+        const text = value===null || value===undefined ? "" : String(value);
+
+        return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+
+    };
+
+    const csv = [
+
+        headers.map(escapeCell).join(","),
+
+        ...rows.map(row=>row.map(escapeCell).join(","))
+
+    ].join("\n");
+
+    const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download = filename;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+// ====================================
 // COMPONENT
 // ====================================
 
@@ -117,6 +161,14 @@ export default function EnquiryModuleFrontPage(){
         setTotal
 
     ] = useState(0);
+
+    const [
+
+        exporting,
+
+        setExporting
+
+    ] = useState(false);
 
     const navigate = useNavigate();
 
@@ -490,15 +542,88 @@ export default function EnquiryModuleFrontPage(){
 
     }
 
-    function handleExport(){
+    async function handleExport(){
 
-        console.log(
+        setExporting(true);
 
-            "[Enquiry] Export requested"
+        try{
 
-        );
+            // The list endpoint caps page_size at 100, so a full
+            // export has to page through everything rather than
+            // requesting one oversized page.
+            const maxPageSize = 100;
 
-        // Backend endpoint will be connected later.
+            let exportPage = 1;
+
+            let allItems = [];
+
+            while(true){
+
+                const response = await getEnquiries({
+
+                    status,
+
+                    search:searchText,
+
+                    page:exportPage,
+
+                    pageSize:maxPageSize
+
+                });
+
+                const items = response.items ?? [];
+
+                allItems = allItems.concat(items);
+
+                if(items.length < maxPageSize || allItems.length >= (response.total ?? allItems.length)){
+
+                    break;
+
+                }
+
+                exportPage += 1;
+
+            }
+
+            const rows = allItems.map(item=>[
+
+                item.id,
+                item.customer_name ?? "",
+                item.nature ?? "",
+                item.stage,
+                item.status,
+                item.owner_role ?? "",
+                item.created_at
+                    ? new Date(item.created_at).toLocaleDateString()
+                    : ""
+
+            ]);
+
+            downloadCSV(
+
+                "RAAS_DOS_Enquiries.csv",
+
+                ["Enquiry ID", "Customer", "Nature", "Stage", "Status", "Owner", "Created"],
+
+                rows
+
+            );
+
+        }
+
+        catch(error){
+
+            console.error(error);
+
+            alert("Unable to export enquiries.");
+
+        }
+
+        finally{
+
+            setExporting(false);
+
+        }
 
     }
 
@@ -527,6 +652,8 @@ export default function EnquiryModuleFrontPage(){
             <EnquiryToolbar
 
                 onExport={handleExport}
+
+                exporting={exporting}
 
                 onNewEnquiry={handleNewEnquiry}
 
