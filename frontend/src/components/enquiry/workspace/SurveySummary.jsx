@@ -13,12 +13,24 @@ export default function SurveySummary({
 
     enquiry,
 
-    survey,
+    survey: surveyProp,
+
+    prefillData,
+
+    assetProfile,
 
     reload
 
 }){
     const navigate = useNavigate();
+
+    // Before a Sales Survey has ever been submitted, fall back to
+    // the Customer-Request-derived prefill (same shape, same source
+    // that seeds the real survey form) so the cards below show
+    // whatever is already known instead of being hidden entirely.
+    const survey = surveyProp || prefillData;
+
+    const hasRealSurvey = Boolean(surveyProp);
 
     function handleFillEditSurvey(){
 
@@ -67,6 +79,34 @@ export default function SurveySummary({
     return(
 
         <div className="survey-summary-grid">
+
+            {
+                assetProfile && (
+                    <SurveySummaryCard
+                        title="Asset Profile"
+                        fields={[
+                            { label:"Division", value:assetProfile.division },
+                            { label:"Plant", value:assetProfile.plant },
+                            { label:"Department", value:assetProfile.department },
+                            { label:"Asset Name", value:assetProfile.name },
+                            { label:"Asset Type", value:assetProfile.asset_type },
+                            { label:"Cleaning Frequency", value:assetProfile.cleaning_frequency },
+                            { label:"Material Seen at Site", value:assetProfile.observed_material },
+                            { label:"Access Opening Type", value:assetProfile.access_opening_type },
+                            {
+                                label:"Equipment Nearby",
+                                value:
+                                    assetProfile.can_place_equipment_nearby === null ||
+                                    assetProfile.can_place_equipment_nearby === undefined
+                                        ? undefined
+                                        : (assetProfile.can_place_equipment_nearby ? "Yes" : "No")
+                            },
+                            { label:"Pain Point", value:assetProfile.pain_point },
+                            { label:"Last Verified", value:assetProfile.last_verified }
+                        ]}
+                    />
+                )
+            }
 
             {
                 survey && (
@@ -859,7 +899,7 @@ export default function SurveySummary({
 
                             {
 
-                                survey
+                                hasRealSurvey
 
                                     ?
 

@@ -180,6 +180,36 @@ export default function SectionF_Dewatering({
                     updateSection={updateSection}
                 />
 
+                {
+                    dewatering.filtrate_route === "Yes" && (
+                        <FieldInput
+                            label="Filtrate Route Detail"
+                            value={dewatering.filtrate_route_detail}
+                            section="dewatering"
+                            field="filtrate_route_detail"
+                            updateSection={updateSection}
+                        />
+                    )
+                }
+
+                <FieldInput
+                    label="Polymer Allowed"
+                    value={dewatering.polymer_allowed}
+                    section="dewatering"
+                    field="polymer_allowed"
+                    disabled={disabled}
+                    updateSection={updateSection}
+                />
+
+                <FieldInput
+                    label="Commitment"
+                    value={dewatering.commitment}
+                    section="dewatering"
+                    field="commitment"
+                    disabled={disabled}
+                    updateSection={updateSection}
+                />
+
 
             </div>
 

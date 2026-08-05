@@ -36,6 +36,16 @@ class SalesSurveySchema(BaseModel):
 
     urgency: Optional[str] = None
 
+    surveyed_by: Optional[str] = None
+
+    survey_trigger: Optional[str] = None
+
+    repeat_potential: Optional[str] = None
+
+    tentative_start_date: Optional[str] = None
+
+    tentative_end_date: Optional[str] = None
+
 
     # ====================================
     # SECTION B
@@ -73,6 +83,12 @@ class SalesSurveySchema(BaseModel):
     temperature_range: Optional[str] = None
 
     sample_available: Optional[str] = None
+
+    abrasiveness: Optional[str] = None
+
+    permit_required: Optional[str] = None
+
+    flowability: Optional[str] = None
 
 
     # ====================================
@@ -119,6 +135,10 @@ class SalesSurveySchema(BaseModel):
     access_type: Optional[str] = None
 
     equipment_nearby: Optional[str] = None
+
+    tank_location: Optional[str] = None
+
+    setup_complexity: Optional[str] = None
 
 
     # ====================================
@@ -172,6 +192,10 @@ class SalesSurveySchema(BaseModel):
 
     pump_power_source: Optional[str] = None
 
+    pump_risk: Optional[str] = None
+
+    effective_work_hours: Optional[float] = None
+
 
     # ====================================
     # SECTION F
@@ -201,6 +225,12 @@ class SalesSurveySchema(BaseModel):
 
     cake_handling_scope: Optional[str] = None
 
+    filtrate_route_detail: Optional[str] = None
+
+    polymer_allowed: Optional[str] = None
+
+    commitment: Optional[str] = None
+
 
     # ====================================
     # SECTION G
@@ -211,6 +241,16 @@ class SalesSurveySchema(BaseModel):
     shutdown_window: Optional[str] = None
 
     completion_deadline: Optional[str] = None
+
+    current_method: Optional[str] = None
+
+    budget_known: Optional[str] = None
+
+    budget_estimate: Optional[float] = None
+
+    decision_maker: Optional[str] = None
+
+    billing_address: Optional[str] = None
 
 
     # ====================================
@@ -230,6 +270,11 @@ class CustomerSection(BaseModel):
     nearest_hub: Optional[str]
     urgency: Optional[str]
     survey_date:  date | None
+    surveyed_by: Optional[str] = None
+    survey_trigger: Optional[str] = None
+    repeat_potential: Optional[str] = None
+    tentative_start_date: Optional[str] = None
+    tentative_end_date: Optional[str] = None
 
 
 class JobSection(BaseModel):
@@ -249,6 +294,9 @@ class JobSection(BaseModel):
     flow_after_agitation: Optional[str]
     temperature_range: Optional[str]
     sample_available: Optional[str]
+    abrasiveness: Optional[str] = None
+    permit_required: Optional[str] = None
+    flowability: Optional[str] = None
 
 
 class GeometrySection(BaseModel):
@@ -273,6 +321,8 @@ class GeometrySection(BaseModel):
     equipment_nearby: Optional[str]
     scaffolding_needed: Optional[str]
     crane_available: Optional[str]
+    tank_location: Optional[str] = None
+    setup_complexity: Optional[str] = None
 
 
 class SafetySection(BaseModel):
@@ -301,6 +351,8 @@ class PumpSection(BaseModel):
     debris_present: Optional[str]
     ph_condition: Optional[str]
     pump_power_source: Optional[str]
+    pump_risk: Optional[str] = None
+    effective_work_hours: Optional[float] = None
 
 
 class DewateringSection(BaseModel):
@@ -316,12 +368,20 @@ class DewateringSection(BaseModel):
     filtrate_route: Optional[str]
     moisture_guarantee: Optional[str]
     cake_handling_scope: Optional[str]
+    filtrate_route_detail: Optional[str] = None
+    polymer_allowed: Optional[str] = None
+    commitment: Optional[str] = None
 
 
 class InsightSection(BaseModel):
     customer_pain: Optional[str]
     shutdown_window: Optional[str]
     completion_deadline: Optional[str]
+    current_method: Optional[str] = None
+    budget_known: Optional[str] = None
+    budget_estimate: Optional[float] = None
+    decision_maker: Optional[str] = None
+    billing_address: Optional[str] = None
 
 
 class SalesSurveyResponseSchema(BaseModel):

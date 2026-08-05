@@ -518,7 +518,12 @@ const SURVEY_STRUCTURE = {
         "contact_number",
         "nearest_hub",
         "urgency",
-        "survey_date"
+        "survey_date",
+        "surveyed_by",
+        "survey_trigger",
+        "repeat_potential",
+        "tentative_start_date",
+        "tentative_end_date"
 
     ],
 
@@ -539,7 +544,10 @@ const SURVEY_STRUCTURE = {
         "ph_max",
         "flow_after_agitation",
         "temperature_range",
-        "sample_available"
+        "sample_available",
+        "abrasiveness",
+        "permit_required",
+        "flowability"
 
     ],
 
@@ -565,7 +573,9 @@ const SURVEY_STRUCTURE = {
         "equipment_nearby",
         "scaffolding_needed",
         "crane_available",
-        "opening_height"
+        "opening_height",
+        "tank_location",
+        "setup_complexity"
 
     ],
 
@@ -596,7 +606,9 @@ const SURVEY_STRUCTURE = {
         "disposal_route",
         "disposal_responsibility",
         "discharge_point_distance",
-        "hose_route_bends"
+        "hose_route_bends",
+        "pump_risk",
+        "effective_work_hours"
 
     ],
 
@@ -613,7 +625,10 @@ const SURVEY_STRUCTURE = {
         "space_available",
         "filtrate_route",
         "moisture_guarantee",
-        "cake_handling_scope"
+        "cake_handling_scope",
+        "filtrate_route_detail",
+        "polymer_allowed",
+        "commitment"
 
     ],
 
@@ -622,7 +637,12 @@ const SURVEY_STRUCTURE = {
         "customer_pain",
         "shutdown_window",
         "completion_deadline",
-        "photos"
+        "photos",
+        "current_method",
+        "budget_known",
+        "budget_estimate",
+        "decision_maker",
+        "billing_address"
 
     ]
 

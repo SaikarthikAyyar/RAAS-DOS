@@ -27,6 +27,10 @@ export default function WorkspaceContent({
 
     survey,
 
+    prefillData,
+
+    assetProfile,
+
     opsSelection,
 
     opsScoring,
@@ -52,6 +56,10 @@ export default function WorkspaceContent({
                     enquiry={enquiry}
 
                     survey={survey}
+
+                    prefillData={prefillData}
+
+                    assetProfile={assetProfile}
 
                     reload={reload}
 

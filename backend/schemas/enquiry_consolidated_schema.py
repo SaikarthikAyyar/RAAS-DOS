@@ -52,6 +52,10 @@ class EnquiryConsolidatedListItem(BaseModel):
 
     customer_request_id: Optional[int] = None
 
+    customer_id: Optional[int] = None
+
+    asset_id: Optional[int] = None
+
     customer_name: Optional[str] = None
 
     nature: Optional[str] = None

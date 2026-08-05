@@ -2,7 +2,11 @@ import {
 
 nearestHubs,
 
-urgencyOptions
+urgencyOptions,
+
+triggerOptions,
+
+repeatPotentialOptions
 
 }
 
@@ -10,7 +14,9 @@ from "../../data/salesSurveyOptions";
 
 import {
 
-FieldInput
+FieldInput,
+
+FieldSelect
 
 }
 
@@ -395,6 +401,84 @@ onBlur={()=>touchField("customer", "survey_date")}
 error={fieldError("survey_date")}
 
 errorMessage="Survey Date is required."
+
+/>
+
+<FieldInput
+
+label="Surveyed By"
+
+value={customer.surveyed_by}
+
+section="customer"
+
+field="surveyed_by"
+
+updateSection={updateSection}
+
+/>
+
+<FieldSelect
+
+label="Trigger"
+
+value={customer.survey_trigger}
+
+section="customer"
+
+field="survey_trigger"
+
+options={triggerOptions}
+
+updateSection={updateSection}
+
+/>
+
+<FieldSelect
+
+label="Repeat Potential"
+
+value={customer.repeat_potential}
+
+section="customer"
+
+field="repeat_potential"
+
+options={repeatPotentialOptions}
+
+updateSection={updateSection}
+
+/>
+
+<FieldInput
+
+label="Tentative Start Date"
+
+type="date"
+
+value={customer.tentative_start_date}
+
+section="customer"
+
+field="tentative_start_date"
+
+updateSection={updateSection}
+
+/>
+
+<FieldInput
+
+label="Tentative End Date"
+
+type="date"
+
+value={customer.tentative_end_date}
+
+section="customer"
+
+field="tentative_end_date"
+
+updateSection={updateSection}
 
 />
 

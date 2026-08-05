@@ -205,6 +205,30 @@ def get_customer_survey_request(
             if survey.survey_date
             else None,
 
+            "surveyed_by":
+
+            survey.surveyed_by,
+
+            "survey_trigger":
+
+            survey.survey_trigger,
+
+            "repeat_potential":
+
+            survey.repeat_potential,
+
+            "tentative_start_date":
+
+            survey.tentative_start_date.isoformat()
+            if survey.tentative_start_date
+            else None,
+
+            "tentative_end_date":
+
+            survey.tentative_end_date.isoformat()
+            if survey.tentative_end_date
+            else None,
+
         },
 
 
@@ -278,7 +302,19 @@ def get_customer_survey_request(
 
             "sample_available":
 
-            survey.sample_available
+            survey.sample_available,
+
+            "abrasiveness":
+
+            survey.abrasiveness,
+
+            "permit_required":
+
+            "Yes" if survey.permit_required else "No",
+
+            "flowability":
+
+            survey.flowability
 
         },
 
@@ -371,7 +407,15 @@ def get_customer_survey_request(
 
             "opening_height":
 
-            survey.opening_height
+            survey.opening_height,
+
+            "tank_location":
+
+            survey.tank_location,
+
+            "setup_complexity":
+
+            survey.setup_complexity
 
         },
 
@@ -473,7 +517,15 @@ def get_customer_survey_request(
 
             "pump_power_source":
 
-            survey.pump_power_source
+            survey.pump_power_source,
+
+            "pump_risk":
+
+            survey.pump_risk,
+
+            "effective_work_hours":
+
+            survey.effective_work_hours
 
         },
 
@@ -530,7 +582,19 @@ def get_customer_survey_request(
 
             "cake_handling_scope":
 
-            survey.cake_handling_scope
+            survey.cake_handling_scope,
+
+            "filtrate_route_detail":
+
+            survey.filtrate_route_detail,
+
+            "polymer_allowed":
+
+            survey.polymer_allowed,
+
+            "commitment":
+
+            survey.commitment
 
         },
 
@@ -553,7 +617,27 @@ def get_customer_survey_request(
 
             survey.completion_deadline.isoformat()
             if survey.completion_deadline
-            else None
+            else None,
+
+            "current_method":
+
+            survey.current_method,
+
+            "budget_known":
+
+            "Yes" if survey.budget_known else "No",
+
+            "budget_estimate":
+
+            survey.budget_estimate,
+
+            "decision_maker":
+
+            survey.decision_maker,
+
+            "billing_address":
+
+            survey.billing_address
 
         }
 

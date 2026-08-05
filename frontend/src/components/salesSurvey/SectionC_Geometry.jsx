@@ -9,7 +9,9 @@ accessTypeOptions,
 tankTypeOptions,
 accessSupportOptions,
 customerSupportOptions,
-yesNoUnknown
+yesNoUnknown,
+tankLocationOptions,
+setupComplexityOptions
 
 }
 
@@ -494,6 +496,24 @@ label="Recommended Package"
 
 value={packageName}
 
+/>
+
+<FieldSelect
+label="Location of Tank"
+value={geometry.tank_location}
+section="geometry"
+field="tank_location"
+options={tankLocationOptions}
+updateSection={updateSection}
+/>
+
+<FieldSelect
+label="Setup Complexity"
+value={geometry.setup_complexity}
+section="geometry"
+field="setup_complexity"
+options={setupComplexityOptions}
+updateSection={updateSection}
 />
 
 

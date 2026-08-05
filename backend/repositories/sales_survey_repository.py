@@ -63,6 +63,16 @@ def create_sales_survey(
 
         urgency=payload.urgency,
 
+        surveyed_by=payload.surveyed_by,
+
+        survey_trigger=payload.survey_trigger,
+
+        repeat_potential=payload.repeat_potential,
+
+        tentative_start_date=payload.tentative_start_date,
+
+        tentative_end_date=payload.tentative_end_date,
+
 
         # ====================================
         # SECTION B
@@ -143,6 +153,15 @@ def create_sales_survey(
         sample_available=
         payload.sample_available,
 
+        abrasiveness=
+        payload.abrasiveness,
+
+        permit_required=
+        payload.permit_required=="Yes",
+
+        flowability=
+        payload.flowability,
+
 
         # ====================================
         # SECTION C
@@ -222,6 +241,12 @@ def create_sales_survey(
 
         equipment_nearby=
         payload.equipment_nearby,
+
+        tank_location=
+        payload.tank_location,
+
+        setup_complexity=
+        payload.setup_complexity,
 
 
         # ====================================
@@ -307,6 +332,12 @@ def create_sales_survey(
         pump_power_source=
         payload.pump_power_source,
 
+        pump_risk=
+        payload.pump_risk,
+
+        effective_work_hours=
+        payload.effective_work_hours,
+
 
         # ====================================
         # SECTION F
@@ -348,6 +379,15 @@ def create_sales_survey(
         cake_handling_scope=
         payload.cake_handling_scope,
 
+        filtrate_route_detail=
+        payload.filtrate_route_detail,
+
+        polymer_allowed=
+        payload.polymer_allowed,
+
+        commitment=
+        payload.commitment,
+
 
         # ====================================
         # SECTION G
@@ -362,6 +402,21 @@ def create_sales_survey(
 
         completion_deadline=
         payload.completion_deadline,
+
+        current_method=
+        payload.current_method,
+
+        budget_known=
+        payload.budget_known=="Yes",
+
+        budget_estimate=
+        payload.budget_estimate,
+
+        decision_maker=
+        payload.decision_maker,
+
+        billing_address=
+        payload.billing_address,
 
 
         # ====================================
@@ -442,6 +497,16 @@ def update_sales_survey(
 
     survey.urgency = payload.urgency
 
+    survey.surveyed_by = payload.surveyed_by
+
+    survey.survey_trigger = payload.survey_trigger
+
+    survey.repeat_potential = payload.repeat_potential
+
+    survey.tentative_start_date = payload.tentative_start_date
+
+    survey.tentative_end_date = payload.tentative_end_date
+
 
     # ====================================
     # SECTION B
@@ -480,6 +545,12 @@ def update_sales_survey(
     survey.temperature_range = payload.temperature_range
 
     survey.sample_available = payload.sample_available
+
+    survey.abrasiveness = payload.abrasiveness
+
+    survey.permit_required = payload.permit_required == "Yes"
+
+    survey.flowability = payload.flowability
 
 
     # ====================================
@@ -525,6 +596,10 @@ def update_sales_survey(
     survey.access_type = payload.access_type
 
     survey.equipment_nearby = payload.equipment_nearby
+
+    survey.tank_location = payload.tank_location
+
+    survey.setup_complexity = payload.setup_complexity
 
 
     # ====================================
@@ -578,6 +653,10 @@ def update_sales_survey(
 
     survey.pump_power_source = payload.pump_power_source
 
+    survey.pump_risk = payload.pump_risk
+
+    survey.effective_work_hours = payload.effective_work_hours
+
 
     # ====================================
     # SECTION F
@@ -607,6 +686,12 @@ def update_sales_survey(
 
     survey.cake_handling_scope = payload.cake_handling_scope
 
+    survey.filtrate_route_detail = payload.filtrate_route_detail
+
+    survey.polymer_allowed = payload.polymer_allowed
+
+    survey.commitment = payload.commitment
+
 
     # ====================================
     # SECTION G
@@ -617,6 +702,16 @@ def update_sales_survey(
     survey.shutdown_window = payload.shutdown_window
 
     survey.completion_deadline = payload.completion_deadline
+
+    survey.current_method = payload.current_method
+
+    survey.budget_known = payload.budget_known == "Yes"
+
+    survey.budget_estimate = payload.budget_estimate
+
+    survey.decision_maker = payload.decision_maker
+
+    survey.billing_address = payload.billing_address
 
 
     db.commit()

@@ -153,7 +153,48 @@ function handleExistingCustomerSelect(customerId){
 
 function handleAssetChange(value){
 
-    updateSection("customer", "existing_asset_id", value ? Number(value) : null);
+    const assetId = value ? Number(value) : null;
+
+    updateSection("customer", "existing_asset_id", assetId);
+
+    const asset = assetOptions.find(a => a.id === assetId);
+
+    if(!asset){
+        return;
+    }
+
+    // Autofill every field the picked asset already has a stored
+    // value for - keeps them visible/editable (pre-populated, not
+    // hidden), so the user only has to confirm or correct rather
+    // than re-enter what's already known about this site.
+
+    if(asset.plant){
+        updateSection("customer", "plant_site_location", asset.plant);
+    }
+
+    if(asset.cleaning_frequency){
+        updateSection("requirement", "cleaning_frequency", asset.cleaning_frequency);
+    }
+
+    if(asset.observed_material){
+        updateSection("requirement", "observed_material", asset.observed_material);
+    }
+
+    if(asset.access_opening_type){
+        updateSection("requirement", "access_opening_type", asset.access_opening_type);
+    }
+
+    if(asset.can_place_equipment_nearby !== null && asset.can_place_equipment_nearby !== undefined){
+        updateSection(
+            "requirement",
+            "can_place_equipment_nearby",
+            asset.can_place_equipment_nearby ? "Yes, within 10 m" : "No"
+        );
+    }
+
+    if(asset.pain_point){
+        updateSection("requirement", "pain_point", asset.pain_point);
+    }
 
 }
 

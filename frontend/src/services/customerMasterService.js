@@ -45,6 +45,36 @@ export async function getCustomerAssets(
 
 
 // ====================================
+// ASSET DETAIL (single asset)
+// For the Enquiry Workspace's Asset Profile card.
+// ====================================
+
+export async function getAsset(
+
+    assetId
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/assets/${assetId}`
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // CREATE CUSTOMER
 // ====================================
 

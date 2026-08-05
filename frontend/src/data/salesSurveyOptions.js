@@ -8,7 +8,9 @@ export const nearestHubs=[
 
 "Coimbatore",
 
-"Jamshedpur"
+"Jamshedpur",
+
+"Delhi-NCR (North)"
 
 ];
 
@@ -17,6 +19,20 @@ export const urgencyOptions = [
     "1 Month",
     "2 Months",
     "3 Months"
+];
+
+export const triggerOptions = [
+    "Preventive Maintenance",
+    "Breakdown",
+    "Statutory / Compliance",
+    "Customer Complaint",
+    "New Project"
+];
+
+export const repeatPotentialOptions = [
+    "One-time",
+    "Potential AMC",
+    "Confirmed AMC"
 ];
 
 
@@ -174,6 +190,12 @@ export const waterVisibilityOptions = [
     "Opaque"
 ];
 
+export const flowabilityOptions = [
+    "Free-flowing",
+    "Semi-solid",
+    "Solid-compacted"
+];
+
 
 // ====================================
 // SECTION C
@@ -205,30 +227,40 @@ export const tankTypeOptions = [
 
 ];
 
+export const tankLocationOptions = [
+
+"Overhead",
+
+"Underground"
+
+];
+
+export const setupComplexityOptions = [
+
+"Low",
+
+"Medium",
+
+"High"
+
+];
+
 
 // ====================================
 // SECTION E
 // ====================================
 
+// Corrected 2026-08-05: this was a byte-identical duplicate of
+// sludge_hardnessOptions (a copy-paste mislabel) - Abrasiveness is
+// its own field, Low/Medium/High per the wireframe, distinct from
+// Sludge Hardness which keeps its own options list untouched.
 export const abrasivenessOptions=[
 
-"Free flowing",
+"Low",
 
-"Semi-viscous",
+"Medium",
 
-"Sticky",
-
-"Hard settled",
-
-"Abrasive",
-
-"Corrosive",
-
-"Fibrous",
-
-"Oily/emulsified",
-
-"Unknown"
+"High"
 
 ];
 
@@ -257,6 +289,20 @@ export const pumpPowerOptions=[
 "Battery / DC",
 
 "Not known"
+
+];
+
+export const pumpRiskOptions=[
+
+"None",
+
+"Abrasion",
+
+"Corrosion",
+
+"Clogging (high solids)",
+
+"Cavitation (deep suction)"
 
 ];
 
@@ -323,6 +369,18 @@ export const cakeHandlingOptions=[
 // ====================================
 // SECTION G
 // ====================================
+
+export const currentMethodOptions=[
+
+"Manual",
+
+"Robotic",
+
+"Never done before",
+
+"Other"
+
+];
 
 export const shutdownOptions=[
 

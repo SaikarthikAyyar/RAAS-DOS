@@ -14,7 +14,9 @@ yesNoUnknown,
 
 waterVisibilityOptions,
 temperatureRangeOptions,
-sampleAvailabilityOptions
+sampleAvailabilityOptions,
+abrasivenessOptions,
+flowabilityOptions
 
 }
 
@@ -249,7 +251,32 @@ options={sampleAvailabilityOptions}
 updateSection={updateSection}
 />
 
+<FieldSelect
+label="Abrasiveness"
+value={job.abrasiveness}
+section="job"
+field="abrasiveness"
+options={abrasivenessOptions}
+updateSection={updateSection}
+/>
 
+<FieldSelect
+label="Permit Required"
+value={job.permit_required}
+section="job"
+field="permit_required"
+options={["Yes", "No"]}
+updateSection={updateSection}
+/>
+
+<FieldSelect
+label="Flowability"
+value={job.flowability}
+section="job"
+field="flowability"
+options={flowabilityOptions}
+updateSection={updateSection}
+/>
 
 
 </div>

@@ -18,7 +18,8 @@ from backend.schemas.customer_master_schema import (
     ContactCreateSchema,
     ContactSchema,
     FollowUpSchema,
-    AssetOptionListResponse
+    AssetOptionListResponse,
+    AssetSchema
 )
 
 from backend.services.customer_master_service import (
@@ -27,7 +28,8 @@ from backend.services.customer_master_service import (
     get_customer_detail_request,
     add_contact_request,
     set_follow_up_request,
-    list_customer_assets_request
+    list_customer_assets_request,
+    get_asset_detail_request
 )
 
 # ====================================
@@ -120,6 +122,30 @@ def list_customer_assets(
     return {
         "items": list_customer_assets_request(db, customer_id)
     }
+
+
+# ====================================
+# ASSET DETAIL (single asset - for the Enquiry Workspace's
+# Asset Profile card)
+# ====================================
+
+@router.get(
+    "/business-master/assets/{asset_id}",
+    response_model=AssetSchema
+)
+def get_asset_detail(
+        asset_id: int,
+        db: Session = Depends(get_db)
+):
+    asset = get_asset_detail_request(db, asset_id)
+
+    if not asset:
+        raise HTTPException(
+            status_code=404,
+            detail="Asset not found."
+        )
+
+    return asset
 
 
 # ====================================

@@ -69,6 +69,26 @@ class AssetOptionSchema(BaseModel):
 
     label: str
 
+    division: str | None = None
+
+    plant: str | None = None
+
+    department: str | None = None
+
+    name: str | None = None
+
+    asset_type: str | None = None
+
+    cleaning_frequency: str | None = None
+
+    observed_material: str | None = None
+
+    access_opening_type: str | None = None
+
+    can_place_equipment_nearby: bool | None = None
+
+    pain_point: str | None = None
+
 
 class AssetOptionListResponse(BaseModel):
 
@@ -82,6 +102,8 @@ class AssetOptionListResponse(BaseModel):
 class AssetSchema(BaseModel):
 
     id: int
+
+    customer_id: int | None = None
 
     division: str | None = None
 
@@ -100,6 +122,14 @@ class AssetSchema(BaseModel):
     last_verified: str | None = None
 
     verified_by: str | None = None
+
+    observed_material: str | None = None
+
+    access_opening_type: str | None = None
+
+    can_place_equipment_nearby: bool | None = None
+
+    pain_point: str | None = None
 
     class Config:
 

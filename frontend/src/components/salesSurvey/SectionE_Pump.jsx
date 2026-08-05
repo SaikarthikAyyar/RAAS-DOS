@@ -12,7 +12,8 @@ pumpPowerOptions,
 dischargeMediumOptions,
 
 disposalRouteOptions,
-disposalResponsibilityOptions
+disposalResponsibilityOptions,
+pumpRiskOptions
 
 }
 
@@ -187,6 +188,24 @@ label="Hose Route Bends"
 value={pump.hose_route_bends}
 section="pump"
 field="hose_route_bends"
+updateSection={updateSection}
+/>
+
+<FieldSelect
+label="Pump Risk"
+value={pump.pump_risk}
+section="pump"
+field="pump_risk"
+options={pumpRiskOptions}
+updateSection={updateSection}
+/>
+
+<FieldInput
+label="Effective Work Hours/Day"
+value={pump.effective_work_hours}
+section="pump"
+field="effective_work_hours"
+unit="hrs/day"
 updateSection={updateSection}
 />
 

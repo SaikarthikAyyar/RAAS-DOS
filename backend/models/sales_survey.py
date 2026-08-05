@@ -5,6 +5,7 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy import Float
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
@@ -387,3 +388,38 @@ class SalesSurvey(Base):
     dewatering_volume = Column(Float)
     inlet_moisture = Column(Float)
     visible_free_water = Column(String(20))
+
+    # ====================================
+    # WIREFRAME-PARITY FIELDS (Phase 7C)
+    # ====================================
+
+    # Section A
+    surveyed_by = Column(String(150))
+    survey_trigger = Column(String(100))
+    repeat_potential = Column(String(100))
+    tentative_start_date = Column(Date)
+    tentative_end_date = Column(Date)
+
+    # Section B
+    permit_required = Column(Boolean)
+    flowability = Column(String(100))
+
+    # Section C
+    tank_location = Column(String(100))
+    setup_complexity = Column(String(100))
+
+    # Section E
+    pump_risk = Column(String(100))
+    effective_work_hours = Column(Float)
+
+    # Section F
+    filtrate_route_detail = Column(Text)
+    polymer_allowed = Column(String(255))
+    commitment = Column(String(255))
+
+    # Section G
+    current_method = Column(String(100))
+    budget_known = Column(Boolean)
+    budget_estimate = Column(Float)
+    decision_maker = Column(String(150))
+    billing_address = Column(Text)

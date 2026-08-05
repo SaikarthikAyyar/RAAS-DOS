@@ -79,7 +79,15 @@ def create_customer_request(
 
         payload.asset_type,
 
-        payload.cleaning_frequency
+        payload.cleaning_frequency,
+
+        payload.observed_material,
+
+        payload.access_opening_type,
+
+        payload.can_place_equipment_nearby,
+
+        payload.pain_point
 
     )
 
@@ -221,6 +229,8 @@ def get_sales_prefill(
 
             "geometry": {},
 
+            "safety": {},
+
             "pump": {},
 
             "dewatering": {},
@@ -347,6 +357,13 @@ def get_sales_prefill(
             )
 
         },
+
+
+        # ====================================
+        # SECTION D
+        # ====================================
+
+        "safety": {},
 
 
         # ====================================

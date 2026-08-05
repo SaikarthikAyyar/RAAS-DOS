@@ -30,9 +30,17 @@ import {
 
 import {
 
-    getCustomerSurvey
+    getCustomerSurvey,
+
+    getSalesPrefill
 
 } from "../services/salesSurveyService";
+
+import {
+
+    getAsset
+
+} from "../services/customerMasterService";
 
 import {
 
@@ -88,6 +96,10 @@ export default function EnquiryWorkspace() {
     const [customer, setCustomer] = useState(null);
 
     const [survey, setSurvey] = useState(null);
+
+    const [prefillData, setPrefillData] = useState(null);
+
+    const [assetProfile, setAssetProfile] = useState(null);
 
     const [opsSelection, setOpsSelection] = useState(null);
 
@@ -158,6 +170,26 @@ export default function EnquiryWorkspace() {
                         );
 
                         setSurvey(surveyData);
+
+                    }
+
+                    else {
+
+                        const prefill = await getSalesPrefill(
+                            response.customer_request_id
+                        );
+
+                        setPrefillData(prefill);
+
+                    }
+
+                    if (response.asset_id) {
+
+                        const assetData = await getAsset(
+                            response.asset_id
+                        );
+
+                        setAssetProfile(assetData);
 
                     }
 
@@ -321,6 +353,10 @@ export default function EnquiryWorkspace() {
                 customer={customer}
 
                 survey={survey}
+
+                prefillData={prefillData}
+
+                assetProfile={assetProfile}
 
                 opsSelection={opsSelection}
 

@@ -17,9 +17,43 @@ from backend.repositories.customer_master_repository import (
     get_asset,
     find_asset_by_path,
     create_asset,
+    update_asset_profile,
     set_follow_up,
     list_linked_enquiries
 )
+
+
+# ====================================
+# ASSET DETAIL (single asset - for the Enquiry Workspace's
+# Asset Profile card, shown before a Sales Survey has ever been
+# submitted for an enquiry linked to a known asset)
+# ====================================
+
+def get_asset_detail_request(
+        db,
+        asset_id
+):
+    asset = get_asset(db, asset_id)
+
+    if not asset:
+        return None
+
+    return {
+        "id": asset.id,
+        "division": asset.division,
+        "plant": asset.plant,
+        "department": asset.department,
+        "name": asset.name,
+        "asset_type": asset.asset_type,
+        "cleaning_frequency": asset.cleaning_frequency,
+        "next_due": asset.next_due.isoformat() if asset.next_due else None,
+        "last_verified": asset.last_verified.isoformat() if asset.last_verified else None,
+        "verified_by": asset.verified_by,
+        "observed_material": asset.observed_material,
+        "access_opening_type": asset.access_opening_type,
+        "can_place_equipment_nearby": asset.can_place_equipment_nearby,
+        "pain_point": asset.pain_point
+    }
 
 from backend.models.techno_commercial_quote import Quote
 
@@ -213,7 +247,17 @@ def list_customer_assets_request(
             "id": asset.id,
             "label": " → ".join(filter(None, [
                 asset.division, asset.plant, asset.department, asset.name
-            ]))
+            ])),
+            "division": asset.division,
+            "plant": asset.plant,
+            "department": asset.department,
+            "name": asset.name,
+            "asset_type": asset.asset_type,
+            "cleaning_frequency": asset.cleaning_frequency,
+            "observed_material": asset.observed_material,
+            "access_opening_type": asset.access_opening_type,
+            "can_place_equipment_nearby": asset.can_place_equipment_nearby,
+            "pain_point": asset.pain_point
         }
         for asset in list_assets(db, customer_id)
     ]
@@ -263,10 +307,23 @@ def resolve_or_create_asset(
         department,
         name,
         asset_type,
-        cleaning_frequency
+        cleaning_frequency,
+        observed_material=None,
+        access_opening_type=None,
+        can_place_equipment_nearby=None,
+        pain_point=None
 ):
     if asset_id:
-        return get_asset(db, asset_id)
+        asset = get_asset(db, asset_id)
+
+        if asset:
+            return update_asset_profile(
+                db, asset, asset_type, cleaning_frequency,
+                observed_material, access_opening_type,
+                can_place_equipment_nearby, pain_point
+            )
+
+        return None
 
     if not (plant and name):
         return None
@@ -278,7 +335,11 @@ def resolve_or_create_asset(
     existing = find_asset_by_path(db, customer_id, division, plant, department, name)
 
     if existing:
-        return existing
+        return update_asset_profile(
+            db, existing, asset_type, cleaning_frequency,
+            observed_material, access_opening_type,
+            can_place_equipment_nearby, pain_point
+        )
 
     return create_asset(
         db,
@@ -288,5 +349,9 @@ def resolve_or_create_asset(
         department,
         name,
         asset_type,
-        cleaning_frequency
+        cleaning_frequency,
+        observed_material,
+        access_opening_type,
+        can_place_equipment_nearby,
+        pain_point
     )

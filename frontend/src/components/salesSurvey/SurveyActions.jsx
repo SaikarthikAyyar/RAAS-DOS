@@ -101,6 +101,21 @@ surveyData.customer?.nearest_hub,
 urgency:
 surveyData.customer?.urgency,
 
+surveyed_by:
+surveyData.customer?.surveyed_by,
+
+survey_trigger:
+surveyData.customer?.survey_trigger,
+
+repeat_potential:
+surveyData.customer?.repeat_potential,
+
+tentative_start_date:
+surveyData.customer?.tentative_start_date,
+
+tentative_end_date:
+surveyData.customer?.tentative_end_date,
+
 
 // ====================================
 // SECTION B
@@ -166,6 +181,15 @@ surveyData.job?.temperature_range,
 
 sample_available:
 surveyData.job?.sample_available,
+
+abrasiveness:
+surveyData.job?.abrasiveness,
+
+permit_required:
+surveyData.job?.permit_required,
+
+flowability:
+surveyData.job?.flowability,
 
 
 // ====================================
@@ -323,6 +347,12 @@ surveyData.geometry?.access_type,
 equipment_nearby:
 surveyData.geometry?.equipment_nearby,
 
+tank_location:
+surveyData.geometry?.tank_location,
+
+setup_complexity:
+surveyData.geometry?.setup_complexity,
+
 
 // ====================================
 // SECTION D
@@ -413,6 +443,12 @@ surveyData.pump?.ph_condition,
 pump_power_source:
 surveyData.pump?.pump_power_source,
 
+pump_risk:
+surveyData.pump?.pump_risk,
+
+effective_work_hours:
+Number(surveyData.pump?.effective_work_hours) || null,
+
 
 // ====================================
 // SECTION F
@@ -454,6 +490,15 @@ surveyData.dewatering?.moisture_guarantee,
 cake_handling_scope:
 surveyData.dewatering?.cake_handling_scope,
 
+filtrate_route_detail:
+surveyData.dewatering?.filtrate_route_detail,
+
+polymer_allowed:
+surveyData.dewatering?.polymer_allowed,
+
+commitment:
+surveyData.dewatering?.commitment,
+
 
 // ====================================
 // SECTION G
@@ -467,7 +512,22 @@ shutdown_window:
 surveyData.insights?.shutdown_window,
 
 completion_deadline:
-surveyData.insights?.completion_deadline
+surveyData.insights?.completion_deadline,
+
+current_method:
+surveyData.insights?.current_method,
+
+budget_known:
+surveyData.insights?.budget_known,
+
+budget_estimate:
+Number(surveyData.insights?.budget_estimate) || null,
+
+decision_maker:
+surveyData.insights?.decision_maker,
+
+billing_address:
+surveyData.insights?.billing_address
 
 };
 

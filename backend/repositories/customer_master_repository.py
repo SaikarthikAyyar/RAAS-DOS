@@ -296,7 +296,11 @@ def create_asset(
         department,
         name,
         asset_type,
-        cleaning_frequency
+        cleaning_frequency,
+        observed_material=None,
+        access_opening_type=None,
+        can_place_equipment_nearby=None,
+        pain_point=None
 ):
     asset = Asset(
         customer_id=customer_id,
@@ -305,10 +309,57 @@ def create_asset(
         department=department,
         name=name,
         asset_type=asset_type,
-        cleaning_frequency=cleaning_frequency
+        cleaning_frequency=cleaning_frequency,
+        observed_material=observed_material,
+        access_opening_type=access_opening_type,
+        can_place_equipment_nearby=can_place_equipment_nearby,
+        pain_point=pain_point
     )
 
     db.add(asset)
+    db.commit()
+    db.refresh(asset)
+
+    return asset
+
+
+# ====================================
+# UPDATE ASSET PROFILE
+# Keeps a reused asset's mutable site-profile fields current with
+# whatever was just submitted, instead of leaving them frozen at
+# first creation - these fields are expected to drift over time
+# (material on site, access changes, etc), unlike the structural
+# division/plant/department/name identity of the asset.
+# ====================================
+
+def update_asset_profile(
+        db,
+        asset,
+        asset_type,
+        cleaning_frequency,
+        observed_material,
+        access_opening_type,
+        can_place_equipment_nearby,
+        pain_point
+):
+    if asset_type:
+        asset.asset_type = asset_type
+
+    if cleaning_frequency:
+        asset.cleaning_frequency = cleaning_frequency
+
+    if observed_material:
+        asset.observed_material = observed_material
+
+    if access_opening_type:
+        asset.access_opening_type = access_opening_type
+
+    if can_place_equipment_nearby is not None:
+        asset.can_place_equipment_nearby = can_place_equipment_nearby
+
+    if pain_point:
+        asset.pain_point = pain_point
+
     db.commit()
     db.refresh(asset)
 
