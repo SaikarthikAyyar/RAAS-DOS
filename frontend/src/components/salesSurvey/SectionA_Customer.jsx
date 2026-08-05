@@ -8,6 +8,14 @@ urgencyOptions
 
 from "../../data/salesSurveyOptions";
 
+import {
+
+FieldInput
+
+}
+
+from "../shared/FormField";
+
 
 export default function SectionA_Customer({
 
@@ -25,11 +33,25 @@ customerSurveys,
 
 selectedSurvey,
 
-setSelectedSurvey
+setSelectedSurvey,
+
+errors,
+
+touched,
+
+touchField,
+
+submitAttempted
 
 }){
 
 const customer = surveyData.customer || {};
+
+function fieldError(field){
+
+    return errors?.[`customer.${field}`] && (touched?.[`customer.${field}`] || submitAttempted);
+
+}
 
 return(
 
@@ -164,7 +186,7 @@ value={customer.id}
 
 >
 
-{`CR-${customer.id} | ${customer.company_name}`}
+{`CR${customer.id} - ${customer.company_name}`}
 
 </option>
 
@@ -270,7 +292,7 @@ readOnly
 {/* NEAREST HUB */}
 {/* ==================================== */}
 
-<div className="survey-field">
+<div className={fieldError("nearest_hub") ? "survey-field field-error" : "survey-field"}>
 
 <label>
 
@@ -295,6 +317,8 @@ e.target.value
 )
 
 }
+
+onBlur={()=>touchField("customer", "nearest_hub")}
 
 >
 
@@ -330,13 +354,19 @@ value={item}
 
 </select>
 
+{
+    fieldError("nearest_hub") && (
+        <span className="field-error-message">Nearest Hub is required.</span>
+    )
+}
+
 </div>
 
 {/* ==================================== */}
 {/* URGENCY */}
 {/* ==================================== */}
 
-<div className="survey-field">
+<div className={fieldError("urgency") ? "survey-field field-error" : "survey-field"}>
 
 <label>
 
@@ -361,6 +391,8 @@ e.target.value
 )
 
 }
+
+onBlur={()=>touchField("customer", "urgency")}
 
 >
 
@@ -396,43 +428,39 @@ value={item}
 
 </select>
 
+{
+    fieldError("urgency") && (
+        <span className="field-error-message">Urgency is required.</span>
+    )
+}
+
 </div>
 
 {/* ==================================== */}
 {/* SURVEY DATE */}
 {/* ==================================== */}
 
-<div className="survey-field">
+<FieldInput
 
-<label>
-
-Survey Date*
-
-</label>
-
-<input
+label="Survey Date*"
 
 type="date"
 
-value={customer.survey_date || ""}
+value={customer.survey_date}
 
-onChange={(e)=>
+section="customer"
 
-updateSection(
+field="survey_date"
 
-"customer",
+updateSection={updateSection}
 
-"survey_date",
+onBlur={()=>touchField("customer", "survey_date")}
 
-e.target.value
+error={fieldError("survey_date")}
 
-)
-
-}
+errorMessage="Survey Date is required."
 
 />
-
-</div>
 
 </div>
 

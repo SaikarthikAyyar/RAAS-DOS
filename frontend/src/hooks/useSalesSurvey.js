@@ -85,6 +85,41 @@ previous=>(
 // until submit uploads them)
 // ====================================
 
+const [
+
+touched,
+
+setTouched
+
+] = useState({});
+
+const touchField=(
+
+section,
+
+field
+
+)=>{
+
+setTouched(
+
+previous=>(
+
+{
+
+...previous,
+
+[`${section}.${field}`]:true
+
+}
+
+)
+
+);
+
+};
+
+
 const updateMediaFiles=(
 
 files
@@ -654,39 +689,57 @@ Object.entries(
 
 
 
-const requiredFields = [
+// ====================================
+// REQUIRED FIELD KEYS
+// Single source of truth for which Sales Survey fields are required
+// (Sections A/B/C only - matches the "*" labels already on those
+// fields; D-H have none). Both the canSubmit gate below and the
+// per-field error highlighting derive from this same list, so they
+// can never drift apart.
+// ====================================
+
+const REQUIRED_FIELD_KEYS = [
 
     // Section A
-    surveyData.customer?.company_name,
-    surveyData.customer?.plant_site_location,
-    surveyData.customer?.contact_person,
-    surveyData.customer?.contact_number,
-    surveyData.customer?.nearest_hub,
-    surveyData.customer?.urgency,
-    surveyData.customer?.survey_date,
+    "customer.company_name",
+    "customer.plant_site_location",
+    "customer.contact_person",
+    "customer.contact_number",
+    "customer.nearest_hub",
+    "customer.urgency",
+    "customer.survey_date",
 
     // Section B
-    surveyData.job?.job_type,
-    surveyData.job?.material_category,
-    surveyData.job?.sludge_hardness,
-    surveyData.job?.debris_level,
-    surveyData.job?.cleaning_date,
-    surveyData.job?.cleaning_frequency,
+    "job.job_type",
+    "job.material_category",
+    "job.sludge_hardness",
+    "job.debris_level",
+    "job.cleaning_date",
+    "job.cleaning_frequency",
 
     // Section C
-    surveyData.geometry?.tank_type,
-    surveyData.geometry?.length_dia,
-    surveyData.geometry?.width,
-    surveyData.geometry?.sludge_depth,
-
+    "geometry.tank_type",
+    "geometry.length_dia",
+    "geometry.width",
+    "geometry.sludge_depth"
 
 ];
 
-const canSubmit = requiredFields.every(value =>
-    value !== null &&
-    value !== undefined &&
-    value !== ""
-);
+function isEmpty(value){
+    return value === null || value === undefined || value === "";
+}
+
+const errors = {};
+
+REQUIRED_FIELD_KEYS.forEach(key => {
+
+    const [section, field] = key.split(".");
+
+    errors[key] = isEmpty(surveyData[section]?.[field]);
+
+});
+
+const canSubmit = Object.values(errors).every(hasError => !hasError);
 
 const completion = Math.min(
     100,
@@ -739,7 +792,13 @@ updateMediaFiles,
 
 metrics,
 
-canSubmit
+canSubmit,
+
+errors,
+
+touched,
+
+touchField
 
 };
 

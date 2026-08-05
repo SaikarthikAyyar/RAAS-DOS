@@ -10,6 +10,16 @@ assetTypeOptions
 
 from "../../data/salesSurveyOptions";
 
+import {
+
+FieldInput,
+
+FieldSelect
+
+}
+
+from "../shared/FormField";
+
 
 // ====================================
 // COMPONENT
@@ -23,7 +33,15 @@ export default function Section2_RequirementBasics({
 
 customerData,
 
-updateSection
+updateSection,
+
+errors,
+
+touched,
+
+touchField,
+
+submitAttempted
 
 }){
 
@@ -36,6 +54,12 @@ const requirement=
 customerData.requirement || {};
 
 const hasExistingAsset = Boolean(customer.existing_asset_id);
+
+function fieldError(field){
+
+    return errors?.[field] && (touched?.[`requirement.${field}`] || submitAttempted);
+
+}
 
 
 return(
@@ -74,6 +98,12 @@ section="customer"
 field="plant_site_location"
 
 updateSection={updateSection}
+
+onBlur={()=>touchField("customer", "plant_site_location")}
+
+error={errors?.plant_site_location && (touched?.["customer.plant_site_location"] || submitAttempted)}
+
+errorMessage="Plant / Site Location is required."
 
 />
 
@@ -196,6 +226,9 @@ updateSection={updateSection}
     section="requirement"
     field="cleaning_date"
     updateSection={updateSection}
+    onBlur={()=>touchField("requirement", "cleaning_date")}
+    error={fieldError("cleaning_date")}
+    errorMessage="Cleaning Date is required."
 />
 
 <FieldSelect
@@ -212,6 +245,9 @@ updateSection={updateSection}
         "Yearly"
     ]}
     updateSection={updateSection}
+    onBlur={()=>touchField("requirement", "cleaning_frequency")}
+    error={fieldError("cleaning_frequency")}
+    errorMessage="Cleaning Frequency is required."
 />
 
 {
@@ -301,152 +337,6 @@ e.target.value
 
 
 </div>
-
-</div>
-
-)
-
-}
-
-
-// ====================================
-// INPUT
-// ====================================
-
-function FieldInput({
-
-label,
-
-value,
-type,
-
-section,
-
-field,
-
-updateSection
-
-}){
-
-return(
-
-<div className="survey-field">
-
-<label>
-
-{label}
-
-</label>
-
-<input
-    type={type || "text"}
-
-value={value || ""}
-
-onChange={(e)=>
-
-updateSection(
-
-section,
-
-field,
-
-e.target.value
-
-)
-
-}
-
-/>
-
-</div>
-
-)
-
-}
-
-
-// ====================================
-// SELECT
-// ====================================
-
-function FieldSelect({
-
-label,
-
-value,
-
-section,
-
-field,
-
-options,
-
-updateSection
-
-}){
-
-return(
-
-<div className="survey-field">
-
-<label>
-
-{label}
-
-</label>
-
-<select
-
-value={value || ""}
-
-onChange={(e)=>
-
-updateSection(
-
-section,
-
-field,
-
-e.target.value
-
-)
-
-}
-
->
-
-<option value="">
-
-Select
-
-</option>
-
-{
-
-options.map(
-
-item=>(
-
-<option
-
-key={item}
-
-value={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
 
 </div>
 

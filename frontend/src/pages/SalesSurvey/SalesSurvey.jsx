@@ -96,13 +96,21 @@ updateMediaFiles,
 
 metrics,
 
-canSubmit
+canSubmit,
+
+errors,
+
+touched,
+
+touchField
 
 }
 
 =
 
 useSalesSurvey();
+
+const [submitAttempted, setSubmitAttempted] = useState(false);
 
 
 
@@ -299,7 +307,7 @@ customers={[
 
 id:selectedCustomer,
 
-company_name:surveyData.company_name
+company_name:surveyData.customer?.company_name
 
 }
 
@@ -315,6 +323,14 @@ selectedSurvey={selectedSurvey}
 
 setSelectedSurvey={setSelectedSurvey}
 
+errors={errors}
+
+touched={touched}
+
+touchField={touchField}
+
+submitAttempted={submitAttempted}
+
 />
 
 
@@ -323,6 +339,14 @@ setSelectedSurvey={setSelectedSurvey}
 surveyData={surveyData}
 
 updateSection={updateSection}
+
+errors={errors}
+
+touched={touched}
+
+touchField={touchField}
+
+submitAttempted={submitAttempted}
 
 />
 
@@ -334,6 +358,14 @@ surveyData={surveyData}
 updateSection={updateSection}
 
 metrics={metrics}
+
+errors={errors}
+
+touched={touched}
+
+touchField={touchField}
+
+submitAttempted={submitAttempted}
 
 />
 
@@ -405,6 +437,8 @@ customerRequestId={selectedCustomer}
 enquiryId={enquiryId}
 
 salesSurveyId={salesSurveyId}
+
+onBlockedSubmit={()=>setSubmitAttempted(true)}
 
 />
 

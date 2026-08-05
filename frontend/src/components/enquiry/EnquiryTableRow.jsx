@@ -53,9 +53,13 @@ export default function EnquiryTableRow({
 
                     enquiry.customer_name
 
-                    ||
+                        ? (
+                            enquiry.customer_request_id
+                                ? `CR${enquiry.customer_request_id} - ${enquiry.customer_name}`
+                                : enquiry.customer_name
+                        )
 
-                    "—"
+                        : "—"
 
                 }
 

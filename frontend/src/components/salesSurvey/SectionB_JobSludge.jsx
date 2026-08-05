@@ -20,17 +20,41 @@ sampleAvailabilityOptions
 
 from "../../data/salesSurveyOptions";
 
+import {
+
+FieldInput,
+
+FieldSelect
+
+}
+
+from "../shared/FormField";
+
 
 export default function SectionB_JobSludge({
 
 surveyData,
 
-updateSection
+updateSection,
+
+errors,
+
+touched,
+
+touchField,
+
+submitAttempted
 
 }){
 
 
 const job = surveyData.job || {};
+
+function fieldError(field){
+
+    return errors?.[`job.${field}`] && (touched?.[`job.${field}`] || submitAttempted);
+
+}
 
 
 return(
@@ -60,6 +84,9 @@ section="job"
 field="job_type"
 options={jobTypes}
 updateSection={updateSection}
+onBlur={()=>touchField("job", "job_type")}
+error={fieldError("job_type")}
+errorMessage="Job Type is required."
 />
 
 
@@ -70,6 +97,9 @@ section="job"
 field="material_category"
 options={materialCategories}
 updateSection={updateSection}
+onBlur={()=>touchField("job", "material_category")}
+error={fieldError("material_category")}
+errorMessage="Material Category is required."
 />
 
 <FieldInput
@@ -79,6 +109,9 @@ value={job.cleaning_date}
 section="job"
 field="cleaning_date"
 updateSection={updateSection}
+onBlur={()=>touchField("job", "cleaning_date")}
+error={fieldError("cleaning_date")}
+errorMessage="Cleaning Date is required."
 />
 
 <FieldInput
@@ -87,6 +120,9 @@ value={job.cleaning_frequency}
 section="job"
 field="cleaning_frequency"
 updateSection={updateSection}
+onBlur={()=>touchField("job", "cleaning_frequency")}
+error={fieldError("cleaning_frequency")}
+errorMessage="Cleaning Frequency is required."
 />
 
 
@@ -97,6 +133,9 @@ section="job"
 field="sludge_hardness"
 options={sludge_hardnessOptions}
 updateSection={updateSection}
+onBlur={()=>touchField("job", "sludge_hardness")}
+error={fieldError("sludge_hardness")}
+errorMessage="Sludge Hardness is required."
 />
 
 
@@ -109,6 +148,9 @@ section="job"
 field="debris_level"
 options={debrisLevels}
 updateSection={updateSection}
+onBlur={()=>touchField("job", "debris_level")}
+error={fieldError("debris_level")}
+errorMessage="Debris Level is required."
 />
 
 <FieldSelect
@@ -211,144 +253,6 @@ updateSection={updateSection}
 
 
 </div>
-
-</div>
-
-)
-
-}
-
-
-function FieldInput({
-
-label,
-
-type,
-
-value,
-
-section,
-
-field,
-
-updateSection
-
-}){
-
-return(
-
-<div className="survey-field">
-
-<label>
-
-{label}
-
-</label>
-
-<input
-
-type={type || "text"}
-
-value={value || ""}
-
-onChange={(e)=>
-
-updateSection(
-
-section,
-
-field,
-
-e.target.value
-
-)
-
-}
-
-/>
-
-</div>
-
-)
-
-}
-
-
-function FieldSelect({
-
-label,
-
-value,
-
-section,
-
-field,
-
-options,
-
-updateSection
-
-}){
-
-return(
-
-<div className="survey-field">
-
-<label>
-
-{label}
-
-</label>
-
-<select
-
-value={value || ""}
-
-onChange={(e)=>
-
-updateSection(
-
-section,
-
-field,
-
-e.target.value
-
-)
-
-}
-
->
-
-<option value="">
-
-Select
-
-</option>
-
-{
-
-options.map(
-
-item=>(
-
-<option
-
-key={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
 
 </div>
 

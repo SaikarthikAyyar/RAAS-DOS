@@ -15,6 +15,10 @@ import { useNavigate } from "react-router-dom";
 import useCustomerRequest from "../../hooks/useCustomerRequest";
 
 import {
+  getCustomerRequestErrors
+} from "../../utils/customerRequestValidation";
+
+import {
   createCustomerRequest
 } from "../../services/customerService";
 
@@ -85,7 +89,11 @@ const{
 
     updateSection,
 
-    updateMedia
+    updateMedia,
+
+    touched,
+
+    touchField
 
 }
 
@@ -95,6 +103,15 @@ useCustomerRequest();
 
   const [submitting, setSubmitting] = useState(false);
 
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const errors = getCustomerRequestErrors(
+    customerData.customer || {},
+    customerData.requirement || {}
+  );
+
+  const hasErrors = Object.values(errors).some(Boolean);
+
 
   // ====================================
   // SUBMIT
@@ -103,6 +120,12 @@ useCustomerRequest();
 async function submit(){
 
     if(submitting){
+      return;
+    }
+
+    if(hasErrors){
+      setSubmitAttempted(true);
+      alert("Please fix the highlighted fields before submitting.");
       return;
     }
 
@@ -118,16 +141,6 @@ async function submit(){
 
       const uploads =
         customerData.uploads || {};
-
-      if(!customer.company_name){
-        alert("Company Name is required.");
-        return;
-      }
-
-      if(!customer.nature_of_job){
-        alert("Nature of Job is required.");
-        return;
-      }
 
       const hasExistingAsset = Boolean(customer.existing_asset_id);
 
@@ -245,11 +258,23 @@ customerData={customerData}
 
 updateSection={updateSection}
 
+errors={errors}
+
+touched={touched}
+
+touchField={touchField}
+
+submitAttempted={submitAttempted}
+
 />
 
       <Section2_RequirementBasics
         customerData={customerData}
         updateSection={updateSection}
+        errors={errors}
+        touched={touched}
+        touchField={touchField}
+        submitAttempted={submitAttempted}
       />
 
 

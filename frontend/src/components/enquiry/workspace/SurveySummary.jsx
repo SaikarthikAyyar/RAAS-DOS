@@ -5,10 +5,6 @@ import "./SurveySummary.css";
 import { useNavigate } from "react-router-dom";
 
 import {
-    createSurveyBranch
-} from "../../../services/enquiryWorkspaceService";
-
-import {
     advanceStageAtLeast
 }
 from "../../../services/enquiryWorkspaceService";
@@ -50,18 +46,6 @@ export default function SurveySummary({
 
             }
 
-        );
-
-    }
-
-    async function handleCreateSurvey(){
-
-        const newEnquiry = await createSurveyBranch(
-            enquiry.id
-        );
-
-        navigate(
-            `/enquiries/workspace/${newEnquiry.id}`
         );
 
     }
@@ -886,18 +870,6 @@ export default function SurveySummary({
                                     "Fill Survey"
 
                             }
-
-                        </button>
-
-                        <button
-
-                            className="survey-action-button survey-create-button"
-
-                            onClick={handleCreateSurvey}
-
-                        >
-
-                            Create Survey
 
                         </button>
 

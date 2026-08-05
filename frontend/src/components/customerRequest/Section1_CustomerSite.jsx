@@ -32,6 +32,18 @@ getCustomerAssets
 
 from "../../services/customerMasterService";
 
+import {
+
+FieldInput,
+
+FieldSelect
+
+}
+
+from "../shared/FormField";
+
+import { useAuth } from "../../contexts/AuthContext";
+
 
 // ====================================
 // COMPONENT
@@ -39,15 +51,35 @@ from "../../services/customerMasterService";
 // datalist-backed input (existing customer autocomplete, or type a
 // new one), an "Existing asset" dropdown scoped to whichever
 // customer resolves, driving whether NewSiteFields shows below.
+//
+// Only Admin gets the free-text datalist (typing an unmatched name
+// creates a new Business Master customer, per
+// resolve_or_create_customer -> create_customer_minimal). Every
+// other role is restricted to a plain select of existing customers -
+// no way to create a new one from here.
 // ====================================
 
 export default function Section1_CustomerSite({
 
 customerData,
 
-updateSection
+updateSection,
+
+errors,
+
+touched,
+
+touchField,
+
+submitAttempted
 
 }){
+
+const { user } = useAuth();
+
+const isAdmin = user?.role === "admin";
+
+const [addingNewCustomer, setAddingNewCustomer] = useState(false);
 
 const customer=
 
@@ -105,9 +137,29 @@ function handleCompanyNameChange(value){
 
 }
 
+function handleExistingCustomerSelect(customerId){
+
+    const match = allCustomers.find(
+        c=>String(c.id)===String(customerId)
+    );
+
+    updateSection("customer", "company_name", match ? match.company_name : "");
+
+    updateSection("customer", "customer_id", match ? match.id : null);
+
+    updateSection("customer", "existing_asset_id", null);
+
+}
+
 function handleAssetChange(value){
 
     updateSection("customer", "existing_asset_id", value ? Number(value) : null);
+
+}
+
+function fieldError(field){
+
+    return errors?.[field] && (touched?.[`customer.${field}`] || submitAttempted);
 
 }
 
@@ -137,35 +189,93 @@ Required
 <div className="survey-grid">
 
 
-<div className="survey-field">
+{
 
-<label>
+    isAdmin && addingNewCustomer
 
-*Company Name
+        ? (
 
-</label>
+            <div className={fieldError("company_name") ? "survey-field field-error" : "survey-field"}>
 
-<input
+                <label>
+                    *Company Name
+                    <button
+                        type="button"
+                        className="field-inline-link"
+                        onClick={()=>{
+                            setAddingNewCustomer(false);
+                            updateSection("customer", "company_name", "");
+                            updateSection("customer", "customer_id", null);
+                            updateSection("customer", "existing_asset_id", null);
+                        }}
+                    >
+                        ← Choose existing customer
+                    </button>
+                </label>
 
-    value={customer.company_name || ""}
+                <input
+                    value={customer.company_name || ""}
+                    autoComplete="off"
+                    placeholder="Type new company name"
+                    onChange={e=>handleCompanyNameChange(e.target.value)}
+                    onBlur={()=>touchField("customer", "company_name")}
+                />
 
-    list="crCustomerList"
+                {
+                    fieldError("company_name") && (
+                        <span className="field-error-message">
+                            Company Name is required.
+                        </span>
+                    )
+                }
 
-    onChange={e=>handleCompanyNameChange(e.target.value)}
+            </div>
 
-/>
+        )
+        : (
 
-<datalist id="crCustomerList">
+            <div className={fieldError("company_name") ? "survey-field field-error" : "survey-field"}>
 
-    {allCustomers.map(c=>(
+                <label>
+                    *Company Name
+                </label>
 
-        <option key={c.id} value={c.company_name} />
+                <select
+                    value={customer.customer_id || ""}
+                    onChange={e=>{
+                        if(e.target.value === "__new__"){
+                            setAddingNewCustomer(true);
+                            updateSection("customer", "company_name", "");
+                            updateSection("customer", "customer_id", null);
+                            updateSection("customer", "existing_asset_id", null);
+                            return;
+                        }
+                        handleExistingCustomerSelect(e.target.value);
+                    }}
+                    onBlur={()=>touchField("customer", "company_name")}
+                >
+                    <option value="">Select</option>
+                    {isAdmin && (
+                        <option value="__new__">+ Add New Customer</option>
+                    )}
+                    {allCustomers.map(c=>(
+                        <option key={c.id} value={c.id}>{c.company_name}</option>
+                    ))}
+                </select>
 
-    ))}
+                {
+                    fieldError("company_name") && (
+                        <span className="field-error-message">
+                            Company Name is required.
+                        </span>
+                    )
+                }
 
-</datalist>
+            </div>
 
-</div>
+        )
+
+}
 
 
 <FieldSelect
@@ -187,7 +297,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Contact Person"
+label="Client Site Contact Name"
 
 value={customer.contact_person}
 
@@ -202,7 +312,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Contact Number"
+label="Client Site Contact Number"
 
 value={customer.contact_number}
 
@@ -210,7 +320,38 @@ section="customer"
 
 field="contact_number"
 
+placeholder="e.g. +91 98200 11223"
+
 updateSection={updateSection}
+
+onBlur={()=>touchField("customer", "contact_number")}
+
+error={fieldError("contact_number")}
+
+errorMessage="Enter a valid 10-digit mobile number (e.g. +91 98200 11223)."
+
+/>
+
+
+<FieldInput
+
+label="Client Site Contact Email"
+
+value={customer.client_contact_email}
+
+section="customer"
+
+field="client_contact_email"
+
+placeholder="e.g. contact@company.com"
+
+updateSection={updateSection}
+
+onBlur={()=>touchField("customer", "client_contact_email")}
+
+error={fieldError("client_contact_email")}
+
+errorMessage="Enter a valid email address."
 
 />
 
@@ -262,14 +403,12 @@ options={natureOfJobOptions}
 
 updateSection={updateSection}
 
-/>
+onBlur={()=>touchField("customer", "nature_of_job")}
 
-<FieldInput
-label="Client Contact Email"
-value={customer.client_contact_email}
-section="customer"
-field="client_contact_email"
-updateSection={updateSection}
+error={fieldError("nature_of_job")}
+
+errorMessage="Nature of Job is required."
+
 />
 
 <div className="survey-field">
@@ -341,152 +480,3 @@ updateSection={updateSection}
 )
 
 }
-
-
-// ====================================
-// INPUT
-// ====================================
-
-function FieldInput({
-
-label,
-
-value,
-
-type,
-
-section,
-
-field,
-
-updateSection
-
-}){
-
-return(
-
-<div className="survey-field">
-
-<label>
-
-{label}
-
-</label>
-
-<input
-
-type={type || "text"}
-
-value={value || ""}
-
-onChange={(e)=>
-
-updateSection(
-
-section,
-
-field,
-
-e.target.value
-
-)
-
-}
-
-/>
-
-</div>
-
-)
-
-}
-
-
-// ====================================
-// SELECT
-// ====================================
-
-function FieldSelect({
-
-label,
-
-value,
-
-section,
-
-field,
-
-options,
-
-updateSection
-
-}){
-
-return(
-
-<div className="survey-field">
-
-<label>
-
-{label}
-
-</label>
-
-<select
-
-value={value || ""}
-
-onChange={(e)=>
-
-updateSection(
-
-section,
-
-field,
-
-e.target.value
-
-)
-
-}
-
->
-
-<option value="">
-
-Select
-
-</option>
-
-{
-
-options.map(
-
-item=>(
-
-<option
-
-key={item}
-
-value={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-</div>
-
-)
-
-}
-

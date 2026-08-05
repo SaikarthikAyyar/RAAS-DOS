@@ -62,6 +62,41 @@ previous=>(
 };
 
 
+const [
+
+touched,
+
+setTouched
+
+] = useState({});
+
+const touchField=(
+
+section,
+
+field
+
+)=>{
+
+setTouched(
+
+previous=>(
+
+{
+
+...previous,
+
+[`${section}.${field}`]:true
+
+}
+
+)
+
+);
+
+};
+
+
 const updateMedia=(
 
 type,
@@ -154,7 +189,11 @@ updateSection,
 
 updateMedia,
 
-counts
+counts,
+
+touched,
+
+touchField
 
 };
 

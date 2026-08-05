@@ -108,26 +108,6 @@ export async function updateModuleReference(
 
 }
 
-export async function createSurveyBranch(
-    enquiryId
-){
-
-    const response = await fetch(
-
-        `${API}/enquiry-consolidated/${enquiryId}/create-survey`,
-
-        {
-
-            method:"POST"
-
-        }
-
-    );
-
-    return response.json();
-
-}
-
 export async function requestOpsReview(
     enquiryId
 ){

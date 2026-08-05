@@ -331,9 +331,10 @@ text-align:left;
 
 /* ===================================
    INPUTS
-   Permanent visible orange border (not focus-only) - fields were
-   getting lost against the page because the resting border was
-   almost invisible (rgba(255,255,255,.12) on a light background).
+   Default border is neutral/black - it only turns orange when the
+   field is actually invalid (see .field-error below). Previously
+   every field was permanently orange regardless of validity, which
+   gave no signal about what was actually wrong with the form.
 =================================== */
 
 .survey-field input,
@@ -344,7 +345,7 @@ width:100%;
 
 height:auto;
 
-border:1.5px solid var(--orange);
+border:1.5px solid var(--ink);
 
 border-radius:8px;
 
@@ -359,6 +360,64 @@ background:#fff;
 color:var(--ink);
 
 outline:none;
+
+}
+
+
+/* ===================================
+   FIELD ERROR
+   Orange border + small inline message - the one signal reserved
+   for "this field is missing or malformed".
+=================================== */
+
+.survey-field.field-error input,
+
+.survey-field.field-error select{
+
+border-color:var(--orange);
+
+}
+
+.field-error-message{
+
+display:block;
+
+color:var(--orange);
+
+font-size:10.5px;
+
+font-weight:600;
+
+margin-top:3px;
+
+}
+
+
+/* ===================================
+   INLINE FIELD LINK
+   Small text-button next to a label (e.g. "Choose existing
+   customer" toggle) - not a full button, just a link-styled action.
+=================================== */
+
+.field-inline-link{
+
+background:none;
+
+border:none;
+
+padding:0;
+
+margin-left:8px;
+
+font-size:10.5px;
+
+font-weight:700;
+
+color:var(--orange);
+
+cursor:pointer;
+
+text-decoration:underline;
 
 }
 

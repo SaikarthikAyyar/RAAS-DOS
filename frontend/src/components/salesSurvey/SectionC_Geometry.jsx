@@ -26,7 +26,15 @@ surveyData,
 
 updateSection,
 
-metrics
+metrics,
+
+errors,
+
+touched,
+
+touchField,
+
+submitAttempted
 
 }){
 
@@ -34,6 +42,12 @@ metrics
 const geometry =
 
 surveyData.geometry || {};
+
+function fieldError(field){
+
+    return errors?.[`geometry.${field}`] && (touched?.[`geometry.${field}`] || submitAttempted);
+
+}
 
 
 const {
@@ -93,6 +107,12 @@ options={tankTypeOptions}
 
 updateSection={updateSection}
 
+onBlur={()=>touchField("geometry", "tank_type")}
+
+error={fieldError("tank_type")}
+
+errorMessage="Tank Type is required."
+
 />
 
 
@@ -109,6 +129,12 @@ field="length_dia"
 unit="m"
 
 updateSection={updateSection}
+
+onBlur={()=>touchField("geometry", "length_dia")}
+
+error={fieldError("length_dia")}
+
+errorMessage="Length / Dia is required."
 
 />
 
@@ -127,6 +153,12 @@ unit="m"
 
 updateSection={updateSection}
 
+onBlur={()=>touchField("geometry", "width")}
+
+error={fieldError("width")}
+
+errorMessage="Width is required."
+
 />
 
 
@@ -143,6 +175,12 @@ field="sludge_depth"
 unit="m"
 
 updateSection={updateSection}
+
+onBlur={()=>touchField("geometry", "sludge_depth")}
+
+error={fieldError("sludge_depth")}
+
+errorMessage="Sludge Depth is required."
 
 />
 
@@ -486,14 +524,20 @@ unit,
 
 placeholder,
 
-updateSection
+updateSection,
+
+onBlur,
+
+error,
+
+errorMessage
 
 }){
 
 
 return(
 
-<div className="survey-field">
+<div className={error ? "survey-field field-error" : "survey-field"}>
 
 
 <label>
@@ -523,6 +567,8 @@ e.target.value
 
 }
 
+onBlur={onBlur}
+
 />
 
 
@@ -538,6 +584,13 @@ unit && (
 
 )
 
+}
+
+
+{
+    error && errorMessage && (
+        <span className="field-error-message">{errorMessage}</span>
+    )
 }
 
 
@@ -564,14 +617,20 @@ field,
 
 options,
 
-updateSection
+updateSection,
+
+onBlur,
+
+error,
+
+errorMessage
 
 }){
 
 
 return(
 
-<div className="survey-field">
+<div className={error ? "survey-field field-error" : "survey-field"}>
 
 
 <label>
@@ -598,6 +657,8 @@ e.target.value
 )
 
 }
+
+onBlur={onBlur}
 
 >
 
@@ -633,6 +694,13 @@ value={item}
 }
 
 </select>
+
+
+{
+    error && errorMessage && (
+        <span className="field-error-message">{errorMessage}</span>
+    )
+}
 
 
 </div>

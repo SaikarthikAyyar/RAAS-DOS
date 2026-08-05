@@ -42,12 +42,24 @@ customerRequestId,
 
 enquiryId,
 
-salesSurveyId
+salesSurveyId,
+
+onBlockedSubmit
 
 }){
 
 
 async function submitSurvey(){
+
+if(!canSubmit){
+
+    onBlockedSubmit?.();
+
+    alert("Please fix the highlighted fields before submitting.");
+
+    return;
+
+}
 
 try{
 
@@ -543,8 +555,6 @@ return(
 <button
 
 className="survey-btn save-btn"
-
-disabled={!canSubmit}
 
 onClick={submitSurvey}
 
