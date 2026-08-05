@@ -11,6 +11,30 @@ from backend.models.enquiry import Enquiry
 
 
 # ====================================
+# NORMALIZE COMPANY NAME
+# Trims + collapses whitespace runs (str.split() with no args does
+# both), then uppercases only each word's first character - not
+# .title()/.capitalize(), which lowercase everything after the first
+# letter and would mangle real acronym-style customer names already
+# in the data (NTPC NNTPS, JSW Steel, ACC, GAIL Pipelines) into
+# nonsense like "Ntpc Nntps".
+# ====================================
+
+def normalize_company_name(
+        name
+):
+    if not name:
+        return name
+
+    words = name.split()
+
+    return " ".join(
+        w[0].upper() + w[1:] if w else w
+        for w in words
+    )
+
+
+# ====================================
 # LIST CUSTOMERS
 # ====================================
 
@@ -74,12 +98,14 @@ def get_customer_by_company_name(
         db,
         company_name
 ):
+    normalized = normalize_company_name(company_name)
+
     return (
         db.query(
             Customer
         )
         .filter(
-            Customer.company_name.ilike(company_name)
+            Customer.company_name.ilike(normalized)
         )
         .first()
     )
@@ -87,14 +113,26 @@ def get_customer_by_company_name(
 
 # ====================================
 # CREATE CUSTOMER
+# Finds-or-creates by normalized name first, matching
+# resolve_or_create_customer()'s established pattern - this path
+# (the Business Masters "New customer" modal) previously had no
+# dedup check at all, so a repeat submission would silently insert
+# a duplicate row.
 # ====================================
 
 def create_customer(
         db,
         payload
 ):
+    normalized_name = normalize_company_name(payload.company_name)
+
+    existing = get_customer_by_company_name(db, normalized_name)
+
+    if existing:
+        return existing
+
     customer = Customer(
-        company_name=payload.company_name,
+        company_name=normalized_name,
         category=payload.category,
         industry=payload.industry,
         region=payload.region,
@@ -120,7 +158,7 @@ def create_customer_minimal(
         owner=None
 ):
     customer = Customer(
-        company_name=company_name,
+        company_name=normalize_company_name(company_name),
         category="Standard Industrial",
         owner=owner
     )

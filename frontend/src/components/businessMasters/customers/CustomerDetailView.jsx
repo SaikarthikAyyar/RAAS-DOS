@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
+import * as XLSX from "xlsx";
+
 
 // ====================================
 // FORMATTERS
@@ -26,45 +28,17 @@ function followUpPill(bucket){
 
 
 // ====================================
-// CSV EXPORT (client-side, matches
-// wireframe's exportCustomerCSV())
+// SHEET NAME
+// Excel sheet names are capped at 31 characters and can't contain
+// []:*?/\ — trims and strips those so long/odd company names don't
+// break the export.
 // ====================================
 
-function downloadCSV(filename, headers, rows){
+function sheetName(suffix, companyName){
 
-    const escapeCell = value=>{
+    const base = `${companyName} - ${suffix}`.replace(/[\[\]:*?/\\]/g, "");
 
-        const text = value===null || value===undefined ? "" : String(value);
-
-        return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-
-    };
-
-    const csv = [
-
-        headers.map(escapeCell).join(","),
-
-        ...rows.map(row=>row.map(escapeCell).join(","))
-
-    ].join("\n");
-
-    const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-    link.href = url;
-
-    link.download = filename;
-
-    document.body.appendChild(link);
-
-    link.click();
-
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
+    return base.slice(0, 31);
 
 }
 
@@ -100,9 +74,9 @@ export default function CustomerDetailView({
 
             <>
 
-            <button className="bm-backlink" onClick={onBack}>← Back</button>
-
             <p className="bm-muted" style={{marginTop:12}}>Loading customer...</p>
+
+            <button className="bm-backlink" onClick={onBack}>← Back</button>
 
             </>
 
@@ -110,43 +84,49 @@ export default function CustomerDetailView({
 
     }
 
-    function handleExportAssets(){
+    function handleExportCustomer(){
 
-        if(!detail.assets || detail.assets.length===0){
+        const detailsSheet = XLSX.utils.aoa_to_sheet([
 
-            alert("No assets on file for this customer yet — nothing to export.");
-
-            return;
-
-        }
-
-        const rows = detail.assets.map(a=>[
-
-            detail.company_name,
-
-            a.division,
-
-            a.plant,
-
-            a.department,
-
-            a.name,
-
-            a.cleaning_frequency,
-
-            a.next_due
+            ["Field", "Value"],
+            ["Company", detail.company_name],
+            ["Category", detail.category || ""],
+            ["Industry", detail.industry || ""],
+            ["Region", detail.region || ""],
+            ["Owner", detail.owner || ""],
+            ["GST Number", detail.gst_number || ""],
+            ["Next Follow-up Date", detail.next_follow_up_date || ""],
+            ["Next Follow-up Note", detail.next_follow_up_note || ""]
 
         ]);
 
-        downloadCSV(
+        const assetRows = (detail.assets || []).map(a=>[
 
-            detail.company_name.replace(/\s/g, "_")+"_assets.csv",
+            a.division || "",
+            a.plant || "",
+            a.department || "",
+            a.name || "",
+            a.cleaning_frequency || "",
+            a.next_due || "",
+            a.last_verified || "",
+            a.verified_by || ""
 
-            ["Company","Division","Plant","Department","Asset","Frequency","Next due"],
+        ]);
 
-            rows
+        const assetsSheet = XLSX.utils.aoa_to_sheet([
 
-        );
+            ["Division", "Plant", "Department", "Asset", "Cleaning Frequency", "Next Due", "Last Verified", "Verified By"],
+            ...assetRows
+
+        ]);
+
+        const workbook = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(workbook, detailsSheet, sheetName("Details", detail.company_name));
+
+        XLSX.utils.book_append_sheet(workbook, assetsSheet, sheetName("Assets", detail.company_name));
+
+        XLSX.writeFile(workbook, `${detail.company_name.replace(/\s/g, "_")}_360_Export.xlsx`);
 
     }
 
@@ -154,8 +134,9 @@ export default function CustomerDetailView({
 
         <>
 
-        <button className="bm-backlink" onClick={onBack}>← Back</button>
-
+        <div className="bm-detail-header">
+            <button className="bm-backlink" style={{marginTop:12}} onClick={onBack}>← Back</button>
+        </div>
         <div className="bm-detail-grid">
 
             <div className="bm-card">
@@ -278,11 +259,11 @@ export default function CustomerDetailView({
 
                     style={{marginTop:8}}
 
-                    onClick={handleExportAssets}
+                    onClick={handleExportCustomer}
 
                 >
 
-                    ⬇ Export customer assets
+                    ⬇ Export Current Customer
 
                 </button>
 
@@ -381,6 +362,7 @@ export default function CustomerDetailView({
             </div>
 
         </div>
+
 
         </>
 

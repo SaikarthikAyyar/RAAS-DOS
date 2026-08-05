@@ -83,6 +83,16 @@
     border-color:var(--deep);
 }
 
+/* ====================================
+   DETAIL HEADER
+==================================== */
+
+.bm-detail-header{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    margin-bottom:12px;
+}
 
 /* ====================================
    CARD (matches wireframe .card / .card h3 / .card h4)

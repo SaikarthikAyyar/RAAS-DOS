@@ -65,71 +65,7 @@ A. Customer / Opportunity
 
 </h2>
 
-<div className="survey-id">
 
-<label>
-
-Survey ID
-
-</label>
-
-<select
-
-value={selectedSurvey}
-
-onChange={(e)=>{
-
-console.log(
-
-"[SalesSurvey] Survey Selected:",
-
-e.target.value
-
-);
-
-setSelectedSurvey(
-
-e.target.value
-
-);
-
-}}
-
->
-
-<option value="">
-
-Pending
-
-</option>
-
-{
-
-customerSurveys.map(
-
-survey=>(
-
-<option
-
-key={survey.id}
-
-value={survey.id}
-
->
-
-{`SS-${survey.id}`}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-</div>
 
 
 </div>
