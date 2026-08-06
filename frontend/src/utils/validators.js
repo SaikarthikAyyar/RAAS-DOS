@@ -39,3 +39,25 @@ export function isValidPhone(value) {
     return PHONE_PATTERN.test(normalized);
 
 }
+
+
+// ====================================
+// JANYUTECH EMAIL
+// Only @janyutech.com addresses are accepted for new user accounts
+// (both the public signup form and Administration's Add User form) -
+// mirrors backend/utils/email_validation.py's is_janyutech_email.
+// ====================================
+
+export function isJanyutechEmail(value) {
+
+    if (!value) {
+        return true;
+    }
+
+    const normalized = value.trim().toLowerCase();
+
+    const [localPart, domain] = normalized.split("@");
+
+    return Boolean(localPart) && domain === "janyutech.com";
+
+}

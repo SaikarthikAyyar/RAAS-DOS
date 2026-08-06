@@ -5,6 +5,7 @@ from backend.schemas.administrationUsers_schema import (
     AdministrationUserCreate,
     AdministrationUserUpdate,
 )
+from backend.services.email_service import send_welcome_email
 
 
 # ==========================================================
@@ -81,6 +82,18 @@ def create_user(
     print(
 
         f"[Administration Users Service] -> User created successfully. ID = {new_user.id}"
+
+    )
+
+    send_welcome_email(
+
+        new_user.email,
+
+        new_user.name,
+
+        new_user.role,
+
+        payload.password,
 
     )
 

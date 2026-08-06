@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
+
+from backend.utils.email_validation import is_janyutech_email
 
 
 class AdministrationUserCreate(BaseModel):
@@ -10,6 +12,13 @@ class AdministrationUserCreate(BaseModel):
     password: str
     role: str
     is_active: bool = True
+
+    @field_validator("email")
+    @classmethod
+    def validate_janyutech_email(cls, value):
+        if not is_janyutech_email(value):
+            raise ValueError("Only @janyutech.com email addresses are allowed")
+        return value
 
 
 class AdministrationUserUpdate(BaseModel):

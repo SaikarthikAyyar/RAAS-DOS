@@ -10,6 +10,10 @@ import { useAuth } from "../contexts/AuthContext";
 
 import logo from "../assets/JanyutechLogo.jpg";
 
+import { isJanyutechEmail } from "../utils/validators";
+
+import { signupUser } from "../services/signupService";
+
 
 // ====================================
 // DEVELOPMENT USERS
@@ -56,64 +60,51 @@ function Login(){
     const navigate = useNavigate();
 
 
-    const [
+    // ====================================
+    // TAB
+    // ====================================
 
+    const [activeTab, setActiveTab] = useState("login");
+
+
+    // ====================================
+    // LOGIN TAB STATE
+    // ====================================
+
+    const [
         role,
-
         setRole
-
     ] = useState("");
 
-
-
     const [
-
         email,
-
         setEmail
-
     ] = useState("");
-
-
 
     const [
-
         password,
-
         setPassword
-
     ] = useState("");
-
 
 
     function handleRoleChange(
-
         selectedRole
-
     ){
 
         setRole(
-
             selectedRole
-
         );
 
         if(
-
             developmentUsers[selectedRole]
-
         ){
 
             setEmail(
-
                 developmentUsers[selectedRole].email
-
             );
 
             setPassword(
-
                 developmentUsers[selectedRole].password
-
             );
 
         }
@@ -127,7 +118,6 @@ function Login(){
         }
 
     }
-
 
 
     async function handleLogin(){
@@ -171,6 +161,101 @@ function Login(){
     }
 
 
+    // ====================================
+    // SIGN UP TAB STATE
+    // Role is fixed to Sales Executive for now - not a selectable
+    // field, per direct instruction.
+    // ====================================
+
+    const [signupName, setSignupName] = useState("");
+
+    const [signupEmail, setSignupEmail] = useState("");
+
+    const [signupEmailTouched, setSignupEmailTouched] = useState(false);
+
+    const [signupPassword, setSignupPassword] = useState("");
+
+    const [signingUp, setSigningUp] = useState(false);
+
+    const [signupMessage, setSignupMessage] = useState("");
+
+    const signupEmailInvalid =
+        signupEmailTouched && signupEmail && !isJanyutechEmail(signupEmail);
+
+    async function handleSignup(){
+
+        if(signingUp){
+            return;
+        }
+
+        if(!signupName.trim()){
+            alert("Name is required.");
+            return;
+        }
+
+        if(!isJanyutechEmail(signupEmail)){
+            setSignupEmailTouched(true);
+            alert("Only @janyutech.com email addresses are allowed.");
+            return;
+        }
+
+        if(!signupPassword){
+            alert("Password is required.");
+            return;
+        }
+
+        setSigningUp(true);
+
+        setSignupMessage("");
+
+        try{
+
+            await signupUser(
+
+                signupName,
+
+                signupEmail,
+
+                signupPassword
+
+            );
+
+            setSignupMessage(
+                "Account created. Your login details have been emailed to you — switch to the Login tab to sign in."
+            );
+
+            setSignupName("");
+
+            setSignupEmail("");
+
+            setSignupEmailTouched(false);
+
+            setSignupPassword("");
+
+        }
+
+        catch(error){
+
+            alert(
+
+                error.message
+
+            );
+
+        }
+
+        finally{
+
+            setSigningUp(false);
+
+        }
+
+    }
+
+
+    // ====================================
+    // UI
+    // ====================================
 
     return(
 
@@ -196,97 +281,245 @@ function Login(){
 
     </p>
 
-    <div className="login-form">
+    <div className="login-tabs">
 
-    <select
+        <button
 
-    value={role}
+            type="button"
 
-    onChange={(e)=>
+            className={
+                activeTab === "login"
+                    ? "login-tab login-tab-active"
+                    : "login-tab"
+            }
 
-    handleRoleChange(
+            onClick={()=>setActiveTab("login")}
 
-    e.target.value
+        >
 
-    )
+            Login
 
-    }
+        </button>
 
-    >
+        <button
 
-    <option value="">
+            type="button"
 
-    Select Development Role
+            className={
+                activeTab === "signup"
+                    ? "login-tab login-tab-active"
+                    : "login-tab"
+            }
 
-    </option>
+            onClick={()=>setActiveTab("signup")}
 
-    <option value="admin">
+        >
 
-    Admin
+            Sign Up
 
-    </option>
-
-    <option value="sales_executive">
-
-    Sales Executive
-
-    </option>
-
-    </select>
-
-    <input
-
-    type="email"
-
-    placeholder="Email"
-
-    value={email}
-
-    onChange={(e)=>
-
-    setEmail(
-
-    e.target.value
-
-    )
-
-    }
-
-    />
-
-    <input
-
-    type="password"
-
-    placeholder="Password"
-
-    value={password}
-
-    onChange={(e)=>
-
-    setPassword(
-
-    e.target.value
-
-    )
-
-    }
-
-    />
-
-    <button
-
-    className="primary-button"
-
-    onClick={handleLogin}
-
-    >
-
-    Login
-
-    </button>
+        </button>
 
     </div>
+
+    {
+
+        activeTab === "login"
+
+            ? (
+
+                <div className="login-form">
+
+                    <select
+
+                    value={role}
+
+                    onChange={(e)=>
+
+                    handleRoleChange(
+
+                    e.target.value
+
+                    )
+
+                    }
+
+                    >
+
+                    <option value="">
+
+                    Select Development Role
+
+                    </option>
+
+                    <option value="admin">
+
+                    Admin
+
+                    </option>
+
+                    <option value="sales_executive">
+
+                    Sales Executive
+
+                    </option>
+
+                    </select>
+
+                    <input
+
+                    type="email"
+
+                    placeholder="Email"
+
+                    value={email}
+
+                    onChange={(e)=>
+
+                    setEmail(
+
+                    e.target.value
+
+                    )
+
+                    }
+
+                    />
+
+                    <input
+
+                    type="password"
+
+                    placeholder="Password"
+
+                    value={password}
+
+                    onChange={(e)=>
+
+                    setPassword(
+
+                    e.target.value
+
+                    )
+
+                    }
+
+                    />
+
+                    <button
+
+                    className="primary-button"
+
+                    onClick={handleLogin}
+
+                    >
+
+                    Login
+
+                    </button>
+
+                </div>
+
+            )
+
+            : (
+
+                <div className="login-form">
+
+                    <input
+
+                        type="text"
+
+                        placeholder="Full Name"
+
+                        value={signupName}
+
+                        onChange={(e)=>setSignupName(e.target.value)}
+
+                    />
+
+                    <input
+
+                        type="email"
+
+                        placeholder="Email (e.g. name@janyutech.com)"
+
+                        className={signupEmailInvalid ? "login-input-invalid" : ""}
+
+                        value={signupEmail}
+
+                        onChange={(e)=>setSignupEmail(e.target.value)}
+
+                        onBlur={()=>setSignupEmailTouched(true)}
+
+                    />
+
+                    {
+
+                        signupEmailInvalid && (
+
+                            <span className="login-field-error">
+
+                                Only @janyutech.com email addresses are allowed.
+
+                            </span>
+
+                        )
+
+                    }
+
+                    <input
+
+                        type="password"
+
+                        placeholder="Password"
+
+                        value={signupPassword}
+
+                        onChange={(e)=>setSignupPassword(e.target.value)}
+
+                    />
+
+                    <div className="login-role-fixed">
+
+                        <span>Role</span>
+
+                        <strong>Sales Executive</strong>
+
+                    </div>
+
+                    <button
+
+                        className="primary-button"
+
+                        onClick={handleSignup}
+
+                        disabled={signingUp}
+
+                    >
+
+                        {signingUp ? "Creating account..." : "Sign Up"}
+
+                    </button>
+
+                    {
+
+                        signupMessage && (
+
+                            <p className="login-signup-success">
+
+                                {signupMessage}
+
+                            </p>
+
+                        )
+
+                    }
+
+                </div>
+
+            )
+
+    }
 
     </div>
 
