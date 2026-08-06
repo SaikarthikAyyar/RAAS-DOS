@@ -6,6 +6,10 @@ import { useEffect } from "react";
 
 import { useState } from "react";
 
+import { useRef } from "react";
+
+import { ArrowUp } from "lucide-react";
+
 import {
 
     useLocation
@@ -111,6 +115,43 @@ touchField
 useSalesSurvey();
 
 const [submitAttempted, setSubmitAttempted] = useState(false);
+
+// ====================================
+// SCROLL-TO-TOP BUTTON
+// Shows once the user has scrolled past the top cards, so it isn't
+// just sitting there redundantly when the top of the page (where it
+// scrolls back to) is already in view.
+// ====================================
+
+const [showScrollTop, setShowScrollTop] = useState(false);
+
+const pageRef = useRef(null);
+
+useEffect(()=>{
+
+    const scrollContainer = pageRef.current?.closest(".app-content");
+
+    if(!scrollContainer){
+        return;
+    }
+
+    function handleScroll(){
+        setShowScrollTop(scrollContainer.scrollTop > 300);
+    }
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+
+    return ()=>scrollContainer.removeEventListener("scroll", handleScroll);
+
+}, []);
+
+function scrollToTop(){
+
+    const scrollContainer = pageRef.current?.closest(".app-content");
+
+    scrollContainer?.scrollTo({ top:0, behavior:"smooth" });
+
+}
 
 
 
@@ -289,10 +330,26 @@ useEffect(() => {
 
 return(
 
-<div className="sales-survey-page">
+<div className="sales-survey-page" ref={pageRef}>
+
+
+<div className="survey-completion-card">
+
+    <span>Progress:</span>
+
+    <strong>{metrics.completion}%</strong>
+
+</div>
 
 
 <SurveyProgress/>
+
+
+<SurveySummary
+
+metrics={metrics}
+
+/>
 
 
 <SectionA_Customer
@@ -415,15 +472,6 @@ customerRequestId={selectedCustomer}
 />
 
 
-<SurveySummary
-
-metrics={metrics}
-
-completion={metrics.completion}
-
-/>
-
-
 <SurveyActions
 
 surveyData={surveyData}
@@ -441,6 +489,31 @@ salesSurveyId={salesSurveyId}
 onBlockedSubmit={()=>setSubmitAttempted(true)}
 
 />
+
+
+{
+
+    showScrollTop && (
+
+        <button
+
+            type="button"
+
+            className="survey-scroll-top-btn"
+
+            aria-label="Scroll to top"
+
+            onClick={scrollToTop}
+
+        >
+
+            <ArrowUp size={20}/>
+
+        </button>
+
+    )
+
+}
 
 
 </div>

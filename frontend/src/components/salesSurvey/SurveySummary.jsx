@@ -4,9 +4,7 @@
 
 export default function SurveySummary({
 
-metrics = {},
-
-completion = 0
+metrics = {}
 
 }){
 
@@ -132,15 +130,6 @@ title="Recommended Package"
 value={packageName}
 
 />
-
-
-<div className="survey-completion-card">
-
-    <span>Progress:</span>
-
-    <strong>{completion}%</strong>
-
-</div>
 
 
 </div>

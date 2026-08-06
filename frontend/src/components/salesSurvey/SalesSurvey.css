@@ -171,7 +171,7 @@ border:1px solid var(--line);
 
 background:white;
 
-box-shadow:0 4px 14px rgba(17,24,39,.04);
+box-shadow:0 6px 18px rgba(17,24,39,.12);
 
 display:flex;
 
@@ -191,7 +191,13 @@ color:var(--ink);
 
 flex-shrink:0;
 
-position:static;
+position:fixed;
+
+top:96px;
+
+right:28px;
+
+z-index:50;
 
 }
 
@@ -605,6 +611,58 @@ color:var(--ink);
 
 
 /* ===================================
+   SCROLL TO TOP
+   Fixed bottom-right, shown once the user has scrolled past the
+   top-of-page metric cards - lets them jump back up to see those
+   without manually scrolling through the whole form.
+=================================== */
+
+.survey-scroll-top-btn{
+
+position:fixed;
+
+right:28px;
+
+bottom:28px;
+
+width:44px;
+
+height:44px;
+
+border:none;
+
+border-radius:50%;
+
+background:var(--orange);
+
+color:white;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+cursor:pointer;
+
+box-shadow:0 8px 20px rgba(245,130,32,.35);
+
+transition:.15s ease;
+
+z-index:50;
+
+}
+
+.survey-scroll-top-btn:hover{
+
+background:#d96b0d;
+
+transform:translateY(-2px);
+
+}
+
+
+/* ===================================
    RESPONSIVE
 =================================== */
 
@@ -623,14 +681,6 @@ grid-template-columns:repeat(2,1fr);
 flex-direction:column;
 
 gap:12px;
-
-}
-
-.survey-completion-card{
-
-width:100%;
-
-justify-content:center;
 
 }
 
