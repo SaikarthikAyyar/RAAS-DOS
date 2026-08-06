@@ -627,17 +627,109 @@ box-shadow:0 10px 34px rgba(245,130,32,.5);
 }
 
 /* ====================================
+   SIDEBAR TOGGLE (hamburger)
+   Always visible now, on every screen size - the sidebar is an
+   off-canvas drawer everywhere, not just on mobile.
+==================================== */
+
+.sidebar-toggle-btn{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+width:38px;
+
+height:38px;
+
+border:none;
+
+border-radius:10px;
+
+background:transparent;
+
+color:var(--ink);
+
+cursor:pointer;
+
+flex-shrink:0;
+
+}
+
+.sidebar-toggle-btn:hover{
+
+background:var(--bg);
+
+}
+
+/* ====================================
+   SIDEBAR - OFF-CANVAS DRAWER (all screen sizes)
+   Fixed and translated off-screen by default, slid in via the
+   .app-sidebar-open class toggled from MainLayout's state. Since
+   it's taken out of normal flow, .app-main naturally fills the
+   full width underneath it.
+==================================== */
+
+.app-shell{
+
+position:relative;
+
+}
+
+.app-sidebar{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:min(85vw,290px);
+
+min-width:0;
+
+height:100vh;
+
+transform:translateX(-100%);
+
+transition:transform .25s ease;
+
+z-index:100;
+
+}
+
+.app-sidebar.app-sidebar-open{
+
+transform:translateX(0);
+
+}
+
+/* ====================================
+   SIDEBAR BACKDROP
+   Tapping anywhere on this closes the open drawer. Only ever in the
+   DOM while the sidebar is open (conditionally rendered), so no
+   hidden/shown toggle needed here.
+==================================== */
+
+.sidebar-backdrop{
+
+position:fixed;
+
+inset:0;
+
+background:rgba(9,11,16,.5);
+
+z-index:90;
+
+}
+
+/* ====================================
    RESPONSIVE
 ==================================== */
 
 @media(max-width:900px){
-
-.app-sidebar{
-
-width:240px;
-min-width:240px;
-
-}
 
 .login-card{
 
@@ -648,22 +740,6 @@ width:90%;
 }
 
 @media(max-width:700px){
-
-.app-shell{
-
-flex-direction:column;
-
-}
-
-.app-sidebar{
-
-width:100%;
-min-width:100%;
-height:auto;
-
-}
-
-
 
 .app-content{
 

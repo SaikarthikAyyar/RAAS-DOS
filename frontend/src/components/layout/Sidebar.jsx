@@ -3,7 +3,11 @@ import logo from "../../assets/JanyutechLogo.jpg";
 import { MODULE_META } from "../../config/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 
-export default function Sidebar(){
+export default function Sidebar({
+
+    onNavigate
+
+}){
 
     const { permissions, logout } = useAuth();
 
@@ -42,6 +46,8 @@ export default function Sidebar(){
                             key={item.path}
 
                             to={item.path}
+
+                            onClick={onNavigate}
 
                             className={({isActive})=>
 
