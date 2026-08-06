@@ -67,28 +67,36 @@ ROLES = [
 # EXCEPT admin - corrected per direct instruction to exclude
 # Customer Portal and Analytics (a deliberate change, not a faithful
 # migration, for that one role).
+#
+# Dashboard is deliberately excluded from every role below (2026-08-06
+# direct instruction) - the page is incomplete, so it's pulled from
+# the accessible-modules list for now rather than left half-built and
+# visible. The module/route itself is untouched, just not granted to
+# anyone - add "/dashboard" back to the relevant role(s) here (and
+# rerun the same removal script against role_permissions on both DBs,
+# in reverse, or just re-seed) once the page is ready.
 ROLE_NAV_ACCESS = {
 
     "admin": [
         path for path, _ in NAV_MODULES
-        if path not in ("/customer-portal", "/analytics")
+        if path not in ("/customer-portal", "/analytics", "/dashboard")
     ],
 
     "sales": [
-        "/dashboard", "/business-master", "/sales-survey", "/quote", "/quotes"
+        "/business-master", "/sales-survey", "/quote", "/quotes"
     ],
 
     "ops": [
-        "/dashboard", "/ops-approval", "/ops-selector", "/dewatering-gate",
+        "/ops-approval", "/ops-selector", "/dewatering-gate",
         "/job-creation", "/allocation", "/execution"
     ],
 
     "management": [
-        "/dashboard", "/approval"
+        "/approval"
     ],
 
     "customer": [
-        "/dashboard", "/customer-request", "/customer-portal"
+        "/customer-request", "/customer-portal"
     ],
 
     "sales_executive": [

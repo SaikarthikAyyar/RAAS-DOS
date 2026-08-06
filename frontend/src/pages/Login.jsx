@@ -152,7 +152,7 @@ function Login(){
 
             navigate(
 
-                "/dashboard"
+                "/administration"
 
             );
 
