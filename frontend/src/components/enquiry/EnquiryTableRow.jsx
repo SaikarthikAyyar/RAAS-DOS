@@ -1,3 +1,38 @@
+import { FolderOpen, Archive, ArchiveRestore, Ban, CheckCheck, Trash2 } from "lucide-react";
+
+// =========================================
+// ACTION BUTTON
+// Icon button with a custom hover tooltip - the native `title`
+// attribute has an inconsistent OS/browser-controlled delay and
+// position, so this renders its own instead for a reliable, styled
+// hover label.
+// =========================================
+
+function ActionButton({ icon: Icon, label, className, onClick }){
+
+    return(
+
+        <span className="enquiry-action-wrap">
+
+            <button
+                type="button"
+                className={className}
+                aria-label={label}
+                onClick={onClick}
+            >
+                <Icon size={15} strokeWidth={2}/>
+            </button>
+
+            <span className="enquiry-action-tooltip">
+                {label}
+            </span>
+
+        </span>
+
+    );
+
+}
+
 // =========================================
 // COMPONENT
 // =========================================
@@ -167,167 +202,47 @@ export default function EnquiryTableRow({
 
             <td className="enquiry-actions">
 
-                <button
-
-                    type="button"
-
+                <ActionButton
+                    icon={FolderOpen}
+                    label="Open"
                     className="enquiry-view"
+                    onClick={()=>onView?.(enquiry)}
+                />
 
-                    onClick={
-
-                        ()=>onView?.(
-
-                            enquiry
-
-                        )
-
-                    }
-
-                >
-
-                    Open
-
-                </button>
-
-                <span>
-
-                    &nbsp;•&nbsp;
-
-                </span>
-
-                <button
-
-                    type="button"
-
+                <ActionButton
+                    icon={Archive}
+                    label="Archive"
                     className="enquiry-archive"
+                    onClick={()=>onArchive?.(enquiry.id)}
+                />
 
-                    onClick={
-
-                        ()=>onArchive?.(
-
-                            enquiry.id
-
-                        )
-
-                    }
-
-                >
-
-                    Archive
-
-                </button>
-
-                <span>
-
-                    &nbsp;•&nbsp;
-
-                </span>
-
-                <button
-
-                    type="button"
-
+                <ActionButton
+                    icon={ArchiveRestore}
+                    label="Restore"
                     className="enquiry-restore"
+                    onClick={()=>onRestore?.(enquiry.id)}
+                />
 
-                    onClick={
-
-                        ()=>onRestore?.(
-
-                            enquiry.id
-
-                        )
-
-                    }
-
-                >
-
-                    Restore
-
-                </button>
-
-                <span>
-
-                    &nbsp;•&nbsp;
-
-                </span>
-
-                <button
-
-                    type="button"
-
+                <ActionButton
+                    icon={Ban}
+                    label="Lost"
                     className="enquiry-lost"
+                    onClick={()=>onLost?.(enquiry.id)}
+                />
 
-                    onClick={
-
-                        ()=>onLost?.(
-
-                            enquiry.id
-
-                        )
-
-                    }
-
-                >
-
-                    Lost
-
-                </button>
-
-                <span>
-
-                    &nbsp;•&nbsp;
-
-                </span>
-
-                <button
-
-                    type="button"
-
+                <ActionButton
+                    icon={CheckCheck}
+                    label="Close"
                     className="enquiry-close"
+                    onClick={()=>onClose?.(enquiry.id)}
+                />
 
-                    onClick={
-
-                        ()=>onClose?.(
-
-                            enquiry.id
-
-                        )
-
-                    }
-
-                >
-
-                    Close
-
-                </button>
-
-                <span>
-
-                    &nbsp;•&nbsp;
-
-                </span>
-
-                <button
-
-                    type="button"
-
+                <ActionButton
+                    icon={Trash2}
+                    label="Delete"
                     className="enquiry-delete"
-
-                    onClick={
-
-                        ()=>onDelete?.(
-
-                            enquiry.id
-
-                        )
-
-                    }
-
-                >
-
-                    Delete
-
-                </button>
+                    onClick={()=>onDelete?.(enquiry.id)}
+                />
 
             </td>
 

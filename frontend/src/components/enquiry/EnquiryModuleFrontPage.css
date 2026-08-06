@@ -399,7 +399,7 @@
 
     align-items:center;
 
-    gap:10px;
+    gap:5px;
 
     flex-wrap:nowrap;
 
@@ -407,21 +407,49 @@
 
 }
 
+.enquiry-action-wrap{
+
+    position:relative;
+
+    display:inline-flex;
+
+}
+
 .enquiry-actions button{
 
-    border:none;
+    display:flex;
 
-    background:none;
+    align-items:center;
+
+    justify-content:center;
+
+    width:28px;
+
+    height:28px;
+
+    border:1px solid transparent;
+
+    border-radius:7px;
+
+    background:transparent;
 
     cursor:pointer;
 
-    font-size:14px;
+    transition:.15s ease;
 
-    font-weight:700;
+}
 
-    transition:.2s;
+.enquiry-actions button:hover{
 
-    padding:0;
+    filter:brightness(0.92);
+
+    transform:translateY(-1px);
+
+}
+
+.enquiry-actions button:active{
+
+    transform:translateY(0);
 
 }
 
@@ -429,11 +457,9 @@
 
     color:var(--enquiry-blue);
 
-}
+    background:rgba(37,99,235,.08);
 
-.enquiry-view:hover{
-
-    text-decoration:underline;
+    border-color:rgba(37,99,235,.16);
 
 }
 
@@ -441,11 +467,9 @@
 
     color:var(--enquiry-purple);
 
-}
+    background:rgba(124,58,237,.08);
 
-.enquiry-archive:hover{
-
-    text-decoration:underline;
+    border-color:rgba(124,58,237,.16);
 
 }
 
@@ -453,11 +477,9 @@
 
     color:var(--enquiry-green);
 
-}
+    background:rgba(22,163,74,.08);
 
-.enquiry-restore:hover{
-
-    text-decoration:underline;
+    border-color:rgba(22,163,74,.16);
 
 }
 
@@ -465,11 +487,9 @@
 
     color:#ea580c;
 
-}
+    background:rgba(234,88,12,.08);
 
-.enquiry-lost:hover{
-
-    text-decoration:underline;
+    border-color:rgba(234,88,12,.16);
 
 }
 
@@ -477,11 +497,9 @@
 
     color:#0891b2;
 
-}
+    background:rgba(8,145,178,.08);
 
-.enquiry-close:hover{
-
-    text-decoration:underline;
+    border-color:rgba(8,145,178,.16);
 
 }
 
@@ -489,11 +507,63 @@
 
     color:var(--enquiry-red);
 
+    background:rgba(220,38,38,.08);
+
+    border-color:rgba(220,38,38,.16);
+
 }
 
-.enquiry-delete:hover{
 
-    text-decoration:underline;
+/* ==========================================================
+   ACTION TOOLTIP
+   Custom tooltip, not the native `title` attribute - browser-native
+   tooltips have an inconsistent OS-controlled delay/position, this
+   shows immediately and consistently on hover instead.
+========================================================== */
+
+.enquiry-action-tooltip{
+
+    position:absolute;
+
+    bottom:calc(100% + 6px);
+
+    left:50%;
+
+    transform:translateX(-50%) translateY(2px);
+
+    background:var(--ink, #1f2937);
+
+    color:#fff;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    line-height:1;
+
+    white-space:nowrap;
+
+    padding:5px 8px;
+
+    border-radius:5px;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:opacity .12s ease, transform .12s ease;
+
+    z-index:20;
+
+    box-shadow:0 4px 10px rgba(17,24,39,.18);
+
+}
+
+.enquiry-action-wrap:hover .enquiry-action-tooltip{
+
+    opacity:1;
+
+    transform:translateX(-50%) translateY(0);
 
 }
 
