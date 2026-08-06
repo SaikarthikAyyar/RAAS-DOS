@@ -142,15 +142,23 @@ def get_customer_detail_request(
     assets = [
         {
             "id": asset.id,
+            "customer_id": asset.customer_id,
             "division": asset.division,
             "plant": asset.plant,
             "department": asset.department,
             "name": asset.name,
             "asset_type": asset.asset_type,
             "cleaning_frequency": asset.cleaning_frequency,
+            "last_cleaned": asset.last_cleaned.isoformat() if asset.last_cleaned else None,
             "next_due": asset.next_due.isoformat() if asset.next_due else None,
             "last_verified": asset.last_verified.isoformat() if asset.last_verified else None,
-            "verified_by": asset.verified_by
+            "verified_by": asset.verified_by,
+            "observed_material": asset.observed_material,
+            "access_opening_type": asset.access_opening_type,
+            "can_place_equipment_nearby": asset.can_place_equipment_nearby,
+            "pain_point": asset.pain_point,
+            "profile": asset.profile,
+            "created_at": asset.created_at
         }
         for asset in list_assets(db, customer_id)
     ]
@@ -196,6 +204,8 @@ def get_customer_detail_request(
         "next_follow_up_owner": customer.next_follow_up_owner,
         "next_follow_up_note": customer.next_follow_up_note,
         "follow_up_bucket": _follow_up_bucket(customer.next_follow_up_date),
+        "created_at": customer.created_at,
+        "updated_at": customer.updated_at,
         "contacts": contacts,
         "assets": assets,
         "linked_enquiries": linked_enquiries

@@ -117,6 +117,8 @@ class AssetSchema(BaseModel):
 
     cleaning_frequency: str | None = None
 
+    last_cleaned: str | None = None
+
     next_due: str | None = None
 
     last_verified: str | None = None
@@ -130,6 +132,10 @@ class AssetSchema(BaseModel):
     can_place_equipment_nearby: bool | None = None
 
     pain_point: str | None = None
+
+    profile: dict | None = None
+
+    created_at: datetime | None = None
 
     class Config:
 
@@ -213,6 +219,10 @@ class CustomerListResponse(BaseModel):
 class CustomerDetailSchema(CustomerListItemSchema):
 
     gst_number: str | None = None
+
+    created_at: datetime | None = None
+
+    updated_at: datetime | None = None
 
     next_follow_up_owner: str | None = None
 

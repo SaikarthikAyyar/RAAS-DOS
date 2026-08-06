@@ -44,6 +44,29 @@ function sheetName(suffix, companyName){
 
 
 // ====================================
+// EXPORT FORMATTERS
+// ====================================
+
+function formatDateTime(value){
+
+    if(!value) return "";
+
+    const parsed = new Date(value);
+
+    return isNaN(parsed) ? value : parsed.toLocaleString();
+
+}
+
+function formatBool(value){
+
+    if(value===null || value===undefined) return "";
+
+    return value ? "Yes" : "No";
+
+}
+
+
+// ====================================
 // COMPONENT
 // Matches customerDetail(): grid cols2 (1.3fr/.7fr), left card =
 // company + contacts + assets, right card (single) = next
@@ -89,6 +112,7 @@ export default function CustomerDetailView({
         const detailsSheet = XLSX.utils.aoa_to_sheet([
 
             ["Field", "Value"],
+            ["ID", detail.id],
             ["Company", detail.company_name],
             ["Category", detail.category || ""],
             ["Industry", detail.industry || ""],
@@ -96,26 +120,45 @@ export default function CustomerDetailView({
             ["Owner", detail.owner || ""],
             ["GST Number", detail.gst_number || ""],
             ["Next Follow-up Date", detail.next_follow_up_date || ""],
-            ["Next Follow-up Note", detail.next_follow_up_note || ""]
+            ["Next Follow-up Owner", detail.next_follow_up_owner || ""],
+            ["Next Follow-up Note", detail.next_follow_up_note || ""],
+            ["Created At", formatDateTime(detail.created_at)],
+            ["Updated At", formatDateTime(detail.updated_at)]
 
         ]);
 
         const assetRows = (detail.assets || []).map(a=>[
 
+            a.id,
+            a.customer_id,
             a.division || "",
             a.plant || "",
             a.department || "",
             a.name || "",
+            a.asset_type || "",
             a.cleaning_frequency || "",
+            a.last_cleaned || "",
             a.next_due || "",
             a.last_verified || "",
-            a.verified_by || ""
+            a.verified_by || "",
+            a.observed_material || "",
+            a.access_opening_type || "",
+            formatBool(a.can_place_equipment_nearby),
+            a.pain_point || "",
+            a.profile ? JSON.stringify(a.profile) : "",
+            formatDateTime(a.created_at)
 
         ]);
 
         const assetsSheet = XLSX.utils.aoa_to_sheet([
 
-            ["Division", "Plant", "Department", "Asset", "Cleaning Frequency", "Next Due", "Last Verified", "Verified By"],
+            [
+                "ID", "Customer ID", "Division", "Plant", "Department", "Asset",
+                "Asset Type", "Cleaning Frequency", "Last Cleaned", "Next Due",
+                "Last Verified", "Verified By", "Observed Material",
+                "Access Opening Type", "Equipment Nearby Possible", "Pain Point",
+                "Profile", "Created At"
+            ],
             ...assetRows
 
         ]);
