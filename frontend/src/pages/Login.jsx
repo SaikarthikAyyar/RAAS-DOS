@@ -16,36 +16,6 @@ import { signupUser } from "../services/signupService";
 
 
 // ====================================
-// DEVELOPMENT USERS
-// ====================================
-
-// Trimmed to Admin + Sales Executive per direct instruction - the
-// other roles (management/sales/ops/customer) stay fully "linked"
-// (real roles, real role_permissions rows, real User accounts,
-// still work via manual email/password login) but no longer get a
-// one-click dropdown prefill.
-const developmentUsers = {
-
-    admin:{
-
-        email:"admin@raasdos.com",
-
-        password:"admin123"
-
-    },
-
-    sales_executive:{
-
-        email:"salesexec@raasdos.com",
-
-        password:"salesexec123"
-
-    }
-
-};
-
-
-// ====================================
 // COMPONENT
 // ====================================
 
@@ -72,11 +42,6 @@ function Login(){
     // ====================================
 
     const [
-        role,
-        setRole
-    ] = useState("");
-
-    const [
         email,
         setEmail
     ] = useState("");
@@ -85,39 +50,6 @@ function Login(){
         password,
         setPassword
     ] = useState("");
-
-
-    function handleRoleChange(
-        selectedRole
-    ){
-
-        setRole(
-            selectedRole
-        );
-
-        if(
-            developmentUsers[selectedRole]
-        ){
-
-            setEmail(
-                developmentUsers[selectedRole].email
-            );
-
-            setPassword(
-                developmentUsers[selectedRole].password
-            );
-
-        }
-
-        else{
-
-            setEmail("");
-
-            setPassword("");
-
-        }
-
-    }
 
 
     async function handleLogin(){
@@ -328,42 +260,6 @@ function Login(){
             ? (
 
                 <div className="login-form">
-
-                    <select
-
-                    value={role}
-
-                    onChange={(e)=>
-
-                    handleRoleChange(
-
-                    e.target.value
-
-                    )
-
-                    }
-
-                    >
-
-                    <option value="">
-
-                    Select Development Role
-
-                    </option>
-
-                    <option value="admin">
-
-                    Admin
-
-                    </option>
-
-                    <option value="sales_executive">
-
-                    Sales Executive
-
-                    </option>
-
-                    </select>
 
                     <input
 
