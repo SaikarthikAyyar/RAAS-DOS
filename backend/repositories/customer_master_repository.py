@@ -367,6 +367,28 @@ def update_asset_profile(
 
 
 # ====================================
+# SURVEY PROFILE
+# Second write-back point (the first is update_asset_profile above,
+# from Customer Request) - merges the site/geometry/access/pump
+# fields learned during a Sales Survey onto the linked Asset's
+# `profile` JSONB column, so the site's profile keeps accumulating
+# across both stages of the workflow.
+# ====================================
+
+def set_asset_survey_profile(
+        db,
+        asset,
+        profile_dict
+):
+    asset.profile = profile_dict
+
+    db.commit()
+    db.refresh(asset)
+
+    return asset
+
+
+# ====================================
 # NEXT FOLLOW-UP
 # ====================================
 
@@ -391,6 +413,29 @@ def set_follow_up(
     db.refresh(customer)
 
     return customer
+
+
+# ====================================
+# ENQUIRY BY CUSTOMER REQUEST
+# Resolves the asset linked to a given Customer Request (via its
+# Enquiry row's asset_id) - used to find which Asset a Sales Survey's
+# profile write-back should land on, since SalesSurvey only carries
+# customer_request_id, not asset_id directly.
+# ====================================
+
+def get_enquiry_by_customer_request(
+        db,
+        customer_request_id
+):
+    return (
+        db.query(
+            Enquiry
+        )
+        .filter(
+            Enquiry.customer_request_id == customer_request_id
+        )
+        .first()
+    )
 
 
 # ====================================

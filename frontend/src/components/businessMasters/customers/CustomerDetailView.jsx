@@ -107,6 +107,52 @@ export default function CustomerDetailView({
 
     }
 
+    const SURVEY_PROFILE_COLUMNS = [
+        ["material_category", "Survey: Material Category"],
+        ["tank_type", "Survey: Tank Type"],
+        ["sludge_hardness", "Survey: Sludge Hardness"],
+        ["debris_level", "Survey: Debris Level"],
+        ["water_visibility", "Survey: Water Visibility"],
+        ["hazard_level", "Survey: Hazard Level"],
+        ["tank_length", "Survey: Tank Length/Dia (m)"],
+        ["tank_width", "Survey: Tank Width (m)"],
+        ["tank_depth", "Survey: Sludge Depth (m)"],
+        ["opening_length", "Survey: Opening Length (mm)"],
+        ["opening_width", "Survey: Opening Width (mm)"],
+        ["opening_height", "Survey: Opening Height (mm)"],
+        ["height_from_ground", "Survey: Height From Ground (m)"],
+        ["drop_to_floor", "Survey: Drop To Floor (m)"],
+        ["setup_distance", "Survey: Setup Distance (m)"],
+        ["vertical_lift", "Survey: Vertical Lift (m)"],
+        ["hose_distance", "Survey: Hose Distance (m)"],
+        ["access_path_width", "Survey: Access Path Width (m)"],
+        ["access_support", "Survey: Access Support"],
+        ["customer_support", "Survey: Customer Support"],
+        ["access_type", "Survey: Access Type"],
+        ["equipment_nearby", "Survey: Equipment Nearby"],
+        ["scaffolding_needed", "Survey: Scaffolding Needed", true],
+        ["crane_available", "Survey: Crane Available", true],
+        ["tank_location", "Survey: Tank Location"],
+        ["setup_complexity", "Survey: Setup Complexity"],
+        ["power_available", "Survey: Power Available"],
+        ["water_available", "Survey: Water Available", true],
+        ["air_supply_available", "Survey: Air Supply Available"],
+        ["confined_space", "Survey: Confined Space", true],
+        ["ventilation_required", "Survey: Ventilation Required", true],
+        ["gas_testing_required", "Survey: Gas Testing Required", true],
+        ["ehs_restriction", "Survey: EHS Restriction"],
+        ["power_distance", "Survey: Power Distance (m)"],
+        ["abrasiveness", "Survey: Abrasiveness"],
+        ["ph_condition", "Survey: pH Condition"],
+        ["pump_power_source", "Survey: Pump Power Source"],
+        ["discharge_medium", "Survey: Discharge Medium"],
+        ["disposal_route", "Survey: Disposal Route"],
+        ["disposal_responsibility", "Survey: Disposal Responsibility"],
+        ["discharge_point_distance", "Survey: Discharge Point Distance (m)"],
+        ["last_survey_id", "Survey: Last Survey ID"],
+        ["last_survey_date", "Survey: Last Survey Date"]
+    ];
+
     function handleExportCustomer(){
 
         const detailsSheet = XLSX.utils.aoa_to_sheet([
@@ -145,7 +191,11 @@ export default function CustomerDetailView({
             a.access_opening_type || "",
             formatBool(a.can_place_equipment_nearby),
             a.pain_point || "",
-            a.profile ? JSON.stringify(a.profile) : "",
+            ...SURVEY_PROFILE_COLUMNS.map(([key, , isBool])=>{
+                const value = a.profile ? a.profile[key] : undefined;
+                if(value === undefined || value === null) return "";
+                return isBool ? formatBool(value) : value;
+            }),
             formatDateTime(a.created_at)
 
         ]);
@@ -157,7 +207,8 @@ export default function CustomerDetailView({
                 "Asset Type", "Cleaning Frequency", "Last Cleaned", "Next Due",
                 "Last Verified", "Verified By", "Observed Material",
                 "Access Opening Type", "Equipment Nearby Possible", "Pain Point",
-                "Profile", "Created At"
+                ...SURVEY_PROFILE_COLUMNS.map(([, label])=>label),
+                "Created At"
             ],
             ...assetRows
 

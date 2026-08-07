@@ -18,9 +18,72 @@ from backend.repositories.customer_master_repository import (
     find_asset_by_path,
     create_asset,
     update_asset_profile,
+    set_asset_survey_profile,
+    get_enquiry_by_customer_request,
     set_follow_up,
     list_linked_enquiries
 )
+
+
+# ====================================
+# SURVEY -> ASSET PROFILE WRITE-BACK
+# The second of the two write-backs the Asset record receives
+# (the first is at Customer Request submission, via
+# resolve_or_create_asset/update_asset_profile). Site/geometry/
+# access/pump fields that Sales Survey confirms in person, scoped to
+# match the Asset.profile column's own reserved intent ("geometry/
+# access/pump fields"). No-op if this Customer Request's Enquiry has
+# no linked asset (e.g. a request with no existing-asset match).
+# ====================================
+
+SURVEY_PROFILE_FIELDS = [
+    # Material / site condition
+    "material_category", "tank_type", "sludge_hardness", "debris_level",
+    "water_visibility", "hazard_level",
+    # Geometry / access
+    "tank_length", "tank_width", "tank_depth",
+    "opening_length", "opening_width", "opening_height",
+    "height_from_ground", "drop_to_floor", "setup_distance",
+    "vertical_lift", "hose_distance", "access_path_width",
+    "access_support", "customer_support", "access_type", "equipment_nearby",
+    "scaffolding_needed", "crane_available", "tank_location", "setup_complexity",
+    # Safety / utilities
+    "power_available", "water_available", "air_supply_available",
+    "confined_space", "ventilation_required", "gas_testing_required",
+    "ehs_restriction", "power_distance",
+    # Pump / discharge
+    "abrasiveness", "ph_condition", "pump_power_source",
+    "discharge_medium", "disposal_route", "disposal_responsibility",
+    "discharge_point_distance"
+]
+
+
+def sync_asset_profile_from_survey(
+        db,
+        survey
+):
+    enquiry = get_enquiry_by_customer_request(db, survey.customer_request_id)
+
+    if not enquiry or not enquiry.asset_id:
+        return None
+
+    asset = get_asset(db, enquiry.asset_id)
+
+    if not asset:
+        return None
+
+    profile_dict = {
+        field: getattr(survey, field)
+        for field in SURVEY_PROFILE_FIELDS
+    }
+
+    profile_dict["last_survey_id"] = survey.id
+
+    profile_dict["last_survey_date"] = (
+        survey.survey_date.isoformat() if survey.survey_date else None
+    )
+
+    return set_asset_survey_profile(db, asset, profile_dict)
 
 
 # ====================================

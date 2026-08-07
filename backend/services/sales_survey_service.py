@@ -30,6 +30,10 @@ from backend.services.enquiry_consolidated_service import (
     update_module_reference
 )
 
+from backend.services.customer_master_service import (
+    sync_asset_profile_from_survey
+)
+
 
 
 
@@ -50,7 +54,7 @@ def create_sales_survey_request(
 
         print("[Workflow] Updating Existing Survey")
 
-        return update_sales_survey(
+        survey = update_sales_survey(
 
             db,
 
@@ -60,15 +64,23 @@ def create_sales_survey_request(
 
         )
 
-    print("[Workflow] Creating New Survey")
+    else:
 
-    return create_sales_survey(
+        print("[Workflow] Creating New Survey")
 
-        db,
+        survey = create_sales_survey(
 
-        payload
+            db,
 
-    )
+            payload
+
+        )
+
+    if survey:
+
+        sync_asset_profile_from_survey(db, survey)
+
+    return survey
 
 
 # ====================================
