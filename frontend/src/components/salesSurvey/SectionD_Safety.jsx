@@ -265,20 +265,6 @@ e.target.value
 
 />
 
-{
-
-unit && (
-
-<div>
-
-{unit}
-
-</div>
-
-)
-
-}
-
 </div>
 
 )

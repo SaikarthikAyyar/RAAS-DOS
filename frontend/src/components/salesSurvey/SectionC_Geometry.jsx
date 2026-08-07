@@ -593,21 +593,6 @@ onBlur={onBlur}
 
 
 {
-
-unit && (
-
-<div>
-
-{unit}
-
-</div>
-
-)
-
-}
-
-
-{
     error && errorMessage && (
         <span className="field-error-message">{errorMessage}</span>
     )
@@ -764,21 +749,6 @@ readOnly
 value={value}
 
 />
-
-
-{
-
-unit && (
-
-<div>
-
-{unit}
-
-</div>
-
-)
-
-}
 
 
 </div>
