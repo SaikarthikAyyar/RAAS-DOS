@@ -36,9 +36,21 @@ function followUpPill(bucket){
 
 function sheetName(suffix, companyName){
 
-    const base = `${companyName} - ${suffix}`.replace(/[\[\]:*?/\\]/g, "");
+    // Excel sheet names cap at 31 chars. Truncating the full
+    // "{company} - {suffix}" string from the end (the old approach)
+    // could cut the suffix off entirely for a long company name,
+    // making the Details and Assets sheets collide on the exact same
+    // truncated name and crash the export - truncate the company
+    // portion instead, so the suffix always survives.
+    const cleanCompany = companyName.replace(/[\[\]:*?/\\]/g, "");
 
-    return base.slice(0, 31);
+    const cleanSuffix = suffix.replace(/[\[\]:*?/\\]/g, "");
+
+    const tail = ` - ${cleanSuffix}`;
+
+    const truncatedCompany = cleanCompany.slice(0, Math.max(31 - tail.length, 0));
+
+    return `${truncatedCompany}${tail}`.slice(0, 31);
 
 }
 
