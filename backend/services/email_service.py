@@ -3,27 +3,21 @@
 # ====================================
 
 import os
-import smtplib
-
-from email.message import EmailMessage
+import requests
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USERNAME = os.getenv("SMTP_USERNAME")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "RAAS-DOS")
-
-# Display "From" address - separate from SMTP_USERNAME, which is the
-# Gmail account actually authenticating. Gmail only lets the From
-# header be something other than the authenticated account if that
-# address is added as a verified "Send mail as" alias under
-# Settings -> Accounts and Import in that Gmail account; otherwise
-# Gmail silently rewrites it back to SMTP_USERNAME.
-SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", SMTP_USERNAME)
+# Render's outbound network blocks raw SMTP ports (confirmed via
+# [Errno 101] Network is unreachable connecting to smtp.gmail.com:587),
+# so the backend can no longer send mail directly via smtplib. Instead
+# it calls a small relay endpoint deployed on Vercel
+# (frontend/api/send-email.js) over plain HTTPS, which does the actual
+# Gmail SMTP send from there instead - HTTPS isn't blocked the way raw
+# SMTP ports are.
+EMAIL_RELAY_URL = os.getenv("EMAIL_RELAY_URL")
+EMAIL_RELAY_SECRET = os.getenv("EMAIL_RELAY_SECRET")
 
 
 # ====================================
@@ -62,17 +56,20 @@ If anything about your access looks wrong, contact your administrator.
 - RAAS-DOS
 """
 
-    message = EmailMessage()
-    message["Subject"] = subject
-    message["From"] = f"{SMTP_FROM_NAME} <{SMTP_FROM_EMAIL}>"
-    message["To"] = to_email
-    message.set_content(body)
-
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
-            server.starttls()
-            server.login(SMTP_USERNAME, SMTP_PASSWORD)
-            server.send_message(message)
+        response = requests.post(
+            EMAIL_RELAY_URL,
+            json={
+                "to": to_email,
+                "subject": subject,
+                "text": body
+            },
+            headers={
+                "x-relay-secret": EMAIL_RELAY_SECRET
+            },
+            timeout=15
+        )
+        response.raise_for_status()
 
         print(f"[EmailService] Welcome email sent to {to_email}")
 
