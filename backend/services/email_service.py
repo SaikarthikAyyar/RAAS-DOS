@@ -35,25 +35,30 @@ def send_welcome_email(
         role,
         password
 ):
-    subject = "Welcome to RAAS-DOS"
+    subject = "RAAS-DOS Account Notification"
 
-    body = f"""Hi {name},
+    body = f"""Dear {name},
 
-An account has been created for you on RAAS-DOS, the role-based workflow management system used to run enquiries, surveys, and job execution from a single place.
+This is an auto-generated notification. Please do not reply to this email.
 
-Your login details:
+An account has been created for you on RAAS-DOS, the role-based workflow management system used to manage enquiries, surveys, and job execution.
+
+Account details:
 
   Email:    {to_email}
   Password: {password}
   Role:     {role}
 
-RAAS-DOS walks an enquiry through its full lifecycle - Customer Request, Sales Survey, Ops Review, Techno-Commercial Approval, Commercial Approval, PO, Job Creation, Execution, and Completion - with each stage handled by the people whose role covers it. As a {role}, your sidebar will show only the modules relevant to your role.
+RAAS-DOS manages an enquiry through its full lifecycle - Customer Request, Sales Survey, Ops Review, Techno-Commercial Approval, Commercial Approval, PO, Job Creation, Execution, and Completion - with each stage handled by the personnel whose role covers it. As a {role}, you will have access to the modules relevant to your role.
 
-Log in at the RAAS-DOS URL you were given, using the email and password above. You can change your password later from within the app.
+Please log in using the email and password provided above. You are advised to change your password after your first login.
 
-If anything about your access looks wrong, contact your administrator.
+If you believe you have received this email in error, or if your access appears incorrect, please contact your system administrator.
 
-- RAAS-DOS
+This is a system-generated email. Please do not reply.
+
+Regards,
+RAAS-DOS
 """
 
     try:
