@@ -51,7 +51,7 @@ export default function OpsSelector(){
 
             <div className="ops-page-header">
 
-                <h1 style={{ color: "#000000" }}>
+                <h1>
 
                     Ops Selector
 
@@ -64,47 +64,6 @@ export default function OpsSelector(){
                     Operations Selection.
 
                 </p>
-
-            </div>
-
-
-            {/* ==================================== */}
-            {/* WORKFLOW INFORMATION */}
-            {/* ==================================== */}
-
-            <div className="ops-selector-bar">
-
-                <div className="ops-workflow-chip">
-
-                    <strong>
-
-                        Customer Request :
-
-                    </strong>
-
-                    {" "}
-
-                    CR-
-
-                    {opsData.customer_request_id}
-
-                </div>
-
-                <div className="ops-workflow-chip">
-
-                    <strong>
-
-                        Sales Survey :
-
-                    </strong>
-
-                    {" "}
-
-                    SS-
-
-                    {opsData.sales_survey_id}
-
-                </div>
 
             </div>
 

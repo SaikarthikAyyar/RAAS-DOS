@@ -1,36 +1,91 @@
 /* ===================================
    PAGE
+   Resized to the same scale as SalesSurvey.css / BusinessMasters.css
+   (h1 21px, card header 14.5px, field text 12.5px, buttons 12px) -
+   this file previously ran on its own much larger scale (56px
+   heading, 24px card headers, 18px table cells, 28px card radius),
+   which is what made Ops Selector look like a different product from
+   the rest of the app.
 =================================== */
 
 .ops-selector-page{
+
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
 
 width:100%;
 
 min-height:100vh;
 
-padding:20px 40px;
+padding:20px;
 
 background:var(--bg);
 
-overflow-y:auto;
+font-family:Inter,"Segoe UI",Arial,sans-serif;
+
+color:var(--ink);
+
+font-size:14px;
 
 }
 
+
 /* ===================================
-   OPS GRID
+   PAGE HEADER
+=================================== */
+
+.ops-page-header{
+
+margin-bottom:16px;
+
+}
+
+
+.ops-page-header h1{
+
+font-size:21px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0 0 6px 0;
+
+}
+
+
+.ops-page-header p{
+
+font-size:13px;
+
+color:var(--muted);
+
+margin:0;
+
+max-width:640px;
+
+line-height:1.5;
+
+}
+
+
+/* ===================================
+   GRID
 =================================== */
 
 .ops-grid{
 
 display:grid;
 
-grid-template-columns:1fr 1fr;
+grid-template-columns:repeat(2,minmax(0,1fr));
 
-gap:28px;
+gap:14px;
 
-align-items:start;
-
-margin-bottom:28px;
+margin-bottom:14px;
 
 }
 
@@ -47,280 +102,245 @@ background:var(--card);
 
 border:1px solid var(--line);
 
-border-radius:28px;
+border-radius:14px;
 
-padding:28px;
-
-margin-bottom:24px;
+padding:16px;
 
 box-shadow:0 4px 14px rgba(17,24,39,.04);
 
 }
 
 
-/* ===================================
-   HEADER
-=================================== */
-
 .ops-header{
 
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-margin-bottom:28px;
+margin-bottom:12px;
 
 }
 
+
 .ops-header h2{
 
-margin:0;
-
-font-size:24px;
+font-size:14.5px;
 
 font-weight:800;
 
 color:var(--ink);
+
+margin:0;
 
 }
 
 
 /* ===================================
    TABLE
+   Not a real <table> - a 3-column grid (label / value / unit) shared
+   by OpsInputs, OpsDecision, and OpsDaysManpower.
 =================================== */
 
 .ops-table{
 
 width:100%;
 
-display:flex;
-
-flex-direction:column;
-
-gap:16px;
-
 }
 
-
-/* ===================================
-   TABLE HEADER
-=================================== */
 
 .ops-table-header{
 
 display:grid;
 
-grid-template-columns:
+grid-template-columns:1fr 1.4fr .7fr;
 
-2fr
+gap:10px;
 
-2fr
+padding:0 0 8px 0;
 
-1fr;
+border-bottom:1px solid var(--line);
 
-padding:0 24px;
+}
 
-font-size:17px;
 
-font-weight:700;
+.ops-table-header > div{
+
+font-size:10.5px;
+
+font-weight:800;
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
 
 color:#475569;
 
 }
 
 
-/* ===================================
-   ROW
-=================================== */
-
 .ops-table-row{
 
 display:grid;
 
-grid-template-columns:
+grid-template-columns:1fr 1.4fr .7fr;
 
-2fr
-
-2fr
-
-1fr;
+gap:10px;
 
 align-items:center;
 
-min-height:72px;
+padding:8px 0;
 
-padding:0 24px;
-
-border-radius:22px;
-
-background:white;
-
-border:1px solid var(--line);
+border-bottom:1px dashed var(--line);
 
 }
 
 
-/* ===================================
-   TEXT
-=================================== */
+.ops-table-row:last-child{
+
+border-bottom:none;
+
+}
+
 
 .ops-label{
 
-font-size:18px;
-
-font-weight:600;
-
-color:var(--ink);
-
-}
-
-.ops-value{
-
-font-size:18px;
-
-font-weight:600;
-
-color:var(--ink);
-
-}
-
-.ops-unit{
-
-font-size:17px;
-
-font-weight:600;
-
-color:var(--muted);
-
-text-align:right;
-
-}
-
-
-/* ===================================
-   BADGES
-=================================== */
-
-.ops-badge{
-
-display:inline-flex;
-
-justify-content:center;
-
-align-items:center;
-
-padding:10px 22px;
-
-border-radius:999px;
-
-font-size:16px;
+font-size:12px;
 
 font-weight:700;
 
-width:max-content;
-
-}
-
-.badge-green{
-
-background:#c9f7d8;
-
-color:#0f6a37;
-
-}
-
-.badge-blue{
-
-background:#d8e7ff;
-
-color:#2248b5;
-
-}
-
-.badge-yellow{
-
-background:#fff0b8;
-
-color:#7b5d00;
-
-}
-
-.badge-red{
-
-background:#ffd6d6;
-
-color:#9f2020;
+color:var(--ink);
 
 }
 
 
-/* ===================================
-   ACTIONS
-=================================== */
+.ops-value{
 
-.ops-actions{
-
-display:flex;
-
-gap:20px;
-
-padding-top:10px;
-
-flex-wrap:wrap;
-
-}
-
-.ops-btn{
-
-height:72px;
-
-padding:0 34px;
-
-border:none;
-
-border-radius:22px;
-
-font-size:20px;
-
-font-weight:800;
-
-cursor:pointer;
-
-transition:0.2s;
-
-}
-
-.ops-btn-primary{
-
-background:var(--orange);
-
-color:#ffffff;
-
-}
-
-.ops-btn-secondary{
-
-background:white;
-
-border:1px solid var(--line);
+font-size:12.5px;
 
 color:var(--ink);
 
 }
 
-.ops-btn:hover{
 
-transform:translateY(-2px);
+.ops-unit{
+
+font-size:11px;
+
+color:var(--muted);
 
 }
 
-.ops-btn:disabled{
 
-opacity:.5;
+/* ===================================
+   INPUTS
+=================================== */
 
-cursor:not-allowed;
+.ops-input,
+
+.ops-select{
+
+width:100%;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:6px 8px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+}
+
+
+.ops-input:focus,
+
+.ops-select:focus{
+
+border-color:var(--orange);
+
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
+}
+
+
+/* ===================================
+   ACTIONS CARD
+=================================== */
+
+.ops-action-text{
+
+font-size:12.5px;
+
+color:var(--muted);
+
+margin:0 0 14px 0;
+
+line-height:1.5;
+
+}
+
+
+.ops-primary-btn,
+
+.ops-secondary-btn{
+
+display:block;
+
+width:100%;
+
+border-radius:9px;
+
+padding:8px 16px;
+
+font-size:12px;
+
+font-weight:750;
+
+cursor:pointer;
+
+margin-bottom:10px;
+
+border:1px solid var(--line);
+
+}
+
+
+.ops-primary-btn:last-child,
+
+.ops-secondary-btn:last-child{
+
+margin-bottom:0;
+
+}
+
+
+.ops-primary-btn{
+
+background:var(--orange);
+
+border-color:var(--orange);
+
+color:#fff;
+
+}
+
+
+.ops-secondary-btn{
+
+background:#fff;
+
+color:var(--ink);
+
+}
+
+
+.ops-secondary-btn:hover{
+
+background:#f8fafc;
 
 }
 
@@ -329,339 +349,12 @@ cursor:not-allowed;
    RESPONSIVE
 =================================== */
 
-@media(max-width:1100px){
+@media (max-width: 900px){
 
-.ops-table-header,
-
-.ops-table-row{
-
-grid-template-columns:
-
-1.5fr
-
-1.5fr
-
-1fr;
-
-}
-
-}
-
-@media(max-width:768px){
-
-.ops-table-header{
-
-display:none;
-
-}
-
-.ops-table-row{
+.ops-grid{
 
 grid-template-columns:1fr;
 
-gap:8px;
-
-padding:18px;
-
 }
-
-.ops-unit{
-
-text-align:left;
-
-}
-
-.ops-actions{
-
-flex-direction:column;
-
-}
-
-}
-
-/* ===================================
-   CARD
-=================================== */
-
-.ops-card{
-
-width:100%;
-
-height:100%;
-
-min-height:520px;
-
-display:flex;
-
-flex-direction:column;
-
-}
-
-.ops-action-text{
-
-font-size:20px;
-
-line-height:1.6;
-
-margin-bottom:30px;
-
-color:var(--muted);
-
-}
-
-.ops-primary-btn{
-
-width:100%;
-
-padding:18px;
-
-border:none;
-
-border-radius:18px;
-
-font-size:26px;
-
-font-weight:700;
-
-cursor:pointer;
-
-background:var(--orange);
-
-color:white;
-
-margin-bottom:20px;
-
-transition:.2s;
-
-}
-
-.ops-primary-btn:hover{
-
-transform:translateY(-2px);
-
-}
-
-.ops-secondary-btn{
-
-width:100%;
-
-padding:18px;
-
-border:1px solid var(--line);
-
-border-radius:18px;
-
-font-size:24px;
-
-font-weight:700;
-
-cursor:pointer;
-
-background:white;
-
-color:var(--ink);
-
-transition:.2s;
-
-}
-
-.ops-secondary-btn:hover{
-
-transform:translateY(-2px);
-
-}
-
-/* ====================================
-PAGE HEADER
-==================================== */
-
-.ops-page-header{
-
-text-align:center;
-
-margin-bottom:30px;
-
-}
-
-.ops-page-header h1{
-
-font-size:56px;
-
-font-weight:700;
-
-color:#162033;
-
-margin-bottom:8px;
-
-}
-
-.ops-page-header p{
-
-font-size:18px;
-
-color:#5c6f8b;
-
-margin:0;
-
-}
-
-
-/* ====================================
-SURVEY SELECTOR
-==================================== */
-
-.ops-selector-bar{
-
-display:flex;
-
-justify-content:center;
-
-margin-bottom:35px;
-
-}
-
-.ops-survey-select{
-
-width:420px;
-
-padding:12px 18px;
-
-font-size:16px;
-
-border-radius:10px;
-
-border:1px solid var(--line);
-
-background:white;
-
-}
-
-
-.ops-input{
-
-width:100%;
-
-background:white;
-
-color:var(--ink);
-
-border:1px solid var(--line);
-
-border-radius:18px;
-
-padding:14px 18px;
-
-font-size:18px;
-
-font-weight:600;
-
-outline:none;
-
-}
-
-.ops-input:focus{
-
-border-color:var(--orange);
-
-box-shadow:0 0 0 2px rgba(245,130,32,.15);
-
-}
-
-.ops-input::placeholder{
-
-    color:var(--muted);
-
-}
-
-.ops-input option{
-
-    background:#184b4d;
-
-    color:white;
-
-}
-
-.ops-input{
-
-    width:100%;
-
-    background:#2f7472;
-
-    color:#fff;
-
-    border:1px solid #3f8f8d;
-
-    border-radius:18px;
-
-    padding:14px 18px;
-
-    font-size:18px;
-
-    font-weight:600;
-
-    outline:none;
-
-}
-
-.ops-input:focus{
-
-    border-color:#46d8cf;
-
-    box-shadow:0 0 0 2px rgba(70,216,207,.25);
-
-}
-
-.ops-select{
-
-    width:100%;
-
-    min-width:220px;
-
-    background:white;
-
-    color:var(--ink);
-
-    border:1px solid var(--line);
-
-    border-radius:18px;
-
-    padding:14px 42px 14px 18px;
-
-    font-size:18px;
-
-    font-weight:600;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-
-    cursor:pointer;
-
-    outline:none;
-
-    appearance:none;
-    -webkit-appearance:none;
-    -moz-appearance:none;
-
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%231f2937' viewBox='0 0 16 16'%3E%3Cpath d='M3.204 5h9.592L8 10.481z'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;
-    background-position:right 14px center;
-}
-
-.ops-select option{
-
-background:white;
-
-color:var(--ink);
-
-}
-
-.ops-select:focus{
-
-   border-color:var(--orange);
-
-   box-shadow:0 0 0 2px rgba(245,130,32,.15);
 
 }
