@@ -8,13 +8,13 @@ export default function QuotesSearchBar({
 
     return (
 
-        <div className="enquiry-search-bar">
+        <div className="quotes-search-bar">
 
             <input
 
                 type="text"
 
-                className="enquiry-search-input"
+                className="quotes-search-input"
 
                 placeholder="Search by quote ID, enquiry ID or customer..."
 

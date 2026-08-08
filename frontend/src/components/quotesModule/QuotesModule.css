@@ -1,0 +1,497 @@
+/* ===================================
+   PAGE
+   Standalone stylesheet at the same type scale as SalesSurvey.css /
+   BusinessMasters.css / Operations.css - previously this page had no
+   CSS of its own and borrowed EnquiryModuleFrontPage.css wholesale
+   (34px heading, 30px card title, 999px pill tabs at 15px/700), which
+   is a much larger scale than the rest of the app and not what the
+   wireframe's renderQuotes() actually specifies. Deliberately kept
+   fully separate from EnquiryModuleFrontPage.css (class names below
+   are quotes-* not enquiry-*) so the Enquiry list page is untouched.
+=================================== */
+
+.quotes-page{
+
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
+
+width:100%;
+
+min-height:100vh;
+
+padding:20px;
+
+background:var(--bg);
+
+font-family:Inter,"Segoe UI",Arial,sans-serif;
+
+color:var(--ink);
+
+font-size:14px;
+
+}
+
+
+/* ===================================
+   HEADER
+=================================== */
+
+.quotes-header{
+
+margin-bottom:14px;
+
+}
+
+
+.quotes-header-title{
+
+font-size:21px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0 0 4px 0;
+
+}
+
+
+.quotes-header-subtitle{
+
+font-size:13px;
+
+color:var(--muted);
+
+margin:0;
+
+}
+
+
+/* ===================================
+   TOOLBAR
+=================================== */
+
+.quotes-toolbar{
+
+display:flex;
+
+align-items:center;
+
+margin-bottom:12px;
+
+}
+
+
+.quotes-toolbar-spacer{
+
+flex:1;
+
+}
+
+
+.quotes-export-button{
+
+border:1px solid var(--line);
+
+background:#fff;
+
+color:var(--ink);
+
+border-radius:9px;
+
+padding:7px 14px;
+
+font-size:12px;
+
+font-weight:750;
+
+cursor:pointer;
+
+transition:.15s;
+
+}
+
+
+.quotes-export-button:hover{
+
+background:#f8fafc;
+
+}
+
+
+.quotes-export-button:disabled{
+
+opacity:.6;
+
+cursor:default;
+
+}
+
+
+/* ===================================
+   STATUS TABS
+=================================== */
+
+.quotes-status-tabs{
+
+display:flex;
+
+gap:8px;
+
+margin-bottom:12px;
+
+}
+
+
+.quotes-status-tab{
+
+border:1px solid var(--line);
+
+background:#fff;
+
+color:#374151;
+
+border-radius:999px;
+
+padding:6px 14px;
+
+font-size:12px;
+
+font-weight:800;
+
+cursor:pointer;
+
+transition:.15s;
+
+}
+
+
+.quotes-status-tab.active{
+
+background:var(--deep);
+
+border-color:var(--deep);
+
+color:#fff;
+
+}
+
+
+/* ===================================
+   SEARCH BAR
+=================================== */
+
+.quotes-search-bar{
+
+margin-bottom:14px;
+
+}
+
+
+.quotes-search-input{
+
+width:100%;
+
+max-width:420px;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:7px 10px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+}
+
+
+.quotes-search-input:focus{
+
+border-color:var(--orange);
+
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
+}
+
+
+/* ===================================
+   CARD / TABLE
+=================================== */
+
+.quotes-card{
+
+width:100%;
+
+background:var(--card);
+
+border:1px solid var(--line);
+
+border-radius:14px;
+
+padding:16px;
+
+box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+margin-bottom:14px;
+
+}
+
+
+.quotes-table{
+
+width:100%;
+
+overflow-x:auto;
+
+}
+
+
+.quotes-table table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+
+.quotes-table th{
+
+text-align:left;
+
+font-size:10.5px;
+
+font-weight:800;
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
+
+color:#475569;
+
+background:#f8fafc;
+
+padding:8px 10px;
+
+border-bottom:1px solid var(--line);
+
+}
+
+
+.quotes-table td{
+
+font-size:12.5px;
+
+color:var(--ink);
+
+padding:9px 10px;
+
+border-bottom:1px solid var(--line);
+
+}
+
+
+.quotes-table tr:last-child td{
+
+border-bottom:none;
+
+}
+
+
+.quotes-loading,
+
+.quotes-error,
+
+.quotes-empty{
+
+font-size:12.5px;
+
+color:var(--muted);
+
+padding:10px 0;
+
+}
+
+
+.quotes-error{
+
+color:#b91c1c;
+
+}
+
+
+/* ===================================
+   STATUS PILLS
+   Matches the wireframe's own .pill / pillFor() exactly (padding
+   3px 10px, 11px/800, NOT uppercase - the Enquiry list's .enquiry-
+   status class this was based on before is a different, larger
+   convention and isn't what the wireframe actually uses here).
+=================================== */
+
+.quotes-status{
+
+display:inline-flex;
+
+align-items:center;
+
+border-radius:999px;
+
+padding:3px 10px;
+
+font-size:11px;
+
+font-weight:800;
+
+border:1px solid var(--line);
+
+background:#fff;
+
+white-space:nowrap;
+
+}
+
+
+.quotes-status-approved{
+
+color:#166534;
+
+background:#dcfce7;
+
+border-color:#bbf7d0;
+
+}
+
+
+.quotes-status-rejected{
+
+color:#991b1b;
+
+background:#fee2e2;
+
+border-color:#fecaca;
+
+}
+
+
+.quotes-status-revision{
+
+color:#92400e;
+
+background:#fef3c7;
+
+border-color:#fde68a;
+
+}
+
+
+.quotes-status-default{
+
+color:#475569;
+
+background:#f1f5f9;
+
+}
+
+
+/* ===================================
+   ROW ACTION
+   Matches the wireframe's .backlink exactly - a plain bold orange
+   text link ("Open →"), not a bordered/filled button.
+=================================== */
+
+.quotes-open-btn{
+
+background:none;
+
+border:none;
+
+padding:0;
+
+font-size:12px;
+
+font-weight:800;
+
+color:var(--orange);
+
+cursor:pointer;
+
+}
+
+
+.quotes-open-btn:hover{
+
+text-decoration:underline;
+
+}
+
+
+/* ===================================
+   PAGINATION
+   Matches the wireframe's .pager + .btn.xs exactly (left-aligned,
+   not centered; small 4px 8px / 11px buttons).
+=================================== */
+
+.quotes-pagination{
+
+display:flex;
+
+align-items:center;
+
+gap:10px;
+
+margin-top:10px;
+
+font-size:12px;
+
+}
+
+
+.quotes-pagination-button{
+
+border:1px solid var(--line);
+
+background:#fff;
+
+color:#374151;
+
+border-radius:9px;
+
+padding:4px 8px;
+
+font-size:11px;
+
+font-weight:750;
+
+cursor:pointer;
+
+}
+
+
+.quotes-pagination-button:disabled{
+
+opacity:.4;
+
+cursor:not-allowed;
+
+}
+
+
+.quotes-pagination-info{
+
+font-size:12px;
+
+color:var(--muted);
+
+}

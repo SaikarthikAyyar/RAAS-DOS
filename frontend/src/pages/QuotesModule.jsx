@@ -8,14 +8,14 @@ import {
 
 } from "react";
 
-import "../components/enquiry/EnquiryModuleFrontPage.css";
+import "../components/quotesModule/QuotesModule.css";
 
 import QuotesHeader from "../components/quotesModule/QuotesHeader";
 import QuotesToolbar from "../components/quotesModule/QuotesToolbar";
 import QuotesStatusTabs from "../components/quotesModule/QuotesStatusTabs";
 import QuotesSearchBar from "../components/quotesModule/QuotesSearchBar";
 import QuotesTable from "../components/quotesModule/QuotesTable";
-import EnquiryPagination from "../components/enquiry/EnquiryPagination";
+import QuotesPagination from "../components/quotesModule/QuotesPagination";
 
 import { getQuotesList } from "../services/quotesModuleService";
 
@@ -209,7 +209,7 @@ export default function QuotesModule(){
 
     return (
 
-        <div className="enquiry-module-front-page">
+        <div className="quotes-page">
 
             <QuotesHeader total={total} />
 
@@ -247,7 +247,7 @@ export default function QuotesModule(){
 
             />
 
-            <EnquiryPagination
+            <QuotesPagination
 
                 page={page}
 

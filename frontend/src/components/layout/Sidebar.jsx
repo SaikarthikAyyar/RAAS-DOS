@@ -10,9 +10,16 @@ export default function Sidebar({
 
     const { permissions } = useAuth();
 
-    const menu = (permissions?.navModules || [])
-        .map(path=>MODULE_META[path])
-        .filter(Boolean);
+    // Display order is decided here, by MODULE_META's own key order -
+    // not by whatever order permissions.navModules happens to come
+    // back from the API in (that's just a permission check now, via
+    // the Set below), so reordering the sidebar is just a matter of
+    // reordering MODULE_META, regardless of role_permissions row order.
+    const allowedPaths = new Set(permissions?.navModules || []);
+
+    const menu = Object.keys(MODULE_META)
+        .filter(path=>allowedPaths.has(path))
+        .map(path=>MODULE_META[path]);
 
     return(
 

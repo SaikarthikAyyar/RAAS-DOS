@@ -1,509 +1,414 @@
-/* ====================================
+/* ===================================
    PAGE
-==================================== */
+   Resized to the same scale as SalesSurvey.css / Operations.css /
+   QuotesModule.css - previously this file ran on its own much larger
+   scale (56px heading, 28px card headers, 22px inputs, a 360x72px
+   Save button) with no CSS variables actually defined anywhere in its
+   own scope, which is what made this page look like a different
+   product from the rest of the app.
+=================================== */
 
 .quote-page{
+
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
 
 width:100%;
 
 min-height:100vh;
 
-padding:20px 40px;
+padding:20px;
 
 background:var(--bg);
 
-overflow-y:auto;
-
-}
-
-
-/* ====================================
-   PAGE HEADER
-==================================== */
-
-.quote-page-header{
-
-text-align:center;
-
-margin-bottom:35px;
-
-}
-
-.quote-page-header h1{
-
-margin:0 0 10px 0;
-
-font-size:56px;
-
-font-weight:700;
+font-family:Inter,"Segoe UI",Arial,sans-serif;
 
 color:var(--ink);
 
+font-size:14px;
+
 }
 
-.quote-page-header p{
 
-margin:0;
+/* ===================================
+   HEADER
+=================================== */
 
-font-size:19px;
+.quote-header{
+
+margin-bottom:16px;
+
+}
+
+
+.quote-header h1{
+
+font-size:21px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0 0 6px 0;
+
+}
+
+
+.quote-header p{
+
+font-size:13px;
 
 color:var(--muted);
 
+margin:0;
+
+max-width:640px;
+
+line-height:1.5;
+
 }
 
 
-/* ====================================
+/* ===================================
+   OPS SELECTOR BAR
+=================================== */
+
+.quote-selector-bar{
+
+margin-bottom:14px;
+
+max-width:420px;
+
+}
+
+
+.quote-ops-select{
+
+width:100%;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:7px 10px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+}
+
+
+.quote-ops-select:focus{
+
+border-color:var(--orange);
+
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
+}
+
+
+/* ===================================
    GRID
-==================================== */
+=================================== */
 
 .quote-grid{
 
 display:grid;
 
-grid-template-columns:1fr 1fr;
+grid-template-columns:repeat(2,minmax(0,1fr));
 
-gap:28px;
-
-align-items:start;
-
-margin-bottom:30px;
+gap:14px;
 
 }
 
 
-/* ====================================
+@media (max-width: 900px){
+
+.quote-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+
+/* ===================================
    CARD
-==================================== */
+=================================== */
 
 .quote-card{
 
 width:100%;
 
-min-height:520px;
-
-display:flex;
-
-flex-direction:column;
-
 background:var(--card);
 
 border:1px solid var(--line);
 
-border-radius:28px;
+border-radius:14px;
 
-padding:28px;
+padding:16px;
 
 box-shadow:0 4px 14px rgba(17,24,39,.04);
 
 }
 
 
-/* ====================================
-   CARD HEADER
-==================================== */
-
 .quote-card-header{
 
-margin-bottom:24px;
+margin-bottom:12px;
 
 }
 
+
 .quote-card-header h2{
 
-margin:0;
-
-font-size:28px;
+font-size:14.5px;
 
 font-weight:800;
 
 color:var(--ink);
 
+margin:0;
+
 }
 
 
-/* ====================================
+/* ===================================
    TABLE
-==================================== */
+   Not a real <table> - a grid (label / value[/value]) shared by
+   TechnicalSummaryCard (2-col) and CommercialEstimateCard (2-col and
+   3-col min/max rows).
+=================================== */
 
 .quote-table{
 
-display:flex;
-
-flex-direction:column;
-
-gap:16px;
+width:100%;
 
 }
 
-
-/* ====================================
-   TABLE HEADER
-==================================== */
 
 .quote-table-header{
 
 display:grid;
 
-grid-template-columns:
+grid-template-columns:1fr 1fr;
 
-1.4fr
+gap:10px;
 
-2fr;
+padding:0 0 8px 0;
 
-padding:0 22px;
+border-bottom:1px solid var(--line);
 
-font-size:17px;
+font-size:10.5px;
 
-font-weight:700;
+font-weight:800;
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
 
 color:#475569;
 
 }
 
 
-/* ====================================
-   TABLE ROW
-==================================== */
+.quote-table-header-3{
+
+display:grid;
+
+grid-template-columns:1.2fr .9fr .9fr;
+
+gap:10px;
+
+padding:0 0 8px 0;
+
+border-bottom:1px solid var(--line);
+
+font-size:10.5px;
+
+font-weight:800;
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
+
+color:#475569;
+
+}
+
 
 .quote-table-row{
 
 display:grid;
 
-grid-template-columns:
-
-1.4fr
-
-2fr;
-
-align-items:center;
-
-min-height:74px;
-
-padding:0 22px;
-
-border-radius:22px;
-
-background:white;
-
-border:1px solid var(--line);
-
-}
-
-
-/* ====================================
-   TEXT
-==================================== */
-
-.quote-label{
-
-font-size:18px;
-
-font-weight:600;
-
-color:var(--ink);
-
-}
-
-.quote-value{
-
-font-size:18px;
-
-font-weight:600;
-
-color:var(--ink);
-
-text-align:right;
-
-word-break:break-word;
-
-}
-
-
-/* ====================================
-   TOTAL VALUE
-==================================== */
-
-.quote-commercial-total{
-
-font-size:32px;
-
-font-weight:800;
-
-color:var(--orange);
-
-text-align:right;
-
-}
-
-
-/* ====================================
-   ACTIONS
-==================================== */
-
-.quote-actions{
-
-display:flex;
-
-justify-content:center;
-
-margin-top:10px;
-
-}
-
-.quote-primary-btn{
-
-width:360px;
-
-height:72px;
-
-border:none;
-
-border-radius:20px;
-
-background:var(--orange);
-
-color:#ffffff;
-
-font-size:24px;
-
-font-weight:800;
-
-cursor:pointer;
-
-transition:.2s;
-
-}
-
-.quote-primary-btn:hover{
-
-transform:translateY(-2px);
-
-}
-
-.quote-primary-btn:disabled{
-
-opacity:.5;
-
-cursor:not-allowed;
-
-}
-
-
-/* ====================================
-   RESPONSIVE
-==================================== */
-
-@media(max-width:1100px){
-
-.quote-grid{
-
-grid-template-columns:1fr;
-
-}
-
-.quote-card{
-
-min-height:auto;
-
-}
-
-}
-
-
-@media(max-width:768px){
-
-.quote-page{
-
-padding:20px;
-
-}
-
-.quote-page-header h1{
-
-font-size:38px;
-
-}
-
-.quote-page-header p{
-
-font-size:16px;
-
-}
-
-.quote-table-header{
-
-display:none;
-
-}
-
-.quote-table-row{
-
-grid-template-columns:1fr;
+grid-template-columns:1fr 1fr;
 
 gap:10px;
 
-padding:18px;
+align-items:center;
+
+padding:8px 0;
+
+border-bottom:1px dashed var(--line);
 
 }
 
+
+.quote-table-row-3{
+
+display:grid;
+
+grid-template-columns:1.2fr .9fr .9fr;
+
+gap:10px;
+
+align-items:center;
+
+padding:8px 0;
+
+border-bottom:1px dashed var(--line);
+
+}
+
+
+.quote-table-row:last-child,
+
+.quote-table-row-3:last-child{
+
+border-bottom:none;
+
+}
+
+
+.quote-label{
+
+font-size:12px;
+
+font-weight:700;
+
+color:var(--ink);
+
+}
+
+
 .quote-value{
+
+font-size:12.5px;
+
+color:var(--ink);
+
+}
+
+
+/* ===================================
+   INPUTS
+=================================== */
+
+.quote-input{
+
+width:100%;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:6px 8px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+text-align:right;
+
+}
+
+.quote-actions .quote-input{
 
 text-align:left;
 
 }
 
-.quote-primary-btn{
-
-width:100%;
-
-}
-
-}
-
-
-/* ====================================
-   OPS SELECTOR
-==================================== */
-
-.quote-selector-bar{
-
-display:flex;
-
-justify-content:center;
-
-margin-bottom:35px;
-
-}
-
-.quote-ops-select{
-
-width:420px;
-
-padding:12px 18px;
-
-font-size:16px;
-
-border-radius:10px;
-
-border:1px solid var(--line);
-
-background:white;
-
-}
-
-.quote-input{
-
-    width:180px;
-
-    padding:12px 18px;
-
-    border-radius:16px;
-
-    border:1px solid var(--line);
-
-    background:white;
-
-    color:var(--ink);
-
-    font-size:22px;
-
-    font-weight:700;
-
-    text-align:right;
-
-    outline:none;
-
-    transition:.2s;
-
-}
 
 .quote-input:focus{
 
-    border-color:var(--orange);
+border-color:var(--orange);
 
-    box-shadow:0 0 0 2px rgba(245,130,32,.15);
-
-}
-
-.quote-input::-webkit-outer-spin-button,
-.quote-input::-webkit-inner-spin-button{
-
-    -webkit-appearance:none;
-
-    margin:0;
-
-}
-
-.quote-input[type=number]{
-
-    appearance: textfield;
-
-    -moz-appearance: textfield;
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
 
 }
 
 
-/* ====================================
-   MIN/MAX EDITABLE ROWS
-   (Commercial Estimate card - every
-   quote line, not just the original 3)
-==================================== */
+/* ===================================
+   ACTIONS
+=================================== */
 
-.quote-table-header-3,
-.quote-table-row-3{
+.quote-actions{
 
-    display:grid;
+display:flex;
 
-    grid-template-columns:1.4fr 1fr 1fr;
+align-items:center;
 
-    align-items:center;
+gap:8px;
 
-    padding:0 22px;
+margin-top:14px;
 
 }
 
-.quote-table-header-3{
 
-    font-size:15px;
+.quote-actions .quote-input{
 
-    font-weight:700;
-
-    color:#475569;
+flex:1;
 
 }
 
-.quote-table-row-3{
 
-    min-height:64px;
+.quote-primary-btn{
 
-    border-radius:18px;
+border:1px solid var(--orange);
 
-    background:white;
+background:var(--orange);
 
-    border:1px solid var(--line);
+color:#fff;
+
+border-radius:9px;
+
+padding:8px 16px;
+
+font-size:12px;
+
+font-weight:750;
+
+cursor:pointer;
+
+white-space:nowrap;
+
+transition:.15s;
 
 }
 
-.quote-table-row-3 .quote-input{
 
-    width:100%;
+.quote-primary-btn:hover{
 
-    font-size:16px;
+background:#d96b0d;
 
-    padding:8px 12px;
-
-}
-
-@media(max-width:768px){
-
-    .quote-table-header-3{
-        display:none;
-    }
-
-    .quote-table-row-3{
-        grid-template-columns:1fr;
-        gap:8px;
-        padding:14px;
-    }
+border-color:#d96b0d;
 
 }

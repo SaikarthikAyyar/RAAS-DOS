@@ -10,10 +10,10 @@ function inr(value){
 
 function statusClass(label){
 
-    if(label==="Approved") return "enquiry-status enquiry-status-open";
-    if(label==="Rejected") return "enquiry-status enquiry-status-lost";
-    if(label==="Revision Requested") return "enquiry-status enquiry-status-archived";
-    return "enquiry-status enquiry-status-closed";
+    if(label==="Approved") return "quotes-status quotes-status-approved";
+    if(label==="Rejected") return "quotes-status quotes-status-rejected";
+    if(label==="Revision Requested") return "quotes-status quotes-status-revision";
+    return "quotes-status quotes-status-default";
 
 }
 
@@ -47,21 +47,21 @@ export default function QuotesTable({
 
     if(loading){
 
-        return <div className="enquiry-loading">Loading quotes...</div>;
+        return <div className="quotes-loading">Loading quotes...</div>;
 
     }
 
     if(error){
 
-        return <div className="enquiry-error">{error}</div>;
+        return <div className="quotes-error">{error}</div>;
 
     }
 
     return (
 
-        <div className="enquiry-card">
+        <div className="quotes-card">
 
-            <div className="enquiry-table">
+            <div className="quotes-table">
 
                 <table>
 
@@ -108,7 +108,7 @@ export default function QuotesTable({
 
                                                 <button
 
-                                                    className="enquiry-view"
+                                                    className="quotes-open-btn"
 
                                                     onClick={()=>handleOpen(item)}
 
@@ -120,7 +120,7 @@ export default function QuotesTable({
 
                                             ) : (
 
-                                                <span className="enquiry-loading" style={{padding:0}}>-</span>
+                                                <span className="quotes-loading" style={{padding:0}}>-</span>
 
                                             )
                                         }
@@ -132,7 +132,7 @@ export default function QuotesTable({
                             )) : (
 
                                 <tr>
-                                    <td colSpan={6} className="enquiry-empty">No quotes match.</td>
+                                    <td colSpan={6} className="quotes-empty">No quotes match.</td>
                                 </tr>
 
                             )

@@ -37,28 +37,6 @@ onClick={saveOps}
 
 >
 
-Open Dewatering Gate
-
-</button>
-
-<button
-
-className="ops-secondary-btn"
-
->
-
-Approve Without Dewatering
-
-</button>
-
-<button
-
-className="ops-secondary-btn"
-
-onClick={saveOps}
-
->
-
 Save Ops Selection
 
 </button>

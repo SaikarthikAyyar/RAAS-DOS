@@ -8,15 +8,15 @@ export default function QuotesToolbar({
 
     return (
 
-        <div className="enquiry-toolbar">
+        <div className="quotes-toolbar">
 
-            <div className="enquiry-toolbar-spacer"></div>
+            <div className="quotes-toolbar-spacer"></div>
 
-            <div className="enquiry-toolbar-actions">
+            <div className="quotes-toolbar-actions">
 
                 <button
 
-                    className="enquiry-export-button"
+                    className="quotes-export-button"
 
                     onClick={onExport}
 

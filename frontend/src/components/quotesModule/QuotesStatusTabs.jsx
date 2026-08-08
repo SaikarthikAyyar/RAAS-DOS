@@ -16,7 +16,7 @@ export default function QuotesStatusTabs({
 
     return (
 
-        <div className="enquiry-status-tabs">
+        <div className="quotes-status-tabs">
 
             {
                 TABS.map(tab=>(
@@ -30,8 +30,8 @@ export default function QuotesStatusTabs({
                         className={
 
                             activeTab===tab.value
-                                ? "enquiry-status-tab active"
-                                : "enquiry-status-tab"
+                                ? "quotes-status-tab active"
+                                : "quotes-status-tab"
 
                         }
 

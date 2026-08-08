@@ -22,13 +22,13 @@ NAV_MODULES = [
     ("/administration", "Administration"),
     ("/business-master", "Business Masters"),
     ("/enquiry", "Enquiries"),
+    ("/quotes", "Quotes"),
     ("/customer-request", "Customer Request"),
     ("/sales-survey", "Sales Survey"),
     ("/ops-approval", "Ops Approval"),
     ("/ops-selector", "Ops Selector"),
     ("/dewatering-gate", "Dewatering Gate"),
     ("/quote", "Quote"),
-    ("/quotes", "Quotes"),
     ("/approval", "Approval"),
     ("/job-creation", "Job Creation"),
     ("/allocation", "Allocation"),
@@ -75,11 +75,16 @@ ROLES = [
 # anyone - add "/dashboard" back to the relevant role(s) here (and
 # rerun the same removal script against role_permissions on both DBs,
 # in reverse, or just re-seed) once the page is ready.
+#
+# Dewatering Gate is excluded the same way, as of 2026-08-08 - the
+# module hasn't been built yet either. Add "/dewatering-gate" back
+# to admin/ops here (and undo the matching can_view=False update on
+# both DBs) once that module is ready.
 ROLE_NAV_ACCESS = {
 
     "admin": [
         path for path, _ in NAV_MODULES
-        if path not in ("/customer-portal", "/analytics", "/dashboard")
+        if path not in ("/customer-portal", "/analytics", "/dashboard", "/dewatering-gate")
     ],
 
     "sales": [
@@ -87,7 +92,7 @@ ROLE_NAV_ACCESS = {
     ],
 
     "ops": [
-        "/ops-approval", "/ops-selector", "/dewatering-gate",
+        "/ops-approval", "/ops-selector",
         "/job-creation", "/allocation", "/execution"
     ],
 
