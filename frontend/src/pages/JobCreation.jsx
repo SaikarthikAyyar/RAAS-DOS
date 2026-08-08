@@ -2,25 +2,15 @@
 // IMPORTS
 // ====================================
 
+import { useState } from "react";
+
 import "../components/jobCreation/JobCreation.css";
 
 import useJobCreation from "../hooks/useJobCreation";
 
-import JobHeaderCard from "../components/jobCreation/JobHeaderCard";
+import JobCreationCard from "../components/jobCreation/JobCreationCard";
 
-import AllocationCard from "../components/jobCreation/AllocationCard";
-
-import ManpowerCard from "../components/jobCreation/ManpowerCard";
-
-import ReadinessChecklist from "../components/jobCreation/ReadinessChecklist";
-
-import {
-
-    saveJobCreation
-
-}
-
-from "../services/jobCreationService";
+import { saveJobCreation } from "../services/jobCreationService";
 
 
 // ====================================
@@ -45,192 +35,144 @@ export default function JobCreation(){
 
     } = useJobCreation();
 
-    // ====================================
-    // VERIFICATION
-    // ====================================
+    const [saving, setSaving] = useState(false);
 
-    console.log(
+    async function handleCreateJob(formValues){
 
-        "\n========== JOB CREATION PAGE =========="
+        const selected = approvedQuotes.find(
+            q => q.quote_id === selectedQuote
+        );
 
-    );
+        if(!selected){
+            alert("Select a quote first.");
+            return;
+        }
 
-    console.log(
+        setSaving(true);
 
-        "Loading:",
+        try{
 
-        loading
+            await saveJobCreation({
 
-    );
+                approval_board_id: selected.approval_board_id,
+                planned_start: formValues.planned_start,
+                customer_visible_status: formValues.customer_visible_status,
+                approved_service_configuration: jobData.recommended?.service_configuration,
+                approved_machine: jobData.recommended?.recommended_machine,
+                approved_pump_package: jobData.recommended?.pump_hose_package
 
-    console.log(
+            });
 
-        "Error:",
+            await handleQuoteChange(selectedQuote);
 
-        error
+        }
 
-    );
+        catch(err){
 
-    console.log(
+            alert(
+                err?.detail ||
+                err?.message ||
+                "Failed to create job."
+            );
 
-        "Job Data:",
+        }
 
-        jobData
+        finally{
 
-    );
+            setSaving(false);
 
-    console.log(
+        }
 
-        "=======================================\n"
+    }
 
-    );
-
-    if(
-
-        loading
-
-    ){
+    if(loading){
 
         return(
-
-            <div>
-
-                Loading Job Creation...
-
+            <div className="job-page">
+                <p className="job-muted">Loading Job Creation...</p>
             </div>
-
         );
 
     }
 
-    if(
-
-        error
-
-    ){
+    if(error){
 
         return(
-
-            <div>
-
-                Failed to load Job Creation.
-
+            <div className="job-page">
+                <p className="job-muted">Failed to load Job Creation.</p>
             </div>
-
         );
 
     }
 
     return(
 
-        <div className="jobCreationPage">
+        <div className="job-page">
 
-            <JobHeaderCard
+            <div className="job-page-header">
 
-                header={
+                <h1>Job Creation</h1>
 
-                    jobData.header
+                <p>
 
-                }
+                    Confirm the assignment recommended by Ops and
+                    create the job once the quote has been management
+                    approved.
 
-                quotes={
-
-                    approvedQuotes
-
-                }
-
-                selectedQuote={
-
-                    selectedQuote
-
-                }
-
-                handleQuoteChange={
-
-                    handleQuoteChange
-
-                }
-
-            />
-
-            <AllocationCard
-
-                allocation={
-
-                    jobData.recommended
-
-                }
-
-            />
-
-            <div className="jobCreationBottom">
-
-                <ManpowerCard
-
-                    manpower={
-
-                        jobData.manpower
-
-                    }
-
-                />
-
-                <ReadinessChecklist
-
-                    checklist={
-
-                        jobData.readiness
-
-                    }
-
-                />
-
-                <button
-                    onClick={async () => {
-
-                        const selected = approvedQuotes.find(
-                            q => q.quote_id === selectedQuote
-                        );
-
-                        if (!selected) {
-                            alert("Please select a quote.");
-                            return;
-                        }
-
-                        try {
-
-                            await saveJobCreation({
-
-                                approval_board_id:
-                                    selected.approval_board_id
-
-                            });
-
-                            alert("Job created successfully.\nInvoice generated.\nAllocation workflow started.");
-
-                            window.location.reload();
-
-                        }
-                        catch (error) {
-
-                            alert(
-                                error?.detail ||
-                                error?.message ||
-                                "Failed to create job."
-                            );
-
-                        }
-
-                    }}
-                >
-
-                    Create Job
-
-                </button>
-
-
+                </p>
 
             </div>
+
+            <div className="job-selector-bar">
+
+                <label>PO / Quote Reference</label>
+
+                <select
+
+                    value={selectedQuote || ""}
+
+                    onChange={e=>handleQuoteChange(Number(e.target.value))}
+
+                >
+
+                    {
+                        approvedQuotes.map(quote=>(
+
+                            <option key={quote.quote_id} value={quote.quote_id}>
+                                {quote.quote_reference} | {quote.customer}
+                            </option>
+
+                        ))
+                    }
+
+                </select>
+
+            </div>
+
+            {
+                approvedQuotes.length === 0 ? (
+
+                    <div className="job-card">
+                        <p className="job-muted">
+                            No management-approved quotes yet - a job
+                            can be created once one is available.
+                        </p>
+                    </div>
+
+                ) : (
+
+                    <JobCreationCard
+
+                        jobExists={jobData.job_exists}
+                        header={jobData.header}
+                        recommended={jobData.recommended}
+                        onCreateJob={handleCreateJob}
+                        saving={saving}
+
+                    />
+
+                )
+            }
 
         </div>
 

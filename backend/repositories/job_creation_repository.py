@@ -420,6 +420,10 @@ def get_job_creation_data(
 
     return {
 
+        "job_exists":
+
+            job is not None,
+
         "header": {
 
             "quote_reference":
