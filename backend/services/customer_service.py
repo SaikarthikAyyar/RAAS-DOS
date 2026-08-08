@@ -179,7 +179,9 @@ def create_customer_request(
 
         customer_name=customer.company_name,
 
-        nature=payload.nature_of_job
+        nature=payload.nature_of_job,
+
+        owner=customer.owner
 
     )
 

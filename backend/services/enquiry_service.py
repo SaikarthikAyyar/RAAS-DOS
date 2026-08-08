@@ -13,7 +13,8 @@ class EnquiryService:
         customer_id=None,
         asset_id=None,
         customer_name=None,
-        nature=None
+        nature=None,
+        owner=None
     ):
 
         enquiry = Enquiry(
@@ -41,6 +42,8 @@ class EnquiryService:
             customer_name=customer_name,
 
             nature=nature,
+
+            owner=owner,
 
             sender_role="CUSTOMER",
 

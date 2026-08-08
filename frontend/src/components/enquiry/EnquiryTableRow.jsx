@@ -162,6 +162,10 @@ export default function EnquiryTableRow({
 
                 {
 
+                    enquiry.owner
+
+                    ||
+
                     enquiry.owner_role
 
                     ||

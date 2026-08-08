@@ -89,6 +89,14 @@ class Enquiry(Base):
         nullable=True
     )
 
+    # Snapshot of the linked Business Master Customer's `owner` at the
+    # moment this Enquiry was created - distinct from owner_role/
+    # owner_user_id below (workflow role assignment, unrelated).
+    owner = Column(
+        String(150),
+        nullable=True
+    )
+
     # ====================================
     # ROUTING
     # ====================================

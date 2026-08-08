@@ -60,6 +60,8 @@ class EnquiryConsolidatedListItem(BaseModel):
 
     nature: Optional[str] = None
 
+    owner: Optional[str] = None
+
     stage: EnquiryStage
 
     status: EnquiryStatus
