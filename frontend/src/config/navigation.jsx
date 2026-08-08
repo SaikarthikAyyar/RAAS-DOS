@@ -34,7 +34,9 @@ BarChart3,
 
 FolderOpen,
 
-Users
+Users,
+
+History
 
 }
 
@@ -68,6 +70,7 @@ export const MODULE_META = {
 "/allocation":         {title:"Allocation",path:"/allocation",icon:<Truck size={18}/>},
 "/execution":          {title:"Execution",path:"/execution",icon:<PlayCircle size={18}/>},
 "/customer-portal":    {title:"Customer Portal",path:"/customer-portal",icon:<UserCircle size={18}/>},
-"/analytics":          {title:"Analytics",path:"/analytics",icon:<BarChart3 size={18}/>}
+"/analytics":          {title:"Analytics",path:"/analytics",icon:<BarChart3 size={18}/>},
+"/audit-trail":        {title:"Audit Trail",path:"/audit-trail",icon:<History size={18}/>}
 
 };

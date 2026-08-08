@@ -1,0 +1,304 @@
+/* ===================================
+   PAGE
+   Standalone stylesheet at the same type scale as QuotesModule.css /
+   BusinessMasters.css - mirrors the wireframe's renderAudit() (Case,
+   Customer, Module, Field, From, To, By, Date columns; Reason is
+   dropped - see plan notes) at the app's established scale.
+=================================== */
+
+.audit-page{
+
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
+
+width:100%;
+
+min-height:100vh;
+
+padding:20px;
+
+background:var(--bg);
+
+font-family:Inter,"Segoe UI",Arial,sans-serif;
+
+color:var(--ink);
+
+font-size:14px;
+
+}
+
+
+/* ===================================
+   HEADER
+=================================== */
+
+.audit-title-row{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:flex-start;
+
+gap:16px;
+
+margin-bottom:16px;
+
+flex-wrap:wrap;
+
+}
+
+.audit-header-title{
+
+font-size:21px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0 0 4px 0;
+
+}
+
+.audit-header-subtitle{
+
+font-size:13px;
+
+color:var(--muted);
+
+margin:0;
+
+}
+
+.audit-export-button{
+
+border:1px solid var(--line);
+
+background:#fff;
+
+color:var(--ink);
+
+border-radius:9px;
+
+padding:7px 14px;
+
+font-size:12px;
+
+font-weight:750;
+
+cursor:pointer;
+
+transition:.15s;
+
+white-space:nowrap;
+
+}
+
+.audit-export-button:hover{
+
+background:var(--bg);
+
+}
+
+.audit-export-button:disabled{
+
+opacity:.55;
+
+cursor:not-allowed;
+
+}
+
+
+/* ===================================
+   FILTER BAR (date range only, per plan)
+=================================== */
+
+.audit-filterbar{
+
+display:flex;
+
+gap:10px;
+
+align-items:center;
+
+margin-bottom:12px;
+
+flex-wrap:wrap;
+
+}
+
+.audit-filterbar label{
+
+font-size:11px;
+
+font-weight:800;
+
+color:var(--muted);
+
+}
+
+.audit-filterbar input{
+
+height:32px;
+
+padding:0 10px;
+
+border:1.5px solid var(--line);
+
+border-radius:8px;
+
+font-size:12.5px;
+
+color:var(--ink);
+
+}
+
+.audit-filterbar button{
+
+height:32px;
+
+padding:0 14px;
+
+border:1px solid var(--line);
+
+border-radius:8px;
+
+background:#fff;
+
+color:var(--ink);
+
+font-size:12px;
+
+font-weight:750;
+
+cursor:pointer;
+
+}
+
+.audit-filterbar button:hover{
+
+background:var(--bg);
+
+}
+
+
+/* ===================================
+   TABLE CARD
+=================================== */
+
+.audit-card{
+
+background:var(--card);
+
+border:1px solid var(--line);
+
+border-radius:14px;
+
+padding:16px;
+
+box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+overflow-x:auto;
+
+}
+
+.audit-table{
+
+width:100%;
+
+border-collapse:separate;
+
+border-spacing:0;
+
+}
+
+.audit-table th,
+.audit-table td{
+
+text-align:left;
+
+border-bottom:1px solid var(--line);
+
+padding:8px 9px;
+
+font-size:12.5px;
+
+vertical-align:top;
+
+white-space:nowrap;
+
+}
+
+.audit-table th{
+
+font-size:11px;
+
+font-weight:800;
+
+color:var(--muted);
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
+
+}
+
+.audit-table td.audit-old{
+
+color:#991b1b;
+
+text-decoration:line-through;
+
+background:#fef2f2;
+
+}
+
+.audit-table td.audit-new{
+
+color:#166534;
+
+font-weight:700;
+
+background:#f0fdf4;
+
+}
+
+.audit-backlink{
+
+font-size:12px;
+
+font-weight:800;
+
+color:var(--orange);
+
+cursor:pointer;
+
+background:none;
+
+border:none;
+
+padding:0;
+
+}
+
+.audit-muted{
+
+color:var(--muted);
+
+}
+
+.audit-empty-row td{
+
+text-align:center;
+
+padding:30px;
+
+color:var(--muted);
+
+font-weight:600;
+
+}

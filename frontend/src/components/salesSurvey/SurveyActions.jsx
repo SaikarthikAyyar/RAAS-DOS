@@ -26,6 +26,8 @@ import {
 
 from "../../services/customerMediaService";
 
+import { useAuth } from "../../contexts/AuthContext";
+
 // ====================================
 // COMPONENT
 // ====================================
@@ -47,6 +49,8 @@ salesSurveyId,
 onBlockedSubmit
 
 }){
+
+const { user: currentUser } = useAuth();
 
 
 async function submitSurvey(){
@@ -81,6 +85,13 @@ customerRequestId
 sales_survey_id:
 
 salesSurveyId,
+
+actor:
+currentUser ? {
+    user_id: currentUser.id,
+    name: currentUser.name,
+    role: currentUser.role
+} : null,
 
 
 survey_date:

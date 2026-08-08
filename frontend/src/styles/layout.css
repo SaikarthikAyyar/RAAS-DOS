@@ -363,6 +363,268 @@ margin-left:auto;
 }
 
 /* ====================================
+   NOTIFICATIONS (bell icon + panel)
+==================================== */
+
+.notif-menu{
+
+    position:relative;
+
+}
+
+.notif-bell-wrap{
+
+    position:relative;
+
+}
+
+.notif-badge{
+
+    position:absolute;
+
+    top:-2px;
+
+    right:-2px;
+
+    min-width:17px;
+
+    height:17px;
+
+    padding:0 4px;
+
+    border-radius:999px;
+
+    background:var(--red);
+
+    color:#fff;
+
+    font-size:10px;
+
+    font-weight:800;
+
+    line-height:17px;
+
+    text-align:center;
+
+    box-shadow:0 0 0 2px #fff;
+
+}
+
+.notif-hover-tooltip{
+
+    position:absolute;
+
+    top:calc(100% + 8px);
+
+    right:0;
+
+    max-width:260px;
+
+    background:var(--ink);
+
+    color:#fff;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    line-height:1.4;
+
+    white-space:normal;
+
+    padding:8px 10px;
+
+    border-radius:8px;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:opacity .12s ease, transform .12s ease;
+
+    transform:translateY(2px);
+
+    z-index:70;
+
+    box-shadow:0 4px 14px rgba(17,24,39,.2);
+
+}
+
+.notif-bell-wrap:hover .notif-hover-tooltip{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+.notif-panel{
+
+    position:absolute;
+
+    top:calc(100% + 10px);
+
+    right:0;
+
+    width:340px;
+
+    background:#fff;
+
+    border:1px solid var(--line);
+
+    border-radius:12px;
+
+    box-shadow:0 10px 30px rgba(17,24,39,.12);
+
+    z-index:60;
+
+    overflow:hidden;
+
+}
+
+.notif-panel-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    padding:12px 14px;
+
+    border-bottom:1px solid var(--line);
+
+    font-size:13px;
+
+    font-weight:800;
+
+    color:var(--ink);
+
+}
+
+.notif-panel-filters{
+
+    display:flex;
+
+    gap:6px;
+
+}
+
+.notif-panel-filters input{
+
+    width:112px;
+
+    height:28px;
+
+    padding:0 6px;
+
+    border:1.5px solid var(--line);
+
+    border-radius:6px;
+
+    font-size:10.5px;
+
+    color:var(--ink);
+
+}
+
+/* Fixed size - exactly tall enough for 5 title rows, scrolls both
+   ways beyond that (rows stay single-line instead of wrapping). */
+.notif-panel-body{
+
+    height:210px;
+
+    max-height:210px;
+
+    overflow-y:auto;
+
+    overflow-x:auto;
+
+    scrollbar-width:thin;
+
+    scrollbar-color:var(--orange) #f3f4f6;
+
+}
+
+.notif-panel-body::-webkit-scrollbar{
+
+    width:8px;
+    height:8px;
+
+}
+
+.notif-panel-body::-webkit-scrollbar-track{
+
+    background:#f3f4f6;
+
+}
+
+.notif-panel-body::-webkit-scrollbar-thumb{
+
+    background:var(--orange);
+    border-radius:999px;
+
+}
+
+.notif-panel-row{
+
+    display:block;
+
+    width:100%;
+
+    height:42px;
+
+    min-width:max-content;
+
+    padding:0 14px;
+
+    border:none;
+
+    border-bottom:1px solid var(--line);
+
+    background:transparent;
+
+    color:var(--ink);
+
+    font-size:12px;
+
+    font-weight:600;
+
+    text-align:left;
+
+    white-space:nowrap;
+
+    cursor:pointer;
+
+    transition:.15s;
+
+}
+
+.notif-panel-row:hover{
+
+    background:#fff4ea;
+
+    color:var(--orange);
+
+}
+
+.notif-panel-empty{
+
+    padding:20px 14px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    color:var(--muted);
+
+    text-align:center;
+
+}
+
+/* ====================================
    PROFILE DROPDOWN
 ==================================== */
 

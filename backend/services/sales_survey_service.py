@@ -34,7 +34,19 @@ from backend.services.customer_master_service import (
     sync_asset_profile_from_survey
 )
 
+from backend.repositories.customer_master_repository import (
+    get_enquiry_by_customer_request
+)
 
+from backend.repositories.notification_repository import record_change
+
+
+# Fields on SalesSurveySchema that aren't survey data - never diffed.
+SALES_SURVEY_EXCLUDED_FIELDS = {"customer_request_id", "sales_survey_id", "actor", "status"}
+
+
+def _snapshot_survey_fields(survey, field_names):
+    return {field: getattr(survey, field, None) for field in field_names}
 
 
 
@@ -50,7 +62,21 @@ def create_sales_survey_request(
 
 ):
 
-    if payload.sales_survey_id:
+    is_update = bool(payload.sales_survey_id)
+
+    field_names = [
+        field for field in payload.model_fields.keys()
+        if field not in SALES_SURVEY_EXCLUDED_FIELDS
+    ]
+
+    before_snapshot = {}
+
+    if is_update:
+
+        existing = get_sales_survey_by_id(db, payload.sales_survey_id)
+
+        if existing:
+            before_snapshot = _snapshot_survey_fields(existing, field_names)
 
         print("[Workflow] Updating Existing Survey")
 
@@ -78,7 +104,48 @@ def create_sales_survey_request(
 
     if survey:
 
-        sync_asset_profile_from_survey(db, survey)
+        enquiry = get_enquiry_by_customer_request(db, survey.customer_request_id)
+
+        actor = payload.actor
+
+        if actor and enquiry:
+
+            after_snapshot = _snapshot_survey_fields(survey, field_names)
+
+            changes = []
+
+            for field in field_names:
+
+                before = before_snapshot.get(field)
+                after = after_snapshot.get(field)
+
+                if before != after and after is not None:
+                    changes.append({"field": field, "before": before, "after": after})
+
+            if changes:
+
+                record_change(
+                    db=db,
+                    module="Sales Survey",
+                    action="UPDATE" if is_update else "CREATE",
+                    actor_user_id=actor.user_id,
+                    actor_name=actor.name,
+                    actor_role=actor.role,
+                    enquiry_id=enquiry.id,
+                    customer_name=enquiry.customer_name,
+                    title=(
+                        f"{actor.name} {'updated' if is_update else 'submitted'} "
+                        f"the Sales Survey for {enquiry.customer_name or 'Unknown'}"
+                    ),
+                    changes=changes
+                )
+
+        sync_asset_profile_from_survey(
+            db,
+            survey,
+            actor=actor.model_dump() if actor else None,
+            enquiry=enquiry
+        )
 
     return survey
 

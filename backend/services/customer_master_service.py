@@ -24,6 +24,8 @@ from backend.repositories.customer_master_repository import (
     list_linked_enquiries
 )
 
+from backend.repositories.notification_repository import record_change
+
 
 # ====================================
 # SURVEY -> ASSET PROFILE WRITE-BACK
@@ -60,9 +62,11 @@ SURVEY_PROFILE_FIELDS = [
 
 def sync_asset_profile_from_survey(
         db,
-        survey
+        survey,
+        actor=None,
+        enquiry=None
 ):
-    enquiry = get_enquiry_by_customer_request(db, survey.customer_request_id)
+    enquiry = enquiry or get_enquiry_by_customer_request(db, survey.customer_request_id)
 
     if not enquiry or not enquiry.asset_id:
         return None
@@ -83,7 +87,38 @@ def sync_asset_profile_from_survey(
         survey.survey_date.isoformat() if survey.survey_date else None
     )
 
-    return set_asset_survey_profile(db, asset, profile_dict)
+    before_profile = dict(asset.profile or {})
+
+    updated_asset = set_asset_survey_profile(db, asset, profile_dict)
+
+    if actor:
+
+        changes = []
+
+        for field in SURVEY_PROFILE_FIELDS:
+
+            before = before_profile.get(field)
+            after = profile_dict.get(field)
+
+            if before != after:
+                changes.append({"field": field, "before": before, "after": after})
+
+        if changes:
+
+            record_change(
+                db=db,
+                module="Business Masters",
+                action="UPDATE",
+                actor_user_id=actor["user_id"],
+                actor_name=actor["name"],
+                actor_role=actor["role"],
+                enquiry_id=enquiry.id,
+                customer_name=enquiry.customer_name,
+                title=f"{actor['name']} updated the asset profile for {enquiry.customer_name or 'Unknown'} via Sales Survey",
+                changes=changes
+            )
+
+    return updated_asset
 
 
 # ====================================

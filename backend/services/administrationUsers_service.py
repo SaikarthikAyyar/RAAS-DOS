@@ -6,6 +6,11 @@ from backend.schemas.administrationUsers_schema import (
     AdministrationUserUpdate,
 )
 from backend.services.email_service import send_welcome_email
+from backend.repositories.notification_repository import record_change
+
+# Excluded from change-tracking - we don't want plaintext password
+# values (old or new) ever written into the audit trail.
+NOTIFICATION_EXCLUDED_FIELDS = {"password", "actor"}
 
 
 # ==========================================================
@@ -122,6 +127,8 @@ def update_user(
 
     update_data = payload.model_dump(exclude_unset=True)
 
+    actor = update_data.pop("actor", None)
+
     # Do not overwrite password if it was left blank
     if "password" in update_data and (
         update_data["password"] is None or
@@ -129,17 +136,44 @@ def update_user(
     ):
         del update_data["password"]
 
+    changes = []
+
     for field, value in update_data.items():
+
+        before = getattr(user, field, None)
 
         setattr(user, field, value)
 
         print(f"Updated {field} -> {value}")
+
+        if field not in NOTIFICATION_EXCLUDED_FIELDS and before != value:
+
+            changes.append({
+                "field": field,
+                "before": before,
+                "after": value
+            })
 
     db.commit()
 
     db.refresh(user)
 
     print("[Administration Users Service] -> Update completed.")
+
+    if actor and changes:
+
+        record_change(
+            db=db,
+            module="Administration",
+            action="UPDATE",
+            actor_user_id=actor["user_id"],
+            actor_name=actor["name"],
+            actor_role=actor["role"],
+            enquiry_id=None,
+            customer_name=None,
+            title=f"{actor['name']} updated {user.name}'s {', '.join(c['field'] for c in changes)} in Administration",
+            changes=changes
+        )
 
     return user
 

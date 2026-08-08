@@ -6,7 +6,16 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../contexts/AuthContext";
 
+import { getUnreadNotifications } from "../../services/notificationsService";
+
 import logo from "../../assets/JanyutechLogo.jpg";
+
+// Other parts of the app (the Audit Trail page, on mount) dispatch
+// this after marking notifications read, so the bell updates
+// immediately instead of waiting for the next poll.
+export const NOTIFICATIONS_REFRESH_EVENT = "notifications:refresh";
+
+const POLL_INTERVAL_MS = 30000;
 
 export default function Topbar({
 
@@ -22,6 +31,16 @@ export default function Topbar({
 
     const profileRef = useRef(null);
 
+    const [notifOpen, setNotifOpen] = useState(false);
+
+    const [unread, setUnread] = useState([]);
+
+    const [notifDateFrom, setNotifDateFrom] = useState("");
+
+    const [notifDateTo, setNotifDateTo] = useState("");
+
+    const notifRef = useRef(null);
+
     function handleLogout(){
 
         logout();
@@ -30,7 +49,67 @@ export default function Topbar({
 
     }
 
-    // Close the profile dropdown on any click outside it.
+    async function loadUnread(){
+
+        if(!user?.id) return;
+
+        try{
+
+            const data = await getUnreadNotifications(user.id, {
+                dateFrom: notifDateFrom || undefined,
+                dateTo: notifDateTo || undefined
+            });
+
+            setUnread(data);
+
+        }
+        catch(error){
+
+            console.error("[Topbar] Failed to load unread notifications", error);
+
+        }
+
+    }
+
+    // Initial load + poll + listen for the "mark all read" refresh
+    // signal fired from the Audit Trail page.
+    useEffect(()=>{
+
+        loadUnread();
+
+        const interval = setInterval(loadUnread, POLL_INTERVAL_MS);
+
+        window.addEventListener(NOTIFICATIONS_REFRESH_EVENT, loadUnread);
+
+        return ()=>{
+            clearInterval(interval);
+            window.removeEventListener(NOTIFICATIONS_REFRESH_EVENT, loadUnread);
+        };
+
+    }, [user?.id]);
+
+    // Re-fetch whenever the panel's own date filter changes.
+    useEffect(()=>{
+
+        loadUnread();
+
+    }, [notifDateFrom, notifDateTo]);
+
+    function handleNotificationClick(notification){
+
+        setNotifOpen(false);
+
+        const day = notification.created_at
+            ? notification.created_at.slice(0, 10)
+            : "";
+
+        navigate(
+            `/audit-trail${day ? `?date_from=${day}&date_to=${day}` : ""}`
+        );
+
+    }
+
+    // Close the profile dropdown / notifications panel on any click outside them.
     useEffect(()=>{
 
         function handleOutsideClick(event){
@@ -40,6 +119,13 @@ export default function Topbar({
                 !profileRef.current.contains(event.target)
             ){
                 setProfileOpen(false);
+            }
+
+            if(
+                notifRef.current &&
+                !notifRef.current.contains(event.target)
+            ){
+                setNotifOpen(false);
             }
 
         }
@@ -89,15 +175,97 @@ export default function Topbar({
 
             <div className="topbar-right">
 
-                <button
-                    type="button"
-                    className="topbar-icon-btn"
-                    aria-label="Notifications"
-                >
+                <div className="notif-menu" ref={notifRef}>
 
-                    <Bell size={20}/>
+                    <button
+                        type="button"
+                        className="topbar-icon-btn notif-bell-wrap"
+                        aria-label="Notifications"
+                        onClick={()=>setNotifOpen(open=>!open)}
+                    >
 
-                </button>
+                        <Bell size={20}/>
+
+                        {
+                            unread.length > 0 && (
+                                <span className="notif-badge">
+                                    {unread.length > 9 ? "9+" : unread.length}
+                                </span>
+                            )
+                        }
+
+                        {
+                            unread.length > 0 && (
+                                <span className="notif-hover-tooltip">
+                                    {unread[0].title}
+                                </span>
+                            )
+                        }
+
+                    </button>
+
+                    {
+                        notifOpen && (
+
+                            <div className="notif-panel">
+
+                                <div className="notif-panel-header">
+
+                                    <span>Notifications</span>
+
+                                    <div className="notif-panel-filters">
+
+                                        <input
+                                            type="date"
+                                            value={notifDateFrom}
+                                            onChange={e=>setNotifDateFrom(e.target.value)}
+                                        />
+
+                                        <input
+                                            type="date"
+                                            value={notifDateTo}
+                                            onChange={e=>setNotifDateTo(e.target.value)}
+                                        />
+
+                                    </div>
+
+                                </div>
+
+                                <div className="notif-panel-body">
+
+                                    {
+                                        unread.length === 0 ? (
+
+                                            <div className="notif-panel-empty">
+                                                No unread notifications
+                                            </div>
+
+                                        ) : (
+
+                                            unread.map(notification=>(
+
+                                                <button
+                                                    key={notification.id}
+                                                    type="button"
+                                                    className="notif-panel-row"
+                                                    onClick={()=>handleNotificationClick(notification)}
+                                                >
+                                                    {notification.title}
+                                                </button>
+
+                                            ))
+
+                                        )
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        )
+                    }
+
+                </div>
 
                 <div className="profile-menu" ref={profileRef}>
 

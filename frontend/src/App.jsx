@@ -41,6 +41,8 @@ import BusinessMastersModule from "./pages/BusinessMastersModule";
 
 import Analytics from "./pages/Analytics";
 
+import AuditTrail from "./pages/AuditTrail";
+
 
 function App() {
 
@@ -112,6 +114,8 @@ function App() {
           <Route path="customer-portal" element={<CustomerPortal />} />
 
           <Route path="analytics" element={<Analytics />} />
+
+          <Route path="audit-trail" element={<AuditTrail />} />
 
         </Route>
 

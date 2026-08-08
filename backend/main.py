@@ -44,6 +44,8 @@ from backend.api.administrationUsers_api import api as administrationUsers_api
 
 from backend.api.signup_api import api as signup_api
 
+from backend.api.notification_api import api as notification_api
+
 from backend.api.allocation_api import (
     router as allocation_router
 )
@@ -216,6 +218,8 @@ app.include_router(
 app.include_router(administrationUsers_api)
 
 app.include_router(signup_api)
+
+app.include_router(notification_api)
 
 
 

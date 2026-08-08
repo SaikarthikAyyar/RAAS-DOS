@@ -34,7 +34,8 @@ NAV_MODULES = [
     ("/allocation", "Allocation"),
     ("/execution", "Execution"),
     ("/customer-portal", "Customer Portal"),
-    ("/analytics", "Analytics")
+    ("/analytics", "Analytics"),
+    ("/audit-trail", "Audit Trail")
 
 ]
 

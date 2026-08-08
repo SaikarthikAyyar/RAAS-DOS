@@ -43,6 +43,8 @@ from backend.models.partners import Partner
 from backend.models.customer_master import Customer, CustomerContact
 from backend.models.asset import Asset
 
+from backend.models.notification import Notification, NotificationChange, NotificationRead
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel

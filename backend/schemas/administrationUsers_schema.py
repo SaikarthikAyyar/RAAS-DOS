@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from backend.utils.email_validation import is_janyutech_email
+from backend.schemas.notification_schema import ActorSchema
 
 
 class AdministrationUserCreate(BaseModel):
@@ -27,6 +28,7 @@ class AdministrationUserUpdate(BaseModel):
     password: Optional[str] = None
     role: Optional[str] = None
     is_active: Optional[bool] = None
+    actor: Optional[ActorSchema] = None
 
 
 class AdministrationUserResponse(BaseModel):

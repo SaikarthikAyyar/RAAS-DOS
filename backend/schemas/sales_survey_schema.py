@@ -8,6 +8,8 @@ from typing import Optional
 
 from datetime import date
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 # ====================================
 # SALES SURVEY SCHEMA
@@ -22,6 +24,7 @@ class SalesSurveySchema(BaseModel):
 
     customer_request_id:int
     sales_survey_id: int | None = None
+    actor: Optional[ActorSchema] = None
 
 
     # ====================================

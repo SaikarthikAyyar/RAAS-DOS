@@ -25,6 +25,8 @@ import AdministrationUserDialog from "./AdministrationUserDialog";
 import AdministrationUserForm
 from "./AdministrationUserForm";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
 
 
 export default function AdministrationUsers({
@@ -32,6 +34,8 @@ export default function AdministrationUsers({
     createSignal
 
 }){
+
+    const { user: currentUser } = useAuth();
 
     console.log(
 
@@ -291,7 +295,19 @@ export default function AdministrationUsers({
 
                 selectedUser.id,
 
-                payload
+                {
+
+                    ...payload,
+
+                    actor: currentUser ? {
+
+                        user_id: currentUser.id,
+                        name: currentUser.name,
+                        role: currentUser.role
+
+                    } : null
+
+                }
 
             );
 
