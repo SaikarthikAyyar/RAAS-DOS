@@ -12,6 +12,8 @@ from backend.database.connection import get_db
 
 from backend.schemas.sales_survey_schema import SalesSurveySchema
 
+from backend.schemas.sales_survey_schema import SalesSurveyCreateResponseSchema
+
 from backend.services.sales_survey_service import (
     create_sales_survey_request
 )
@@ -66,7 +68,9 @@ def sales_survey():
 
 @router.post(
 
-    "/sales-survey"
+    "/sales-survey",
+
+    response_model=SalesSurveyCreateResponseSchema
 
 )
 

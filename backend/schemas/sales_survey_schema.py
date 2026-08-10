@@ -2,13 +2,29 @@
 # IMPORTS
 # ====================================
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from typing import Optional
 
 from datetime import date
 
 from backend.schemas.notification_schema import ActorSchema
+
+
+# ====================================
+# CREATE/UPDATE RESPONSE
+# Minimal response for POST /sales-survey - the frontend needs a real
+# `id` back (to link it onto the Enquiry as sales_survey_id) rather
+# than the `{}` FastAPI produces trying to auto-serialize the raw
+# SQLAlchemy ORM object with no response_model at all.
+# ====================================
+
+class SalesSurveyCreateResponseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    customer_request_id: int
+    status: Optional[str] = None
 
 
 # ====================================
