@@ -170,6 +170,7 @@ label="Fluid Density (kg/m³)"
 value={job.bulk_density}
 section="job"
 field="bulk_density"
+type="number"
 updateSection={updateSection}
 />
 
@@ -211,6 +212,7 @@ label="pH Min"
 value={job.ph_min}
 section="job"
 field="ph_min"
+type="number"
 updateSection={updateSection}
 />
 
@@ -220,6 +222,7 @@ label="pH Max"
 value={job.ph_max}
 section="job"
 field="ph_max"
+type="number"
 updateSection={updateSection}
 />
 

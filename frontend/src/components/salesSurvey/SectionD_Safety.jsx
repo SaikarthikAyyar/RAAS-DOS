@@ -201,6 +201,8 @@ field="power_distance"
 
 unit="m"
 
+type="number"
+
 updateSection={updateSection}
 
 />
@@ -231,6 +233,8 @@ field,
 
 unit,
 
+type,
+
 updateSection
 
 }){
@@ -246,6 +250,8 @@ return(
 </label>
 
 <input
+
+type={type || "text"}
 
 value={value || ""}
 

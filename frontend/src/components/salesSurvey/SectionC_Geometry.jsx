@@ -130,6 +130,8 @@ field="length_dia"
 
 unit="m"
 
+type="number"
+
 updateSection={updateSection}
 
 onBlur={()=>touchField("geometry", "length_dia")}
@@ -153,6 +155,8 @@ field="width"
 
 unit="m"
 
+type="number"
+
 updateSection={updateSection}
 
 onBlur={()=>touchField("geometry", "width")}
@@ -175,6 +179,8 @@ section="geometry"
 field="sludge_depth"
 
 unit="m"
+
+type="number"
 
 updateSection={updateSection}
 
@@ -229,6 +235,8 @@ field="average_output"
 
 unit="m³/hr"
 
+type="number"
+
 updateSection={updateSection}
 
 />
@@ -248,6 +256,8 @@ field="opening_length"
 
 unit="mm"
 
+type="number"
+
 updateSection={updateSection}
 
 />
@@ -265,6 +275,8 @@ field="opening_width"
 
 unit="mm"
 
+type="number"
+
 updateSection={updateSection}
 
 />
@@ -281,6 +293,8 @@ section="geometry"
 field="height_from_ground"
 
 unit="m"
+
+type="number"
 
 updateSection={updateSection}
 
@@ -301,6 +315,8 @@ field="drop_to_floor"
 
 unit="m"
 
+type="number"
+
 updateSection={updateSection}
 
 />
@@ -318,6 +334,8 @@ field="setup_distance"
 
 unit="m"
 
+type="number"
+
 updateSection={updateSection}
 
 />
@@ -334,6 +352,8 @@ section="geometry"
 field="vertical_lift"
 
 unit="m"
+
+type="number"
 
 updateSection={updateSection}
 
@@ -354,6 +374,8 @@ field="hose_distance"
 
 unit="m"
 
+type="number"
+
 updateSection={updateSection}
 
 />
@@ -370,6 +392,8 @@ section="geometry"
 field="access_path_width"
 
 unit="m"
+
+type="number"
 
 placeholder="e.g., 2.5"
 
@@ -453,6 +477,7 @@ value={geometry.opening_height}
 section="geometry"
 field="opening_height"
 unit="mm"
+type="number"
 updateSection={updateSection}
 />
 
@@ -550,7 +575,9 @@ onBlur,
 
 error,
 
-errorMessage
+errorMessage,
+
+type
 
 }){
 
@@ -568,6 +595,8 @@ return(
 
 
 <input
+
+type={type || "text"}
 
 placeholder={placeholder || ""}
 

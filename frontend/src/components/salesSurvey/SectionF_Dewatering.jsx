@@ -69,6 +69,7 @@ export default function SectionF_Dewatering({
                     value={dewatering.dewatering_volume}
                     section="dewatering"
                     field="dewatering_volume"
+                    type="number"
                     disabled={disabled}
                     updateSection={updateSection}
                 />
@@ -79,6 +80,7 @@ export default function SectionF_Dewatering({
                     value={dewatering.inlet_moisture}
                     section="dewatering"
                     field="inlet_moisture"
+                    type="number"
                     disabled={disabled}
                     updateSection={updateSection}
                 />
@@ -89,6 +91,7 @@ export default function SectionF_Dewatering({
                     value={dewatering.target_final_moisture}
                     section="dewatering"
                     field="target_final_moisture"
+                    type="number"
                     disabled={disabled}
                     updateSection={updateSection}
                 />
@@ -236,6 +239,8 @@ function FieldInput({
 
     disabled,
 
+    type,
+
     updateSection
 
 }){
@@ -247,6 +252,8 @@ function FieldInput({
             <label>{label}</label>
 
             <input
+
+                type={type || "text"}
 
                 disabled={disabled}
 

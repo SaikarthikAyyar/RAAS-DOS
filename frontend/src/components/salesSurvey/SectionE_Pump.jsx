@@ -62,6 +62,7 @@ value={pump.target_flow}
 section="pump"
 field="target_flow"
 unit="m³/hr"
+type="number"
 updateSection={updateSection}
 />
 
@@ -72,6 +73,7 @@ value={pump.suction_depth}
 section="pump"
 field="suction_depth"
 unit="m"
+type="number"
 updateSection={updateSection}
 />
 
@@ -82,6 +84,7 @@ value={pump.discharge_distance}
 section="pump"
 field="discharge_distance"
 unit="m"
+type="number"
 updateSection={updateSection}
 />
 
@@ -92,6 +95,7 @@ value={pump.discharge_height}
 section="pump"
 field="discharge_height"
 unit="m"
+type="number"
 updateSection={updateSection}
 />
 
@@ -180,6 +184,7 @@ value={pump.discharge_point_distance}
 section="pump"
 field="discharge_point_distance"
 unit="m"
+type="number"
 updateSection={updateSection}
 />
 
@@ -188,6 +193,7 @@ label="Hose Route Bends"
 value={pump.hose_route_bends}
 section="pump"
 field="hose_route_bends"
+type="number"
 updateSection={updateSection}
 />
 
@@ -206,6 +212,7 @@ value={pump.effective_work_hours}
 section="pump"
 field="effective_work_hours"
 unit="hrs/day"
+type="number"
 updateSection={updateSection}
 />
 
@@ -235,6 +242,8 @@ field,
 
 unit,
 
+type,
+
 updateSection
 
 }){
@@ -250,6 +259,8 @@ return(
 </label>
 
 <input
+
+type={type || "text"}
 
 value={value || ""}
 
