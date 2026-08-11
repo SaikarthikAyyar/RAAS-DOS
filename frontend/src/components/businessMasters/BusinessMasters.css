@@ -118,6 +118,75 @@
     color:#111827;
 }
 
+/* ====================================
+   LOOKUP LISTS TAB
+==================================== */
+
+.bm-lookup-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:14px;
+}
+
+@media (max-width:1100px){
+    .bm-lookup-grid{
+        grid-template-columns:repeat(2, 1fr);
+    }
+}
+
+@media (max-width:700px){
+    .bm-lookup-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+.bm-lookup-card h3{
+    font-size:12.5px;
+}
+
+.bm-lookup-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:10px;
+    min-height:22px;
+}
+
+.bm-lookup-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:#f3f4f6;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px 8px;
+    font-size:11px;
+    color:#111827;
+}
+
+.bm-lookup-chip-other{
+    background:rgba(234,88,12,.08);
+    border-color:rgba(234,88,12,.25);
+}
+
+.bm-lookup-chip-badge{
+    font-size:9px;
+    font-weight:700;
+    text-transform:uppercase;
+    color:#ea580c;
+}
+
+.bm-lookup-chip-remove{
+    cursor:pointer;
+    font-weight:700;
+    color:#6b7280;
+    padding:0 2px;
+}
+
+.bm-lookup-chip-remove:hover{
+    color:var(--enquiry-red, #dc2626);
+}
+
 .bm-card h4{
     margin:14px 0 8px;
     font-size:12px;

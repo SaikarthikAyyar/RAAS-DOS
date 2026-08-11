@@ -78,6 +78,8 @@ from backend.api.accessories_api import api as accessories_api
 
 from backend.api.commercial_rules_api import api as commercial_rules_api
 
+from backend.api.lookup_list_api import api as lookup_list_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -236,6 +238,8 @@ app.include_router(dewatering_methods_api)
 app.include_router(accessories_api)
 
 app.include_router(commercial_rules_api)
+
+app.include_router(lookup_list_api)
 
 
 

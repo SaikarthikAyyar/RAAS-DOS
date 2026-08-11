@@ -1,26 +1,12 @@
 import {
 
-nearestHubs,
-
-urgencyOptions,
-
-triggerOptions,
-
-repeatPotentialOptions
-
-}
-
-from "../../data/salesSurveyOptions";
-
-import {
-
-FieldInput,
-
-FieldSelect
+FieldInput
 
 }
 
 from "../shared/FormField";
+
+import LookupSelect from "../shared/LookupSelect";
 
 
 export default function SectionA_Customer({
@@ -234,149 +220,53 @@ readOnly
 {/* NEAREST HUB */}
 {/* ==================================== */}
 
-<div className={fieldError("nearest_hub") ? "survey-field field-error" : "survey-field"}>
+<LookupSelect
 
-<label>
+listKey="nearestHub"
 
-Nearest Hub*
+label="Nearest Hub*"
 
-</label>
+value={customer.nearest_hub}
 
-<select
+section="customer"
 
-value={customer.nearest_hub || ""}
+field="nearest_hub"
 
-onChange={(e)=>
-
-updateSection(
-
-"customer",
-
-"nearest_hub",
-
-e.target.value
-
-)
-
-}
+updateSection={updateSection}
 
 onBlur={()=>touchField("customer", "nearest_hub")}
 
->
+error={fieldError("nearest_hub")}
 
-<option value="">
+errorMessage="Nearest Hub is required."
 
-Select
-
-</option>
-
-{
-
-nearestHubs.map(
-
-item=>(
-
-<option
-
-key={item}
-
-value={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-{
-    fieldError("nearest_hub") && (
-        <span className="field-error-message">Nearest Hub is required.</span>
-    )
-}
-
-</div>
+/>
 
 {/* ==================================== */}
 {/* URGENCY */}
 {/* ==================================== */}
 
-<div className={fieldError("urgency") ? "survey-field field-error" : "survey-field"}>
+<LookupSelect
 
-<label>
+listKey="urgency"
 
-Urgency*
+label="Urgency*"
 
-</label>
+value={customer.urgency}
 
-<select
+section="customer"
 
-value={customer.urgency || ""}
+field="urgency"
 
-onChange={(e)=>
-
-updateSection(
-
-"customer",
-
-"urgency",
-
-e.target.value
-
-)
-
-}
+updateSection={updateSection}
 
 onBlur={()=>touchField("customer", "urgency")}
 
->
+error={fieldError("urgency")}
 
-<option value="">
+errorMessage="Urgency is required."
 
-Select
-
-</option>
-
-{
-
-urgencyOptions.map(
-
-item=>(
-
-<option
-
-key={item}
-
-value={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-{
-    fieldError("urgency") && (
-        <span className="field-error-message">Urgency is required.</span>
-    )
-}
-
-</div>
+/>
 
 {/* ==================================== */}
 {/* SURVEY DATE */}
@@ -418,7 +308,9 @@ updateSection={updateSection}
 
 />
 
-<FieldSelect
+<LookupSelect
+
+listKey="trigger"
 
 label="Trigger"
 
@@ -428,13 +320,13 @@ section="customer"
 
 field="survey_trigger"
 
-options={triggerOptions}
-
 updateSection={updateSection}
 
 />
 
-<FieldSelect
+<LookupSelect
+
+listKey="repeatPotential"
 
 label="Repeat Potential"
 
@@ -443,8 +335,6 @@ value={customer.repeat_potential}
 section="customer"
 
 field="repeat_potential"
-
-options={repeatPotentialOptions}
 
 updateSection={updateSection}
 

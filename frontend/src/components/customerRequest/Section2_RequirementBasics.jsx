@@ -1,24 +1,12 @@
 import {
 
-materialCategories,
-
-accessTypeOptions,
-
-assetTypeOptions
-
-}
-
-from "../../data/salesSurveyOptions";
-
-import {
-
-FieldInput,
-
-FieldSelect
+FieldInput
 
 }
 
 from "../shared/FormField";
+
+import LookupSelect from "../shared/LookupSelect";
 
 
 // ====================================
@@ -159,7 +147,9 @@ Department
 
 }
 
-<FieldSelect
+<LookupSelect
+
+listKey="materialCategory"
 
 label="Material seen at site"
 
@@ -169,14 +159,14 @@ section="requirement"
 
 field="observed_material"
 
-options={materialCategories}
-
 updateSection={updateSection}
 
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="accessType"
 
 label="Access opening type"
 
@@ -186,14 +176,14 @@ section="requirement"
 
 field="access_opening_type"
 
-options={accessTypeOptions}
-
 updateSection={updateSection}
 
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="equipmentNearby"
 
 label="Equipment placement nearby?"
 
@@ -202,18 +192,6 @@ value={requirement.can_place_equipment_nearby}
 section="requirement"
 
 field="can_place_equipment_nearby"
-
-options={[
-
-"Yes, within 10 m",
-
-"Yes, within 20 m",
-
-"No",
-
-"Unknown"
-
-]}
 
 updateSection={updateSection}
 
@@ -231,19 +209,12 @@ updateSection={updateSection}
     errorMessage="Cleaning Date is required."
 />
 
-<FieldSelect
+<LookupSelect
+    listKey="cleaningFrequency"
     label="*Cleaning Frequency"
     value={requirement.cleaning_frequency}
     section="requirement"
     field="cleaning_frequency"
-    options={[
-        "One Time",
-        "Weekly",
-        "Monthly",
-        "Quarterly",
-        "Half Yearly",
-        "Yearly"
-    ]}
     updateSection={updateSection}
     onBlur={()=>touchField("requirement", "cleaning_frequency")}
     error={fieldError("cleaning_frequency")}
@@ -258,7 +229,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Asset Name"
+label="Tank Name"
 
 value={requirement.asset_name}
 
@@ -270,17 +241,17 @@ updateSection={updateSection}
 
 />
 
-<FieldSelect
+<LookupSelect
 
-label="Asset Type"
+listKey="assetType"
+
+label="Tank Type"
 
 value={requirement.asset_type}
 
 section="requirement"
 
 field="asset_type"
-
-options={assetTypeOptions}
 
 updateSection={updateSection}
 

@@ -1,14 +1,6 @@
 import { useState } from "react";
 
-import {
-
-    customerCategories,
-
-    customerIndustries,
-
-    customerRegions
-
-} from "../../../data/customerMasterOptions";
+import LookupSelect from "../../shared/LookupSelect";
 
 
 // ====================================
@@ -30,11 +22,21 @@ export default function NewCustomerModal({
 
     const [companyName, setCompanyName] = useState("");
 
-    const [category, setCategory] = useState(customerCategories[1]);
+    const [category, setCategory] = useState("Standard Industrial");
 
     const [industry, setIndustry] = useState("");
 
     const [region, setRegion] = useState("");
+
+    function updateField(_section, field, value){
+
+        if(field==="category") setCategory(value);
+
+        if(field==="industry") setIndustry(value);
+
+        if(field==="region") setRegion(value);
+
+    }
 
     const [gstNumber, setGstNumber] = useState("");
 
@@ -118,63 +120,53 @@ export default function NewCustomerModal({
 
                     </div>
 
-                    <div>
+                    <LookupSelect
 
-                        <label>Category</label>
+                        listKey="customerCategory"
 
-                        <select
+                        label="Category"
 
-                            value={category}
+                        value={category}
 
-                            onChange={e=>setCategory(e.target.value)}
+                        section="customer"
 
-                        >
+                        field="category"
 
-                            {customerCategories.map(c=><option key={c}>{c}</option>)}
+                        updateSection={updateField}
 
-                        </select>
+                    />
 
-                    </div>
+                    <LookupSelect
 
-                    <div>
+                        listKey="customerIndustry"
 
-                        <label>Industry</label>
+                        label="Industry"
 
-                        <select
+                        value={industry}
 
-                            value={industry}
+                        section="customer"
 
-                            onChange={e=>setIndustry(e.target.value)}
+                        field="industry"
 
-                        >
+                        updateSection={updateField}
 
-                            <option value="">Select</option>
+                    />
 
-                            {customerIndustries.map(i=><option key={i}>{i}</option>)}
+                    <LookupSelect
 
-                        </select>
+                        listKey="customerRegion"
 
-                    </div>
+                        label="Region"
 
-                    <div>
+                        value={region}
 
-                        <label>Region</label>
+                        section="customer"
 
-                        <select
+                        field="region"
 
-                            value={region}
+                        updateSection={updateField}
 
-                            onChange={e=>setRegion(e.target.value)}
-
-                        >
-
-                            <option value="">Select</option>
-
-                            {customerRegions.map(r=><option key={r}>{r}</option>)}
-
-                        </select>
-
-                    </div>
+                    />
 
                     <div>
 

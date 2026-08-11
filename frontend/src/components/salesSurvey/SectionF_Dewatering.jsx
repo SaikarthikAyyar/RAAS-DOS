@@ -2,21 +2,7 @@
 // IMPORTS
 // ====================================
 
-import {
-
-    yesNoOptions,
-
-    finalFormOptions,
-
-    settlingOptions,
-
-    spaceOptions,
-
-    cakeHandlingOptions
-
-}
-
-from "../../data/salesSurveyOptions";
+import LookupSelect from "../shared/LookupSelect";
 
 
 // ====================================
@@ -54,12 +40,12 @@ export default function SectionF_Dewatering({
             <div className="survey-grid">
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="yesNoNA"
                     label="Dewatering Required?"
                     value={dewatering.dewatering_required || "Yes"}
                     section="dewatering"
                     field="dewatering_required"
-                    options={yesNoOptions}
                     updateSection={updateSection}
                 />
 
@@ -97,88 +83,88 @@ export default function SectionF_Dewatering({
                 />
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="finalForm"
                     label="Expected Final Form"
                     value={dewatering.expected_final_form}
                     section="dewatering"
                     field="expected_final_form"
-                    options={finalFormOptions}
                     disabled={disabled}
                     updateSection={updateSection}
                 />
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="yesNoNA"
                     label="Visible Free Water?"
                     value={dewatering.visible_free_water}
                     section="dewatering"
                     field="visible_free_water"
-                    options={yesNoOptions}
                     disabled={disabled}
                     updateSection={updateSection}
                 />
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="settling"
                     label="Natural Settling Ability"
                     value={dewatering.natural_settling}
                     section="dewatering"
                     field="natural_settling"
-                    options={settlingOptions}
                     disabled={disabled}
                     updateSection={updateSection}
                 />
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="yesNoNA"
                     label="Oily / Emulsified?"
                     value={dewatering.oily_emulsified}
                     section="dewatering"
                     field="oily_emulsified"
-                    options={yesNoOptions}
                     updateSection={updateSection}
                 />
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="space"
                     label="Space for Bags / Holding?"
                     value={dewatering.space_available}
                     section="dewatering"
                     field="space_available"
-                    options={spaceOptions}
                     disabled={disabled}
                     updateSection={updateSection}
                 />
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="yesNoNA"
                     label="Filtrate Route Available?"
                     value={dewatering.filtrate_route}
                     section="dewatering"
                     field="filtrate_route"
-                    options={yesNoOptions}
                     disabled={disabled}
                     updateSection={updateSection}
                 />
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="yesNoNA"
                     label="Customer Demands Final Moisture Guarantee?"
                     value={dewatering.moisture_guarantee}
                     section="dewatering"
                     field="moisture_guarantee"
-                    options={yesNoOptions}
                     disabled={disabled}
                     updateSection={updateSection}
                 />
 
 
-                <FieldSelect
+                <LookupSelect
+                    listKey="cakeHandling"
                     label="Cake Handling Scope"
                     value={dewatering.cake_handling_scope}
                     section="dewatering"
                     field="cake_handling_scope"
-                    options={cakeHandlingOptions}
                     disabled={disabled}
                     updateSection={updateSection}
                 />
@@ -282,76 +268,3 @@ function FieldInput({
 }
 
 
-// ====================================
-// SELECT
-// ====================================
-
-function FieldSelect({
-
-    label,
-
-    value,
-
-    section,
-
-    field,
-
-    options,
-
-    disabled,
-
-    updateSection
-
-}){
-
-    return(
-
-        <div className={`survey-field${disabled ? " disabled" : ""}`}>
-
-            <label>{label}</label>
-
-            <select
-
-                disabled={disabled}
-
-                value={value || ""}
-
-                onChange={(e)=>
-
-                    updateSection(
-
-                        section,
-
-                        field,
-
-                        e.target.value
-
-                    )
-
-                }
-
-            >
-
-                <option value="">Select</option>
-
-                {
-
-                    options.map(item=>(
-
-                        <option key={item} value={item}>
-
-                            {item}
-
-                        </option>
-
-                    ))
-
-                }
-
-            </select>
-
-        </div>
-
-    );
-
-}

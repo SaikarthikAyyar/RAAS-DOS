@@ -2,28 +2,6 @@ import { useEffect, useState } from "react";
 
 import {
 
-nearestHubs,
-
-urgencyOptions,
-
-leadSourceOptions,
-
-jobTypes
-
-}
-
-from "../../data/salesSurveyOptions";
-
-import {
-
-natureOfJobOptions
-
-}
-
-from "../../data/customerMasterOptions";
-
-import {
-
 getCustomers,
 
 getCustomerAssets
@@ -34,13 +12,13 @@ from "../../services/customerMasterService";
 
 import {
 
-FieldInput,
-
-FieldSelect
+FieldInput
 
 }
 
 from "../shared/FormField";
+
+import LookupSelect from "../shared/LookupSelect";
 
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -204,6 +182,13 @@ function fieldError(field){
 
 }
 
+// The 4 named Channel Partner Lead Source options only appear when
+// the resolved customer's Industry is "Channel Partner" (Business
+// Masters already has this field/value - see Phase 11).
+const resolvedCustomer = allCustomers.find(c => c.id === customer.customer_id);
+
+const isChannelPartner = resolvedCustomer?.industry === "Channel Partner";
+
 
 return(
 
@@ -319,7 +304,9 @@ Required
 }
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="jobType"
 
 label="Job Type"
 
@@ -328,8 +315,6 @@ value={requirement.service_requirement_type}
 section="requirement"
 
 field="service_requirement_type"
-
-options={jobTypes}
 
 updateSection={updateSection}
 
@@ -397,7 +382,9 @@ errorMessage="Enter a valid email address."
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="nearestHub"
 
 label="Nearest City / Hub"
 
@@ -407,14 +394,14 @@ section="customer"
 
 field="nearest_city_hub"
 
-options={nearestHubs}
-
 updateSection={updateSection}
 
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="urgency"
 
 label="Urgency"
 
@@ -424,13 +411,13 @@ section="customer"
 
 field="urgency"
 
-options={urgencyOptions}
-
 updateSection={updateSection}
 
 />
 
-<FieldSelect
+<LookupSelect
+
+listKey="natureOfJob"
 
 label="*Nature of Job"
 
@@ -439,8 +426,6 @@ value={customer.nature_of_job}
 section="customer"
 
 field="nature_of_job"
-
-options={natureOfJobOptions}
 
 updateSection={updateSection}
 
@@ -482,7 +467,11 @@ Existing asset (optional)
 
 </div>
 
-<FieldSelect
+<LookupSelect
+
+listKey="leadSource"
+
+conditionalTag={isChannelPartner ? "channel_partner" : undefined}
 
 label="Lead Source"
 
@@ -491,8 +480,6 @@ value={customer.lead_source}
 section="customer"
 
 field="lead_source"
-
-options={leadSourceOptions}
 
 updateSection={updateSection}
 

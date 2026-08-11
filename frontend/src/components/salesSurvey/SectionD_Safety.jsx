@@ -2,13 +2,7 @@
 // IMPORTS
 // ====================================
 
-import {
-
-yesNoUnknown
-
-}
-
-from "../../data/salesSurveyOptions";
+import LookupSelect from "../shared/LookupSelect";
 
 
 // ====================================
@@ -52,7 +46,9 @@ D. Support, Safety & Utilities
 
 {/* ROW 1 */}
 
-<FieldSelect
+<LookupSelect
+
+listKey="powerAvailable"
 
 label="Power Available"
 
@@ -62,26 +58,14 @@ section="safety"
 
 field="power_available"
 
-options={[
-
-"230V 1PH",
-
-"415V 3PH",
-
-"Generator Required",
-
-"Hydraulic Powerpack",
-
-"Unknown"
-
-]}
-
 updateSection={updateSection}
 
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="yesNoUnknown"
 
 label="Water Available?"
 
@@ -91,23 +75,23 @@ section="safety"
 
 field="water_available"
 
-options={yesNoUnknown}
-
 updateSection={updateSection}
 
 />
 
-<FieldSelect
+<LookupSelect
+    listKey="yesNoUnknown"
     label="Air Supply Available"
     value={safety.air_supply_available}
     section="safety"
     field="air_supply_available"
-    options={yesNoUnknown}
     updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="yesNoUnknown"
 
 label="Confined Space?"
 
@@ -117,8 +101,6 @@ section="safety"
 
 field="confined_space"
 
-options={yesNoUnknown}
-
 updateSection={updateSection}
 
 />
@@ -126,7 +108,9 @@ updateSection={updateSection}
 
 {/* ROW 2 */}
 
-<FieldSelect
+<LookupSelect
+
+listKey="yesNoUnknown"
 
 label="Ventilation Required?"
 
@@ -136,14 +120,14 @@ section="safety"
 
 field="ventilation_required"
 
-options={yesNoUnknown}
-
 updateSection={updateSection}
 
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="yesNoUnknown"
 
 label="Gas Testing Required?"
 
@@ -153,14 +137,14 @@ section="safety"
 
 field="gas_testing_required"
 
-options={yesNoUnknown}
-
 updateSection={updateSection}
 
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="ehsRestriction"
 
 label="EHS Restriction"
 
@@ -169,18 +153,6 @@ value={safety.ehs_restriction}
 section="safety"
 
 field="ehs_restriction"
-
-options={[
-
-"Low",
-
-"Medium",
-
-"High",
-
-"Critical"
-
-]}
 
 updateSection={updateSection}
 
@@ -278,90 +250,3 @@ e.target.value
 }
 
 
-// ====================================
-// SELECT
-// ====================================
-
-function FieldSelect({
-
-label,
-
-value,
-
-section,
-
-field,
-
-options,
-
-updateSection
-
-}){
-
-return(
-
-<div className="survey-field">
-
-<label>
-
-{label}
-
-</label>
-
-<select
-
-value={value || ""}
-
-onChange={(e)=>
-
-updateSection(
-
-section,
-
-field,
-
-e.target.value
-
-)
-
-}
-
->
-
-<option value="">
-
-Select
-
-</option>
-
-{
-
-options.map(
-
-item=>(
-
-<option
-
-key={item}
-
-value={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-</div>
-
-)
-
-}

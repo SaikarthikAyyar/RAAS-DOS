@@ -117,6 +117,47 @@ useSalesSurvey();
 const [submitAttempted, setSubmitAttempted] = useState(false);
 
 // ====================================
+// MEDIA UPLOAD FEEDBACK
+// A distinct toast (not just the generic "Sales Survey Saved" alert)
+// naming what was uploaded, plus a refresh key that forces
+// SectionH_Media to refetch immediately - it previously only fetched
+// on mount, so newly uploaded files stayed invisible until the user
+// navigated away and back into the enquiry.
+// ====================================
+
+const [mediaToast, setMediaToast] = useState("");
+
+const [mediaRefreshKey, setMediaRefreshKey] = useState(0);
+
+useEffect(()=>{
+
+    if(!mediaToast) return;
+
+    const timer = setTimeout(()=>setMediaToast(""), 4000);
+
+    return ()=>clearTimeout(timer);
+
+}, [mediaToast]);
+
+function handleMediaUploaded(photoCount, videoCount){
+
+    const parts = [];
+
+    if(photoCount) parts.push(`${photoCount} photo${photoCount===1?"":"s"}`);
+
+    if(videoCount) parts.push(`${videoCount} video${videoCount===1?"":"s"}`);
+
+    if(parts.length){
+
+        setMediaToast(`Uploaded ${parts.join(" and ")}.`);
+
+    }
+
+    setMediaRefreshKey(prev=>prev+1);
+
+}
+
+// ====================================
 // SCROLL-TO-TOP BUTTON
 // Shows once the user has scrolled past the top cards, so it isn't
 // just sitting there redundantly when the top of the page (where it
@@ -469,6 +510,8 @@ updateMediaFiles={updateMediaFiles}
 
 customerRequestId={selectedCustomer}
 
+mediaRefreshKey={mediaRefreshKey}
+
 />
 
 
@@ -488,7 +531,23 @@ salesSurveyId={salesSurveyId}
 
 onBlockedSubmit={()=>setSubmitAttempted(true)}
 
+onMediaUploaded={handleMediaUploaded}
+
 />
+
+{
+
+    mediaToast && (
+
+        <div className="media-upload-toast">
+
+            {mediaToast}
+
+        </div>
+
+    )
+
+}
 
 
 {

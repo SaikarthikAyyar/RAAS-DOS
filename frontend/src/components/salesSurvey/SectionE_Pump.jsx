@@ -2,22 +2,7 @@
 // IMPORTS
 // ====================================
 
-import {
-
-debrisOptions,
-
-phOptions,
-
-pumpPowerOptions,
-dischargeMediumOptions,
-
-disposalRouteOptions,
-disposalResponsibilityOptions,
-pumpRiskOptions
-
-}
-
-from "../../data/salesSurveyOptions";
+import LookupSelect from "../shared/LookupSelect";
 
 
 // ====================================
@@ -100,32 +85,32 @@ updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="debrisLevel"
 label="Debris / Fibers Present?"
 value={pump.debris_present}
 section="pump"
 field="debris_present"
-options={debrisOptions}
 updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="ph"
 label="pH / Corrosiveness"
 value={pump.ph_condition}
 section="pump"
 field="ph_condition"
-options={phOptions}
 updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="pumpPower"
 label="Power Source for Pump"
 value={pump.pump_power_source}
 section="pump"
 field="pump_power_source"
-options={pumpPowerOptions}
 updateSection={updateSection}
 />
 
@@ -151,30 +136,30 @@ updateSection={updateSection}
 
 />
 
-<FieldSelect
+<LookupSelect
+    listKey="dischargeMedium"
     label="Discharge Medium"
     value={pump.discharge_medium}
     section="pump"
     field="discharge_medium"
-    options={dischargeMediumOptions}
     updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="disposalRoute"
 label="Disposal Route"
 value={pump.disposal_route}
 section="pump"
 field="disposal_route"
-options={disposalRouteOptions}
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="disposalResponsibility"
 label="Disposal Responsibility"
 value={pump.disposal_responsibility}
 section="pump"
 field="disposal_responsibility"
-options={disposalResponsibilityOptions}
 updateSection={updateSection}
 />
 
@@ -197,12 +182,12 @@ type="number"
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="pumpRisk"
 label="Pump Risk"
 value={pump.pump_risk}
 section="pump"
 field="pump_risk"
-options={pumpRiskOptions}
 updateSection={updateSection}
 />
 
@@ -286,56 +271,3 @@ e.target.value
 
 }
 
-function FieldSelect({
-
-    label,
-
-    value,
-
-    section,
-
-    field,
-
-    options,
-
-    updateSection
-
-}){
-
-    return(
-
-        <div className="survey-field">
-
-            <label>{label}</label>
-
-            <select
-                value={value || ""}
-                onChange={(e)=>
-                    updateSection(
-                        section,
-                        field,
-                        e.target.value
-                    )
-                }
-            >
-
-                <option value="">
-                    Select
-                </option>
-
-                {options.map(item=>(
-                    <option
-                        key={item}
-                        value={item}
-                    >
-                        {item}
-                    </option>
-                ))}
-
-            </select>
-
-        </div>
-
-    )
-
-}

@@ -1,36 +1,12 @@
 import {
 
-jobTypes,
-
-materialCategories,
-
-sludge_hardnessOptions,
-
-debrisLevels,
-
-hazardLevels,
-
-yesNoUnknown,
-
-waterVisibilityOptions,
-temperatureRangeOptions,
-sampleAvailabilityOptions,
-abrasivenessOptions,
-flowabilityOptions
-
-}
-
-from "../../data/salesSurveyOptions";
-
-import {
-
-FieldInput,
-
-FieldSelect
+FieldInput
 
 }
 
 from "../shared/FormField";
+
+import LookupSelect from "../shared/LookupSelect";
 
 
 export default function SectionB_JobSludge({
@@ -79,12 +55,12 @@ B. Job / Material Details
 <div className="survey-grid">
 
 
-<FieldSelect
+<LookupSelect
+listKey="jobType"
 label="Job Type*"
 value={job.job_type}
 section="job"
 field="job_type"
-options={jobTypes}
 updateSection={updateSection}
 onBlur={()=>touchField("job", "job_type")}
 error={fieldError("job_type")}
@@ -92,12 +68,12 @@ errorMessage="Job Type is required."
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="materialCategory"
 label="Material Category*"
 value={job.material_category}
 section="job"
 field="material_category"
-options={materialCategories}
 updateSection={updateSection}
 onBlur={()=>touchField("job", "material_category")}
 error={fieldError("material_category")}
@@ -128,12 +104,12 @@ errorMessage="Cleaning Frequency is required."
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="sludgeHardness"
 label="Sludge Hardness*"
 value={job.sludge_hardness}
 section="job"
 field="sludge_hardness"
-options={sludge_hardnessOptions}
 updateSection={updateSection}
 onBlur={()=>touchField("job", "sludge_hardness")}
 error={fieldError("sludge_hardness")}
@@ -143,24 +119,24 @@ errorMessage="Sludge Hardness is required."
 
 
 
-<FieldSelect
+<LookupSelect
+listKey="debrisLevel"
 label="Debris Level*"
 value={job.debris_level}
 section="job"
 field="debris_level"
-options={debrisLevels}
 updateSection={updateSection}
 onBlur={()=>touchField("job", "debris_level")}
 error={fieldError("debris_level")}
 errorMessage="Debris Level is required."
 />
 
-<FieldSelect
+<LookupSelect
+listKey="waterVisibility"
 label="Water Visibility"
 value={job.water_visibility}
 section="job"
 field="water_visibility"
-options={waterVisibilityOptions}
 updateSection={updateSection}
 />
 
@@ -175,12 +151,12 @@ updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="yesNoUnknown"
 label="Is Material Pumpable?"
 value={job.pumpable}
 section="job"
 field="pumpable"
-options={yesNoUnknown}
 updateSection={updateSection}
 />
 
@@ -197,12 +173,12 @@ updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="hazardLevel"
 label="Hazard Level"
 value={job.hazard_level}
 section="job"
 field="hazard_level"
-options={hazardLevels}
 updateSection={updateSection}
 />
 
@@ -227,57 +203,57 @@ updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="yesNoUnknown"
 label="Can Material Flow After Agitation?"
 value={job.flow_after_agitation}
 section="job"
 field="flow_after_agitation"
-options={yesNoUnknown}
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="temperatureRange"
 label="Temperature Range"
 value={job.temperature_range}
 section="job"
 field="temperature_range"
-options={temperatureRangeOptions}
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="sampleAvailability"
 label="Sample Available"
 value={job.sample_available}
 section="job"
 field="sample_available"
-options={sampleAvailabilityOptions}
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="abrasiveness"
 label="Abrasiveness"
 value={job.abrasiveness}
 section="job"
 field="abrasiveness"
-options={abrasivenessOptions}
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="permitRequired"
 label="Permit Required"
 value={job.permit_required}
 section="job"
 field="permit_required"
-options={["Yes", "No"]}
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="flowability"
 label="Flowability"
 value={job.flowability}
 section="job"
 field="flowability"
-options={flowabilityOptions}
 updateSection={updateSection}
 />
 

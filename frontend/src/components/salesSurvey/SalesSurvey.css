@@ -399,6 +399,84 @@ margin-top:3px;
 }
 
 
+/* ====================================
+   MEDIA UPLOAD TOAST
+==================================== */
+
+.media-upload-toast{
+
+position:fixed;
+
+bottom:24px;
+
+right:24px;
+
+background:var(--ink, #1f2937);
+
+color:#fff;
+
+font-size:12.5px;
+
+font-weight:600;
+
+padding:12px 18px;
+
+border-radius:8px;
+
+box-shadow:0 8px 20px rgba(17,24,39,.25);
+
+z-index:50;
+
+animation:mediaToastIn .15s ease;
+
+}
+
+@keyframes mediaToastIn{
+
+from{ opacity:0; transform:translateY(8px); }
+
+to{ opacity:1; transform:translateY(0); }
+
+}
+
+
+/* ====================================
+   LOOKUP SELECT - "Other" free-text mode
+==================================== */
+
+.lookup-select-other-wrap{
+
+position:relative;
+
+}
+
+.lookup-select-back-link{
+
+background:none;
+
+border:none;
+
+color:var(--orange);
+
+font-size:10.5px;
+
+font-weight:600;
+
+cursor:pointer;
+
+padding:2px 0 0;
+
+margin-top:2px;
+
+}
+
+.lookup-select-back-link:hover{
+
+text-decoration:underline;
+
+}
+
+
 /* ===================================
    INLINE FIELD LINK
    Small text-button next to a label (e.g. "Choose existing

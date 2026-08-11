@@ -23,17 +23,23 @@ AuthProvider
 
 from "./contexts/AuthContext";
 
+import { LookupListsProvider } from "./context/LookupListsContext";
+
 createRoot(document.getElementById("root")).render(
 
 <React.StrictMode>
 
 <AuthProvider>
 
+<LookupListsProvider>
+
 <WorkflowProvider>
 
 <App />
 
 </WorkflowProvider>
+
+</LookupListsProvider>
 
 </AuthProvider>
 

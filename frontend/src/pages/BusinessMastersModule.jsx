@@ -22,6 +22,7 @@ import ServiceConfigTab from "../components/businessMasters/serviceConfig/Servic
 import DewateringMethodsTab from "../components/businessMasters/dewatering/DewateringMethodsTab";
 import AccessoriesTab from "../components/businessMasters/accessories/AccessoriesTab";
 import CommercialRulesTab from "../components/businessMasters/rules/CommercialRulesTab";
+import LookupListsTab from "../components/businessMasters/lookupLists/LookupListsTab";
 
 import {
 
@@ -533,6 +534,10 @@ export default function BusinessMastersModule(){
                 ) : activeTab==="rules" ? (
 
                     <CommercialRulesTab />
+
+                ) : activeTab==="lists" ? (
+
+                    <LookupListsTab />
 
                 ) : (
 

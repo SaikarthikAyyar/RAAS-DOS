@@ -46,7 +46,9 @@ enquiryId,
 
 salesSurveyId,
 
-onBlockedSubmit
+onBlockedSubmit,
+
+onMediaUploaded
 
 }){
 
@@ -594,6 +596,8 @@ if(mediaFiles.length){
         Number(customerRequestId),
         { photos, videos }
     );
+
+    onMediaUploaded?.(photos.length, videos.length);
 
 }
 

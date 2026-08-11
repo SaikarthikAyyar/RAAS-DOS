@@ -53,6 +53,8 @@ from backend.models.business_masters_pricing import (
     CustomerCategory
 )
 
+from backend.models.lookup_list_model import LookupList, LookupListValue
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel

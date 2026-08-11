@@ -2,20 +2,7 @@
 // IMPORTS
 // ====================================
 
-import {
-
-accessTypeOptions,
-
-tankTypeOptions,
-accessSupportOptions,
-customerSupportOptions,
-yesNoUnknown,
-tankLocationOptions,
-setupComplexityOptions
-
-}
-
-from "../../data/salesSurveyOptions";
+import LookupSelect from "../shared/LookupSelect";
 
 
 // ====================================
@@ -95,7 +82,9 @@ C. Geometry, Access & Setup
 
 {/* ROW 1 */}
 
-<FieldSelect
+<LookupSelect
+
+listKey="geometryTankType"
 
 label="Tank Type*"
 
@@ -104,8 +93,6 @@ value={geometry.tank_type}
 section="geometry"
 
 field="tank_type"
-
-options={tankTypeOptions}
 
 updateSection={updateSection}
 
@@ -195,7 +182,9 @@ errorMessage="Sludge Depth is required."
 
 {/* ROW 2 */}
 
-<FieldSelect
+<LookupSelect
+
+listKey="accessType"
 
 label="Access Type"
 
@@ -204,8 +193,6 @@ value={geometry.access_type}
 section="geometry"
 
 field="access_type"
-
-options={accessTypeOptions}
 
 updateSection={updateSection}
 
@@ -402,7 +389,9 @@ updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+
+listKey="equipmentNearby"
 
 label="Equipment Nearby Possible?"
 
@@ -412,18 +401,6 @@ section="geometry"
 
 field="equipment_nearby"
 
-options={[
-
-"Yes, within 10 m",
-
-"Yes, within 20 m",
-
-"No",
-
-"Unknown"
-
-]}
-
 updateSection={updateSection}
 
 />
@@ -431,43 +408,43 @@ updateSection={updateSection}
 
 {/* ROW 6 */}
 
-<FieldSelect
+<LookupSelect
+listKey="accessSupport"
 label="Access Support"
 value={geometry.access_support}
 section="geometry"
 field="access_support"
-options={accessSupportOptions}
 updateSection={updateSection}
 />
 
 
-<FieldSelect
+<LookupSelect
+listKey="customerSupport"
 label="Customer Support Equipment"
 value={geometry.customer_support}
 section="geometry"
 field="customer_support"
-options={customerSupportOptions}
 updateSection={updateSection}
 />
 
 
 {/* ROW 7 */}
 
-<FieldSelect
+<LookupSelect
+listKey="yesNoUnknown"
 label="Scaffolding Needed?"
 value={geometry.scaffolding_needed}
 section="geometry"
 field="scaffolding_needed"
-options={yesNoUnknown}
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="yesNoUnknown"
 label="Crane Available?"
 value={geometry.crane_available}
 section="geometry"
 field="crane_available"
-options={yesNoUnknown}
 updateSection={updateSection}
 />
 
@@ -523,21 +500,21 @@ value={packageName}
 
 />
 
-<FieldSelect
+<LookupSelect
+listKey="tankLocation"
 label="Location of Tank"
 value={geometry.tank_location}
 section="geometry"
 field="tank_location"
-options={tankLocationOptions}
 updateSection={updateSection}
 />
 
-<FieldSelect
+<LookupSelect
+listKey="setupComplexity"
 label="Setup Complexity"
 value={geometry.setup_complexity}
 section="geometry"
 field="setup_complexity"
-options={setupComplexityOptions}
 updateSection={updateSection}
 />
 
@@ -619,115 +596,6 @@ e.target.value
 onBlur={onBlur}
 
 />
-
-
-{
-    error && errorMessage && (
-        <span className="field-error-message">{errorMessage}</span>
-    )
-}
-
-
-</div>
-
-)
-
-}
-
-
-// ====================================
-// SELECT FIELD
-// ====================================
-
-function FieldSelect({
-
-label,
-
-value,
-
-section,
-
-field,
-
-options,
-
-updateSection,
-
-onBlur,
-
-error,
-
-errorMessage
-
-}){
-
-
-return(
-
-<div className={error ? "survey-field field-error" : "survey-field"}>
-
-
-<label>
-
-{label}
-
-</label>
-
-
-<select
-
-value={value || ""}
-
-onChange={(e)=>
-
-updateSection(
-
-section,
-
-field,
-
-e.target.value
-
-)
-
-}
-
-onBlur={onBlur}
-
->
-
-<option value="">
-
-Select
-
-</option>
-
-
-{
-
-options.map(
-
-item=>(
-
-<option
-
-key={item}
-
-value={item}
-
->
-
-{item}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
 
 
 {

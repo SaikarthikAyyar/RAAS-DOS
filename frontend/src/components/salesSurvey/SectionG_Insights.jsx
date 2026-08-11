@@ -2,7 +2,7 @@
 // IMPORTS
 // ====================================
 
-import { shutdownOptions, currentMethodOptions } from "../../data/salesSurveyOptions";
+import LookupSelect from "../shared/LookupSelect";
 
 
 // ====================================
@@ -140,74 +140,21 @@ export default function SectionG_Insights({
 
                 {/* Shutdown Window */}
 
-                <div className="survey-field">
+                <LookupSelect
 
-                    <label>
+                    listKey="shutdown"
 
-                        Shutdown Window
+                    label="Shutdown Window"
 
-                    </label>
+                    value={insights.shutdown_window}
 
-                    <select
+                    section="insights"
 
-                        value={
+                    field="shutdown_window"
 
-                            insights.shutdown_window
+                    updateSection={updateSection}
 
-                            || ""
-
-                        }
-
-                        onChange={(e)=>
-
-                            updateSection(
-
-                                "insights",
-
-                                "shutdown_window",
-
-                                e.target.value
-
-                            )
-
-                        }
-
-                    >
-
-                        <option value="">
-
-                            Select
-
-                        </option>
-
-
-                        {
-
-                            shutdownOptions.map(
-
-                                item=>(
-
-                                    <option
-
-                                        key={item}
-
-                                        value={item}
-
-                                    >
-
-                                        {item}
-
-                                    </option>
-
-                                )
-
-                            )
-
-                        }
-
-                    </select>
-
-                </div>
+                />
 
 
                 {/* Completion Deadline */}
@@ -253,98 +200,40 @@ export default function SectionG_Insights({
 
                 {/* Current Method */}
 
-                <div className="survey-field">
+                <LookupSelect
 
-                    <label>
+                    listKey="currentMethod"
 
-                        Current Method
+                    label="Current Method"
 
-                    </label>
+                    value={insights.current_method}
 
-                    <select
+                    section="insights"
 
-                        value={insights.current_method || ""}
+                    field="current_method"
 
-                        onChange={(e)=>
+                    updateSection={updateSection}
 
-                            updateSection(
-
-                                "insights",
-
-                                "current_method",
-
-                                e.target.value
-
-                            )
-
-                        }
-
-                    >
-
-                        <option value="">Select</option>
-
-                        {
-
-                            currentMethodOptions.map(
-
-                                item=>(
-
-                                    <option key={item} value={item}>
-
-                                        {item}
-
-                                    </option>
-
-                                )
-
-                            )
-
-                        }
-
-                    </select>
-
-                </div>
+                />
 
 
                 {/* Budget Known */}
 
-                <div className="survey-field">
+                <LookupSelect
 
-                    <label>
+                    listKey="budgetKnown"
 
-                        Budget Known
+                    label="Budget Known"
 
-                    </label>
+                    value={insights.budget_known}
 
-                    <select
+                    section="insights"
 
-                        value={insights.budget_known || ""}
+                    field="budget_known"
 
-                        onChange={(e)=>
+                    updateSection={updateSection}
 
-                            updateSection(
-
-                                "insights",
-
-                                "budget_known",
-
-                                e.target.value
-
-                            )
-
-                        }
-
-                    >
-
-                        <option value="">Select</option>
-
-                        <option value="Yes">Yes</option>
-
-                        <option value="No">No</option>
-
-                    </select>
-
-                </div>
+                />
 
 
                 {/* Budget Estimate (INR) - only shown when Budget Known = Yes */}

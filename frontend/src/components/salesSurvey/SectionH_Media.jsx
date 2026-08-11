@@ -29,7 +29,9 @@ from "../../services/customerMediaService";
 
 export default function SectionH_Media({
 
-customerRequestId
+customerRequestId,
+
+mediaRefreshKey
 
 }){
 
@@ -119,7 +121,8 @@ useEffect(()=>{
     }
 
 },[
-    loadMedia
+    loadMedia,
+    mediaRefreshKey
 ]);
 
 
