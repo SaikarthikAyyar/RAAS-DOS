@@ -1,4 +1,39 @@
+import { Pencil, Trash2 } from "lucide-react";
+
 import "./AdministrationRoles.css";
+
+
+// =========================================
+// ACTION BUTTON
+// Icon button with a custom hover tooltip - same pattern as the
+// Enquiries list's row actions (native `title` has an inconsistent
+// OS/browser-controlled delay and position).
+// =========================================
+
+function RoleActionButton({ icon: Icon, label, className, onClick }){
+
+    return(
+
+        <span className="role-action-wrap">
+
+            <button
+                type="button"
+                className={className}
+                aria-label={label}
+                onClick={onClick}
+            >
+                <Icon size={13} strokeWidth={2}/>
+            </button>
+
+            <span className="role-action-tooltip">
+                {label}
+            </span>
+
+        </span>
+
+    );
+
+}
 
 
 export default function AdministrationRoleCard({
@@ -131,45 +166,19 @@ export default function AdministrationRoleCard({
 
             >
 
-                <button
-
+                <RoleActionButton
+                    icon={Pencil}
+                    label="Edit"
                     className="role-edit-button"
+                    onClick={()=>onEdit(role)}
+                />
 
-                    onClick={
-
-                        ()=>onEdit(
-
-                            role
-
-                        )
-
-                    }
-
-                >
-
-                    Edit
-
-                </button>
-
-                <button
-
+                <RoleActionButton
+                    icon={Trash2}
+                    label="Delete"
                     className="role-delete-button"
-
-                    onClick={
-
-                        ()=>onDelete(
-
-                            role
-
-                        )
-
-                    }
-
-                >
-
-                    Delete
-
-                </button>
+                    onClick={()=>onDelete(role)}
+                />
 
             </div>
 

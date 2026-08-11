@@ -4,13 +4,13 @@
 
 .administration-roles-sidebar{
 
-    width:340px;
-
     display:flex;
 
     flex-direction:column;
 
-    gap:18px;
+    align-items:flex-start;
+
+    gap:10px;
 
     margin-top:20px;
 
@@ -19,21 +19,26 @@
 
 /* ==========================================
    Role Card
+   width hugs its content (name/type/status + icons) instead of
+   stretching to fill a fixed-width container - the old layout used
+   justify-content:space-between inside a 260px-wide stretched card,
+   which left a large dead gap between the text and the icons on
+   every short role name.
 ========================================== */
 
 .role-card{
 
     display:flex;
 
-    justify-content:space-between;
-
     align-items:center;
 
-    padding:18px 22px;
+    gap:20px;
+
+    padding:8px 12px;
 
     border:1px solid #dcdcdc;
 
-    border-radius:10px;
+    border-radius:8px;
 
     background:#ffffff;
 
@@ -75,14 +80,14 @@
 
     flex-direction:column;
 
-    gap:6px;
+    gap:3px;
 
 }
 
 
 .role-name{
 
-    font-size:18px;
+    font-size:14px;
 
     font-weight:600;
 
@@ -93,7 +98,7 @@
 
 .role-type{
 
-    font-size:14px;
+    font-size:11.5px;
 
     color:#666;
 
@@ -114,11 +119,11 @@
 
     width:max-content;
 
-    padding:4px 10px;
+    padding:2px 8px;
 
     border-radius:999px;
 
-    font-size:12px;
+    font-size:10.5px;
 
     font-weight:600;
 
@@ -153,7 +158,16 @@
 
     align-items:center;
 
-    gap:10px;
+    gap:6px;
+
+}
+
+
+.role-action-wrap{
+
+    position:relative;
+
+    display:inline-flex;
 
 }
 
@@ -162,37 +176,25 @@
 
 .role-delete-button{
 
-    min-width:90px;
+    display:flex;
 
-    padding:8px 14px;
+    align-items:center;
 
-    border:none;
+    justify-content:center;
+
+    width:24px;
+
+    height:24px;
+
+    border:1px solid transparent;
 
     border-radius:6px;
 
     cursor:pointer;
 
-    font-size:14px;
+    background:transparent;
 
-    transition:opacity .2s ease;
-
-}
-
-
-.role-edit-button{
-
-    background:#1976d2;
-
-    color:white;
-
-}
-
-
-.role-delete-button{
-
-    background:#d32f2f;
-
-    color:white;
+    transition:.15s ease;
 
 }
 
@@ -201,7 +203,95 @@
 
 .role-delete-button:hover{
 
-    opacity:.9;
+    filter:brightness(0.92);
+
+    transform:translateY(-1px);
+
+}
+
+
+.role-edit-button:active,
+
+.role-delete-button:active{
+
+    transform:translateY(0);
+
+}
+
+
+.role-edit-button{
+
+    color:#1976d2;
+
+    background:rgba(25,118,210,.08);
+
+    border-color:rgba(25,118,210,.16);
+
+}
+
+
+.role-delete-button{
+
+    color:#d32f2f;
+
+    background:rgba(211,47,47,.08);
+
+    border-color:rgba(211,47,47,.16);
+
+}
+
+
+/* ==========================================
+   Action Tooltip
+   Custom tooltip, not the native `title` attribute - matches the
+   Enquiries list's row-action tooltip (immediate, consistent
+   position/timing instead of the browser-native delay).
+========================================== */
+
+.role-action-tooltip{
+
+    position:absolute;
+
+    bottom:calc(100% + 6px);
+
+    left:50%;
+
+    transform:translateX(-50%) translateY(2px);
+
+    background:var(--ink, #1f2937);
+
+    color:#fff;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    line-height:1;
+
+    white-space:nowrap;
+
+    padding:5px 8px;
+
+    border-radius:5px;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:opacity .12s ease, transform .12s ease;
+
+    z-index:20;
+
+    box-shadow:0 4px 10px rgba(17,24,39,.18);
+
+}
+
+
+.role-action-wrap:hover .role-action-tooltip{
+
+    opacity:1;
+
+    transform:translateX(-50%) translateY(0);
 
 }
 
