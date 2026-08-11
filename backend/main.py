@@ -70,6 +70,14 @@ from backend.api.customer_live_order_api import router as customer_live_order_ap
 
 from backend.api.administrationPartners_api import api as administrationPartnersApi
 
+from backend.api.service_configurations_api import api as service_configurations_api
+
+from backend.api.dewatering_methods_api import api as dewatering_methods_api
+
+from backend.api.accessories_api import api as accessories_api
+
+from backend.api.commercial_rules_api import api as commercial_rules_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -220,6 +228,14 @@ app.include_router(administrationUsers_api)
 app.include_router(signup_api)
 
 app.include_router(notification_api)
+
+app.include_router(service_configurations_api)
+
+app.include_router(dewatering_methods_api)
+
+app.include_router(accessories_api)
+
+app.include_router(commercial_rules_api)
 
 
 

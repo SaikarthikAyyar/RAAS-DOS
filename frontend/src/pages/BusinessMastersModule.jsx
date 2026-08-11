@@ -18,6 +18,10 @@ import NewCustomerModal from "../components/businessMasters/customers/NewCustome
 import AddContactModal from "../components/businessMasters/customers/AddContactModal";
 import SetFollowUpModal from "../components/businessMasters/customers/SetFollowUpModal";
 import SendReminderModal from "../components/businessMasters/customers/SendReminderModal";
+import ServiceConfigTab from "../components/businessMasters/serviceConfig/ServiceConfigTab";
+import DewateringMethodsTab from "../components/businessMasters/dewatering/DewateringMethodsTab";
+import AccessoriesTab from "../components/businessMasters/accessories/AccessoriesTab";
+import CommercialRulesTab from "../components/businessMasters/rules/CommercialRulesTab";
 
 import {
 
@@ -513,6 +517,22 @@ export default function BusinessMastersModule(){
                         onReload={loadCustomers}
 
                     />
+
+                ) : activeTab==="serviceconfig" ? (
+
+                    <ServiceConfigTab />
+
+                ) : activeTab==="dewatering" ? (
+
+                    <DewateringMethodsTab />
+
+                ) : activeTab==="accessories" ? (
+
+                    <AccessoriesTab />
+
+                ) : activeTab==="rules" ? (
+
+                    <CommercialRulesTab />
 
                 ) : (
 

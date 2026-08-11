@@ -2,32 +2,12 @@
 # IMPORTS
 # ====================================
 
-from backend.data.commercial_assumptions import (
-
-    MOBILISATION_RATE,
-
-    SETUP_RATE,
-
-    DEMOBILISATION_RATE,
-
-    OVERHEAD_PERCENTAGE,
-
-    CONTINGENCY_PERCENTAGE,
-
-    MARGIN_PERCENTAGE,
-
-    PUMP_ADDON_RATE,
-
-    DOCUMENTATION_BUFFER,
-
-    ACCESS_SUPPORT_BUFFER,
-
-    SERVICE_RATES,
-
-    DEWATERING_RATE
-
+from backend.models.business_masters_pricing import (
+    ServiceConfiguration,
+    DewateringMethod,
+    Accessory,
+    CommercialRules
 )
-
 
 
 # ====================================
@@ -80,43 +60,98 @@ def build_snapshot(
 
 
 # ====================================
-# COMMERCIAL CALCULATION (MIN/MAX RANGE)
-#
-# Same formula and order of operations as
-# the original single-value version - every
-# line just gets a min AND a max instead of
-# one number. Every line below is currently
-# a FIXED quantity (days, machine choice) so
-# min===max for all of them; that mirrors
-# the RAAS DOS wireframe's own quote engine,
-# where fixed-quantity lines are also
-# min===max ("Fixed rate, no range"). Only
-# the dewatering add-on (computed separately,
-# see build_dewatering_addon) actually
-# differs between min and max, because that's
-# the one place we collect a real range
-# (dewatering_method_min / _max).
+# ACCESSORIES ADD-ON
+# Sums the rate of every accessory marked "Needed: Yes" on the
+# Deployment Plan (ops.accessories_plan), matched by name against the
+# Accessories master. Replaces the old flat PUMP_ADDON_RATE constant.
+# An accessory name with no matching master row (e.g. machine_library.py
+# lists a name that was renamed/removed from the master) contributes 0
+# rather than erroring - a pricing gap shouldn't block the whole quote,
+# same posture as the welcome-email try/except.
 # ====================================
 
-def build_commercial(
+def build_accessories_addon(
 
+    db,
     ops
 
 ):
 
-    machine_cost = SERVICE_RATES.get(
+    accessories_plan = ops.accessories_plan or []
 
-        ops.service_configuration,
+    needed_names = [
+        row.get("name")
+        for row in accessories_plan
+        if row.get("needed") == "Yes"
+    ]
 
-        0
+    if not needed_names:
+
+        return 0.0
+
+    rows = (
+
+        db.query(Accessory)
+        .filter(Accessory.name.in_(needed_names))
+        .all()
 
     )
+
+    rates_by_name = {row.name: float(row.rate) for row in rows}
+
+    return sum(
+
+        rates_by_name.get(name, 0.0)
+        for name in needed_names
+
+    )
+
+
+# ====================================
+# COMMERCIAL CALCULATION (MIN/MAX RANGE)
+#
+# Same formula and order of operations as the original single-value
+# version - every line just gets a min AND a max instead of one
+# number. Every line below is currently a FIXED quantity (days,
+# machine choice) so min===max for all of them; that mirrors the RAAS
+# DOS wireframe's own quote engine, where fixed-quantity lines are
+# also min===max ("Fixed rate, no range"). Only the dewatering add-on
+# (computed separately, see build_dewatering_addon) actually differs
+# between min and max, because that's the one place we collect a real
+# range (dewatering_method_min / _max).
+#
+# Reads Business Masters -> Service Configurations / Commercial Rules
+# instead of the old backend/data/commercial_assumptions.py constants
+# (kept in place as a historical reference, no longer imported here).
+# `category_margin_pct`, when given, overrides CommercialRules.margin_pct
+# for this one quote (the enquiry's customer's category override).
+# ====================================
+
+def build_commercial(
+
+    db,
+    ops,
+    category_margin_pct=None
+
+):
+
+    rules = db.query(CommercialRules).first()
+
+    service_config = (
+
+        db.query(ServiceConfiguration)
+        .filter(ServiceConfiguration.code == ops.service_configuration)
+        .first()
+
+    )
+
+    machine_cost = float(service_config.rate_per_day) if service_config else 0.0
 
     mobilisation_cost = (
 
         ops.mobilisation_days *
 
-        MOBILISATION_RATE
+        float(rules.mobilisation_rate)
 
     )
 
@@ -124,7 +159,7 @@ def build_commercial(
 
         ops.setup_days *
 
-        SETUP_RATE
+        float(rules.setup_rate)
 
     )
 
@@ -136,7 +171,11 @@ def build_commercial(
 
     )
 
-    pump_addon_cost = PUMP_ADDON_RATE
+    pump_addon_cost = build_accessories_addon(db, ops)
+
+    documentation_buffer = float(rules.documentation_buffer)
+
+    access_support_buffer = float(rules.access_support_buffer)
 
     direct_cost = (
 
@@ -148,9 +187,9 @@ def build_commercial(
 
         pump_addon_cost +
 
-        DOCUMENTATION_BUFFER +
+        documentation_buffer +
 
-        ACCESS_SUPPORT_BUFFER
+        access_support_buffer
 
     )
 
@@ -158,7 +197,7 @@ def build_commercial(
 
         direct_cost *
 
-        OVERHEAD_PERCENTAGE
+        float(rules.overhead_pct)
 
     )
 
@@ -166,7 +205,7 @@ def build_commercial(
 
         direct_cost *
 
-        CONTINGENCY_PERCENTAGE
+        float(rules.contingency_pct)
 
     )
 
@@ -180,11 +219,19 @@ def build_commercial(
 
     )
 
+    margin_pct = (
+
+        category_margin_pct
+        if category_margin_pct is not None
+        else float(rules.margin_pct)
+
+    )
+
     margin_value = (
 
         before_margin *
 
-        MARGIN_PERCENTAGE
+        margin_pct
 
     )
 
@@ -210,9 +257,9 @@ def build_commercial(
         "pump_addon_cost_min": pump_addon_cost,
         "pump_addon_cost_max": pump_addon_cost,
 
-        "documentation_buffer": DOCUMENTATION_BUFFER,
+        "documentation_buffer": documentation_buffer,
 
-        "access_support_buffer": ACCESS_SUPPORT_BUFFER,
+        "access_support_buffer": access_support_buffer,
 
         "direct_cost_min": direct_cost,
         "direct_cost_max": direct_cost,
@@ -223,7 +270,7 @@ def build_commercial(
         "contingency_cost_min": contingency_cost,
         "contingency_cost_max": contingency_cost,
 
-        "margin_percentage": MARGIN_PERCENTAGE,
+        "margin_percentage": margin_pct,
 
         "margin_value_min": margin_value,
         "margin_value_max": margin_value,
@@ -237,11 +284,10 @@ def build_commercial(
 # ====================================
 # DEWATERING ADD-ON (MIN/MAX RANGE)
 #
-# The one genuine source of range in the
-# quote: dewatering_method_min/_max (set on
-# the Deployment Plan) each pick a different
-# DEWATERING_RATE, applied to the survey's
-# estimated volume.
+# The one genuine source of range in the quote: dewatering_method_min/
+# _max (set on the Deployment Plan) each pick a different rate from
+# the Dewatering Methods master, applied to the survey's estimated
+# volume.
 # ====================================
 
 def build_dewatering_addon(
@@ -284,21 +330,22 @@ def build_dewatering_addon(
 
     )
 
-    rate_min = DEWATERING_RATE.get(
+    def rate_for(method_key):
 
-        ops.dewatering_method_min,
+        if not method_key:
+            return 0.0
 
-        0
+        row = (
+            db.query(DewateringMethod)
+            .filter(DewateringMethod.method_key == method_key)
+            .first()
+        )
 
-    )
+        return float(row.rate_per_m3) if row else 0.0
 
-    rate_max = DEWATERING_RATE.get(
+    rate_min = rate_for(ops.dewatering_method_min)
 
-        ops.dewatering_method_max,
-
-        0
-
-    )
+    rate_max = rate_for(ops.dewatering_method_max)
 
     addon_min = rate_min * volume
 
@@ -321,7 +368,9 @@ def build_quote(
 
     db,
 
-    ops
+    ops,
+
+    category_margin_pct=None
 
 ):
 
@@ -333,7 +382,11 @@ def build_quote(
 
     commercial = build_commercial(
 
-        ops
+        db,
+
+        ops,
+
+        category_margin_pct
 
     )
 

@@ -1,0 +1,12 @@
+-- The Quote model has never declared any uniqueness on ops_selection_id
+-- (quotes are explicitly designed to support multiple revisions per
+-- ops_selection_id, via revision_number / get_next_revision_number in
+-- techno_commercial_quote_service.py). A stale UNIQUE constraint from
+-- an earlier schema version was left behind on the deployed database
+-- only (confirmed absent locally), causing every second-and-later
+-- quote revision for the same ops_selection to fail with
+-- "duplicate key value violates unique constraint
+-- quotes_ops_selection_id_key" - a 500 on POST /quote that both the
+-- Ops Review "Save Deployment Plan & Generate Quote" action and the
+-- standalone Quote page's "Save Quote" action funnel into.
+ALTER TABLE quotes DROP CONSTRAINT IF EXISTS quotes_ops_selection_id_key;

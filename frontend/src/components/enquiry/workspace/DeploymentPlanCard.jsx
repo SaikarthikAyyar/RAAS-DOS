@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
     saveDeploymentPlan
@@ -8,7 +8,9 @@ import {
     saveQuote
 } from "../../../services/technoCommercialQuoteService";
 
-const DEWATERING_METHODS = ["FILTER_PRESS", "CENTRIFUGE"];
+import {
+    getDewateringMethods
+} from "../../../services/dewateringMethodsService";
 
 function defaultCrewPlan(manpowerRequired){
 
@@ -79,6 +81,16 @@ export default function DeploymentPlanCard({
     const [dewMin, setDewMin] = useState(opsSelection.dewatering_method_min ?? "");
 
     const [dewMax, setDewMax] = useState(opsSelection.dewatering_method_max ?? "");
+
+    const [dewateringMethods, setDewateringMethods] = useState([]);
+
+    useEffect(()=>{
+
+        getDewateringMethods()
+            .then(setDewateringMethods)
+            .catch(err=>console.error(err));
+
+    }, []);
 
     const [saving, setSaving] = useState(false);
 
@@ -398,7 +410,9 @@ export default function DeploymentPlanCard({
                     Min-cost candidate
                     <select value={dewMin} onChange={e=>setDewMin(e.target.value)}>
                         <option value="">-</option>
-                        {DEWATERING_METHODS.map(m=><option key={m}>{m}</option>)}
+                        {dewateringMethods.map(m=>
+                            <option key={m.method_key} value={m.method_key}>{m.method_name}</option>
+                        )}
                     </select>
                 </label>
 
@@ -406,7 +420,9 @@ export default function DeploymentPlanCard({
                     Max-cost candidate
                     <select value={dewMax} onChange={e=>setDewMax(e.target.value)}>
                         <option value="">-</option>
-                        {DEWATERING_METHODS.map(m=><option key={m}>{m}</option>)}
+                        {dewateringMethods.map(m=>
+                            <option key={m.method_key} value={m.method_key}>{m.method_name}</option>
+                        )}
                     </select>
                 </label>
 

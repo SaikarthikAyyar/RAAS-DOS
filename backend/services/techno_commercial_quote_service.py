@@ -41,6 +41,12 @@ from backend.models.enquiry import Enquiry
 
 from backend.services.enquiry_consolidated_service import update_module_reference
 
+from backend.models.customer_master import Customer
+
+from backend.repositories.business_masters_pricing_repository import (
+    get_margin_for_category
+)
+
 
 def create_quote_request(
 
@@ -69,7 +75,7 @@ def create_quote_request(
             "OPS Selection not found."
 
         )
-    
+
     print("\n========== QUOTE WORKFLOW ==========")
     print("[Workflow] Loading incoming SALES quote enquiry")
 
@@ -83,6 +89,56 @@ def create_quote_request(
     dewatering_assessment_id = None
 
     # ====================================
+    # RESOLVE ENQUIRY / CUSTOMER CATEGORY
+    # Moved up from after quote-creation (where only quote_id linkage
+    # used to need it) so the customer's category margin override can
+    # be looked up before the commercial calculation runs.
+    # ====================================
+
+    if getattr(payload, "enquiry_id", None):
+
+        target_enquiry = (
+
+            db.query(Enquiry)
+
+            .filter(Enquiry.id == payload.enquiry_id)
+
+            .first()
+
+        )
+
+    else:
+
+        # Fallback when the caller doesn't know its enquiry_id (e.g. the
+        # standalone Quotes Module opened without workspace context).
+        # Ambiguous when historical duplicate rows share a sales_survey_id
+        # (pre-dates the consolidated-enquiry fix).
+        target_enquiry = (
+
+            db.query(Enquiry)
+
+            .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+
+            .order_by(Enquiry.id.desc())
+
+            .first()
+
+        )
+
+    category_margin_pct = None
+
+    if target_enquiry and target_enquiry.customer_id:
+
+        customer = (
+            db.query(Customer)
+            .filter(Customer.id == target_enquiry.customer_id)
+            .first()
+        )
+
+        if customer:
+            category_margin_pct = get_margin_for_category(db, customer.category)
+
+    # ====================================
     # BUILD COMMERCIAL QUOTE
     # ====================================
 
@@ -90,7 +146,9 @@ def create_quote_request(
 
         db,
 
-        ops
+        ops,
+
+        category_margin_pct
 
     )
 
@@ -211,36 +269,6 @@ def create_quote_request(
     print("[Workflow] Customer Status -> AWAITING_CUSTOMER_REVIEW")
 
     print("[Workflow] Updating consolidated Enquiry")
-
-    if getattr(payload, "enquiry_id", None):
-
-        target_enquiry = (
-
-            db.query(Enquiry)
-
-            .filter(Enquiry.id == payload.enquiry_id)
-
-            .first()
-
-        )
-
-    else:
-
-        # Fallback when the caller doesn't know its enquiry_id (e.g. the
-        # standalone Quotes Module opened without workspace context).
-        # Ambiguous when historical duplicate rows share a sales_survey_id
-        # (pre-dates the consolidated-enquiry fix).
-        target_enquiry = (
-
-            db.query(Enquiry)
-
-            .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
-
-            .order_by(Enquiry.id.desc())
-
-            .first()
-
-        )
 
     if target_enquiry:
 

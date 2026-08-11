@@ -45,6 +45,14 @@ from backend.models.asset import Asset
 
 from backend.models.notification import Notification, NotificationChange, NotificationRead
 
+from backend.models.business_masters_pricing import (
+    ServiceConfiguration,
+    DewateringMethod,
+    Accessory,
+    CommercialRules,
+    CustomerCategory
+)
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel
