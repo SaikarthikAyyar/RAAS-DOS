@@ -2,7 +2,11 @@
 // IMPORTS
 // ====================================
 
+import { useState } from "react";
+
 import LookupSelect from "../shared/LookupSelect";
+
+import { uploadMedia } from "../../services/customerMediaService";
 
 
 // ====================================
@@ -15,9 +19,15 @@ export default function SectionG_Insights({
 
     updateSection,
 
-    updateMediaFiles
+    updateMediaFiles,
+
+    customerRequestId,
+
+    onMediaUploaded
 
 }) {
+
+    const [uploading, setUploading] = useState(false);
 
     const insights =
 
@@ -376,23 +386,61 @@ export default function SectionG_Insights({
 
                         accept="image/*,video/*"
 
+                        disabled={uploading}
+
                         style={{
 
                             display:"none"
 
                         }}
 
-                        onChange={(e)=>{
+                        onChange={async(e)=>{
 
-                            updateMediaFiles(
+                            const picked = Array.from(e.target.files);
 
-                                Array.from(
+                            e.target.value = "";
 
-                                    e.target.files
+                            if(picked.length===0){
+                                return;
+                            }
 
-                                )
+                            updateMediaFiles(picked);
 
-                            );
+                            if(!customerRequestId){
+                                console.error("No customerRequestId - media staged locally only, will not upload.");
+                                return;
+                            }
+
+                            const photos = picked.filter(file=>file.type.startsWith("image"));
+
+                            const videos = picked.filter(file=>file.type.startsWith("video"));
+
+                            setUploading(true);
+
+                            try{
+
+                                await uploadMedia(
+                                    Number(customerRequestId),
+                                    { photos, videos }
+                                );
+
+                                onMediaUploaded?.(photos.length, videos.length);
+
+                            }
+
+                            catch(err){
+
+                                console.error(err);
+
+                                alert("Unable to upload media. Please try again.");
+
+                            }
+
+                            finally{
+
+                                setUploading(false);
+
+                            }
 
                         }}
 
@@ -409,6 +457,10 @@ export default function SectionG_Insights({
 
                         {
 
+                            uploading
+                            ?
+                            "Uploading..."
+                            :
                             files.length===0
 
                             ?

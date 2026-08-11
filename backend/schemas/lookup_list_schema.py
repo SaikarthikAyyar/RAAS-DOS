@@ -37,4 +37,5 @@ class LookupListOut(BaseModel):
     list_key: str
     display_name: str
     module: str
+    description: Optional[str] = None
     values: list[LookupListValueOut]

@@ -503,6 +503,10 @@ updateSection={updateSection}
 
 updateMediaFiles={updateMediaFiles}
 
+customerRequestId={selectedCustomer}
+
+onMediaUploaded={handleMediaUploaded}
+
 />
 
 
@@ -530,8 +534,6 @@ enquiryId={enquiryId}
 salesSurveyId={salesSurveyId}
 
 onBlockedSubmit={()=>setSubmitAttempted(true)}
-
-onMediaUploaded={handleMediaUploaded}
 
 />
 

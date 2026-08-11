@@ -144,6 +144,12 @@
     font-size:12.5px;
 }
 
+.bm-lookup-used-in{
+    font-size:10.5px;
+    color:var(--muted, #6b7280);
+    margin:-6px 0 10px;
+}
+
 .bm-lookup-chips{
     display:flex;
     flex-wrap:wrap;

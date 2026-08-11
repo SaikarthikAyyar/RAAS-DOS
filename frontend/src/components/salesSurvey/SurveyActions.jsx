@@ -18,14 +18,6 @@ import {
 
 from "../../services/enquiryWorkspaceService";
 
-import {
-
-    uploadMedia
-
-}
-
-from "../../services/customerMediaService";
-
 import { useAuth } from "../../contexts/AuthContext";
 
 // ====================================
@@ -46,9 +38,7 @@ enquiryId,
 
 salesSurveyId,
 
-onBlockedSubmit,
-
-onMediaUploaded
+onBlockedSubmit
 
 }){
 
@@ -570,36 +560,11 @@ if(
 }
 
 // ====================================
-// UPLOAD MEDIA
-// Files picked in Section G's "Photos /
-// Videos" uploader are held in state until
-// now. Uploaded against the same
-// customer_request_id the Enquiry
-// Workspace's Media card already reads from,
-// so they show up there automatically.
+// MEDIA
+// Files picked in Section G's "Photos / Videos" uploader are now
+// uploaded immediately on pick (see SectionG_Insights.jsx), not
+// deferred to here - nothing left to do for media at submit time.
 // ====================================
-
-const mediaFiles =
-    surveyData.insights?.mediaFiles || [];
-
-if(mediaFiles.length){
-
-    const photos = mediaFiles.filter(
-        file => file.type.startsWith("image")
-    );
-
-    const videos = mediaFiles.filter(
-        file => file.type.startsWith("video")
-    );
-
-    await uploadMedia(
-        Number(customerRequestId),
-        { photos, videos }
-    );
-
-    onMediaUploaded?.(photos.length, videos.length);
-
-}
 
 alert(
 

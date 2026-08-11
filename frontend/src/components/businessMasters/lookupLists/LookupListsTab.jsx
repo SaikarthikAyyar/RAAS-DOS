@@ -19,6 +19,16 @@ function LookupListCard({ list, onAdd, onRemove }){
 
             <h3>{list.display_name}</h3>
 
+            {
+
+                list.description && (
+
+                    <p className="bm-lookup-used-in">{list.description}</p>
+
+                )
+
+            }
+
             <div className="bm-lookup-chips">
 
                 {

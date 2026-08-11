@@ -53,6 +53,7 @@ def list_all_lookup_lists(db):
             "list_key": lookup_list.list_key,
             "display_name": lookup_list.display_name,
             "module": lookup_list.module,
+            "description": lookup_list.description,
             "values": values
 
         })
@@ -77,6 +78,7 @@ def get_lookup_list(db, list_key, conditional_tag=None):
         "list_key": lookup_list.list_key,
         "display_name": lookup_list.display_name,
         "module": lookup_list.module,
+        "description": lookup_list.description,
         "values": filtered
 
     }
