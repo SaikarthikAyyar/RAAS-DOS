@@ -57,6 +57,8 @@ from backend.models.lookup_list_model import LookupList, LookupListValue
 
 from backend.models.email_template import EmailTemplate, EmailTemplateVariable
 
+from backend.models.survey_reminder import SurveyReminder
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel

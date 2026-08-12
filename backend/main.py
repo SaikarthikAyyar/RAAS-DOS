@@ -82,6 +82,8 @@ from backend.api.lookup_list_api import api as lookup_list_api
 
 from backend.api.email_template_api import api as email_template_api
 
+from backend.api.survey_reminder_api import api as survey_reminder_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -244,6 +246,8 @@ app.include_router(commercial_rules_api)
 app.include_router(lookup_list_api)
 
 app.include_router(email_template_api)
+
+app.include_router(survey_reminder_api)
 
 
 

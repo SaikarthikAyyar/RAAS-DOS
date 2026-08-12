@@ -1,5 +1,7 @@
 import { FolderOpen, Archive, ArchiveRestore, Ban, CheckCheck, Trash2 } from "lucide-react";
 
+import { STAGE_LABELS } from "../../data/workflowStages";
+
 // =========================================
 // ACTION BUTTON
 // Icon button with a custom hover tooltip - the native `title`
@@ -126,7 +128,29 @@ export default function EnquiryTableRow({
 
             <td>
 
-                {enquiry.stage}
+                {STAGE_LABELS[enquiry.stage] || enquiry.stage}
+
+            </td>
+
+
+            {/* ===================================== */}
+            {/* AGING */}
+            {/* ===================================== */}
+
+            <td>
+
+                {enquiry.aging_display || "—"}
+
+            </td>
+
+
+            {/* ===================================== */}
+            {/* VALUE */}
+            {/* ===================================== */}
+
+            <td>
+
+                {enquiry.value_display || "—"}
 
             </td>
 

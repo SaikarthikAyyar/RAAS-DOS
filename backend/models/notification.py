@@ -38,6 +38,12 @@ class Notification(Base):
     enquiry_id = Column(Integer, ForeignKey("enquiries.id"))
     customer_name = Column(String(150))
 
+    # NULL = broadcast, visible to everyone (unchanged behavior for every
+    # notification created before this column existed, and any new one
+    # that doesn't set it). Set = visible only to that one user - used by
+    # the Survey Reminder feature for a genuinely per-recipient alert.
+    recipient_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
     created_at = Column(DateTime, server_default=func.now())
 
 

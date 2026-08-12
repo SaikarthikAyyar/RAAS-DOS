@@ -127,6 +127,18 @@ export default function EnquiryTable({
 
                     <th>
 
+                        Aging
+
+                    </th>
+
+                    <th>
+
+                        Value
+
+                    </th>
+
+                    <th>
+
                         Status
 
                     </th>

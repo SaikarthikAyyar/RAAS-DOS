@@ -62,6 +62,10 @@ class EnquiryConsolidatedListItem(BaseModel):
 
     owner: Optional[str] = None
 
+    aging_seconds: Optional[int] = None
+    aging_display: Optional[str] = None
+    value_display: Optional[str] = None
+
     stage: EnquiryStage
 
     status: EnquiryStatus

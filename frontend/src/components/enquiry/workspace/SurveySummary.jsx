@@ -1,13 +1,24 @@
 import SurveySummaryCard from "./SurveySummaryCard";
 import SurveyMediaCard from "./SurveyMediaCard";
+import SurveyReminderModal from "./SurveyReminderModal";
 import "./SurveySummary.css";
 
+import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../../../contexts/AuthContext";
 
 import {
     advanceStageAtLeast
 }
 from "../../../services/enquiryWorkspaceService";
+
+import {
+    getSurveyReminderStatus,
+    cancelSurveyReminder
+}
+from "../../../services/surveyReminderService";
 
 export default function SurveySummary({
 
@@ -24,6 +35,8 @@ export default function SurveySummary({
 }){
     const navigate = useNavigate();
 
+    const { user } = useAuth();
+
     // Before a Sales Survey has ever been submitted, fall back to
     // the Customer-Request-derived prefill (same shape, same source
     // that seeds the real survey form) so the cards below show
@@ -31,6 +44,63 @@ export default function SurveySummary({
     const survey = surveyProp || prefillData;
 
     const hasRealSurvey = Boolean(surveyProp);
+
+    const inSurveyStage = enquiry.stage === "SALES_SURVEY";
+
+    const [reminderStatus, setReminderStatus] = useState(null);
+
+    const [showReminderModal, setShowReminderModal] = useState(false);
+
+    useEffect(()=>{
+
+        if(!inSurveyStage){
+            setReminderStatus(null);
+            return;
+        }
+
+        let cancelled = false;
+
+        getSurveyReminderStatus(enquiry.id)
+            .then(status=>{ if(!cancelled) setReminderStatus(status); })
+            .catch(err=>console.error("[SurveySummary] Failed to load reminder status", err));
+
+        return ()=>{ cancelled = true; };
+
+    }, [enquiry.id, inSurveyStage]);
+
+    async function handleCancelReminder(){
+
+        try{
+
+            await cancelSurveyReminder(enquiry.id);
+
+            setReminderStatus({ active:false });
+
+        }
+
+        catch(err){
+
+            alert(err?.detail || "Unable to cancel reminder.");
+
+        }
+
+    }
+
+    function formatRemaining(seconds){
+
+        if(seconds < 60) return `${Math.ceil(seconds)}s`;
+
+        const totalMinutes = Math.floor(seconds / 60);
+
+        const hours = Math.floor(totalMinutes / 60);
+
+        const minutes = totalMinutes % 60;
+
+        if(hours === 0) return `${minutes}m`;
+
+        return `${hours}h ${minutes}m`;
+
+    }
 
     function handleFillEditSurvey(){
 
@@ -925,10 +995,69 @@ export default function SurveySummary({
 
                         </button>
 
+                        {
+                            inSurveyStage && reminderStatus && (
+
+                                reminderStatus.active ? (
+
+                                    <span className="survey-reminder-status">
+
+                                        Reminder set — fires in {formatRemaining(reminderStatus.remaining_seconds)} · by {reminderStatus.set_by_name}
+
+                                        <button
+
+                                            className="survey-action-button"
+
+                                            onClick={handleCancelReminder}
+
+                                        >
+
+                                            Cancel
+
+                                        </button>
+
+                                    </span>
+
+                                ) : (
+
+                                    <button
+
+                                        className="survey-action-button"
+
+                                        onClick={()=>setShowReminderModal(true)}
+
+                                    >
+
+                                        ⏰ Set Reminder
+
+                                    </button>
+
+                                )
+
+                            )
+                        }
+
                     </div>
 
                 }
             />
+
+            {
+                showReminderModal && (
+
+                    <SurveyReminderModal
+
+                        enquiryId={enquiry.id}
+                        userId={user?.id}
+                        userName={user?.name}
+
+                        onClose={()=>setShowReminderModal(false)}
+                        onSaved={setReminderStatus}
+
+                    />
+
+                )
+            }
 
         </div>
 

@@ -4,6 +4,8 @@
 
 from datetime import timedelta
 
+from sqlalchemy import or_
+
 from backend.models.notification import Notification, NotificationChange, NotificationRead
 
 
@@ -100,6 +102,17 @@ def list_notifications(db, date_from, date_to, user_id):
     if date_to:
         query = query.filter(Notification.created_at < _end_of_day_exclusive(date_to))
 
+    # Broadcast rows (recipient_user_id IS NULL) stay visible to everyone,
+    # unchanged. A targeted row (e.g. a fired Survey Reminder) is only
+    # ever visible to its one recipient - or to nobody if the viewer is
+    # unknown (user_id not supplied).
+    if user_id:
+        query = query.filter(
+            or_(Notification.recipient_user_id.is_(None), Notification.recipient_user_id == user_id)
+        )
+    else:
+        query = query.filter(Notification.recipient_user_id.is_(None))
+
     notifications = query.order_by(Notification.created_at.desc()).all()
 
     read_ids = set()
@@ -153,6 +166,9 @@ def list_unread(db, user_id, date_from=None, date_to=None, limit=50):
     query = (
         db.query(Notification)
         .filter(Notification.id.notin_(read_subquery))
+        .filter(
+            or_(Notification.recipient_user_id.is_(None), Notification.recipient_user_id == user_id)
+        )
     )
 
     if date_from:

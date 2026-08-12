@@ -135,6 +135,17 @@ class Enquiry(Base):
         default="CUSTOMER_REQUEST"
     )
 
+    # Timestamp of the most recent stage transition - reset every time
+    # `stage` changes (backend/services/workflow_service.py::update_stage).
+    # Distinct from updated_at, which changes on any field edit, not just
+    # a stage change - this is what "aging" (time in current stage) is
+    # computed from, precise to the second.
+    stage_entered_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now()
+    )
+
     owner_role = Column(
         String(50),
         nullable=True

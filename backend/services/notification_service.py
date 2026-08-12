@@ -9,6 +9,8 @@ from backend.repositories.notification_repository import (
     get_export_data
 )
 
+from backend.services.survey_reminder_service import sweep_due_reminders
+
 
 # ====================================
 # SERIALIZATION HELPERS
@@ -79,6 +81,12 @@ def list_notifications_request(db, date_from, date_to, user_id):
 # ====================================
 
 def list_unread_request(db, user_id, date_from=None, date_to=None):
+
+    # Every bell-icon poll (every ~30s, from any logged-in user) doubles
+    # as the Survey Reminder feature's trigger - see backend/services/
+    # survey_reminder_service.py::sweep_due_reminders for why this
+    # piggybacks on existing polling infra instead of a new scheduler.
+    sweep_due_reminders(db)
 
     notifications = list_unread(db, user_id, date_from=date_from, date_to=date_to)
 

@@ -2,9 +2,13 @@
 # IMPORTS
 # ====================================
 
+from datetime import datetime, timezone
+
 from fastapi import HTTPException, status
 
 from backend.models.enquiry import Enquiry
+
+from backend.repositories.survey_reminder_repository import cancel_active_reminders_for_enquiry
 
 from enum import Enum
 
@@ -137,7 +141,11 @@ def update_stage(
 
     )
 
+    previous_stage = enquiry.stage
+
     enquiry.stage = stage
+
+    enquiry.stage_entered_at = datetime.now(timezone.utc)
 
     db.commit()
 
@@ -148,6 +156,17 @@ def update_stage(
     )
 
     print("[WORKFLOW] Stage Updated")
+
+    # A reminder can only ever be created while stage == SALES_SURVEY, so
+    # any real stage change means "left the stage the reminder was
+    # watching" - cancel it regardless of which stage it's now moving to.
+    if previous_stage != stage:
+
+        cancelled_count = cancel_active_reminders_for_enquiry(db, enquiry_id)
+
+        if cancelled_count:
+            print(f"[WORKFLOW] Cancelled {cancelled_count} active Survey Reminder(s) on stage change")
+
     print("========================================\n")
 
     return enquiry

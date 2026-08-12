@@ -24,6 +24,46 @@ from backend.services.workflow_service import (
     advance_stage_at_least
 )
 
+from backend.models.techno_commercial_quote import Quote
+
+from backend.utils.aging import compute_aging_seconds, aging_seconds_to_days_display
+from backend.utils.value_display import compute_value_display
+
+
+# ====================================
+# ATTACH AGING + VALUE
+# Both are computed live (never stored/cached) - matches the
+# wireframe's own daysInStage(), which recomputes at render time
+# rather than keeping a background job in sync. Attached as plain
+# Python attributes (not real ORM columns) so EnquiryConsolidatedListItem's
+# from_attributes=True picks them up via getattr, same as any other field.
+# ====================================
+
+def _attach_aging_and_value(db, enquiries):
+
+    quote_ids = [e.quote_id for e in enquiries if e.quote_id]
+
+    quotes_by_id = {}
+
+    if quote_ids:
+
+        quotes = db.query(Quote).filter(Quote.id.in_(quote_ids)).all()
+
+        quotes_by_id = {q.id: q for q in quotes}
+
+    for enquiry in enquiries:
+
+        aging_seconds = compute_aging_seconds(enquiry.stage_entered_at)
+
+        enquiry.aging_seconds = int(aging_seconds)
+        enquiry.aging_display = aging_seconds_to_days_display(aging_seconds)
+
+        quote = quotes_by_id.get(enquiry.quote_id) if enquiry.quote_id else None
+
+        enquiry.value_display = compute_value_display(quote)
+
+    return enquiries
+
 # ====================================
 # PRIVATE
 # ====================================
@@ -111,6 +151,8 @@ def get_enquiries(
         query.search
 
     )
+
+    enquiries = _attach_aging_and_value(db, enquiries)
 
     print(f"[SERVICE] Rows Returned : {len(enquiries)}")
     print(f"[SERVICE] Total Records : {total}")
