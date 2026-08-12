@@ -25,6 +25,28 @@
 
 
 /* ====================================
+   BACK LINK (matches wireframe's
+   `<span class="backlink" onclick="backToList()">` at the top of the
+   case workspace)
+==================================== */
+
+.workspace-backlink{
+    align-self:flex-start;
+    font-size:12px;
+    font-weight:800;
+    color:var(--orange);
+    cursor:pointer;
+    background:none;
+    border:none;
+    padding:0;
+}
+
+.workspace-backlink:hover{
+    text-decoration:underline;
+}
+
+
+/* ====================================
    HEADER (matches wireframe .title)
 ==================================== */
 

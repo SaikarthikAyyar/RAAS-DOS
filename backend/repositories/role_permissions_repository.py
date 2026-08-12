@@ -136,7 +136,17 @@ ROLE_TAB_ACCESS = {
     "management": [key for key, _ in WORKSPACE_TABS],
     "customer": [key for key, _ in WORKSPACE_TABS],
 
-    "sales_executive": ["enquiry-tab-survey"]
+    "sales_executive": ["enquiry-tab-survey"],
+
+    # Added 2026-08-12 per direct instruction - both roles already had
+    # nav access (above) from 2026-08-11 but were missing from this
+    # dict entirely, which meant WorkflowTabs.jsx's "no permissions
+    # loaded yet" fallback (empty workspaceTabs array -> show all 9
+    # tabs) was silently granting them full tab access instead of the
+    # intended Survey-only. Real rows here fix that at the source.
+    "Sales and Marketing": ["enquiry-tab-survey"],
+
+    "Senior General Manager Sales": ["enquiry-tab-survey"]
 
 }
 

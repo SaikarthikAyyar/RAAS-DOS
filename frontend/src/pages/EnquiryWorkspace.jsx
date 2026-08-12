@@ -12,7 +12,9 @@ import {
 
     useParams,
 
-    useLocation
+    useLocation,
+
+    useNavigate
 
 } from "react-router-dom";
 
@@ -80,6 +82,8 @@ export default function EnquiryWorkspace() {
     } = useParams();
 
     const location = useLocation();
+
+    const navigate = useNavigate();
 
     console.log(
 
@@ -320,6 +324,20 @@ export default function EnquiryWorkspace() {
     return (
 
         <div className="enquiry-workspace">
+
+            <button
+
+                type="button"
+
+                className="workspace-backlink"
+
+                onClick={()=>navigate("/enquiry")}
+
+            >
+
+                ← Back to all enquiries
+
+            </button>
 
             <WorkspaceHeader
                 enquiry={enquiry}
