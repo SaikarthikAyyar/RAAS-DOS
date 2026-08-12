@@ -18,6 +18,12 @@ import {
 
 } from "../../../services/administrationUsersService";
 
+import {
+
+    getRoles
+
+} from "../../../services/administrationRolesService";
+
 import AdministrationUserTable from "./AdministrationUsersTable";
 
 import AdministrationUserDialog from "./AdministrationUserDialog";
@@ -51,25 +57,45 @@ export default function AdministrationUsers({
 
     ] = useState([]);
 
-    const roles = [
+    // Was previously derived from whichever roles existing users
+    // already had (plus a hardcoded "partner" fallback) - meant any
+    // real role with zero users assigned yet (a brand-new role, e.g.
+    // one just added in Administration -> Roles & Permissions) never
+    // appeared in this dropdown. Fetched from the real roles table
+    // instead so every active role is always selectable here.
+    const [
 
-        ...new Set(
-            [
+        roles,
 
-            ...users
+        setRoles
 
-                .map(
+    ] = useState([]);
 
-                    user => user.role
+    async function loadRoles(){
 
-                ),
-                "partner"
+        try{
 
-            ]
+            const response = await getRoles();
 
-        )
+            const activeRoleNames = response
 
-    ].sort();
+                .filter(role => role.is_active)
+
+                .map(role => role.name)
+
+                .sort();
+
+            setRoles(activeRoleNames);
+
+        }
+
+        catch(error){
+
+            console.error("[AdministrationUsers] Failed to load roles", error);
+
+        }
+
+    }
 
     const [
 
@@ -162,6 +188,8 @@ export default function AdministrationUsers({
         ()=>{
 
             loadUsers();
+
+            loadRoles();
 
         },
 
