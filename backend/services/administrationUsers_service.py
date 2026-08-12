@@ -5,7 +5,7 @@ from backend.schemas.administrationUsers_schema import (
     AdministrationUserCreate,
     AdministrationUserUpdate,
 )
-from backend.services.email_service import send_welcome_email
+from backend.services.email_template_service import send_user_account_email
 from backend.repositories.notification_repository import record_change
 
 # Excluded from change-tracking - we don't want plaintext password
@@ -90,7 +90,9 @@ def create_user(
 
     )
 
-    send_welcome_email(
+    send_user_account_email(
+
+        db,
 
         new_user.email,
 

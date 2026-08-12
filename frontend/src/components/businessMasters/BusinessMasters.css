@@ -312,6 +312,145 @@
     background:#f1f5f9;
 }
 
+.bm-pill-green{
+    color:#166534;
+    background:#dcfce7;
+    border-color:#bbf7d0;
+}
+
+
+/* ====================================
+   EMAIL TEMPLATES - row action icons + tooltip
+   Same compact icon-button-plus-tooltip pattern used for the
+   Enquiries list and Administration -> Roles & Permissions (a wide
+   text-link row was flagged as wasting space there).
+==================================== */
+
+.email-template-actions{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    flex-wrap:nowrap;
+    white-space:nowrap;
+}
+
+.email-template-action-wrap{
+    position:relative;
+    display:inline-flex;
+}
+
+.email-template-actions button{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;
+    height:26px;
+    border:1px solid transparent;
+    border-radius:7px;
+    background:transparent;
+    cursor:pointer;
+    transition:.15s ease;
+}
+
+.email-template-actions button:hover{
+    filter:brightness(0.92);
+    transform:translateY(-1px);
+}
+
+.email-template-edit{
+    color:#1976d2;
+    background:rgba(25,118,210,.08);
+    border-color:rgba(25,118,210,.16);
+}
+
+.email-template-view{
+    color:#0891b2;
+    background:rgba(8,145,178,.08);
+    border-color:rgba(8,145,178,.16);
+}
+
+.email-template-details{
+    color:#7c3aed;
+    background:rgba(124,58,237,.08);
+    border-color:rgba(124,58,237,.16);
+}
+
+.email-template-send{
+    color:#166534;
+    background:rgba(22,163,74,.08);
+    border-color:rgba(22,163,74,.16);
+}
+
+.email-template-delete{
+    color:#d32f2f;
+    background:rgba(211,47,47,.08);
+    border-color:rgba(211,47,47,.16);
+}
+
+.email-template-action-tooltip{
+    position:absolute;
+    bottom:calc(100% + 6px);
+    left:50%;
+    transform:translateX(-50%) translateY(2px);
+    background:var(--ink, #1f2937);
+    color:#fff;
+    font-size:11px;
+    font-weight:600;
+    line-height:1;
+    white-space:nowrap;
+    padding:5px 8px;
+    border-radius:5px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .12s ease, transform .12s ease;
+    z-index:20;
+    box-shadow:0 4px 10px rgba(17,24,39,.18);
+}
+
+.email-template-action-wrap:hover .email-template-action-tooltip{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+
+/* ====================================
+   EMAIL TEMPLATES - variables list, send form
+==================================== */
+
+.email-template-variable-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 0;
+    border-bottom:1px solid var(--line);
+}
+
+.email-template-variable-key{
+    font-family:monospace;
+    font-size:11.5px;
+    background:#f3f4f6;
+    padding:2px 6px;
+    border-radius:4px;
+}
+
+.email-template-recipient-badge{
+    font-size:9px;
+    font-weight:700;
+    text-transform:uppercase;
+    color:#166534;
+    background:#dcfce7;
+    border-radius:4px;
+    padding:2px 5px;
+}
+
+.email-template-var-reference{
+    background:#f9fafb;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px;
+    margin-top:10px;
+}
+
 
 /* ====================================
    BUTTONS (matches wireframe .btn/.btn.primary/.btn.ok/

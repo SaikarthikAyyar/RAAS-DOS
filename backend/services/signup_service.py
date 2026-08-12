@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from backend.models.users import User
 from backend.schemas.signup_schema import SignupSchema
-from backend.services.email_service import send_welcome_email
+from backend.services.email_template_service import send_user_account_email
 
 
 # ==========================================================
@@ -30,7 +30,8 @@ def signup_user(payload: SignupSchema, db: Session):
 
     print(f"[Signup Service] -> User created successfully. ID = {new_user.id}")
 
-    send_welcome_email(
+    send_user_account_email(
+        db,
         new_user.email,
         new_user.name,
         new_user.role,
