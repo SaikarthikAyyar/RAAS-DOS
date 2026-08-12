@@ -60,7 +60,9 @@ ROLES = [
     ("ops", "janyu"),
     ("management", "janyu"),
     ("customer", "customer"),
-    ("sales_executive", "janyu")
+    ("sales_executive", "janyu"),
+    ("Sales and Marketing", "janyu"),
+    ("Senior General Manager Sales", "janyu")
 
 ]
 
@@ -107,6 +109,19 @@ ROLE_NAV_ACCESS = {
 
     "sales_executive": [
         "/administration", "/enquiry", "/business-master"
+    ],
+
+    # Added 2026-08-11 per direct instruction - both roles were
+    # created directly in Administration -> Roles & Permissions on the
+    # live deployment first; this codifies their nav access so it
+    # survives a redeploy / reseed instead of living only as a manual
+    # DB edit.
+    "Sales and Marketing": [
+        "/business-master", "/enquiry", "/audit-trail"
+    ],
+
+    "Senior General Manager Sales": [
+        "/business-master", "/enquiry", "/audit-trail"
     ]
 
 }
@@ -130,14 +145,18 @@ ROLE_TAB_ACCESS = {
 # SEED ROLES / MODULES / ROLE_PERMISSIONS
 # Idempotent - safe to call on every backend startup, matches the
 # seed_machine_inventory()/seed_personnel() pattern.
+#
+# Originally short-circuited entirely ("if any role_permissions row
+# exists, skip") - that meant adding a new role/permission to the
+# lists above and pushing did nothing on an already-seeded database
+# (local or deployed), silently defeating the "code change takes
+# effect on redeploy" expectation. Fixed 2026-08-11 to check
+# existence per role and per role-permission pair instead, so newly
+# added roles/grants are picked up on the next startup without
+# touching what's already there.
 # ====================================
 
 def seed_roles_modules_permissions(db):
-
-    existing = db.query(RolePermission).first()
-
-    if existing:
-        return
 
     role_rows = {}
 
@@ -180,6 +199,14 @@ def seed_roles_modules_permissions(db):
 
         for path in allowed_paths:
 
+            already_granted = db.query(RolePermission).filter(
+                RolePermission.role_id == role_rows[role_name].id,
+                RolePermission.module_id == module_rows[path].id
+            ).first()
+
+            if already_granted:
+                continue
+
             db.add(RolePermission(
                 role_id=role_rows[role_name].id,
                 module_id=module_rows[path].id,
@@ -189,6 +216,14 @@ def seed_roles_modules_permissions(db):
     for role_name, allowed_tabs in ROLE_TAB_ACCESS.items():
 
         for tab_key in allowed_tabs:
+
+            already_granted = db.query(RolePermission).filter(
+                RolePermission.role_id == role_rows[role_name].id,
+                RolePermission.module_id == module_rows[tab_key].id
+            ).first()
+
+            if already_granted:
+                continue
 
             db.add(RolePermission(
                 role_id=role_rows[role_name].id,
