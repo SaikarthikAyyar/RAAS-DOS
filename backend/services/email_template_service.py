@@ -201,7 +201,7 @@ def send_user_account_email(db, receiver_email, user_name, user_role, user_passw
 
     try:
         subject, body = render_template(template.subject, template.body, variable_values)
-        post_to_relay(receiver_email, subject, body)
+        post_to_relay(receiver_email, subject, body, from_tag="noreply")
         print(f"[EmailTemplateService] Welcome email sent to {receiver_email}")
 
     except Exception as error:

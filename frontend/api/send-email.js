@@ -27,11 +27,28 @@ export default async function handler(req, res){
         return;
     }
 
-    const { to, subject, text } = req.body || {};
+    const { to, subject, text, fromTag } = req.body || {};
 
     if(!to || !subject || !text){
         res.status(400).json({ ok:false, error:"to, subject, and text are required" });
         return;
+    }
+
+    // fromTag: optional Gmail "+tag" address suffix (e.g. "noreply"),
+    // used only for auto-generated emails (welcome/account-creation).
+    // Gmail treats local+tag@domain as the same authenticated mailbox,
+    // so this is accepted without any alias verification - unlike an
+    // arbitrary unverified From address, which Gmail would reject.
+    // Omitted entirely -> unchanged behavior (real address, no tag),
+    // exactly as before for every manually-sent email.
+    function buildFromAddress(tag){
+
+        if(!tag) return process.env.SMTP_USERNAME;
+
+        const [local, domain] = process.env.SMTP_USERNAME.split("@");
+
+        return `${local}+${tag}@${domain}`;
+
     }
 
     try{
@@ -47,7 +64,7 @@ export default async function handler(req, res){
         });
 
         await transporter.sendMail({
-            from:`${process.env.SMTP_FROM_NAME || "RAAS-DOS"} <${process.env.SMTP_USERNAME}>`,
+            from:`${process.env.SMTP_FROM_NAME || "RAAS-DOS"} <${buildFromAddress(fromTag)}>`,
             to,
             subject,
             text

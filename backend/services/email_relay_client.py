@@ -22,15 +22,25 @@ EMAIL_RELAY_URL = os.getenv("EMAIL_RELAY_URL")
 EMAIL_RELAY_SECRET = os.getenv("EMAIL_RELAY_SECRET")
 
 
-def post_to_relay(to, subject, text):
+# from_tag: optional Gmail "+tag" address suffix (e.g. "noreply"),
+# built by the relay itself (only it knows the real SMTP_USERNAME -
+# the backend never sees the actual mailbox address). Omitted for
+# every interactive/manual send; only the automatic user-account-
+# created path passes one. See frontend/api/send-email.js.
+def post_to_relay(to, subject, text, from_tag=None):
+
+    payload = {
+        "to": to,
+        "subject": subject,
+        "text": text
+    }
+
+    if from_tag:
+        payload["fromTag"] = from_tag
 
     response = requests.post(
         EMAIL_RELAY_URL,
-        json={
-            "to": to,
-            "subject": subject,
-            "text": text
-        },
+        json=payload,
         headers={
             "x-relay-secret": EMAIL_RELAY_SECRET
         },
