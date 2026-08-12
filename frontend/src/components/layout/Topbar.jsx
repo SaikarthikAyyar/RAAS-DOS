@@ -8,6 +8,8 @@ import { useAuth } from "../../contexts/AuthContext";
 
 import { getUnreadNotifications } from "../../services/notificationsService";
 
+import NotificationToast from "./NotificationToast";
+
 import logo from "../../assets/JanyutechLogo.jpg";
 
 // Other parts of the app (the Audit Trail page, on mount) dispatch
@@ -41,6 +43,16 @@ export default function Topbar({
 
     const notifRef = useRef(null);
 
+    // Popup toasts, separate from the bell icon's unread list above.
+    // knownIdsRef tracks every notification id already seen this
+    // session - null means "not yet baselined". The first successful
+    // poll after login/reload just records the current unread set
+    // (no toast burst for a backlog that predates this session); every
+    // poll after that toasts only ids that weren't in the previous set.
+    const [toasts, setToasts] = useState([]);
+
+    const knownIdsRef = useRef(null);
+
     function handleLogout(){
 
         logout();
@@ -60,6 +72,30 @@ export default function Topbar({
                 dateTo: notifDateTo || undefined
             });
 
+            const currentIds = new Set(data.map(n=>n.id));
+
+            if(knownIdsRef.current === null){
+
+                knownIdsRef.current = currentIds;
+
+            }
+            else{
+
+                const newlyArrived = data.filter(n=>!knownIdsRef.current.has(n.id));
+
+                if(newlyArrived.length > 0){
+
+                    setToasts(prev=>[
+                        ...prev,
+                        ...newlyArrived.map(n=>({ toastId:n.id, notification:n }))
+                    ]);
+
+                }
+
+                knownIdsRef.current = currentIds;
+
+            }
+
             setUnread(data);
 
         }
@@ -68,6 +104,12 @@ export default function Topbar({
             console.error("[Topbar] Failed to load unread notifications", error);
 
         }
+
+    }
+
+    function dismissToast(toastId){
+
+        setToasts(prev=>prev.filter(t=>t.toastId !== toastId));
 
     }
 
@@ -109,6 +151,14 @@ export default function Topbar({
 
     }
 
+    function handleToastClick(toastId, notification){
+
+        dismissToast(toastId);
+
+        handleNotificationClick(notification);
+
+    }
+
     // Close the profile dropdown / notifications panel on any click outside them.
     useEffect(()=>{
 
@@ -139,6 +189,8 @@ export default function Topbar({
     }, []);
 
     return(
+
+        <>
 
         <div className="topbar">
 
@@ -321,6 +373,33 @@ export default function Topbar({
             </div>
 
         </div>
+
+        {
+            toasts.length > 0 && (
+
+                <div className="notif-toast-stack">
+
+                    {
+                        toasts.map(({ toastId, notification })=>(
+
+                            <NotificationToast
+
+                                key={toastId}
+                                notification={notification}
+                                onClose={()=>dismissToast(toastId)}
+                                onClick={()=>handleToastClick(toastId, notification)}
+
+                            />
+
+                        ))
+                    }
+
+                </div>
+
+            )
+        }
+
+        </>
 
     );
 
