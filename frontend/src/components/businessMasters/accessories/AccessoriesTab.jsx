@@ -9,6 +9,12 @@ import {
 
 } from "../../../services/accessoriesService";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
+
 
 // ====================================
 // ADD / EDIT MODAL
@@ -171,6 +177,10 @@ export default function AccessoriesTab(){
 
     const [editing, setEditing] = useState(null);
 
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
+
     const load = useCallback(async()=>{
 
         setLoading(true);
@@ -205,12 +215,20 @@ export default function AccessoriesTab(){
 
     async function handleSave(payload){
 
+        const remark = await promptForRemark(editing ? "Updating this accessory" : "Creating this accessory");
+
+        if(remark===null){
+            return;
+        }
+
         if(editing){
 
             await updateAccessory(editing.id, {
 
                 unit: payload.unit,
-                rate: payload.rate
+                rate: payload.rate,
+                actor: buildActor(user),
+                remark
 
             });
 
@@ -218,7 +236,7 @@ export default function AccessoriesTab(){
 
         else{
 
-            await createAccessory(payload);
+            await createAccessory({ ...payload, actor:buildActor(user), remark });
 
         }
 
@@ -232,11 +250,15 @@ export default function AccessoriesTab(){
 
     async function handleRemove(id){
 
-        if(!window.confirm("Remove this accessory?")) return;
+        const remark = await promptForRemark("Removing this accessory");
+
+        if(remark===null){
+            return;
+        }
 
         try{
 
-            await deleteAccessory(id);
+            await deleteAccessory(id, buildActor(user), remark);
 
             load();
 
@@ -381,6 +403,8 @@ export default function AccessoriesTab(){
                 )
 
             }
+
+            {remarkModal}
 
         </div>
 

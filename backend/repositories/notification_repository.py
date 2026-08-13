@@ -42,7 +42,13 @@ def record_change(
         enquiry_id,
         customer_name,
         title,
-        changes
+        changes,
+
+        # Business Masters change notifications (Phase 15) only - every
+        # existing caller omits these and gets today's exact behavior.
+        is_important=False,
+        remark=None,
+        exclude_actor=False
 
 ):
 
@@ -58,7 +64,10 @@ def record_change(
         user_name=actor_name,
         user_role=actor_role,
         enquiry_id=enquiry_id,
-        customer_name=customer_name
+        customer_name=customer_name,
+        is_important=is_important,
+        remark=remark,
+        exclude_actor=exclude_actor
 
     )
 
@@ -84,6 +93,47 @@ def record_change(
     db.refresh(notification)
 
     return notification
+
+
+# ====================================
+# RECORD BUSINESS MASTER CHANGE
+# Centralizes the Type C policy (important, remarked, visible to
+# everyone except the actor, no enquiry linkage) in one place so it
+# isn't repeated at every one of the ~19 Business Masters call sites.
+# If that policy ever changes, it changes here only.
+# ====================================
+
+def record_business_master_change(
+
+        db,
+        module,
+        action,
+        actor_user_id,
+        actor_name,
+        actor_role,
+        title,
+        changes,
+        remark
+
+):
+
+    return record_change(
+
+        db,
+        module,
+        action,
+        actor_user_id,
+        actor_name,
+        actor_role,
+        None,
+        None,
+        title,
+        changes,
+        is_important=True,
+        remark=remark,
+        exclude_actor=True
+
+    )
 
 
 # ====================================
@@ -168,6 +218,12 @@ def list_unread(db, user_id, date_from=None, date_to=None, limit=50):
         .filter(Notification.id.notin_(read_subquery))
         .filter(
             or_(Notification.recipient_user_id.is_(None), Notification.recipient_user_id == user_id)
+        )
+        # Business Masters notifications (exclude_actor=True) never show
+        # up in the actor's own bell feed. A no-op for every Type A/B row,
+        # since exclude_actor is always False there.
+        .filter(
+            or_(Notification.exclude_actor.is_(False), Notification.user_id != user_id)
         )
     )
 

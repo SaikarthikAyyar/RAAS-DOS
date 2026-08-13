@@ -42,6 +42,9 @@ class NotificationSchema(BaseModel):
     created_at: datetime
     is_read: bool = False
 
+    is_important: bool = False
+    remark: str | None = None
+
     changes: list[NotificationChangeSchema] = []
 
     class Config:
@@ -71,3 +74,16 @@ class ActorSchema(BaseModel):
     user_id: int
     name: str
     role: str
+
+
+# ====================================
+# BUSINESS MASTER ACTION
+# Shared request-body shape for the ~7 Business Masters DELETE
+# endpoints, which take no body today - actor + remark are the only
+# two things a delete needs beyond the path param.
+# ====================================
+
+class BusinessMasterActionSchema(BaseModel):
+
+    actor: ActorSchema
+    remark: str

@@ -2,9 +2,15 @@ import { useState } from "react";
 
 import { useLookupLists } from "../../../context/LookupListsContext";
 
-import { deleteLookupValue } from "../../../services/lookupListsService";
+import { addLookupValue, deleteLookupValue } from "../../../services/lookupListsService";
 
 import AddLookupValueModal from "./AddLookupValueModal";
+
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
 
 
 // ====================================
@@ -106,21 +112,23 @@ export default function LookupListsTab(){
 
     const [addingList, setAddingList] = useState(null);
 
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
+
     async function handleRemove(list, valueRow){
 
         const label = valueRow.is_other ? `the "Other" option` : `"${valueRow.value}"`;
 
-        const message = valueRow.is_other
+        const remark = await promptForRemark(`Removing ${label} from "${list.display_name}"`);
 
-            ? `Remove ${label} from "${list.display_name}"? This removes the custom-input behaviour from every live form using this list.`
-
-            : `Remove ${label} from "${list.display_name}"?`;
-
-        if(!window.confirm(message)) return;
+        if(remark===null){
+            return;
+        }
 
         try{
 
-            await deleteLookupValue(valueRow.id);
+            await deleteLookupValue(valueRow.id, buildActor(user), remark);
 
             refetchList(list.list_key);
 
@@ -134,11 +142,19 @@ export default function LookupListsTab(){
 
     }
 
-    async function handleSaved(listKey){
+    async function handleAddValue(list, { value, kind }){
+
+        const remark = await promptForRemark(`Adding "${value}" to "${list.display_name}"`);
+
+        if(remark===null){
+            return;
+        }
+
+        await addLookupValue(list.list_key, { value, kind, actor:buildActor(user), remark });
 
         setAddingList(null);
 
-        refetchList(listKey);
+        refetchList(list.list_key);
 
     }
 
@@ -198,13 +214,15 @@ export default function LookupListsTab(){
 
                         onClose={()=>setAddingList(null)}
 
-                        onSaved={()=>handleSaved(addingList.list_key)}
+                        onSave={(payload)=>handleAddValue(addingList, payload)}
 
                     />
 
                 )
 
             }
+
+            {remarkModal}
 
         </>
 

@@ -13,6 +13,8 @@ from backend.schemas.business_masters_pricing_schema import (
     ServiceConfigurationResponse
 )
 
+from backend.schemas.notification_schema import BusinessMasterActionSchema
+
 from backend.services.business_masters_pricing_service import (
     list_service_configurations_request,
     create_service_configuration_request,
@@ -43,8 +45,8 @@ def update_service_configuration(config_id: int, payload: ServiceConfigurationUp
 
 
 @api.delete("/service-configurations/{config_id}")
-def delete_service_configuration(config_id: int, db: Session = Depends(get_db)):
-    result = delete_service_configuration_request(db, config_id)
+def delete_service_configuration(config_id: int, payload: BusinessMasterActionSchema, db: Session = Depends(get_db)):
+    result = delete_service_configuration_request(db, config_id, payload.actor, payload.remark)
     if not result:
         raise HTTPException(status_code=404, detail="Service configuration not found.")
     return {"success": True}

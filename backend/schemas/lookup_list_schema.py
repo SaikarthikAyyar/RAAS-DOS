@@ -6,6 +6,8 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 # ====================================
 # VALUES
@@ -24,6 +26,8 @@ class LookupListValueOut(BaseModel):
 class LookupListValueCreate(BaseModel):
     value: str
     kind: Literal["custom", "other"]
+    actor: ActorSchema
+    remark: str
 
 
 # ====================================

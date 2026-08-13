@@ -13,6 +13,8 @@ from backend.schemas.business_masters_pricing_schema import (
     AccessoryResponse
 )
 
+from backend.schemas.notification_schema import BusinessMasterActionSchema
+
 from backend.services.business_masters_pricing_service import (
     list_accessories_request,
     create_accessory_request,
@@ -43,8 +45,8 @@ def update_accessory(accessory_id: int, payload: AccessoryUpdate, db: Session = 
 
 
 @api.delete("/accessories/{accessory_id}")
-def delete_accessory(accessory_id: int, db: Session = Depends(get_db)):
-    result = delete_accessory_request(db, accessory_id)
+def delete_accessory(accessory_id: int, payload: BusinessMasterActionSchema, db: Session = Depends(get_db)):
+    result = delete_accessory_request(db, accessory_id, payload.actor, payload.remark)
     if not result:
         raise HTTPException(status_code=404, detail="Accessory not found.")
     return {"success": True}

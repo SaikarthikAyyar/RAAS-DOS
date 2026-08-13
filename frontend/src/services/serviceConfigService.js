@@ -64,13 +64,17 @@ export async function updateServiceConfiguration(id, payload){
 }
 
 
-export async function deleteServiceConfiguration(id){
+export async function deleteServiceConfiguration(id, actor, remark){
 
     const response = await fetch(
 
         `${API}/service-configurations/${id}`,
 
-        { method:"DELETE" }
+        {
+            method:"DELETE",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ actor, remark })
+        }
 
     );
 

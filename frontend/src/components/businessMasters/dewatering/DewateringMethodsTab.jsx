@@ -9,6 +9,12 @@ import {
 
 } from "../../../services/dewateringMethodsService";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
+
 
 // ====================================
 // ADD / EDIT MODAL
@@ -207,6 +213,10 @@ export default function DewateringMethodsTab(){
 
     const [editing, setEditing] = useState(null);
 
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
+
     const load = useCallback(async()=>{
 
         setLoading(true);
@@ -241,6 +251,12 @@ export default function DewateringMethodsTab(){
 
     async function handleSave(payload){
 
+        const remark = await promptForRemark(editing ? "Updating this dewatering method" : "Creating this dewatering method");
+
+        if(remark===null){
+            return;
+        }
+
         if(editing){
 
             await updateDewateringMethod(editing.id, {
@@ -248,7 +264,9 @@ export default function DewateringMethodsTab(){
                 method_name: payload.method_name,
                 rate_per_m3: payload.rate_per_m3,
                 best_for: payload.best_for,
-                review_trigger: payload.review_trigger
+                review_trigger: payload.review_trigger,
+                actor: buildActor(user),
+                remark
 
             });
 
@@ -256,7 +274,7 @@ export default function DewateringMethodsTab(){
 
         else{
 
-            await createDewateringMethod(payload);
+            await createDewateringMethod({ ...payload, actor:buildActor(user), remark });
 
         }
 
@@ -270,11 +288,15 @@ export default function DewateringMethodsTab(){
 
     async function handleRemove(id){
 
-        if(!window.confirm("Remove this dewatering method?")) return;
+        const remark = await promptForRemark("Removing this dewatering method");
+
+        if(remark===null){
+            return;
+        }
 
         try{
 
-            await deleteDewateringMethod(id);
+            await deleteDewateringMethod(id, buildActor(user), remark);
 
             load();
 
@@ -423,6 +445,8 @@ export default function DewateringMethodsTab(){
                 )
 
             }
+
+            {remarkModal}
 
         </div>
 

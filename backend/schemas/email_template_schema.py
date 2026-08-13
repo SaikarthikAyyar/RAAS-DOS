@@ -6,16 +6,31 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 # ====================================
 # VARIABLES
 # ====================================
+
+# Nested-only shape (no actor/remark - the wrapping EmailTemplateCreate's
+# own actor/remark already cover creating a template with starter
+# variables in one call; the standalone "add a variable" endpoint below
+# uses EmailTemplateVariableCreate instead, which does require them).
+class EmailTemplateVariableNested(BaseModel):
+    key: str
+    label: str
+    is_recipient_field: bool = False
+    sort_order: int = 0
+
 
 class EmailTemplateVariableCreate(BaseModel):
     key: str
     label: str
     is_recipient_field: bool = False
     sort_order: int = 0
+    actor: ActorSchema
+    remark: str
 
 
 class EmailTemplateVariableUpdate(BaseModel):
@@ -23,6 +38,8 @@ class EmailTemplateVariableUpdate(BaseModel):
     label: Optional[str] = None
     is_recipient_field: Optional[bool] = None
     sort_order: Optional[int] = None
+    actor: ActorSchema
+    remark: str
 
 
 class EmailTemplateVariableResponse(BaseModel):
@@ -46,7 +63,9 @@ class EmailTemplateCreate(BaseModel):
     subject: str
     body: str = ""
     is_active: bool = True
-    variables: list[EmailTemplateVariableCreate] = []
+    variables: list[EmailTemplateVariableNested] = []
+    actor: ActorSchema
+    remark: str
 
 
 class EmailTemplateUpdate(BaseModel):
@@ -55,6 +74,8 @@ class EmailTemplateUpdate(BaseModel):
     subject: Optional[str] = None
     body: Optional[str] = None
     is_active: Optional[bool] = None
+    actor: ActorSchema
+    remark: str
 
 
 class EmailTemplateResponse(BaseModel):

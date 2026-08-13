@@ -610,6 +610,75 @@ margin-left:auto;
 
 }
 
+/* Business Masters (Type C) notifications - red accent instead of
+   the default hover-orange, and the row grows to fit the remark
+   line underneath the title. Regular rows (Type A/B) are untouched. */
+.notif-panel-row.important{
+
+    height:auto;
+
+    min-height:42px;
+
+    padding:8px 14px;
+
+    border-left:3px solid #b91c1c;
+
+    white-space:normal;
+
+}
+
+.notif-panel-row-title{
+
+    display:block;
+
+    white-space:nowrap;
+
+}
+
+.notif-panel-row-remark{
+
+    display:block;
+
+    margin-top:2px;
+
+    font-size:10.5px;
+
+    font-weight:600;
+
+    color:var(--muted);
+
+    white-space:normal;
+
+    overflow-wrap:break-word;
+
+}
+
+.notif-important-badge{
+
+    display:inline-block;
+
+    font-size:9px;
+
+    font-weight:800;
+
+    text-transform:uppercase;
+
+    letter-spacing:.3px;
+
+    color:#fff;
+
+    background:#b91c1c;
+
+    border-radius:4px;
+
+    padding:1px 5px;
+
+    margin-right:6px;
+
+    vertical-align:middle;
+
+}
+
 .notif-panel-empty{
 
     padding:20px 14px;
@@ -685,6 +754,18 @@ margin-left:auto;
 
 }
 
+.notif-toast.important{
+
+    border-left-color:#b91c1c;
+
+}
+
+.notif-toast.important:hover{
+
+    border-color:#b91c1c;
+
+}
+
 .notif-toast-body{
 
     flex:1;
@@ -728,6 +809,20 @@ margin-left:auto;
     line-height:1.35;
 
     margin:0;
+}
+
+.notif-toast-remark{
+
+    font-size:11px;
+
+    font-weight:500;
+
+    color:var(--muted);
+
+    line-height:1.35;
+
+    margin:4px 0 0 0;
+
 }
 
 .notif-toast-byline{

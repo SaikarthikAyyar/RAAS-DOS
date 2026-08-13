@@ -39,6 +39,12 @@ import {
 
 } from "../services/customerMasterService";
 
+import { useAuth } from "../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../hooks/useRemarkPrompt";
+
+import { buildActor } from "../utils/actor";
+
 
 // ====================================
 // CUSTOMERS TAB
@@ -71,6 +77,10 @@ function CustomersTab({
     const [showFollowUpModal, setShowFollowUpModal] = useState(false);
 
     const [showReminderModal, setShowReminderModal] = useState(false);
+
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
 
     const loadDetail = useCallback(async(id)=>{
 
@@ -126,7 +136,13 @@ function CustomersTab({
 
     async function handleCreateCustomer(payload){
 
-        await createCustomer(payload);
+        const remark = await promptForRemark("Creating this customer");
+
+        if(remark===null){
+            return;
+        }
+
+        await createCustomer({ ...payload, actor:buildActor(user), remark });
 
         setShowNewCustomerModal(false);
 
@@ -136,7 +152,13 @@ function CustomersTab({
 
     async function handleAddContact(payload){
 
-        await addContact(selectedCustomerId, payload);
+        const remark = await promptForRemark("Adding this contact");
+
+        if(remark===null){
+            return;
+        }
+
+        await addContact(selectedCustomerId, { ...payload, actor:buildActor(user), remark });
 
         setShowAddContactModal(false);
 
@@ -146,7 +168,13 @@ function CustomersTab({
 
     async function handleSetFollowUp(payload){
 
-        await setFollowUp(selectedCustomerId, payload);
+        const remark = await promptForRemark("Updating this follow-up");
+
+        if(remark===null){
+            return;
+        }
+
+        await setFollowUp(selectedCustomerId, { ...payload, actor:buildActor(user), remark });
 
         setShowFollowUpModal(false);
 
@@ -277,6 +305,8 @@ function CustomersTab({
                 )
 
             }
+
+            {remarkModal}
 
         </>
 

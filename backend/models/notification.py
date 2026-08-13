@@ -6,6 +6,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Text
+from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint
@@ -43,6 +44,15 @@ class Notification(Base):
     # that doesn't set it). Set = visible only to that one user - used by
     # the Survey Reminder feature for a genuinely per-recipient alert.
     recipient_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    # Business Masters change notifications (Phase 15) - a third,
+    # independent notification shape alongside the broadcast (above)
+    # and targeted (recipient_user_id) ones. All three default to
+    # False/NULL so every existing and future Type A/B row is
+    # unaffected.
+    is_important = Column(Boolean, nullable=False, default=False)
+    remark = Column(Text, nullable=True)
+    exclude_actor = Column(Boolean, nullable=False, default=False)
 
     created_at = Column(DateTime, server_default=func.now())
 

@@ -13,6 +13,8 @@ from backend.schemas.lookup_list_schema import (
     LookupListValueCreate
 )
 
+from backend.schemas.notification_schema import BusinessMasterActionSchema
+
 from backend.services.lookup_list_service import (
     list_all_lookup_lists,
     get_lookup_list,
@@ -40,6 +42,6 @@ def add_lookup_list_value(list_key: str, payload: LookupListValueCreate, db: Ses
 
 
 @api.delete("/lookup-lists/values/{value_id}")
-def delete_lookup_list_value(value_id: int, db: Session = Depends(get_db)):
-    delete_lookup_value(db, value_id)
+def delete_lookup_list_value(value_id: int, payload: BusinessMasterActionSchema, db: Session = Depends(get_db)):
+    delete_lookup_value(db, value_id, payload.actor, payload.remark)
     return {"success": True}

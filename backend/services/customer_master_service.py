@@ -24,7 +24,7 @@ from backend.repositories.customer_master_repository import (
     list_linked_enquiries
 )
 
-from backend.repositories.notification_repository import record_change
+from backend.repositories.notification_repository import record_change, record_business_master_change
 
 
 # ====================================
@@ -219,7 +219,30 @@ def create_customer_request(
         db,
         payload
 ):
-    return create_customer(db, payload)
+    already_existed = get_customer_by_company_name(db, payload.company_name) is not None
+
+    customer = create_customer(db, payload)
+
+    if not already_existed:
+
+        record_business_master_change(
+            db=db,
+            module="Business Masters",
+            action="CREATE",
+            actor_user_id=payload.actor.user_id,
+            actor_name=payload.actor.name,
+            actor_role=payload.actor.role,
+            title=f"{payload.actor.name} created customer '{customer.company_name}' in Business Masters",
+            changes=[
+                {"field": "company_name", "before": None, "after": customer.company_name},
+                {"field": "category", "before": None, "after": customer.category},
+                {"field": "industry", "before": None, "after": customer.industry},
+                {"field": "region", "before": None, "after": customer.region}
+            ],
+            remark=payload.remark
+        )
+
+    return customer
 
 
 # ====================================
@@ -319,7 +342,31 @@ def add_contact_request(
         customer_id,
         payload
 ):
-    return add_contact(db, customer_id, payload)
+    customer = get_customer(db, customer_id)
+
+    contact = add_contact(db, customer_id, payload)
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="CREATE",
+        actor_user_id=payload.actor.user_id,
+        actor_name=payload.actor.name,
+        actor_role=payload.actor.role,
+        title=(
+            f"{payload.actor.name} added contact '{contact.name}' to "
+            f"{customer.company_name if customer else 'a customer'} in Business Masters"
+        ),
+        changes=[
+            {"field": "name", "before": None, "after": contact.name},
+            {"field": "designation", "before": None, "after": contact.designation},
+            {"field": "email", "before": None, "after": contact.email},
+            {"field": "phone", "before": None, "after": contact.phone}
+        ],
+        remark=payload.remark
+    )
+
+    return contact
 
 
 # ====================================
@@ -337,7 +384,42 @@ def set_follow_up_request(
         update={"date": parsed_date}
     )
 
-    return set_follow_up(db, customer_id, payload_with_parsed_date)
+    customer_before = get_customer(db, customer_id)
+
+    before_date = customer_before.next_follow_up_date if customer_before else None
+    before_owner = customer_before.next_follow_up_owner if customer_before else None
+    before_note = customer_before.next_follow_up_note if customer_before else None
+
+    customer = set_follow_up(db, customer_id, payload_with_parsed_date)
+
+    if customer:
+
+        changes = []
+
+        if before_date != customer.next_follow_up_date:
+            changes.append({"field": "next_follow_up_date", "before": before_date, "after": customer.next_follow_up_date})
+
+        if before_owner != customer.next_follow_up_owner:
+            changes.append({"field": "next_follow_up_owner", "before": before_owner, "after": customer.next_follow_up_owner})
+
+        if before_note != customer.next_follow_up_note:
+            changes.append({"field": "next_follow_up_note", "before": before_note, "after": customer.next_follow_up_note})
+
+        if changes:
+
+            record_business_master_change(
+                db=db,
+                module="Business Masters",
+                action="UPDATE",
+                actor_user_id=payload.actor.user_id,
+                actor_name=payload.actor.name,
+                actor_role=payload.actor.role,
+                title=f"{payload.actor.name} updated the follow-up for {customer.company_name} in Business Masters",
+                changes=changes,
+                remark=payload.remark
+            )
+
+    return customer
 
 
 # ====================================

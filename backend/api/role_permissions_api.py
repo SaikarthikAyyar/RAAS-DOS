@@ -10,9 +10,17 @@ from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
 
-from backend.schemas.role_permissions_schema import RolePermissionsResponse
+from backend.schemas.role_permissions_schema import (
+    RolePermissionsResponse,
+    NavMatrixResponse,
+    NavMatrixSaveRequest
+)
 
-from backend.services.role_permissions_service import get_role_permissions_request
+from backend.services.role_permissions_service import (
+    get_role_permissions_request,
+    get_nav_matrix_request,
+    save_nav_matrix_request
+)
 
 # ====================================
 # ROUTER
@@ -45,3 +53,37 @@ def get_role_permissions(
         )
 
     return permissions
+
+
+# ====================================
+# NAV MATRIX (admin-facing, editable)
+# Full role x nav-module cross-product - drives the new Navigation
+# Access subtab under Administration -> Roles & Permissions.
+# ====================================
+
+@router.get(
+    "/role-permissions/nav-matrix",
+    response_model=NavMatrixResponse
+)
+def get_nav_matrix(
+        db: Session = Depends(get_db)
+):
+    return get_nav_matrix_request(db)
+
+
+@router.put(
+    "/role-permissions/nav-matrix",
+    response_model=NavMatrixResponse
+)
+def save_nav_matrix(
+        payload: NavMatrixSaveRequest,
+        db: Session = Depends(get_db)
+):
+    try:
+        return save_nav_matrix_request(db, payload)
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )

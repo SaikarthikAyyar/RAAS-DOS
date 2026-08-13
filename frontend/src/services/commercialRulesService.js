@@ -83,13 +83,17 @@ export async function createCustomerCategory(payload){
 }
 
 
-export async function deleteCustomerCategory(id){
+export async function deleteCustomerCategory(id, actor, remark){
 
     const response = await fetch(
 
         `${API}/customer-categories/${id}`,
 
-        { method:"DELETE" }
+        {
+            method:"DELETE",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ actor, remark })
+        }
 
     );
 

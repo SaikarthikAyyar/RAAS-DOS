@@ -68,13 +68,17 @@ function Login(){
 
                 "[Login] Logged in as:",
 
-                user.role
+                user.role,
+
+                "- landing page:",
+
+                user.landingPage
 
             );
 
             navigate(
 
-                "/administration"
+                user.landingPage || "/administration"
 
             );
 

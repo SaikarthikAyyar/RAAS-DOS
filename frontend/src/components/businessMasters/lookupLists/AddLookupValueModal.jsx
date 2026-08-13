@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import { addLookupValue } from "../../../services/lookupListsService";
-
 
 // ====================================
 // COMPONENT
 // Two-step "+ Add" flow: choose Custom vs Other, then type the value.
 // Replaces the wireframe's bare prompt() with a real styled modal,
 // matching this app's established convention (NewCustomerModal etc.).
+// The actual API call (and its remark prompt) lives in the parent
+// tab, matching the Customers tab's onCreate/onAdd callback pattern.
 // ====================================
 
 export default function AddLookupValueModal({
@@ -16,7 +16,7 @@ export default function AddLookupValueModal({
 
     onClose,
 
-    onSaved
+    onSave
 
 }){
 
@@ -46,9 +46,7 @@ export default function AddLookupValueModal({
 
         try{
 
-            await addLookupValue(list.list_key, { value: value.trim(), kind });
-
-            onSaved();
+            await onSave({ value: value.trim(), kind });
 
         }
 

@@ -101,15 +101,15 @@ export function AuthProvider({
 
     ] = useState(
 
-        { navModules:[], workspaceTabs:[] }
+        { navModules:[], workspaceTabs:[], landingPage:null }
 
     );
 
     async function loadPermissions(role){
 
         if(!role){
-            setPermissions({ navModules:[], workspaceTabs:[] });
-            return;
+            setPermissions({ navModules:[], workspaceTabs:[], landingPage:null });
+            return null;
         }
 
         const response = await getRolePermissions(role);
@@ -118,9 +118,13 @@ export function AuthProvider({
 
             navModules: (response.nav_modules || []).map(m=>m.module_key),
 
-            workspaceTabs: (response.workspace_tabs || []).map(m=>m.module_key)
+            workspaceTabs: (response.workspace_tabs || []).map(m=>m.module_key),
+
+            landingPage: response.landing_page || null
 
         });
+
+        return response.landing_page || null;
 
     }
 
@@ -193,9 +197,12 @@ export function AuthProvider({
 
         );
 
-        await loadPermissions(loggedUser.role);
+        const landingPage = await loadPermissions(loggedUser.role);
 
-        return loggedUser;
+        // Surfaced directly on the return value (not just via context
+        // state) so the caller can navigate immediately without waiting
+        // on a re-render to see the freshly-loaded permissions.
+        return { ...loggedUser, landingPage };
 
     }
 

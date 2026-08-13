@@ -27,6 +27,20 @@ from "./AdministrationRoleDialog";
 import AdministrationRoleForm
 from "./AdministrationRoleForm";
 
+import RoleNavigationMatrix
+from "./RoleNavigationMatrix";
+
+
+// Local to this screen only - not the outer Partners/Roles/Users strip
+// one level up in AdministrationPage.jsx. More subtabs (Restrictions,
+// Business Master Accessibility) join this array in later phases.
+const SUB_TABS = [
+
+    ["roles", "Roles"],
+    ["navigation", "Navigation Access"]
+
+];
+
 
 export default function AdministrationRoles({
 
@@ -71,6 +85,14 @@ export default function AdministrationRoles({
         setEditingRole
 
     ] = useState(null);
+
+    const [
+
+        activeSubTab,
+
+        setActiveSubTab
+
+    ] = useState("roles");
 
 
     async function loadRoles(){
@@ -336,6 +358,36 @@ export default function AdministrationRoles({
 
         <>
 
+            <div className="administration-subtabs">
+
+                {
+                    SUB_TABS.map(([key, label])=>(
+
+                        <button
+
+                            key={key}
+                            type="button"
+                            className={
+                                activeSubTab===key
+                                    ? "administration-subtab active"
+                                    : "administration-subtab"
+                            }
+                            onClick={()=>setActiveSubTab(key)}
+
+                        >
+
+                            {label}
+
+                        </button>
+
+                    ))
+                }
+
+            </div>
+
+            {
+                activeSubTab==="roles" && (
+
             <div className="administration-roles-sidebar">
 
             <button
@@ -389,6 +441,15 @@ export default function AdministrationRoles({
                 }
 
             </div>
+
+                )
+            }
+
+            {
+                activeSubTab==="navigation" && (
+                    <RoleNavigationMatrix/>
+                )
+            }
 
             <AdministrationRoleDialog
 

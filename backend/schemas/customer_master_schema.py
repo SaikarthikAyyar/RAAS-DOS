@@ -6,6 +6,8 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 # ====================================
 # CREATE CUSTOMER
@@ -25,6 +27,10 @@ class CustomerCreateSchema(BaseModel):
 
     owner: str | None = None
 
+    actor: ActorSchema
+
+    remark: str
+
 
 # ====================================
 # CONTACT
@@ -39,6 +45,10 @@ class ContactCreateSchema(BaseModel):
     email: str | None = None
 
     phone: str | None = None
+
+    actor: ActorSchema
+
+    remark: str
 
 
 class ContactSchema(BaseModel):
@@ -174,6 +184,10 @@ class FollowUpSchema(BaseModel):
     owner: str | None = None
 
     note: str | None = None
+
+    actor: ActorSchema
+
+    remark: str
 
 
 # ====================================

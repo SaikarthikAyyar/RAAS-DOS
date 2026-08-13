@@ -15,6 +15,12 @@ import ViewBodyModal from "./ViewBodyModal";
 import TemplateVariablesModal from "./TemplateVariablesModal";
 import SendTemplateModal from "./SendTemplateModal";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
+
 
 // ====================================
 // ACTION BUTTON
@@ -70,6 +76,10 @@ export default function EmailTemplatesTab(){
 
     const [sendingTemplate, setSendingTemplate] = useState(null);
 
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
+
     const load = useCallback(async()=>{
 
         setLoading(true);
@@ -104,9 +114,15 @@ export default function EmailTemplatesTab(){
 
     async function handleToggleActive(template){
 
+        const remark = await promptForRemark(template.is_active ? "Deactivating this email template" : "Activating this email template");
+
+        if(remark===null){
+            return;
+        }
+
         try{
 
-            await updateEmailTemplate(template.id, { is_active: !template.is_active });
+            await updateEmailTemplate(template.id, { is_active: !template.is_active, actor:buildActor(user), remark });
 
             load();
 
@@ -122,11 +138,15 @@ export default function EmailTemplatesTab(){
 
     async function handleDelete(template){
 
-        if(!window.confirm(`Remove "${template.name}"?`)) return;
+        const remark = await promptForRemark(`Removing "${template.name}"`);
+
+        if(remark===null){
+            return;
+        }
 
         try{
 
-            await deleteEmailTemplate(template.id);
+            await deleteEmailTemplate(template.id, buildActor(user), remark);
 
             load();
 
@@ -364,6 +384,8 @@ export default function EmailTemplatesTab(){
                 )
 
             }
+
+            {remarkModal}
 
         </div>
 

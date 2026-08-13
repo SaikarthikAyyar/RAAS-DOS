@@ -1,0 +1,189 @@
+/* ==========================================
+   Role Navigation Matrix
+   Reuses the existing orange accent (#f58220) directly rather than
+   var(--orange), since this component isn't guaranteed to render
+   inside the scope that variable is declared on.
+========================================== */
+
+.role-nav-matrix-status{
+
+    margin-top:20px;
+    font-size:13px;
+    color:#666;
+
+}
+
+.role-nav-matrix-wrap{
+
+    margin-top:20px;
+
+}
+
+.role-nav-matrix-header{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:10px;
+
+}
+
+.role-nav-matrix-hint{
+
+    font-size:12px;
+    color:#666;
+    max-width:640px;
+
+}
+
+.role-nav-matrix-message{
+
+    font-size:12.5px;
+    font-weight:600;
+    margin-bottom:10px;
+
+}
+
+.role-nav-matrix-message.success{
+    color:#1b5e20;
+}
+
+.role-nav-matrix-message.error{
+    color:#b71c1c;
+}
+
+.role-nav-matrix-scroll{
+
+    overflow-x:auto;
+    border:1px solid #dcdcdc;
+    border-radius:8px;
+
+}
+
+.role-nav-matrix-table{
+
+    border-collapse:collapse;
+    min-width:max-content;
+    font-size:12px;
+
+}
+
+.role-nav-matrix-table thead{
+
+    background:#f8fafc;
+
+}
+
+.role-nav-matrix-table th{
+
+    padding:10px 12px;
+    text-align:left;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    color:#334155;
+    white-space:nowrap;
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+.role-nav-matrix-table td{
+
+    padding:8px 12px;
+    border-top:1px solid #edf1f5;
+    vertical-align:middle;
+
+}
+
+.role-nav-matrix-table tbody tr:hover{
+
+    background:#fffaf3;
+
+}
+
+.role-nav-matrix-sticky-col{
+
+    position:sticky;
+    left:0;
+    background:#fff;
+    z-index:1;
+    min-width:170px;
+
+}
+
+.role-nav-matrix-role-cell{
+
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+
+}
+
+.role-nav-matrix-table thead .role-nav-matrix-sticky-col{
+
+    background:#f8fafc;
+    z-index:2;
+
+}
+
+.role-nav-matrix-table tbody tr:hover .role-nav-matrix-sticky-col{
+
+    background:#fffaf3;
+
+}
+
+.role-nav-matrix-role-name{
+
+    font-size:12.5px;
+    font-weight:600;
+    color:#222;
+
+}
+
+.role-nav-matrix-role-type{
+
+    font-size:10.5px;
+    color:#666;
+
+}
+
+.role-nav-matrix-cell{
+
+    white-space:nowrap;
+
+}
+
+.role-nav-matrix-checkbox-row{
+
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-size:10.5px;
+    font-weight:600;
+    color:#475569;
+    cursor:pointer;
+    user-select:none;
+
+}
+
+.role-nav-matrix-checkbox-row input{
+
+    width:13px;
+    height:13px;
+    cursor:pointer;
+
+}
+
+.role-nav-matrix-landing input:checked{
+
+    accent-color:#f58220;
+
+}
+
+.role-nav-matrix-landing span{
+
+    color:#c2570f;
+
+}

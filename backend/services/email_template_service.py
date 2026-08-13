@@ -20,6 +20,8 @@ from backend.repositories.email_template_repository import (
 
 from backend.services.email_relay_client import post_to_relay
 
+from backend.repositories.notification_repository import record_business_master_change
+
 
 # ====================================
 # RENDER
@@ -55,7 +57,27 @@ def get_template_request(db, template_id):
 
 
 def create_template_request(db, payload):
-    return create_template(db, payload.model_dump())
+
+    row = create_template(db, payload.model_dump(exclude={"actor", "remark"}))
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="CREATE",
+        actor_user_id=payload.actor.user_id,
+        actor_name=payload.actor.name,
+        actor_role=payload.actor.role,
+        title=f"{payload.actor.name} created email template '{row.name}' in Business Masters",
+        changes=[
+            {"field": "name", "before": None, "after": row.name},
+            {"field": "use_case", "before": None, "after": row.use_case},
+            {"field": "subject", "before": None, "after": row.subject},
+            {"field": "is_active", "before": None, "after": row.is_active}
+        ],
+        remark=payload.remark
+    )
+
+    return row
 
 
 def update_template_request(db, template_id, payload):
@@ -65,19 +87,61 @@ def update_template_request(db, template_id, payload):
     if template is None:
         raise ValueError("Email template not found.")
 
-    data = payload.model_dump(exclude_unset=True)
+    tracked_fields = ("name", "use_case", "subject", "body", "is_active")
 
-    return update_template(db, template, data)
+    before_values = {field: getattr(template, field) for field in tracked_fields}
+
+    data = payload.model_dump(exclude_unset=True, exclude={"actor", "remark"})
+
+    row = update_template(db, template, data)
+
+    changes = [
+        {"field": field, "before": before_values[field], "after": getattr(row, field)}
+        for field in tracked_fields
+        if field in data and before_values[field] != getattr(row, field)
+    ]
+
+    if changes:
+
+        record_business_master_change(
+            db=db,
+            module="Business Masters",
+            action="UPDATE",
+            actor_user_id=payload.actor.user_id,
+            actor_name=payload.actor.name,
+            actor_role=payload.actor.role,
+            title=f"{payload.actor.name} updated email template '{row.name}' in Business Masters",
+            changes=changes,
+            remark=payload.remark
+        )
+
+    return row
 
 
-def delete_template_request(db, template_id):
+def delete_template_request(db, template_id, actor, remark):
 
     template = get_template_by_id(db, template_id)
 
     if template is None:
         raise ValueError("Email template not found.")
 
+    title = f"{actor.name} deleted email template '{template.name}' from Business Masters"
+
+    changes = [{"field": "name", "before": template.name, "after": None}]
+
     delete_template(db, template)
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="DELETE",
+        actor_user_id=actor.user_id,
+        actor_name=actor.name,
+        actor_role=actor.role,
+        title=title,
+        changes=changes,
+        remark=remark
+    )
 
 
 # ====================================
@@ -91,12 +155,27 @@ def add_variable_request(db, template_id, payload):
     if template is None:
         raise ValueError("Email template not found.")
 
-    data = payload.model_dump()
+    data = payload.model_dump(exclude={"actor", "remark"})
 
     row = add_variable(db, template_id, data)
 
     if row.is_recipient_field:
         unset_other_recipient_flags(db, template_id, row.id)
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="CREATE",
+        actor_user_id=payload.actor.user_id,
+        actor_name=payload.actor.name,
+        actor_role=payload.actor.role,
+        title=f"{payload.actor.name} added variable '{row.key}' to email template '{template.name}' in Business Masters",
+        changes=[
+            {"field": "key", "before": None, "after": row.key},
+            {"field": "label", "before": None, "after": row.label}
+        ],
+        remark=payload.remark
+    )
 
     return row
 
@@ -108,24 +187,68 @@ def update_variable_request(db, template_id, variable_id, payload):
     if variable is None or variable.email_template_id != template_id:
         raise ValueError("Email template variable not found.")
 
-    data = payload.model_dump(exclude_unset=True)
+    template = get_template_by_id(db, template_id)
+
+    tracked_fields = ("key", "label", "is_recipient_field", "sort_order")
+
+    before_values = {field: getattr(variable, field) for field in tracked_fields}
+
+    data = payload.model_dump(exclude_unset=True, exclude={"actor", "remark"})
 
     row = update_variable(db, variable, data)
 
     if row.is_recipient_field:
         unset_other_recipient_flags(db, template_id, row.id)
 
+    changes = [
+        {"field": field, "before": before_values[field], "after": getattr(row, field)}
+        for field in tracked_fields
+        if field in data and before_values[field] != getattr(row, field)
+    ]
+
+    if changes:
+
+        record_business_master_change(
+            db=db,
+            module="Business Masters",
+            action="UPDATE",
+            actor_user_id=payload.actor.user_id,
+            actor_name=payload.actor.name,
+            actor_role=payload.actor.role,
+            title=f"{payload.actor.name} updated variable '{row.key}' on email template '{template.name}' in Business Masters",
+            changes=changes,
+            remark=payload.remark
+        )
+
     return row
 
 
-def delete_variable_request(db, template_id, variable_id):
+def delete_variable_request(db, template_id, variable_id, actor, remark):
 
     variable = get_variable_by_id(db, variable_id)
 
     if variable is None or variable.email_template_id != template_id:
         raise ValueError("Email template variable not found.")
 
+    template = get_template_by_id(db, template_id)
+
+    title = f"{actor.name} removed variable '{variable.key}' from email template '{template.name}' in Business Masters"
+
+    changes = [{"field": "key", "before": variable.key, "after": None}]
+
     delete_variable(db, variable)
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="DELETE",
+        actor_user_id=actor.user_id,
+        actor_name=actor.name,
+        actor_role=actor.role,
+        title=title,
+        changes=changes,
+        remark=remark
+    )
 
 
 # ====================================

@@ -2,6 +2,59 @@
    Administration Roles
 ========================================== */
 
+/* Local subtab strip inside this screen (Roles / Navigation Access) -
+   underline style, distinct from the pill-style outer Partners/Roles/
+   Users strip one level up in AdministrationPage.jsx, so the two
+   levels of tabs read as clearly different in hierarchy. */
+
+.administration-subtabs{
+
+    display:flex;
+
+    gap:18px;
+
+    border-bottom:1px solid #e5e7eb;
+
+    margin-bottom:14px;
+
+}
+
+.administration-subtab{
+
+    border:none;
+
+    background:none;
+
+    padding:8px 2px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    color:#666;
+
+    cursor:pointer;
+
+    border-bottom:2px solid transparent;
+
+    margin-bottom:-1px;
+
+}
+
+.administration-subtab:hover{
+
+    color:#222;
+
+}
+
+.administration-subtab.active{
+
+    color:#f58220;
+
+    border-bottom-color:#f58220;
+
+}
+
 .administration-roles-sidebar{
 
     display:flex;

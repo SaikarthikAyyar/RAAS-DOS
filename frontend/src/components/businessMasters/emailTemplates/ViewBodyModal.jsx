@@ -2,6 +2,12 @@ import { useState } from "react";
 
 import { updateEmailTemplate } from "../../../services/emailTemplatesService";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
+
 
 // ====================================
 // COMPONENT
@@ -28,7 +34,17 @@ export default function ViewBodyModal({
 
     const [error, setError] = useState("");
 
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
+
     async function handleSubmit(){
+
+        const remark = await promptForRemark("Updating this email template's body");
+
+        if(remark===null){
+            return;
+        }
 
         setSaving(true);
 
@@ -36,7 +52,7 @@ export default function ViewBodyModal({
 
         try{
 
-            await updateEmailTemplate(template.id, { body });
+            await updateEmailTemplate(template.id, { body, actor:buildActor(user), remark });
 
             onSaved();
 
@@ -141,6 +157,8 @@ export default function ViewBodyModal({
                 </div>
 
             </div>
+
+            {remarkModal}
 
         </div>
 

@@ -19,6 +19,8 @@ from backend.schemas.email_template_schema import (
     EmailTemplateSendRequest
 )
 
+from backend.schemas.notification_schema import BusinessMasterActionSchema
+
 from backend.services.email_template_service import (
     list_templates_request,
     get_template_request,
@@ -61,8 +63,8 @@ def update_template(template_id: int, payload: EmailTemplateUpdate, db: Session 
 
 
 @api.delete("/{template_id}")
-def delete_template(template_id: int, db: Session = Depends(get_db)):
-    delete_template_request(db, template_id)
+def delete_template(template_id: int, payload: BusinessMasterActionSchema, db: Session = Depends(get_db)):
+    delete_template_request(db, template_id, payload.actor, payload.remark)
     return {"success": True}
 
 
@@ -81,8 +83,8 @@ def update_variable(template_id: int, variable_id: int, payload: EmailTemplateVa
 
 
 @api.delete("/{template_id}/variables/{variable_id}")
-def delete_variable(template_id: int, variable_id: int, db: Session = Depends(get_db)):
-    delete_variable_request(db, template_id, variable_id)
+def delete_variable(template_id: int, variable_id: int, payload: BusinessMasterActionSchema, db: Session = Depends(get_db)):
+    delete_variable_request(db, template_id, variable_id, payload.actor, payload.remark)
     return {"success": True}
 
 

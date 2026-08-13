@@ -13,6 +13,10 @@ import { X } from "lucide-react";
 
 const AUTO_DISMISS_MS = 8000;
 
+// Business Masters (Type C) notifications get more time on screen -
+// they're flagged important precisely because they're easy to miss.
+const AUTO_DISMISS_MS_IMPORTANT = 20000;
+
 export default function NotificationToast({
 
     notification,
@@ -22,9 +26,11 @@ export default function NotificationToast({
 
 }){
 
+    const isImportant = !!notification.is_important;
+
     useEffect(()=>{
 
-        const timer = setTimeout(onClose, AUTO_DISMISS_MS);
+        const timer = setTimeout(onClose, isImportant ? AUTO_DISMISS_MS_IMPORTANT : AUTO_DISMISS_MS);
 
         return ()=>clearTimeout(timer);
 
@@ -33,13 +39,21 @@ export default function NotificationToast({
 
     return(
 
-        <div className="notif-toast" onClick={onClick}>
+        <div className={isImportant ? "notif-toast important" : "notif-toast"} onClick={onClick}>
 
             <div className="notif-toast-body">
+
+                {isImportant && <span className="notif-important-badge">Important</span>}
 
                 <span className="notif-toast-module">{notification.module}</span>
 
                 <p className="notif-toast-title">{notification.title}</p>
+
+                {
+                    notification.remark && (
+                        <p className="notif-toast-remark">{notification.remark}</p>
+                    )
+                }
 
                 <span className="notif-toast-byline">by {notification.user_name}</span>
 

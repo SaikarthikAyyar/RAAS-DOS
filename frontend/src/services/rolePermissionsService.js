@@ -32,3 +32,52 @@ export async function getRolePermissions(
     return response.json();
 
 }
+
+
+// ====================================
+// NAV MATRIX (admin-facing, editable)
+// ====================================
+
+export async function getNavMatrix(){
+
+    const response = await fetch(
+
+        `${API}/role-permissions/nav-matrix`
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+export async function saveNavMatrix(cells){
+
+    const response = await fetch(
+
+        `${API}/role-permissions/nav-matrix`,
+
+        {
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({ cells })
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}

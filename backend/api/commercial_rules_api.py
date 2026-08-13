@@ -14,6 +14,8 @@ from backend.schemas.business_masters_pricing_schema import (
     CustomerCategoryResponse
 )
 
+from backend.schemas.notification_schema import BusinessMasterActionSchema
+
 from backend.services.business_masters_pricing_service import (
     get_commercial_rules_request,
     update_commercial_rules_request,
@@ -58,8 +60,8 @@ def create_customer_category(payload: CustomerCategoryCreate, db: Session = Depe
 
 
 @api.delete("/customer-categories/{category_id}")
-def delete_customer_category(category_id: int, db: Session = Depends(get_db)):
-    result = delete_customer_category_request(db, category_id)
+def delete_customer_category(category_id: int, payload: BusinessMasterActionSchema, db: Session = Depends(get_db)):
+    result = delete_customer_category_request(db, category_id, payload.actor, payload.remark)
     if not result:
         raise HTTPException(status_code=404, detail="Customer category not found.")
     return {"success": True}

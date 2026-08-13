@@ -33,6 +33,8 @@ def _serialize_entry(entry):
         "customer_name": notification.customer_name,
         "created_at": notification.created_at,
         "is_read": entry.get("is_read", False),
+        "is_important": notification.is_important,
+        "remark": notification.remark,
         "changes": [
             {
                 "field_name": change.field_name,
@@ -60,6 +62,8 @@ def _serialize_notification_only(notification):
         "customer_name": notification.customer_name,
         "created_at": notification.created_at,
         "is_read": False,
+        "is_important": notification.is_important,
+        "remark": notification.remark,
         "changes": []
 
     }

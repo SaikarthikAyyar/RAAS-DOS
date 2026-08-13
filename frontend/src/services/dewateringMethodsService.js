@@ -64,13 +64,17 @@ export async function updateDewateringMethod(id, payload){
 }
 
 
-export async function deleteDewateringMethod(id){
+export async function deleteDewateringMethod(id, actor, remark){
 
     const response = await fetch(
 
         `${API}/dewatering-methods/${id}`,
 
-        { method:"DELETE" }
+        {
+            method:"DELETE",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ actor, remark })
+        }
 
     );
 

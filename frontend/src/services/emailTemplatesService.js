@@ -73,13 +73,17 @@ export async function updateEmailTemplate(templateId, payload){
 }
 
 
-export async function deleteEmailTemplate(templateId){
+export async function deleteEmailTemplate(templateId, actor, remark){
 
     const response = await fetch(
 
         `${API}/email-templates/${templateId}`,
 
-        { method:"DELETE" }
+        {
+            method:"DELETE",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ actor, remark })
+        }
 
     );
 
@@ -148,13 +152,17 @@ export async function updateTemplateVariable(templateId, variableId, payload){
 }
 
 
-export async function deleteTemplateVariable(templateId, variableId){
+export async function deleteTemplateVariable(templateId, variableId, actor, remark){
 
     const response = await fetch(
 
         `${API}/email-templates/${templateId}/variables/${variableId}`,
 
-        { method:"DELETE" }
+        {
+            method:"DELETE",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ actor, remark })
+        }
 
     );
 

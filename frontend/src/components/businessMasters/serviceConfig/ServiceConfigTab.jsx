@@ -9,6 +9,12 @@ import {
 
 } from "../../../services/serviceConfigService";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
+
 
 // ====================================
 // ADD / EDIT MODAL
@@ -171,6 +177,10 @@ export default function ServiceConfigTab(){
 
     const [editing, setEditing] = useState(null);
 
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
+
     const load = useCallback(async()=>{
 
         setLoading(true);
@@ -205,12 +215,20 @@ export default function ServiceConfigTab(){
 
     async function handleSave(payload){
 
+        const remark = await promptForRemark(editing ? "Updating this service configuration" : "Creating this service configuration");
+
+        if(remark===null){
+            return;
+        }
+
         if(editing){
 
             await updateServiceConfiguration(editing.id, {
 
                 name: payload.name,
-                rate_per_day: payload.rate_per_day
+                rate_per_day: payload.rate_per_day,
+                actor: buildActor(user),
+                remark
 
             });
 
@@ -218,7 +236,7 @@ export default function ServiceConfigTab(){
 
         else{
 
-            await createServiceConfiguration(payload);
+            await createServiceConfiguration({ ...payload, actor:buildActor(user), remark });
 
         }
 
@@ -232,11 +250,15 @@ export default function ServiceConfigTab(){
 
     async function handleRemove(id){
 
-        if(!window.confirm("Remove this service configuration?")) return;
+        const remark = await promptForRemark("Removing this service configuration");
+
+        if(remark===null){
+            return;
+        }
 
         try{
 
-            await deleteServiceConfiguration(id);
+            await deleteServiceConfiguration(id, buildActor(user), remark);
 
             load();
 
@@ -381,6 +403,8 @@ export default function ServiceConfigTab(){
                 )
 
             }
+
+            {remarkModal}
 
         </div>
 

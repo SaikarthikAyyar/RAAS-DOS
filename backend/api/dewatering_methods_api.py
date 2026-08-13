@@ -13,6 +13,8 @@ from backend.schemas.business_masters_pricing_schema import (
     DewateringMethodResponse
 )
 
+from backend.schemas.notification_schema import BusinessMasterActionSchema
+
 from backend.services.business_masters_pricing_service import (
     list_dewatering_methods_request,
     create_dewatering_method_request,
@@ -43,8 +45,8 @@ def update_dewatering_method(method_id: int, payload: DewateringMethodUpdate, db
 
 
 @api.delete("/dewatering-methods/{method_id}")
-def delete_dewatering_method(method_id: int, db: Session = Depends(get_db)):
-    result = delete_dewatering_method_request(db, method_id)
+def delete_dewatering_method(method_id: int, payload: BusinessMasterActionSchema, db: Session = Depends(get_db)):
+    result = delete_dewatering_method_request(db, method_id, payload.actor, payload.remark)
     if not result:
         raise HTTPException(status_code=404, detail="Dewatering method not found.")
     return {"success": True}

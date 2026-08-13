@@ -7,6 +7,12 @@ import {
 
 } from "../../../services/emailTemplatesService";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
+
 
 // ====================================
 // COMPONENT
@@ -37,6 +43,10 @@ export default function EditTemplateModal({
 
     const [error, setError] = useState("");
 
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
+
     async function handleSubmit(){
 
         if(!name.trim() || !useCase.trim() || !subject.trim()){
@@ -45,6 +55,12 @@ export default function EditTemplateModal({
 
             return;
 
+        }
+
+        const remark = await promptForRemark(template ? "Updating this email template" : "Creating this email template");
+
+        if(remark===null){
+            return;
         }
 
         setSaving(true);
@@ -60,7 +76,9 @@ export default function EditTemplateModal({
                     name: name.trim(),
                     use_case: useCase.trim(),
                     subject: subject.trim(),
-                    is_active: isActive
+                    is_active: isActive,
+                    actor: buildActor(user),
+                    remark
 
                 });
 
@@ -75,7 +93,9 @@ export default function EditTemplateModal({
                     subject: subject.trim(),
                     body: "",
                     is_active: isActive,
-                    variables: []
+                    variables: [],
+                    actor: buildActor(user),
+                    remark
 
                 });
 
@@ -216,6 +236,8 @@ export default function EditTemplateModal({
                 </div>
 
             </div>
+
+            {remarkModal}
 
         </div>
 

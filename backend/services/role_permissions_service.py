@@ -6,6 +6,8 @@ from backend.models.roles import Role
 from backend.models.modules import Module
 from backend.models.role_permissions import RolePermission
 
+from backend.repositories import role_permissions_repository as repository
+
 
 # ====================================
 # GET ROLE PERMISSIONS
@@ -57,7 +59,9 @@ def get_role_permissions_request(
 
     workspace_tabs = []
 
-    for _permission, module in rows:
+    landing_page = None
+
+    for permission, module in rows:
 
         entry = {
 
@@ -72,12 +76,33 @@ def get_role_permissions_request(
         else:
             nav_modules.append(entry)
 
+        if permission.is_landing_page:
+            landing_page = module.module_key
+
     return {
 
         "role_name": role.name,
 
         "nav_modules": nav_modules,
 
-        "workspace_tabs": workspace_tabs
+        "workspace_tabs": workspace_tabs,
+
+        "landing_page": landing_page
 
     }
+
+
+# ====================================
+# NAV MATRIX
+# ====================================
+
+def get_nav_matrix_request(db):
+
+    return repository.get_nav_matrix(db)
+
+
+def save_nav_matrix_request(db, payload):
+
+    repository.save_nav_matrix(db, payload.cells)
+
+    return repository.get_nav_matrix(db)

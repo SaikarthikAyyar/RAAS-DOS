@@ -9,6 +9,12 @@ import {
 
 } from "../../../services/emailTemplatesService";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
+
 
 // ====================================
 // COMPONENT (Details action)
@@ -35,6 +41,10 @@ export default function TemplateVariablesModal({
     const [error, setError] = useState("");
 
     const [saving, setSaving] = useState(false);
+
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
 
     async function refresh(){
 
@@ -72,6 +82,12 @@ export default function TemplateVariablesModal({
 
         }
 
+        const remark = await promptForRemark("Adding this variable");
+
+        if(remark===null){
+            return;
+        }
+
         setSaving(true);
 
         setError("");
@@ -83,7 +99,9 @@ export default function TemplateVariablesModal({
                 key: newKey.trim(),
                 label: newLabel.trim(),
                 is_recipient_field: false,
-                sort_order: variables.length
+                sort_order: variables.length,
+                actor: buildActor(user),
+                remark
 
             });
 
@@ -110,11 +128,19 @@ export default function TemplateVariablesModal({
 
     async function handleToggleRecipient(variable){
 
+        const remark = await promptForRemark(`Marking "${variable.key}" as the recipient field`);
+
+        if(remark===null){
+            return;
+        }
+
         try{
 
             await updateTemplateVariable(template.id, variable.id, {
 
-                is_recipient_field: !variable.is_recipient_field
+                is_recipient_field: !variable.is_recipient_field,
+                actor: buildActor(user),
+                remark
 
             });
 
@@ -132,11 +158,15 @@ export default function TemplateVariablesModal({
 
     async function handleRemove(variable){
 
-        if(!window.confirm(`Remove variable "${variable.key}"?`)) return;
+        const remark = await promptForRemark(`Removing variable "${variable.key}"`);
+
+        if(remark===null){
+            return;
+        }
 
         try{
 
-            await deleteTemplateVariable(template.id, variable.id);
+            await deleteTemplateVariable(template.id, variable.id, buildActor(user), remark);
 
             await refresh();
 
@@ -331,6 +361,8 @@ export default function TemplateVariablesModal({
                 </div>
 
             </div>
+
+            {remarkModal}
 
         </div>
 

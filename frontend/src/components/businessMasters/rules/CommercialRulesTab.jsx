@@ -10,6 +10,12 @@ import {
 
 } from "../../../services/commercialRulesService";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
+
+import { buildActor } from "../../../utils/actor";
+
 
 // ====================================
 // RULES FORM FIELDS
@@ -103,6 +109,10 @@ export default function CommercialRulesTab(){
 
     const [newCategoryMargin, setNewCategoryMargin] = useState("");
 
+    const { user } = useAuth();
+
+    const { promptForRemark, remarkModal } = useRemarkPrompt();
+
     const loadRules = useCallback(async()=>{
 
         setLoading(true);
@@ -177,6 +187,12 @@ export default function CommercialRulesTab(){
 
     async function handleSaveRules(){
 
+        const remark = await promptForRemark("Updating commercial rules");
+
+        if(remark===null){
+            return;
+        }
+
         setSaving(true);
 
         setError("");
@@ -185,7 +201,7 @@ export default function CommercialRulesTab(){
 
         try{
 
-            const updated = await updateCommercialRules(toPayload(form));
+            const updated = await updateCommercialRules({ ...toPayload(form), actor:buildActor(user), remark });
 
             setRules(updated);
 
@@ -219,12 +235,20 @@ export default function CommercialRulesTab(){
 
         }
 
+        const remark = await promptForRemark("Adding this customer category");
+
+        if(remark===null){
+            return;
+        }
+
         try{
 
             await createCustomerCategory({
 
                 category: newCategoryName.trim(),
-                margin_pct: Number(newCategoryMargin) / 100
+                margin_pct: Number(newCategoryMargin) / 100,
+                actor: buildActor(user),
+                remark
 
             });
 
@@ -246,11 +270,15 @@ export default function CommercialRulesTab(){
 
     async function handleRemoveCategory(id){
 
-        if(!window.confirm("Remove this customer category?")) return;
+        const remark = await promptForRemark("Removing this customer category");
+
+        if(remark===null){
+            return;
+        }
 
         try{
 
-            await deleteCustomerCategory(id);
+            await deleteCustomerCategory(id, buildActor(user), remark);
 
             loadCategories();
 
@@ -465,6 +493,8 @@ export default function CommercialRulesTab(){
                 }
 
             </div>
+
+            {remarkModal}
 
         </>
 

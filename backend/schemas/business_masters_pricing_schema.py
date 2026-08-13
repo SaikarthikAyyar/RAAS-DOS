@@ -6,6 +6,8 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 # ====================================
 # SERVICE CONFIGURATION
@@ -15,12 +17,16 @@ class ServiceConfigurationCreate(BaseModel):
     code: str
     name: str
     rate_per_day: float
+    actor: ActorSchema
+    remark: str
 
 
 class ServiceConfigurationUpdate(BaseModel):
     code: Optional[str] = None
     name: Optional[str] = None
     rate_per_day: Optional[float] = None
+    actor: ActorSchema
+    remark: str
 
 
 class ServiceConfigurationResponse(BaseModel):
@@ -42,6 +48,8 @@ class DewateringMethodCreate(BaseModel):
     rate_per_m3: float
     best_for: Optional[str] = None
     review_trigger: Optional[str] = None
+    actor: ActorSchema
+    remark: str
 
 
 class DewateringMethodUpdate(BaseModel):
@@ -50,6 +58,8 @@ class DewateringMethodUpdate(BaseModel):
     rate_per_m3: Optional[float] = None
     best_for: Optional[str] = None
     review_trigger: Optional[str] = None
+    actor: ActorSchema
+    remark: str
 
 
 class DewateringMethodResponse(BaseModel):
@@ -71,12 +81,16 @@ class AccessoryCreate(BaseModel):
     name: str
     unit: Optional[str] = "per job"
     rate: float
+    actor: ActorSchema
+    remark: str
 
 
 class AccessoryUpdate(BaseModel):
     name: Optional[str] = None
     unit: Optional[str] = None
     rate: Optional[float] = None
+    actor: ActorSchema
+    remark: str
 
 
 class AccessoryResponse(BaseModel):
@@ -101,6 +115,8 @@ class CommercialRulesUpdate(BaseModel):
     contingency_pct: float
     documentation_buffer: float
     access_support_buffer: float
+    actor: ActorSchema
+    remark: str
 
 
 class CommercialRulesResponse(BaseModel):
@@ -124,6 +140,8 @@ class CommercialRulesResponse(BaseModel):
 class CustomerCategoryCreate(BaseModel):
     category: str
     margin_pct: float
+    actor: ActorSchema
+    remark: str
 
 
 class CustomerCategoryResponse(BaseModel):

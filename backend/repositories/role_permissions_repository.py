@@ -242,3 +242,118 @@ def seed_roles_modules_permissions(db):
             ))
 
     db.commit()
+
+
+# ====================================
+# GET NAV MATRIX
+# Full cross-product of every role x every nav-type module - a role
+# with zero role_permissions rows still returns a complete set of
+# (unchecked) cells, which is what makes a brand-new role show up
+# ready to configure without any extra wiring.
+# ====================================
+
+def get_nav_matrix(db):
+
+    roles = db.query(Role).order_by(Role.name).all()
+
+    modules = (
+        db.query(Module)
+        .filter(Module.module_type == "nav")
+        .order_by(Module.id)
+        .all()
+    )
+
+    existing = {
+        (permission.role_id, permission.module_id): permission
+        for permission in (
+            db.query(RolePermission)
+            .filter(RolePermission.module_id.in_([m.id for m in modules]))
+            .all()
+        )
+    }
+
+    cells = []
+
+    for role in roles:
+        for module in modules:
+
+            permission = existing.get((role.id, module.id))
+
+            cells.append({
+                "role_id": role.id,
+                "module_id": module.id,
+                "can_view": bool(permission.can_view) if permission else False,
+                "is_landing_page": bool(permission.is_landing_page) if permission else False
+            })
+
+    return {
+        "roles": roles,
+        "modules": modules,
+        "cells": cells
+    }
+
+
+# ====================================
+# SAVE NAV MATRIX
+# Validates at most one is_landing_page=True per role_id in the
+# incoming payload before writing anything - a bad payload never
+# partially commits. Finds-or-creates each RolePermission row.
+# ====================================
+
+def save_nav_matrix(db, cells):
+
+    landing_pages_by_role = {}
+
+    for cell in cells:
+
+        if not cell.is_landing_page:
+            continue
+
+        if cell.role_id in landing_pages_by_role:
+            raise ValueError(
+                f"Role {cell.role_id} has more than one landing page in this save request."
+            )
+
+        landing_pages_by_role[cell.role_id] = cell.module_id
+
+    permissions_by_cell = {}
+
+    # Pass 1: upsert can_view for every cell and unconditionally clear
+    # is_landing_page first. Two passes (clear-all, then set-true) so a
+    # role moving its landing page from one module to another never
+    # transiently holds two True rows at once mid-flush, which would
+    # trip the partial unique index regardless of input ordering.
+    for cell in cells:
+
+        permission = (
+            db.query(RolePermission)
+            .filter(
+                RolePermission.role_id == cell.role_id,
+                RolePermission.module_id == cell.module_id
+            )
+            .first()
+        )
+
+        if not permission:
+            permission = RolePermission(
+                role_id=cell.role_id,
+                module_id=cell.module_id
+            )
+            db.add(permission)
+
+        permission.can_view = cell.can_view
+        permission.is_landing_page = False
+
+        permissions_by_cell[(cell.role_id, cell.module_id)] = permission
+
+    db.flush()
+
+    # Pass 2: set the True flags.
+    for cell in cells:
+
+        if not cell.is_landing_page:
+            continue
+
+        permissions_by_cell[(cell.role_id, cell.module_id)].is_landing_page = True
+
+    db.commit()

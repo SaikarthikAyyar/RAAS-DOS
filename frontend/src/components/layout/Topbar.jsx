@@ -299,10 +299,19 @@ export default function Topbar({
                                                 <button
                                                     key={notification.id}
                                                     type="button"
-                                                    className="notif-panel-row"
+                                                    className={notification.is_important ? "notif-panel-row important" : "notif-panel-row"}
                                                     onClick={()=>handleNotificationClick(notification)}
                                                 >
-                                                    {notification.title}
+                                                    <span className="notif-panel-row-title">
+                                                        {notification.is_important && <span className="notif-important-badge">Important</span>}
+                                                        {notification.title}
+                                                    </span>
+
+                                                    {
+                                                        notification.remark && (
+                                                            <span className="notif-panel-row-remark">{notification.remark}</span>
+                                                        )
+                                                    }
                                                 </button>
 
                                             ))

@@ -64,13 +64,17 @@ export async function updateAccessory(id, payload){
 }
 
 
-export async function deleteAccessory(id){
+export async function deleteAccessory(id, actor, remark){
 
     const response = await fetch(
 
         `${API}/accessories/${id}`,
 
-        { method:"DELETE" }
+        {
+            method:"DELETE",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ actor, remark })
+        }
 
     );
 

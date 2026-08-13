@@ -13,6 +13,8 @@ from backend.repositories.lookup_list_repository import (
     soft_delete_value
 )
 
+from backend.repositories.notification_repository import record_business_master_change
+
 
 # ====================================
 # HELPERS
@@ -121,8 +123,39 @@ def add_lookup_value(db, list_key, payload):
 
     next_sort_order = get_max_sort_order(db, lookup_list.id) + 1
 
-    return add_value(db, lookup_list.id, value_text, is_other, next_sort_order)
+    new_value = add_value(db, lookup_list.id, value_text, is_other, next_sort_order)
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="CREATE",
+        actor_user_id=payload.actor.user_id,
+        actor_name=payload.actor.name,
+        actor_role=payload.actor.role,
+        title=f"{payload.actor.name} added '{value_text}' to {lookup_list.display_name} in Business Masters",
+        changes=[{"field": lookup_list.display_name, "before": None, "after": value_text}],
+        remark=payload.remark
+    )
+
+    return new_value
 
 
-def delete_lookup_value(db, value_id):
-    return soft_delete_value(db, value_id)
+def delete_lookup_value(db, value_id, actor, remark):
+
+    row = soft_delete_value(db, value_id)
+
+    if row:
+
+        record_business_master_change(
+            db=db,
+            module="Business Masters",
+            action="DELETE",
+            actor_user_id=actor.user_id,
+            actor_name=actor.name,
+            actor_role=actor.role,
+            title=f"{actor.name} removed '{row.value}' from {row.lookup_list.display_name} in Business Masters",
+            changes=[{"field": row.lookup_list.display_name, "before": row.value, "after": None}],
+            remark=remark
+        )
+
+    return row

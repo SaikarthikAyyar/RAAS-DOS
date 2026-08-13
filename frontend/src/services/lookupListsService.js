@@ -50,13 +50,17 @@ export async function addLookupValue(listKey, payload){
 }
 
 
-export async function deleteLookupValue(valueId){
+export async function deleteLookupValue(valueId, actor, remark){
 
     const response = await fetch(
 
         `${API}/lookup-lists/values/${valueId}`,
 
-        { method:"DELETE" }
+        {
+            method:"DELETE",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ actor, remark })
+        }
 
     );
 
