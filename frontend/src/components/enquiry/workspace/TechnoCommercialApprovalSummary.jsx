@@ -9,6 +9,10 @@ import {
     setEnquiryStage
 } from "../../../services/enquiryWorkspaceService";
 
+import {
+    saveOpsReviewDecision
+} from "../../../services/opsSelectorService";
+
 function inr(value){
 
     if(value===null || value===undefined) return "-";
@@ -100,6 +104,20 @@ export default function TechnoCommercialApprovalSummary({
             else{
 
                 await setEnquiryStage(enquiry.id, nextStage);
+
+                // Ops Review must show a clean, unapproved state when the
+                // case lands back there - not the stale "Approved" from
+                // before this send-back.
+                if(opsSelection?.id){
+
+                    await saveOpsReviewDecision(
+                        opsSelection.id,
+                        "Pending",
+                        approvedBy,
+                        "Reset - sent back from Techno-Commercial Approval"
+                    );
+
+                }
 
             }
 

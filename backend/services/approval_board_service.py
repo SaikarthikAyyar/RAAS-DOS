@@ -36,7 +36,9 @@ from backend.models.enquiry import Enquiry
 
 from backend.services.enquiry_consolidated_service import update_module_reference
 
-from backend.services.workflow_service import advance_stage_at_least, WorkflowStage
+from backend.services.workflow_service import advance_stage_at_least, update_stage, WorkflowStage
+
+from backend.services.ops_selector_service import save_ops_review_decision
 
 
 
@@ -457,15 +459,21 @@ def record_commercial_approval_decision_request(
 
             )
 
-            advance_stage_at_least(
+            # Safety precondition: only ever advance to QUOTE_RELEASED when
+            # this enquiry is genuinely sitting at COMMERCIAL_APPROVAL right
+            # now - the decision itself is still always recorded above
+            # regardless, only the stage-advance is guarded.
+            if target_enquiry.stage == WorkflowStage.COMMERCIAL_APPROVAL.value:
 
-                db,
+                advance_stage_at_least(
 
-                target_enquiry.id,
+                    db,
 
-                WorkflowStage.QUOTE_RELEASED.value
+                    target_enquiry.id,
 
-            )
+                    WorkflowStage.QUOTE_RELEASED.value
+
+                )
 
     else:
 
@@ -488,5 +496,128 @@ def record_commercial_approval_decision_request(
                 approval.id
 
             )
+
+    return approval
+
+
+# ====================================
+# SEND BACK FOR REVIEW (Commercial Approval)
+# Rejects this pass and routes the whole case back to Ops Review to be
+# re-worked and re-walked through every gate again - matches the
+# wireframe's commercialApprovalDecision(id,'Sent back') exactly
+# (regresses past Techno-Commercial, not just one step back). Commercial
+# Approval doesn't revise the quote's values itself, so "send back" here
+# means "reject this pass," not "edit the numbers."
+# ====================================
+
+def send_back_commercial_approval_request(
+
+    db,
+
+    quote_id,
+
+    sent_back_by,
+
+    note,
+
+    enquiry_id=None
+
+):
+
+    quote = get_quote(db, quote_id)
+
+    if quote is None:
+
+        raise ValueError("Quote not found.")
+
+    if quote.techno_status != "Approved":
+
+        raise ValueError(
+            "Quote must be Techno-Commercial Approved before it can go "
+            "through Commercial Approval."
+        )
+
+    approval = record_commercial_approval_decision(
+
+        db,
+
+        quote_id,
+
+        "SENT_BACK",
+
+        sent_back_by,
+
+        note
+
+    )
+
+    ops = get_ops_selection(db, quote.ops_selection_id)
+
+    if enquiry_id is not None:
+
+        target_enquiry = (
+
+            db.query(Enquiry)
+
+            .filter(Enquiry.id == enquiry_id)
+
+            .first()
+
+        )
+
+    else:
+
+        target_enquiry = (
+
+            db.query(Enquiry)
+
+            .filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+
+            .order_by(Enquiry.id.desc())
+
+            .first()
+
+        )
+
+    if target_enquiry:
+
+        update_module_reference(
+
+            db,
+
+            target_enquiry.id,
+
+            "approval_board_id",
+
+            approval.id
+
+        )
+
+        update_stage(
+
+            db,
+
+            target_enquiry.id,
+
+            WorkflowStage.OPS_REVIEW.value
+
+        )
+
+    # Ops Review must show a clean, unapproved state when the case lands
+    # back there - not the stale "Approved" from before this send-back.
+    if ops is not None:
+
+        save_ops_review_decision(
+
+            db,
+
+            ops.id,
+
+            "Pending",
+
+            sent_back_by,
+            "Reset - sent back from Commercial Approval"
+
+        )
 
     return approval

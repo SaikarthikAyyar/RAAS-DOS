@@ -29,7 +29,8 @@ from backend.services.approval_board_service import (
 
 from backend.services.approval_board_service import (
     get_approval_history_request,
-    record_commercial_approval_decision_request
+    record_commercial_approval_decision_request,
+    send_back_commercial_approval_request
 )
 
 # ====================================
@@ -262,6 +263,56 @@ def post_commercial_approval_decision(
         return {
 
             "message": "Decision recorded",
+
+            "approval_id": approval.id
+
+        }
+
+    except ValueError as e:
+
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# ====================================
+# SEND BACK FOR REVIEW (Commercial Approval)
+# ====================================
+
+@router.post(
+
+    "/approval-board/send-back/{quote_id}"
+
+)
+def post_send_back_commercial_approval(
+
+    quote_id: int,
+
+    payload: CommercialApprovalDecisionSchema,
+
+    db: Session = Depends(get_db)
+
+):
+
+    from fastapi import HTTPException
+
+    try:
+
+        approval = send_back_commercial_approval_request(
+
+            db,
+
+            quote_id,
+
+            payload.approved_by,
+
+            payload.note,
+
+            payload.enquiry_id
+
+        )
+
+        return {
+
+            "message": "Sent back to Ops Review",
 
             "approval_id": approval.id
 

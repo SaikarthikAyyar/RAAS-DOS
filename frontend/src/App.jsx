@@ -43,6 +43,8 @@ import Analytics from "./pages/Analytics";
 
 import AuditTrail from "./pages/AuditTrail";
 
+import ReviewsApprovals from "./pages/ReviewsApprovals";
+
 
 function App() {
 
@@ -116,6 +118,8 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
 
           <Route path="audit-trail" element={<AuditTrail />} />
+
+          <Route path="reviews-approvals" element={<ReviewsApprovals />} />
 
         </Route>
 

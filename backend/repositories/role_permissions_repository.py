@@ -35,7 +35,8 @@ NAV_MODULES = [
     ("/execution", "Execution"),
     ("/customer-portal", "Customer Portal"),
     ("/analytics", "Analytics"),
-    ("/audit-trail", "Audit Trail")
+    ("/audit-trail", "Audit Trail"),
+    ("/reviews-approvals", "Reviews & Approvals")
 
 ]
 
@@ -96,11 +97,12 @@ ROLE_NAV_ACCESS = {
 
     "ops": [
         "/ops-approval", "/ops-selector",
-        "/job-creation", "/allocation", "/execution"
+        "/job-creation", "/allocation", "/execution",
+        "/reviews-approvals"
     ],
 
     "management": [
-        "/approval"
+        "/approval", "/reviews-approvals"
     ],
 
     "customer": [

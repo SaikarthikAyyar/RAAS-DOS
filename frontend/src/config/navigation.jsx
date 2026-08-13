@@ -36,7 +36,9 @@ FolderOpen,
 
 Users,
 
-History
+History,
+
+ListChecks
 
 }
 
@@ -71,6 +73,7 @@ export const MODULE_META = {
 "/execution":          {title:"Execution",path:"/execution",icon:<PlayCircle size={18}/>},
 "/customer-portal":    {title:"Customer Portal",path:"/customer-portal",icon:<UserCircle size={18}/>},
 "/analytics":          {title:"Analytics",path:"/analytics",icon:<BarChart3 size={18}/>},
-"/audit-trail":        {title:"Audit Trail",path:"/audit-trail",icon:<History size={18}/>}
+"/audit-trail":        {title:"Audit Trail",path:"/audit-trail",icon:<History size={18}/>},
+"/reviews-approvals":  {title:"Reviews & Approvals",path:"/reviews-approvals",icon:<ListChecks size={18}/>}
 
 };

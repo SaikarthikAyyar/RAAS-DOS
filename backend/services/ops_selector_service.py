@@ -38,7 +38,6 @@ from backend.models.enquiry import Enquiry
 
 from backend.services.enquiry_consolidated_service import update_module_reference
 
-from backend.services.workflow_service import advance_stage_at_least, WorkflowStage
 
 
 
@@ -369,19 +368,14 @@ def create_ops_selection_request(
 
         )
 
-        advance_stage_at_least(
-
-            db,
-
-            target_enquiry.id,
-
-            WorkflowStage.TECHNO_COMMERCIAL_APPROVAL.value
-
-        )
-
+        # Saving/regenerating the Ops Selector is a pure data operation -
+        # it must never move the workflow stage forward. Only the human
+        # "Approve & Send to Techno-Commercial" decision on the Ops
+        # Review Decision card (save_ops_review_decision below) is
+        # allowed to do that.
         print(
             f"[Workflow] Enquiry {target_enquiry.id} -> "
-            f"ops_selector_id={ops.id}, stage=TECHNO_COMMERCIAL_APPROVAL"
+            f"ops_selector_id={ops.id} (stage unchanged - data save only)"
         )
 
     else:

@@ -248,3 +248,52 @@ export async function recordCommercialApprovalDecision(
     return data;
 
 }
+
+
+export async function sendBackCommercialApproval(
+
+    quoteId,
+
+    approvedBy,
+
+    note,
+
+    enquiryId
+
+){
+
+    const response = await fetch(
+
+        `${API}/approval-board/send-back/${quoteId}`,
+
+        {
+
+            method:"POST",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({
+
+                approved_by:approvedBy,
+
+                note,
+
+                enquiry_id:enquiryId
+
+            })
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}

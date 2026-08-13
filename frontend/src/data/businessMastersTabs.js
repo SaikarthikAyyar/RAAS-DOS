@@ -1,9 +1,12 @@
 // ====================================
 // BUSINESS MASTERS TABS
-// Matches the wireframe's renderMasters() tabs list exactly (order
-// and labels). Only "customers" has real content behind it so far —
-// the rest are honest placeholders, same pattern already used for
-// unbuilt Enquiry Workspace tabs.
+// Matches the wireframe's renderMasters() tabs list (order and
+// labels), plus "hubs" - a deliberate addition not in the wireframe
+// (which only has hub ownership as a hardcoded bm.hubs array). Made
+// into a real, admin-editable master since Phase 16's Reviews &
+// Approvals module needs it. Placeholders left for anything without
+// real content yet, same pattern already used for unbuilt Enquiry
+// Workspace tabs.
 // ====================================
 
 export const businessMastersTabs = [
@@ -25,6 +28,8 @@ export const businessMastersTabs = [
     ["serviceconfig", "Service Configurations"],
 
     ["rules", "Commercial Rules"],
+
+    ["hubs", "Hubs"],
 
     ["quotetemplates", "Quote Templates"],
 

@@ -59,6 +59,8 @@ from backend.models.email_template import EmailTemplate, EmailTemplateVariable
 
 from backend.models.survey_reminder import SurveyReminder
 
+from backend.models.hub import Hub
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel

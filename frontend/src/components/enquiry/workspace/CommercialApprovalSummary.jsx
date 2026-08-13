@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 import {
     getApprovalHistory,
-    recordCommercialApprovalDecision
+    recordCommercialApprovalDecision,
+    sendBackCommercialApproval
 } from "../../../services/approvalBoardService";
 
 function inr(value){
@@ -203,9 +204,52 @@ export default function CommercialApprovalSummary({
 
     }
 
-    function handleSendBack(){
+    async function handleSendBack(){
 
-        onTabChange?.("quote-commercial");
+        if(!approvedBy.trim()){
+
+            setError("Enter your name before sending this back.");
+            return;
+
+        }
+
+        if(!note.trim()){
+
+            setError("A note is required - it goes into the decision history.");
+            return;
+
+        }
+
+        setSaving(true);
+        setError("");
+
+        try{
+
+            await sendBackCommercialApproval(
+
+                quote.id,
+                approvedBy,
+                note,
+                enquiry?.id
+
+            );
+
+            reload();
+
+        }
+
+        catch(err){
+
+            console.error(err);
+            setError(err?.detail || "Unable to send this back.");
+
+        }
+
+        finally{
+
+            setSaving(false);
+
+        }
 
     }
 
@@ -216,6 +260,21 @@ export default function CommercialApprovalSummary({
         { label:"Techno-Comm.", value: quote.techno_status ?? "Pending" },
         { label:"Quote", value: quote.workflow_status ?? "-" },
         { label:"PO", value: "Not started" }
+
+    ];
+
+    const lines = [
+
+        { label:"Mobilisation", min:quote.mobilisation_cost_min, max:quote.mobilisation_cost_max },
+        { label:"Setup / Access", min:quote.setup_cost_min, max:quote.setup_cost_max },
+        { label:"Execution (machine)", min:quote.execution_cost_min, max:quote.execution_cost_max },
+        { label:"Pump Addon", min:quote.pump_addon_cost_min, max:quote.pump_addon_cost_max },
+        { label:"Documentation Buffer", min:quote.documentation_buffer, max:quote.documentation_buffer },
+        { label:"Access Support Buffer", min:quote.access_support_buffer, max:quote.access_support_buffer },
+        { label:"Overhead", min:quote.overhead_cost_min, max:quote.overhead_cost_max },
+        { label:"Contingency", min:quote.contingency_cost_min, max:quote.contingency_cost_max },
+        { label:"Margin", min:quote.margin_value_min, max:quote.margin_value_max },
+        { label:"Dewatering Add-on", min:quote.dewatering_addon_min, max:quote.dewatering_addon_max }
 
     ];
 
@@ -248,6 +307,40 @@ export default function CommercialApprovalSummary({
                     }
 
                 </div>
+
+                <h4 className="ops-subheading">Finalized quote lines</h4>
+
+                <table className="ops-scoring-table">
+
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {
+                            lines.map(line=>(
+                                <tr key={line.label}>
+                                    <td>{line.label}</td>
+                                    <td>{inr(line.min)}</td>
+                                    <td>{inr(line.max)}</td>
+                                </tr>
+                            ))
+                        }
+
+                        <tr className="ops-scoring-top">
+                            <td><b>Range</b></td>
+                            <td><b>{inr(quote.combined_budgetary_value_min)}</b></td>
+                            <td><b>{inr(quote.combined_budgetary_value_max)}</b></td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
 
                 <div className="survey-summary-row">
                     <span className="survey-summary-label">Techno-Commercial range</span>
