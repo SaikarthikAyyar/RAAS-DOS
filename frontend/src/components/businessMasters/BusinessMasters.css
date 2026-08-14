@@ -602,6 +602,49 @@
     margin-top:16px;
 }
 
+/* Wider variant for forms with many fields (Machines/Fleet) */
+.bm-modal-box-wide{
+    max-width:760px;
+}
+
+.bm-formgrid h4{
+    grid-column:1 / -1;
+    margin:12px 0 0;
+    font-size:12px;
+    font-weight:800;
+    color:#334155;
+    border-top:1px solid var(--line);
+    padding-top:10px;
+}
+
+.bm-formgrid h4:first-child{
+    margin-top:0;
+    border-top:none;
+    padding-top:0;
+}
+
+.bm-checkbox-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 14px;
+    max-height:120px;
+    overflow-y:auto;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px;
+}
+
+.bm-checkbox-list label{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-size:11.5px;
+    font-weight:600;
+    color:#334155;
+    margin:0;
+    white-space:nowrap;
+}
+
 
 /* ====================================
    PLACEHOLDER TABS (not built yet)

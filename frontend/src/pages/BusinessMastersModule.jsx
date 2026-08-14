@@ -25,6 +25,8 @@ import CommercialRulesTab from "../components/businessMasters/rules/CommercialRu
 import LookupListsTab from "../components/businessMasters/lookupLists/LookupListsTab";
 import EmailTemplatesTab from "../components/businessMasters/emailTemplates/EmailTemplatesTab";
 import HubsTab from "../components/businessMasters/hubs/HubsTab";
+import MachinesTab from "../components/businessMasters/machines/MachinesTab";
+import PumpsTab from "../components/businessMasters/pumps/PumpsTab";
 
 import {
 
@@ -578,6 +580,14 @@ export default function BusinessMastersModule(){
                 ) : activeTab==="hubs" ? (
 
                     <HubsTab />
+
+                ) : activeTab==="machines" ? (
+
+                    <MachinesTab />
+
+                ) : activeTab==="pumps" ? (
+
+                    <PumpsTab />
 
                 ) : (
 

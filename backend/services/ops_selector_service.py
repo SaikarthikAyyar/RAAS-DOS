@@ -43,6 +43,9 @@ from backend.services.workflow_service import (
     WorkflowStage
 )
 
+from backend.repositories.machine_repository import list_active_machines_as_dicts
+from backend.repositories.pump_repository import list_active_pumps_as_dicts
+
 
 
 
@@ -111,9 +114,17 @@ def create_ops_selection_request(
     # RUN ENGINE
     # ====================================
 
+    machines = list_active_machines_as_dicts(db)
+
+    pumps = list_active_pumps_as_dicts(db)
+
     ops_output = run_ops_engine(
 
-        engineering_inputs
+        engineering_inputs,
+
+        machines,
+
+        pumps
 
     )
 
@@ -463,9 +474,17 @@ def get_ops_selection_preview(
     # RUN ENGINE
     # ====================================
 
+    machines = list_active_machines_as_dicts(db)
+
+    pumps = list_active_pumps_as_dicts(db)
+
     ops_output = run_ops_engine(
 
-        engineering_inputs
+        engineering_inputs,
+
+        machines,
+
+        pumps
 
     )
 
@@ -541,9 +560,13 @@ def get_ops_selection_scoring(
 
     )
 
+    machines = list_active_machines_as_dicts(db)
+
     return score_all_machines(
 
-        engineering_inputs
+        engineering_inputs,
+
+        machines
 
     )
 

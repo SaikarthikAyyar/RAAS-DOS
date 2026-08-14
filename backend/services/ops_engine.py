@@ -4,8 +4,6 @@
 
 import math
 
-from backend.data.machine_library import MACHINE_LIBRARY
-
 def evaluate_doability(
 
         engineering_inputs
@@ -261,7 +259,7 @@ def score_access(
 
 
     # --------------------------------
-    # No dimensional restriction
+    # Base fit score
     # --------------------------------
 
     if (
@@ -274,14 +272,9 @@ def score_access(
 
     ):
 
-        return 10
+        base_score = 10
 
-
-    # --------------------------------
-    # Machine fits
-    # --------------------------------
-
-    if (
+    elif (
 
         opening_width >= minimum_width
 
@@ -291,14 +284,64 @@ def score_access(
 
     ):
 
-        return 20
+        base_score = 20
+
+    else:
+
+        base_score = -20
 
 
     # --------------------------------
-    # Machine cannot fit
+    # Vertical lift shortfall
+    # (machine has a real lift limit and the
+    # site's required lift exceeds it)
     # --------------------------------
 
-    return -20
+    penalty = 0
+
+    vertical_lift = engineering_inputs.get("vertical_lift") or 0
+
+    max_vertical_lift = machine.get("max_vertical_lift")
+
+    if max_vertical_lift and vertical_lift > max_vertical_lift:
+
+        penalty -= 15
+
+
+    # --------------------------------
+    # Crane required, none available
+    # --------------------------------
+
+    crane_required = machine.get("crane_required")
+
+    crane_available = engineering_inputs.get("crane_available")
+
+    if crane_required == "Yes" and crane_available == "No":
+
+        penalty -= 15
+
+
+    # --------------------------------
+    # Power availability shortfall.
+    #
+    # Our real Power Available lookup list has no literal "None
+    # Available" option (unlike the wireframe's own vocabulary) -
+    # the closest real signal that a site has no ready electrical
+    # supply is "Generator Required". Only penalize pure-Electric
+    # machines here - Diesel/Hydraulic machines carry their own
+    # power source and are unaffected either way.
+    # --------------------------------
+
+    power_source = engineering_inputs.get("power_source")
+
+    power_type = (machine.get("power_type") or "").strip().lower()
+
+    if power_source == "Generator Required" and power_type == "electric":
+
+        penalty -= 10
+
+
+    return base_score + penalty
 
 
 # ====================================
@@ -548,17 +591,269 @@ def score_volume(
 
 
 # ====================================
+# ENVIRONMENT SCORE
+# ====================================
+
+# Categorical Temperature Range -> a representative Celsius value,
+# used only to compare against a machine's numeric max_operating_temp.
+# Upper end of each band is used deliberately (conservative: flags a
+# machine as unsuitable rather than silently under-estimating heat).
+TEMPERATURE_RANGE_C = {
+
+    "ambient": 35,
+
+    "hot (40°c - 70°c)": 70,
+
+    "very hot (>70°c)": 90,
+
+    "cold (<10°c)": 10
+
+}
+
+
+def score_environment(
+
+        engineering_inputs,
+
+        machine
+
+):
+    """
+    Scores environmental/material-compatibility fit.
+
+    Excel Basis
+
+        Hazard = Explosive/flammable AND machine not ATEX-rated
+
+            -> hard -30
+
+        Otherwise, base 10, then:
+
+            Extreme pH (< 4 or > 10) AND Mild Steel construction
+
+                -> -15
+
+            Site temperature exceeds machine's max operating temp
+
+                -> -15
+    """
+
+    hazard = engineering_inputs.get("hazard") or ""
+
+    hazard_rating = machine.get("hazard_rating") or ""
+
+
+    if (
+
+        hazard == "Explosive / flammable"
+
+        and
+
+        not hazard_rating.startswith("ATEX")
+
+    ):
+
+        return -30
+
+
+    score = 10
+
+
+    ph_min = engineering_inputs.get("ph_min")
+
+    ph_max = engineering_inputs.get("ph_max")
+
+    material_construction = machine.get("material_construction")
+
+    extreme_ph = (
+
+        (ph_min is not None and ph_min < 4)
+
+        or
+
+        (ph_max is not None and ph_max > 10)
+
+    )
+
+    if extreme_ph and material_construction == "Mild Steel":
+
+        score -= 15
+
+
+    temperature_label = (
+
+        engineering_inputs.get("temperature") or ""
+
+    ).strip().lower()
+
+    temperature_c = TEMPERATURE_RANGE_C.get(temperature_label)
+
+    max_operating_temp = machine.get("max_operating_temp")
+
+    if (
+
+        temperature_c is not None
+
+        and
+
+        max_operating_temp is not None
+
+        and
+
+        temperature_c > max_operating_temp
+
+    ):
+
+        score -= 15
+
+
+    return score
+
+
+# ====================================
+# DEBRIS SCORE
+# ====================================
+
+# Our Sales Survey's Debris Level lookup list is more granular than the
+# machine master's simple None/Minor/Moderate/Heavy vocabulary (kept
+# that way deliberately when Machines was promoted to a Business
+# Master, so the wireframe's rank comparison logic still applies) -
+# this maps the survey's real values down to the same 4-point rank.
+SURVEY_DEBRIS_RANK = {
+
+    "none / negligible": 0,
+
+    "minor screenable debris": 1,
+
+    "moderate plastic/fibres": 2,
+
+    "heavy random debris": 3,
+
+    "wood / logs / stones / metal": 3,
+
+    "unknown": 2
+
+}
+
+MACHINE_DEBRIS_RANK = {
+
+    "none": 0,
+
+    "minor": 1,
+
+    "moderate": 2,
+
+    "heavy": 3
+
+}
+
+
+def score_debris(
+
+        engineering_inputs,
+
+        machine
+
+):
+    """
+    Scores whether the machine's debris tolerance
+    meets or exceeds what the site actually has.
+
+    Excel Basis
+
+        Machine tolerance rank >= site debris rank
+
+            -> +10
+
+        Otherwise
+
+            -> -10
+    """
+
+    survey_debris = (
+
+        engineering_inputs.get("debris_level") or ""
+
+    ).strip().lower()
+
+    survey_rank = SURVEY_DEBRIS_RANK.get(survey_debris, 0)
+
+
+    machine_tolerance = (
+
+        machine.get("debris_tolerance") or ""
+
+    ).strip().lower()
+
+    machine_rank = MACHINE_DEBRIS_RANK.get(machine_tolerance, 0)
+
+
+    if machine_rank >= survey_rank:
+
+        return 10
+
+
+    return -10
+
+
+# ====================================
+# HUB FIT SCORE
+# ====================================
+
+def score_hub_fit(
+
+        engineering_inputs,
+
+        machine
+
+):
+    """
+    Scores whether the machine is already
+    stationed at the site's nearest hub.
+
+    Excel Basis
+
+        Machine available at the site's nearest hub
+
+            -> +10
+
+        Otherwise
+
+            -> +5
+    """
+
+    nearest_hub = engineering_inputs.get("nearest_hub")
+
+    hubs_available = machine.get("hubs_available") or []
+
+
+    if nearest_hub and nearest_hub in hubs_available:
+
+        return 10
+
+
+    return 5
+
+
+# ====================================
 # MACHINE SCORING (ALL MACHINES)
 # ====================================
 
 def score_all_machines(
 
-        engineering_inputs
+        engineering_inputs,
+
+        machines
 
 ):
     """
-    Scores every machine in the library and returns
+    Scores every machine in `machines` and returns
     them ranked best-first, with a 1-based "rank" field.
+
+    `machines` is a list of plain dicts (see
+    backend/repositories/machine_repository.py::
+    list_active_machines_as_dicts) - this function has no DB/session
+    coupling of its own, the caller resolves the data source.
 
     Used by:
       - select_machine() below, for the winner
@@ -567,7 +862,7 @@ def score_all_machines(
 
     machine_scores = []
 
-    for machine in MACHINE_LIBRARY:
+    for machine in machines:
 
         access_score = score_access(
 
@@ -604,6 +899,33 @@ def score_all_machines(
         )
 
 
+        environment_score = score_environment(
+
+            engineering_inputs,
+
+            machine
+
+        )
+
+
+        debris_score = score_debris(
+
+            engineering_inputs,
+
+            machine
+
+        )
+
+
+        hub_fit_score = score_hub_fit(
+
+            engineering_inputs,
+
+            machine
+
+        )
+
+
         total_score = (
 
             access_score +
@@ -612,7 +934,13 @@ def score_all_machines(
 
             job_score +
 
-            volume_score
+            volume_score +
+
+            environment_score +
+
+            debris_score +
+
+            hub_fit_score
 
         )
 
@@ -631,7 +959,13 @@ def score_all_machines(
 
                 "job_score": job_score,
 
-                "volume_score": volume_score
+                "volume_score": volume_score,
+
+                "environment_score": environment_score,
+
+                "debris_score": debris_score,
+
+                "hub_fit_score": hub_fit_score
 
             }
 
@@ -658,13 +992,17 @@ def score_all_machines(
 
 def select_machine(
 
-        engineering_inputs
+        engineering_inputs,
+
+        machines
 
 ):
 
     machine_scores = score_all_machines(
 
-        engineering_inputs
+        engineering_inputs,
+
+        machines
 
     )
 
@@ -675,51 +1013,179 @@ def select_machine(
 # PUMP / HOSE PACKAGE
 # ====================================
 
-def build_pump_package(
+def build_pump_selection(
 
+        recommended_machine,
 
-        recommended_machine
+        engineering_inputs,
+
+        pumps
 
 ):
+    """
+    Resolves a real, engineering-informed pump from the compatible
+    set for the recommended machine, replacing the old flat
+    `machine.pump_package` string.
 
-        # ====================================
-    # SELECTED MACHINE
-    # ====================================
+    Falls back to the machine's own `pump_package` string if no
+    compatible pumps are configured yet (e.g. a freshly-added machine
+    with no join rows) - a resolution gap must never block the Ops
+    Engine from returning a result.
 
-    machine = recommended_machine.get(
+    `pumps` is a list of plain dicts from
+    backend/repositories/pump_repository.py::list_active_pumps_as_dicts.
+    """
 
-        "machine",
+    machine = recommended_machine.get("machine", {})
 
-        {}
-
-    )
-
-
-    # ====================================
-    # PUMP PACKAGE
-    # ====================================
-
-    pump_package = machine.get(
-
-        "pump_package"
-
-    )
+    hose_size = machine.get("hose_size")
 
 
-    # ====================================
-    # HOSE SIZE
-    # ====================================
+    compatible_codes = set(machine.get("compatible_pump_codes") or [])
 
-    hose_size = machine.get(
+    candidates = [
 
-        "hose_size"
+        pump for pump in pumps
 
-    )
+        if pump.get("code") in compatible_codes
+
+        and pump.get("active")
+
+    ]
+
+
+    # --------------------------------
+    # No compatible pumps configured yet -
+    # fall back to the machine's own flat string.
+    # --------------------------------
+
+    if not candidates:
+
+        pump_package = machine.get("pump_package")
+
+        return f"{pump_package} | {hose_size}"
+
+
+    # --------------------------------
+    # Prefer pumps meeting the suction depth,
+    # keep the wider set if none qualify.
+    # --------------------------------
+
+    suction_depth = engineering_inputs.get("suction_depth")
+
+    if suction_depth:
+
+        meeting_suction = [
+
+            p for p in candidates
+
+            if p.get("max_suction_lift") is not None
+
+            and p.get("max_suction_lift") >= suction_depth
+
+        ]
+
+        if meeting_suction:
+
+            candidates = meeting_suction
+
+
+    # --------------------------------
+    # Prefer pumps meeting the required vertical
+    # lift (discharge head), same graceful fallback.
+    # --------------------------------
+
+    vertical_lift = engineering_inputs.get("vertical_lift")
+
+    if vertical_lift:
+
+        meeting_lift = [
+
+            p for p in candidates
+
+            if p.get("max_discharge_head") is not None
+
+            and p.get("max_discharge_head") >= vertical_lift
+
+        ]
+
+        if meeting_lift:
+
+            candidates = meeting_lift
+
+
+    # --------------------------------
+    # Explosive/flammable sites prefer a
+    # non-Standard (e.g. ATEX) hazard rating.
+    # --------------------------------
+
+    hazard = engineering_inputs.get("hazard")
+
+    if hazard == "Explosive / flammable":
+
+        atex_rated = [
+
+            p for p in candidates
+
+            if (p.get("hazard_rating") or "Standard") != "Standard"
+
+        ]
+
+        if atex_rated:
+
+            candidates = atex_rated
+
+
+    # --------------------------------
+    # Required flow: smallest pump that still
+    # meets it, else the largest available.
+    # --------------------------------
+
+    required_flow = engineering_inputs.get("required_flow")
+
+    chosen = None
+
+    if required_flow:
+
+        meeting_flow = sorted(
+
+            (
+
+                p for p in candidates
+
+                if p.get("flow_rate") is not None
+
+                and p.get("flow_rate") >= required_flow
+
+            ),
+
+            key=lambda p: p["flow_rate"]
+
+        )
+
+        if meeting_flow:
+
+            chosen = meeting_flow[0]
+
+
+    if chosen is None:
+
+        by_flow = sorted(
+
+            candidates,
+
+            key=lambda p: p.get("flow_rate") or 0,
+
+            reverse=True
+
+        )
+
+        chosen = by_flow[0]
 
 
     return (
 
-        f"{pump_package}"
+        f"{chosen['code']} - {chosen['name']}"
 
         f" | "
 
@@ -1202,13 +1668,24 @@ def generate_selection_reason(
 
 def run_ops_engine(
 
-        engineering_inputs
+        engineering_inputs,
+
+        machines,
+
+        pumps
 
 ):
 
     """
     Executes the complete
     operational engineering workflow.
+
+    `machines` is a list of plain dicts from
+    backend/repositories/machine_repository.py::list_active_machines_as_dicts -
+    resolved by the caller (ops_selector_service.py), not read here.
+
+    `pumps` is the same shape from
+    backend/repositories/pump_repository.py::list_active_pumps_as_dicts.
 
     Returns:
 
@@ -1225,7 +1702,9 @@ def run_ops_engine(
 
     recommended_machine = select_machine(
 
-        engineering_inputs
+        engineering_inputs,
+
+        machines
 
     )
 
@@ -1236,10 +1715,13 @@ def run_ops_engine(
     )
 
 
-    pump_package = build_pump_package(
+    pump_package = build_pump_selection(
 
+        recommended_machine,
 
-        recommended_machine
+        engineering_inputs,
+
+        pumps
 
     )
 

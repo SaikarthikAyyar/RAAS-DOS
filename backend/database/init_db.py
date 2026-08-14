@@ -61,6 +61,8 @@ from backend.models.survey_reminder import SurveyReminder
 
 from backend.models.hub import Hub
 
+from backend.models.machines_pumps import Machine, Pump, MachinePumpCompatibility
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel

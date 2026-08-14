@@ -9,6 +9,8 @@ from backend.models.business_masters_pricing import (
     CommercialRules
 )
 
+from backend.models.machines_pumps import Machine
+
 
 # ====================================
 # TECHNICAL SNAPSHOT
@@ -108,6 +110,65 @@ def build_accessories_addon(
 
 
 # ====================================
+# MACHINE RATE RESOLUTION
+#
+# Resolves the final machine's own per-machine `rate` from the
+# Machines/Fleet Business Master, replacing the old
+# service-configuration-group rate lookup. `ops.override_machine`
+# (set) beats `ops.recommended_machine` - whichever one actually
+# reflects the machine that will be deployed. The identifier is
+# inconsistently a code vs. a name today (pre-existing quirk), so
+# this matches either, mirroring the exact dual-match tolerance
+# DeploymentPlanCard.jsx's defaultAccessoriesPlan already relies on
+# client-side (`r.machine.code===finalMachine || r.machine.name===finalMachine`).
+#
+# Falls back to the pre-Phase-18 ServiceConfiguration.rate_per_day
+# lookup if no machine row matches (e.g. a machine renamed/removed
+# from the master after the quote's ops selection was made) - a
+# resolution gap must never block a quote, same posture as the
+# accessory-name-mismatch fallback above.
+# ====================================
+
+def resolve_machine_rate(
+
+    db,
+    ops
+
+):
+
+    identifier = ops.override_machine or ops.recommended_machine
+
+    machine = None
+
+    if identifier:
+
+        machine = (
+
+            db.query(Machine)
+            .filter(
+                (Machine.code == identifier)
+                | (Machine.name == identifier)
+            )
+            .first()
+
+        )
+
+    if machine and machine.rate is not None:
+
+        return float(machine.rate)
+
+    service_config = (
+
+        db.query(ServiceConfiguration)
+        .filter(ServiceConfiguration.code == ops.service_configuration)
+        .first()
+
+    )
+
+    return float(service_config.rate_per_day) if service_config else 0.0
+
+
+# ====================================
 # COMMERCIAL CALCULATION (MIN/MAX RANGE)
 #
 # Same formula and order of operations as the original single-value
@@ -137,15 +198,7 @@ def build_commercial(
 
     rules = db.query(CommercialRules).first()
 
-    service_config = (
-
-        db.query(ServiceConfiguration)
-        .filter(ServiceConfiguration.code == ops.service_configuration)
-        .first()
-
-    )
-
-    machine_cost = float(service_config.rate_per_day) if service_config else 0.0
+    machine_cost = resolve_machine_rate(db, ops)
 
     mobilisation_cost = (
 

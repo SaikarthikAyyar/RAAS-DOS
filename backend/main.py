@@ -88,6 +88,10 @@ from backend.api.hub_api import api as hub_api
 
 from backend.api.reviews_api import api as reviews_api
 
+from backend.api.machine_api import api as machine_api
+
+from backend.api.pump_api import api as pump_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -256,6 +260,10 @@ app.include_router(survey_reminder_api)
 app.include_router(hub_api)
 
 app.include_router(reviews_api)
+
+app.include_router(machine_api)
+
+app.include_router(pump_api)
 
 
 

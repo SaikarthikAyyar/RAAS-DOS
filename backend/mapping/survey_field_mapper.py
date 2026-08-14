@@ -80,7 +80,17 @@ OPS_FIELD_MAP = {
 
     "discharge_pit_dimension": "discharge_pit_dimension",
 
-    "customer_pain": "customer_pain_point"
+    "customer_pain": "customer_pain_point",
+
+    "crane_available": "crane_available",
+
+    "temperature": "temperature_range",
+
+    "nearest_hub": "nearest_hub",
+
+    "suction_depth": "suction_depth",
+
+    "required_flow": "target_flow"
 
 }
 

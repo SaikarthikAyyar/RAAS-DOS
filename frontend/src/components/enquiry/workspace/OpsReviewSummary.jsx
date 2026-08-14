@@ -326,6 +326,9 @@ export default function OpsReviewSummary({
                                         <th>Material</th>
                                         <th>Job</th>
                                         <th>Volume</th>
+                                        <th>Environment</th>
+                                        <th>Debris</th>
+                                        <th>Hub Fit</th>
                                         <th>Total</th>
                                         <th>Rank</th>
 
@@ -377,6 +380,9 @@ export default function OpsReviewSummary({
                                                 <td>{row.material_score}</td>
                                                 <td>{row.job_score}</td>
                                                 <td>{row.volume_score}</td>
+                                                <td>{row.environment_score}</td>
+                                                <td>{row.debris_score}</td>
+                                                <td>{row.hub_fit_score}</td>
                                                 <td><b>{row.total_score}</b></td>
                                                 <td>{row.rank}</td>
 
@@ -392,9 +398,12 @@ export default function OpsReviewSummary({
 
                             <p className="survey-empty" style={{fontSize:"11.5px", marginTop:8}}>
 
-                                Access checks opening dimensions against each machine's
-                                minimum width/height. Material and Job scores reward machines
-                                whose preferred material/job-type lists match the survey.
+                                Access checks opening dimensions plus vertical-lift/crane/power fit
+                                against each machine's limits. Material and Job scores reward
+                                machines whose preferred material/job-type lists match the survey.
+                                Environment scores hazard/pH/temperature compatibility, Debris
+                                compares tolerance vs. the site's debris level, and Hub Fit checks
+                                whether the machine is stationed at the nearest hub.
 
                             </p>
 
