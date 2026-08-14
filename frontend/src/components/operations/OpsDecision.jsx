@@ -1,4 +1,15 @@
 // ====================================
+// IMPORTS
+// ====================================
+
+import { useState, useEffect } from "react";
+
+import { getMachines } from "../../services/machinesService";
+import { getPumps } from "../../services/pumpsService";
+import { getServiceConfigurations } from "../../services/serviceConfigService";
+
+
+// ====================================
 // COMPONENT
 // ====================================
 
@@ -22,9 +33,59 @@ export default function OpsDecision({
 
         "Engineering Review"
 
-
-
     ];
+
+    // ====================================
+    // BUSINESS MASTER OPTIONS
+    // Recommended Machine / Service Configuration / Pump & Hose Package
+    // only ever take values from these three real masters - fetched
+    // once here so the row selects below always reflect current data,
+    // not a hardcoded/free-typed value.
+    // ====================================
+
+    const [machines, setMachines] = useState([]);
+    const [serviceConfigurations, setServiceConfigurations] = useState([]);
+    const [pumps, setPumps] = useState([]);
+
+    useEffect(()=>{
+
+        getMachines()
+            .then(data=>setMachines((data ?? []).filter(m=>m.active)))
+            .catch(err=>console.error(err));
+
+        getServiceConfigurations()
+            .then(data=>setServiceConfigurations(data ?? []))
+            .catch(err=>console.error(err));
+
+        getPumps()
+            .then(data=>setPumps((data ?? []).filter(p=>p.active)))
+            .catch(err=>console.error(err));
+
+    }, []);
+
+    const machineOptions = machines.map(m=>({
+        value: m.name,
+        label: `${m.code} - ${m.name}`
+    }));
+
+    const serviceConfigOptions = serviceConfigurations.map(sc=>({
+        value: sc.code,
+        label: `${sc.code} - ${sc.name}`
+    }));
+
+    // The selected machine's hose size is baked into every pump option's
+    // value, matching the exact "{code} - {name} | {hose_size}" shape
+    // the Ops Engine's own build_pump_selection() produces - so picking
+    // one here saves the same format a real algorithm run would.
+    const selectedMachine = machines.find(
+        m => m.name === opsData.recommended_machine || m.code === opsData.recommended_machine
+    );
+    const hoseSize = selectedMachine?.hose_size || "-";
+
+    const pumpOptions = pumps.map(p=>({
+        value: `${p.code} - ${p.name} | ${hoseSize}`,
+        label: `${p.code} - ${p.name}`
+    }));
 
     return(
 
@@ -68,6 +129,8 @@ export default function OpsDecision({
                     opsData={opsData}
                     updateField={updateField}
                     options={approvalOptions}
+                    valueOptions={serviceConfigOptions}
+                    valuePlaceholder="Choose service configuration..."
                 />
 
                 <Row
@@ -77,6 +140,8 @@ export default function OpsDecision({
                     opsData={opsData}
                     updateField={updateField}
                     options={approvalOptions}
+                    valueOptions={machineOptions}
+                    valuePlaceholder="Choose machine..."
                 />
 
                 <Row
@@ -86,6 +151,8 @@ export default function OpsDecision({
                     opsData={opsData}
                     updateField={updateField}
                     options={approvalOptions}
+                    valueOptions={pumpOptions}
+                    valuePlaceholder="Choose pump..."
                 />
 
                 <Row
@@ -122,7 +189,11 @@ function Row({
 
     updateField,
 
-    options
+    options,
+
+    valueOptions,
+
+    valuePlaceholder
 
 }){
 
@@ -138,25 +209,83 @@ function Row({
 
             <div className="ops-value">
 
-                <input
+                {
 
-                    className="ops-input"
+                    valueOptions ? (
 
-                    value={opsData[field] ?? ""}
+                        <select
 
-                    onChange={(e)=>
+                            className="ops-input"
 
-                        updateField(
+                            value={opsData[field] ?? ""}
 
-                            field,
+                            onChange={(e)=>
 
-                            e.target.value
+                                updateField(
 
-                        )
+                                    field,
 
-                    }
+                                    e.target.value
 
-                />
+                                )
+
+                            }
+
+                        >
+
+                            <option value="">
+
+                                {valuePlaceholder ?? "Select"}
+
+                            </option>
+
+                            {
+
+                                valueOptions.map(opt=>(
+
+                                    <option
+
+                                        key={opt.value}
+
+                                        value={opt.value}
+
+                                    >
+
+                                        {opt.label}
+
+                                    </option>
+
+                                ))
+
+                            }
+
+                        </select>
+
+                    ) : (
+
+                        <input
+
+                            className="ops-input"
+
+                            value={opsData[field] ?? ""}
+
+                            onChange={(e)=>
+
+                                updateField(
+
+                                    field,
+
+                                    e.target.value
+
+                                )
+
+                            }
+
+                        />
+
+                    )
+
+                }
 
             </div>
 
