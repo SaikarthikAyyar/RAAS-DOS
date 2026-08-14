@@ -40,6 +40,10 @@ from backend.services.workflow_service import advance_stage_at_least, update_sta
 
 from backend.services.ops_selector_service import save_ops_review_decision
 
+from backend.services.quote_release_service import generate_quote_release_docx
+
+from datetime import date
+
 
 
 # ====================================
@@ -319,6 +323,36 @@ def get_approval_board_by_quote_request(
 
 
 # ====================================
+# SHARED: REGRESS TO OPS REVIEW
+# Factored out of send_back_commercial_approval_request so the
+# REJECTED decision path (below) can reuse the exact same stage-
+# regression + review-status-reset mechanics without duplicating them.
+# ====================================
+
+def _regress_to_ops_review(db, ops, target_enquiry, actor_name, note):
+
+    if target_enquiry:
+
+        update_stage(
+            db,
+            target_enquiry.id,
+            WorkflowStage.OPS_REVIEW.value
+        )
+
+    # Ops Review must show a clean, unapproved state when the case
+    # lands back there - not the stale "Approved" from before.
+    if ops is not None:
+
+        save_ops_review_decision(
+            db,
+            ops.id,
+            "Pending",
+            actor_name,
+            note
+        )
+
+
+# ====================================
 # COMMERCIAL APPROVAL TAB
 # ====================================
 
@@ -435,11 +469,17 @@ def record_commercial_approval_decision_request(
 
         )
 
+    generated_document = None
+
     if decision == "APPROVED":
 
         quote.final_approved_value = final_approved_value
 
         quote.workflow_status = "APPROVAL_COMPLETED"
+
+        quote.released = True
+        quote.released_by = approved_by
+        quote.released_date = date.today().isoformat()
 
         db.commit()
 
@@ -475,6 +515,15 @@ def record_commercial_approval_decision_request(
 
                 )
 
+            generated_document = generate_quote_release_docx(
+
+                db,
+                quote_id,
+                target_enquiry.id,
+                approved_by
+
+            )
+
     else:
 
         quote.workflow_status = "REJECTED"
@@ -497,7 +546,15 @@ def record_commercial_approval_decision_request(
 
             )
 
-    return approval
+        # Direct instruction: Reject must still route the case back to
+        # Ops Review, same as Send Back - just recorded under the
+        # REJECTED label instead of SENT_BACK for the decision history.
+        _regress_to_ops_review(db, ops, target_enquiry, approved_by, note)
+
+    return {
+        "approval": approval,
+        "quote_release_document_id": generated_document.id if generated_document else None
+    }
 
 
 # ====================================

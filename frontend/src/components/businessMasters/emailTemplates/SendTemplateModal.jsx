@@ -20,7 +20,9 @@ export default function SendTemplateModal({
 
     template,
 
-    onClose
+    onClose,
+
+    requireAttachment = false
 
 }){
 
@@ -43,6 +45,8 @@ export default function SendTemplateModal({
     const [bodyText, setBodyText] = useState(template.body);
 
     const [previewDirty, setPreviewDirty] = useState(false);
+
+    const [attachmentFile, setAttachmentFile] = useState(null);
 
     const [error, setError] = useState("");
 
@@ -98,6 +102,14 @@ export default function SendTemplateModal({
 
         }
 
+        if(requireAttachment && !attachmentFile){
+
+            setError("Attach the quote release document before sending - there's no point sending this email without it.");
+
+            return;
+
+        }
+
         if(!window.confirm(`Send this email now?\n\nSubject: ${subjectText}`)){
 
             return;
@@ -112,9 +124,10 @@ export default function SendTemplateModal({
 
             await sendEmailTemplate(template.id, {
 
-                variable_values: values,
-                subject_override: subjectText,
-                body_override: bodyText
+                variableValues: values,
+                subjectOverride: subjectText,
+                bodyOverride: bodyText,
+                attachmentFile
 
             });
 
@@ -226,6 +239,20 @@ export default function SendTemplateModal({
 
                     </div>
 
+                    <div>
+
+                        <label>{requireAttachment ? "Attach the quote release document (required)" : "Attach a file (optional)"}</label>
+
+                        <input
+
+                            type="file"
+
+                            onChange={e=>setAttachmentFile(e.target.files?.[0] || null)}
+
+                        />
+
+                    </div>
+
                 </div>
 
                 <div className="bm-modal-actions">
@@ -238,7 +265,7 @@ export default function SendTemplateModal({
 
                         onClick={handleSend}
 
-                        disabled={sending || variables.length===0}
+                        disabled={sending || variables.length===0 || (requireAttachment && !attachmentFile)}
 
                     >
 

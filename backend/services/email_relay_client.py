@@ -27,7 +27,13 @@ EMAIL_RELAY_SECRET = os.getenv("EMAIL_RELAY_SECRET")
 # the backend never sees the actual mailbox address). Omitted for
 # every interactive/manual send; only the automatic user-account-
 # created path passes one. See frontend/api/send-email.js.
-def post_to_relay(to, subject, text, from_tag=None):
+#
+# attachment: optional {"filename": str, "contentBase64": str} (keys
+# match frontend/api/send-email.js's destructuring exactly, same
+# camelCase-passthrough convention as fromTag above) - only the Quote
+# Release send path passes this today. Every other caller
+# (email_service.py, email_template_service.py) omits it, unaffected.
+def post_to_relay(to, subject, text, from_tag=None, attachment=None):
 
     payload = {
         "to": to,
@@ -37,6 +43,9 @@ def post_to_relay(to, subject, text, from_tag=None):
 
     if from_tag:
         payload["fromTag"] = from_tag
+
+    if attachment:
+        payload["attachment"] = attachment
 
     response = requests.post(
         EMAIL_RELAY_URL,

@@ -82,6 +82,12 @@ from backend.api.lookup_list_api import api as lookup_list_api
 
 from backend.api.email_template_api import api as email_template_api
 
+from backend.api.quote_template_api import api as quote_template_api
+
+from backend.api.quote_release_api import router as quote_release_router
+
+from backend.api.purchase_order_api import router as purchase_order_router
+
 from backend.api.survey_reminder_api import api as survey_reminder_api
 
 from backend.api.hub_api import api as hub_api
@@ -254,6 +260,12 @@ app.include_router(commercial_rules_api)
 app.include_router(lookup_list_api)
 
 app.include_router(email_template_api)
+
+app.include_router(quote_template_api)
+
+app.include_router(quote_release_router)
+
+app.include_router(purchase_order_router)
 
 app.include_router(survey_reminder_api)
 

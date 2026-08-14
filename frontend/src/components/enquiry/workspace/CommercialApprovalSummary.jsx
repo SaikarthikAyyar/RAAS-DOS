@@ -6,6 +6,17 @@ import {
     sendBackCommercialApproval
 } from "../../../services/approvalBoardService";
 
+import {
+    quoteReleaseDownloadUrl,
+    getQuoteReleaseDocumentForQuote
+} from "../../../services/quoteReleaseService";
+
+import { getEmailTemplates } from "../../../services/emailTemplatesService";
+
+import SendTemplateModal from "../../businessMasters/emailTemplates/SendTemplateModal";
+
+const QUOTE_RELEASE_EMAIL_TEMPLATE_NAME = "Quote Release";
+
 function inr(value){
 
     if(value===null || value===undefined) return "-";
@@ -54,6 +65,45 @@ export default function CommercialApprovalSummary({
     const [finalValue, setFinalValue] = useState("");
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+
+    const [releaseDocument, setReleaseDocument] = useState(null);
+    const [quoteReleaseEmailTemplate, setQuoteReleaseEmailTemplate] = useState(null);
+    const [showSendModal, setShowSendModal] = useState(false);
+
+    useEffect(()=>{
+
+        if(!quote?.id){
+            setReleaseDocument(null);
+            return;
+        }
+
+        let cancelled = false;
+
+        async function loadReleaseDocument(){
+
+            try{
+
+                const doc = await getQuoteReleaseDocumentForQuote(quote.id);
+
+                if(!cancelled){
+                    setReleaseDocument(doc);
+                }
+
+            }
+
+            catch(err){
+
+                console.error(err);
+
+            }
+
+        }
+
+        loadReleaseDocument();
+
+        return ()=>{ cancelled = true; };
+
+    }, [quote?.id]);
 
     useEffect(()=>{
 
@@ -127,6 +177,14 @@ export default function CommercialApprovalSummary({
 
     async function handleDecision(decision){
 
+        if(decision==="REJECTED"){
+
+            if(!window.confirm("Reject this quote? The case will be sent back to Ops Review.")){
+                return;
+            }
+
+        }
+
         if(!approvedBy.trim()){
 
             setError("Enter your name before recording a decision.");
@@ -174,7 +232,7 @@ export default function CommercialApprovalSummary({
 
         try{
 
-            await recordCommercialApprovalDecision(
+            const result = await recordCommercialApprovalDecision(
 
                 quote.id,
                 decision,
@@ -184,6 +242,12 @@ export default function CommercialApprovalSummary({
                 enquiry?.id
 
             );
+
+            if(result?.quote_release_document_id){
+
+                setReleaseDocument({ id: result.quote_release_document_id });
+
+            }
 
             reload();
 
@@ -248,6 +312,35 @@ export default function CommercialApprovalSummary({
         finally{
 
             setSaving(false);
+
+        }
+
+    }
+
+    async function handleOpenSendModal(){
+
+        try{
+
+            const templates = await getEmailTemplates();
+
+            const template = templates.find(t=>t.name===QUOTE_RELEASE_EMAIL_TEMPLATE_NAME);
+
+            if(!template){
+
+                alert(`No "${QUOTE_RELEASE_EMAIL_TEMPLATE_NAME}" email template found - create one in Business Masters -> Email Templates first.`);
+                return;
+
+            }
+
+            setQuoteReleaseEmailTemplate(template);
+            setShowSendModal(true);
+
+        }
+
+        catch(err){
+
+            console.error(err);
+            alert("Unable to load the Quote Release email template.");
 
         }
 
@@ -360,6 +453,32 @@ export default function CommercialApprovalSummary({
                     )
                 }
 
+                {
+                    releaseDocument?.id && (
+
+                        <div className="survey-actions" style={{marginTop:10, marginBottom:10}}>
+
+                            <a
+                                className="survey-action-button"
+                                href={quoteReleaseDownloadUrl(releaseDocument.id)}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                Download quote document (.docx)
+                            </a>
+
+                            <button
+                                className="survey-action-button survey-action-button-orange"
+                                onClick={handleOpenSendModal}
+                            >
+                                Send Quote Release Email
+                            </button>
+
+                        </div>
+
+                    )
+                }
+
                 <span
                     style={{cursor:"pointer", color:"#f97316", fontWeight:600}}
                     onClick={()=>onTabChange?.("quote-commercial")}
@@ -467,7 +586,7 @@ export default function CommercialApprovalSummary({
                                     onClick={()=>handleDecision("APPROVED")}
                                     disabled={saving}
                                 >
-                                    {saving ? "Saving..." : "Approve (set final value)"}
+                                    {saving ? "Saving..." : "Accept and Generate Quote Release"}
                                 </button>
 
                                 <button
@@ -495,6 +614,22 @@ export default function CommercialApprovalSummary({
                 }
 
             </div>
+
+            {
+                showSendModal && quoteReleaseEmailTemplate && (
+
+                    <SendTemplateModal
+
+                        template={quoteReleaseEmailTemplate}
+
+                        onClose={()=>setShowSendModal(false)}
+
+                        requireAttachment
+
+                    />
+
+                )
+            }
 
         </div>
 

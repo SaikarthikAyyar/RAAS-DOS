@@ -17,7 +17,6 @@ from backend.schemas.techno_commercial_quote_schema import (
     TechnoApprovalDecisionSchema,
     InternalExtraSchema,
     ValidTillSchema,
-    ReleaseQuoteSchema,
     RequestRevisionFlagSchema,
     QuoteListResponse
 )
@@ -31,7 +30,6 @@ from backend.services.techno_commercial_quote_service import (
     get_quote_history_request,
     update_internal_extra_request,
     update_valid_till_request,
-    release_quote_request,
     flag_quote_revision_requested_request,
     list_quotes_request
 )
@@ -388,41 +386,6 @@ def put_valid_till(
 
         raise HTTPException(status_code=404, detail=str(e))
 
-
-@router.post(
-
-    "/quote/{quote_id}/release",
-
-    response_model=QuoteResponseSchema
-
-)
-def post_release_quote(
-
-    quote_id: int,
-
-    payload: ReleaseQuoteSchema,
-
-    db: Session = Depends(get_db)
-
-):
-
-    from fastapi import HTTPException
-
-    try:
-
-        return release_quote_request(
-
-            db,
-
-            quote_id,
-
-            payload.released_by
-
-        )
-
-    except ValueError as e:
-
-        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post(

@@ -9,6 +9,8 @@ import TechnoCommercialApprovalSummary from "./TechnoCommercialApprovalSummary";
 import QuoteCommercialSummary from "./QuoteCommercialSummary";
 
 import CommercialApprovalSummary from "./CommercialApprovalSummary";
+
+import POSummary from "./POSummary";
 // ====================================
 // COMPONENT
 // ====================================
@@ -149,11 +151,13 @@ export default function WorkspaceContent({
 
             return(
 
-                <div>
+                <POSummary
 
-                    PO Placeholder
+                    enquiry={enquiry}
 
-                </div>
+                    reload={reload}
+
+                />
 
             );
 

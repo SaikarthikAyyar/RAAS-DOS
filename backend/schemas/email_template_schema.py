@@ -101,9 +101,3 @@ class EmailTemplateRenderRequest(BaseModel):
 class EmailTemplateRenderResponse(BaseModel):
     subject: str
     body: str
-
-
-class EmailTemplateSendRequest(BaseModel):
-    variable_values: dict[str, str] = {}
-    subject_override: Optional[str] = None
-    body_override: Optional[str] = None

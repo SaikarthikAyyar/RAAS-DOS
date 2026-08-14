@@ -486,31 +486,6 @@ def update_valid_till(
     return quote
 
 
-def release_quote(
-
-    db,
-
-    quote,
-
-    released_by,
-
-    released_date
-
-):
-
-    quote.released = True
-
-    quote.released_by = released_by
-
-    quote.released_date = released_date
-
-    db.commit()
-
-    db.refresh(quote)
-
-    return quote
-
-
 def flag_revision_requested(
 
     db,

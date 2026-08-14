@@ -814,54 +814,6 @@ def update_valid_till_request(
     )
 
 
-def release_quote_request(
-
-    db,
-
-    quote_id,
-
-    released_by
-
-):
-
-    from backend.repositories.techno_commercial_quote_repository import (
-        release_quote
-    )
-
-    quote = get_quote(
-
-        db,
-
-        quote_id
-
-    )
-
-    if quote is None:
-
-        raise ValueError("Quote not found.")
-
-    if quote.techno_status != "Approved":
-
-        raise ValueError(
-
-            "Quote must be Techno-Commercial Approved before it can be "
-            "released to the client."
-
-        )
-
-    return release_quote(
-
-        db,
-
-        quote,
-
-        released_by,
-
-        date.today().isoformat()
-
-    )
-
-
 def flag_quote_revision_requested_request(
 
     db,

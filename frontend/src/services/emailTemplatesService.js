@@ -206,7 +206,15 @@ export async function renderEmailTemplate(templateId, variableValues){
 }
 
 
-export async function sendEmailTemplate(templateId, payload){
+export async function sendEmailTemplate(templateId, { variableValues, subjectOverride, bodyOverride, attachmentFile }){
+
+    const formData = new FormData();
+
+    formData.append("variable_values", JSON.stringify(variableValues || {}));
+
+    if(subjectOverride!==undefined && subjectOverride!==null) formData.append("subject_override", subjectOverride);
+    if(bodyOverride!==undefined && bodyOverride!==null) formData.append("body_override", bodyOverride);
+    if(attachmentFile) formData.append("attachment", attachmentFile);
 
     const response = await fetch(
 
@@ -214,8 +222,7 @@ export async function sendEmailTemplate(templateId, payload){
 
         {
             method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify(payload)
+            body:formData
         }
 
     );

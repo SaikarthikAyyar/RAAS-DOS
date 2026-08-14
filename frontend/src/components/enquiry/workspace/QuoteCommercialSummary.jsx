@@ -6,7 +6,6 @@ import {
     getQuoteHistory,
     updateInternalExtra,
     updateValidTill,
-    releaseQuoteToClient,
     flagQuoteRevisionRequested
 } from "../../../services/technoCommercialQuoteService";
 
@@ -52,9 +51,6 @@ export default function QuoteCommercialSummary({
 
     const [validTill, setValidTill] = useState("");
     const [savingValidTill, setSavingValidTill] = useState(false);
-
-    const [releasedBy, setReleasedBy] = useState("");
-    const [releasing, setReleasing] = useState(false);
 
     const [showPreview, setShowPreview] = useState(false);
 
@@ -185,41 +181,6 @@ export default function QuoteCommercialSummary({
 
     }
 
-    async function handleRelease(){
-
-        if(!releasedBy.trim()){
-
-            setError("Enter your name before releasing the quote.");
-            return;
-
-        }
-
-        setReleasing(true);
-        setError("");
-
-        try{
-
-            await releaseQuoteToClient(quote.id, releasedBy);
-
-            reload();
-
-        }
-
-        catch(err){
-
-            console.error(err);
-            setError(err?.detail || "Unable to release the quote.");
-
-        }
-
-        finally{
-
-            setReleasing(false);
-
-        }
-
-    }
-
     function handleOpenQuotesModule(){
 
         navigate("/quote", {
@@ -292,8 +253,6 @@ export default function QuoteCommercialSummary({
     ];
 
     const quoteCode = `QT-${enquiry?.id ?? "?"}-v${quote.revision_number ?? 1}`;
-
-    const canRelease = quote.techno_status === "Approved";
 
     return(
 
@@ -419,39 +378,11 @@ export default function QuoteCommercialSummary({
                                 Released by {quote.released_by} on {quote.released_date}
                             </span>
 
-                        ) : canRelease ? (
-
-                            <>
-
-                                <div className="ops-override-form">
-
-                                    <input
-                                        placeholder="Released by (your name)"
-                                        value={releasedBy}
-                                        onChange={e=>setReleasedBy(e.target.value)}
-                                    />
-
-                                </div>
-
-                                <div className="survey-actions" style={{marginTop:8}}>
-
-                                    <button
-                                        className="survey-action-button survey-action-button-orange"
-                                        onClick={handleRelease}
-                                        disabled={releasing}
-                                    >
-                                        {releasing ? "Releasing..." : "Release quote to client"}
-                                    </button>
-
-                                </div>
-
-                            </>
-
                         ) : (
 
                             <p className="survey-empty">
-                                Quote must be Techno-Commercial Approved before it
-                                can be released to the client.
+                                A quote is released via the "Accept and Generate Quote
+                                Release" action on the Commercial Approval tab.
                             </p>
 
                         )

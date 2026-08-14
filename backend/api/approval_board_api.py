@@ -242,7 +242,7 @@ def post_commercial_approval_decision(
 
     try:
 
-        approval = record_commercial_approval_decision_request(
+        result = record_commercial_approval_decision_request(
 
             db,
 
@@ -264,7 +264,9 @@ def post_commercial_approval_decision(
 
             "message": "Decision recorded",
 
-            "approval_id": approval.id
+            "approval_id": result["approval"].id,
+
+            "quote_release_document_id": result["quote_release_document_id"]
 
         }
 

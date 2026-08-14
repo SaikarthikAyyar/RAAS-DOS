@@ -27,7 +27,7 @@ export default async function handler(req, res){
         return;
     }
 
-    const { to, subject, text, fromTag } = req.body || {};
+    const { to, subject, text, fromTag, attachment } = req.body || {};
 
     if(!to || !subject || !text){
         res.status(400).json({ ok:false, error:"to, subject, and text are required" });
@@ -63,12 +63,21 @@ export default async function handler(req, res){
             }
         });
 
-        await transporter.sendMail({
+        const mail = {
             from:`${process.env.SMTP_FROM_NAME || "RAAS-DOS"} <${buildFromAddress(fromTag)}>`,
             to,
             subject,
             text
-        });
+        };
+
+        if(attachment && attachment.filename && attachment.contentBase64){
+            mail.attachments = [{
+                filename: attachment.filename,
+                content: Buffer.from(attachment.contentBase64, "base64")
+            }];
+        }
+
+        await transporter.sendMail(mail);
 
         res.status(200).json({ ok:true });
 

@@ -2,7 +2,9 @@
 # IMPORTS
 # ====================================
 
-import re
+import base64
+
+from backend.utils.template_rendering import substitute_tokens
 
 from backend.repositories.email_template_repository import (
     get_all_templates,
@@ -32,16 +34,10 @@ from backend.repositories.notification_repository import record_business_master_
 
 def render_template(subject, body, variable_values):
 
-    variable_values = variable_values or {}
-
-    def substitute(text):
-        return re.sub(
-            r"\{(\w+)\}",
-            lambda match: str(variable_values.get(match.group(1), match.group(0))),
-            text
-        )
-
-    return substitute(subject), substitute(body)
+    return (
+        substitute_tokens(subject, variable_values),
+        substitute_tokens(body, variable_values)
+    )
 
 
 # ====================================
@@ -268,7 +264,17 @@ def render_template_request(db, template_id, variable_values):
     return {"subject": subject, "body": body}
 
 
-def send_template_email(db, template_id, variable_values, subject_override=None, body_override=None):
+def send_template_email(
+
+    db,
+    template_id,
+    variable_values,
+    subject_override=None,
+    body_override=None,
+    attachment_filename=None,
+    attachment_bytes=None
+
+):
 
     template = get_template_by_id(db, template_id)
 
@@ -295,7 +301,16 @@ def send_template_email(db, template_id, variable_values, subject_override=None,
     subject = subject_override if subject_override is not None else subject
     body = body_override if body_override is not None else body
 
-    post_to_relay(to_email, subject, body)
+    attachment = None
+
+    if attachment_bytes:
+
+        attachment = {
+            "filename": attachment_filename,
+            "contentBase64": base64.b64encode(attachment_bytes).decode("ascii")
+        }
+
+    post_to_relay(to_email, subject, body, attachment=attachment)
 
 
 # ====================================

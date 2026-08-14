@@ -2,7 +2,11 @@
 # IMPORTS
 # ====================================
 
-from fastapi import APIRouter, Depends
+import json
+
+from typing import Optional
+
+from fastapi import APIRouter, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
@@ -15,8 +19,7 @@ from backend.schemas.email_template_schema import (
     EmailTemplateVariableUpdate,
     EmailTemplateVariableResponse,
     EmailTemplateRenderRequest,
-    EmailTemplateRenderResponse,
-    EmailTemplateSendRequest
+    EmailTemplateRenderResponse
 )
 
 from backend.schemas.notification_schema import BusinessMasterActionSchema
@@ -98,12 +101,27 @@ def render_template(template_id: int, payload: EmailTemplateRenderRequest, db: S
 
 
 @api.post("/{template_id}/send")
-def send_template(template_id: int, payload: EmailTemplateSendRequest, db: Session = Depends(get_db)):
+async def send_template(
+
+    template_id: int,
+    variable_values: str = Form("{}"),
+    subject_override: Optional[str] = Form(None),
+    body_override: Optional[str] = Form(None),
+    attachment: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db)
+
+):
+
+    attachment_bytes = await attachment.read() if attachment is not None else None
+    attachment_filename = attachment.filename if attachment is not None else None
+
     send_template_email(
         db,
         template_id,
-        payload.variable_values,
-        payload.subject_override,
-        payload.body_override
+        json.loads(variable_values),
+        subject_override,
+        body_override,
+        attachment_filename,
+        attachment_bytes
     )
     return {"success": True}
