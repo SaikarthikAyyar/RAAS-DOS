@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 
 import {
-    advanceStageAtLeast
+    requestOpsReview
 }
 from "../../../services/enquiryWorkspaceService";
 
@@ -134,17 +134,19 @@ export default function SurveySummary({
 
     async function handleRequestOpsReview(){
 
-        await advanceStageAtLeast(
-
-            enquiry.id,
-
-            "OPS_REVIEW"
-
-        );
+        await requestOpsReview(enquiry.id);
 
         reload();
 
     }
+
+    const opsReviewWaitingOnSelector =
+
+        enquiry.stage === "SALES_SURVEY" &&
+
+        Boolean(enquiry.ops_review_requested_at) &&
+
+        !enquiry.ops_selector_id;
 
     return(
 
@@ -994,6 +996,18 @@ export default function SurveySummary({
                             Request Ops Review
 
                         </button>
+
+                        {
+                            opsReviewWaitingOnSelector && (
+
+                                <span className="survey-reminder-status">
+
+                                    Ops Review requested — waiting for the Ops Selector to run.
+
+                                </span>
+
+                            )
+                        }
 
                         {
                             inSurveyStage && reminderStatus && (

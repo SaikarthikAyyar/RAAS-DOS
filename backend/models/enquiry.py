@@ -146,6 +146,16 @@ class Enquiry(Base):
         server_default=func.now()
     )
 
+    # Set when the Survey tab's "Request Ops Review" button is clicked.
+    # SALES_SURVEY -> OPS_REVIEW only actually fires once this is set AND
+    # ops_selector_id is set (see enquiry_consolidated_service.py::
+    # request_ops_review / ops_selector_service.py::create_ops_selection_request) -
+    # so the stage never claims Ops Review before the Ops Selector has run.
+    ops_review_requested_at = Column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+
     owner_role = Column(
         String(50),
         nullable=True

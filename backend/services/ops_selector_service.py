@@ -38,6 +38,11 @@ from backend.models.enquiry import Enquiry
 
 from backend.services.enquiry_consolidated_service import update_module_reference
 
+from backend.services.workflow_service import (
+    advance_to_next_stage,
+    WorkflowStage
+)
+
 
 
 
@@ -369,14 +374,37 @@ def create_ops_selection_request(
         )
 
         # Saving/regenerating the Ops Selector is a pure data operation -
-        # it must never move the workflow stage forward. Only the human
-        # "Approve & Send to Techno-Commercial" decision on the Ops
-        # Review Decision card (save_ops_review_decision below) is
+        # it must never move the workflow stage forward on its own. Only
+        # the human "Approve & Send to Techno-Commercial" decision on the
+        # Ops Review Decision card (save_ops_review_decision below) is
         # allowed to do that.
-        print(
-            f"[Workflow] Enquiry {target_enquiry.id} -> "
-            f"ops_selector_id={ops.id} (stage unchanged - data save only)"
-        )
+        #
+        # One narrow exception: if the Survey tab's "Request Ops Review"
+        # button was already clicked (ops_review_requested_at set) and the
+        # enquiry is still sitting in SALES_SURVEY, this algorithm run is
+        # what fulfills that already-made request - advance to OPS_REVIEW
+        # now, since both halves of the AND-gate are finally true. This is
+        # the mirror of the check in enquiry_consolidated_service.py::
+        # request_ops_review(), which does the same thing from the other
+        # side when the button is clicked after the algorithm already ran.
+        if (
+            target_enquiry.stage == WorkflowStage.SALES_SURVEY.value
+            and target_enquiry.ops_review_requested_at is not None
+        ):
+
+            advance_to_next_stage(db, target_enquiry.id)
+
+            print(
+                f"[Workflow] Enquiry {target_enquiry.id} -> "
+                f"ops_selector_id={ops.id}, pending request fulfilled - stage advanced to OPS_REVIEW"
+            )
+
+        else:
+
+            print(
+                f"[Workflow] Enquiry {target_enquiry.id} -> "
+                f"ops_selector_id={ops.id} (stage unchanged - data save only)"
+            )
 
     else:
 

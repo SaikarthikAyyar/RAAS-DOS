@@ -21,7 +21,8 @@ from backend.services.enquiry_service import EnquiryService
 from backend.services.workflow_service import (
     advance_to_next_stage,
     update_stage,
-    advance_stage_at_least
+    advance_stage_at_least,
+    WorkflowStage
 )
 
 from backend.models.techno_commercial_quote import Quote
@@ -308,10 +309,36 @@ def request_ops_review(
     enquiry_id
 ):
 
-    return advance_to_next_stage(
-        db,
-        enquiry_id
-    )
+    enquiry = repository.get_enquiry(db, enquiry_id)
+
+    if not enquiry:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Enquiry not found."
+        )
+
+    # Always record that the request was made - this is the "button
+    # pushed" half of the AND-gate, independent of whether the Ops
+    # Selector algorithm has run yet.
+    enquiry.ops_review_requested_at = datetime.utcnow()
+    db.commit()
+    db.refresh(enquiry)
+
+    # Only actually enter Ops Review once BOTH halves are true: the
+    # request was just made AND an OpsSelection already exists for this
+    # enquiry (the algorithm has run and produced a recommendation).
+    # A stale click on an enquiry that's already moved past Sales Survey
+    # (the button isn't stage-gated in the UI) is a safe no-op here.
+    if (
+        enquiry.stage == WorkflowStage.SALES_SURVEY.value
+        and enquiry.ops_selector_id is not None
+    ):
+        return advance_to_next_stage(
+            db,
+            enquiry_id
+        )
+
+    return enquiry
 
 
 # ====================================

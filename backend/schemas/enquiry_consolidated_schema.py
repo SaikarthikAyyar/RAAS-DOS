@@ -105,6 +105,8 @@ class EnquiryConsolidatedDetail(EnquiryConsolidatedListItem):
 
     ops_selector_id: Optional[int] = None
 
+    ops_review_requested_at: Optional[datetime] = None
+
     dewatering_assessment_id: Optional[int] = None
 
     quote_id: Optional[int] = None
