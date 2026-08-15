@@ -908,7 +908,7 @@ def list_quotes_request(
 
     items = []
 
-    for quote, company_name, enquiry_id in rows:
+    for quote, company_name, enquiry_id, enquiry_stage in rows:
 
         items.append({
 
@@ -921,6 +921,8 @@ def list_quotes_request(
             "customer_name": company_name,
 
             "enquiry_id": enquiry_id,
+
+            "enquiry_stage": enquiry_stage,
 
             "revision_number": quote.revision_number,
 

@@ -24,7 +24,11 @@ from backend.utils.template_rendering import substitute_tokens
 
 from backend.reporting.quote_release_docx import (
     build_tank_machine_table,
-    build_commercial_table
+    build_techno_commercial_summary_table,
+    add_cover_logo,
+    add_header_logo,
+    set_document_base_font,
+    add_body_paragraph
 )
 
 
@@ -41,7 +45,7 @@ FALLBACK_BODY = (
     "Proposal No: {proposal_no}\nEnquiry reference no: {enquiry_ref}\n"
     "Proposal Submission Date: {proposal_date}\n\n"
     "TANK / MACHINE DETAILS\n{tank_machine_table}\n\n"
-    "COMMERCIAL PROPOSAL\n{commercial_table}\n\n"
+    "TECHNO-COMMERCIAL QUOTE SUMMARY\n{commercial_table}\n\n"
     "Valid till: {valid_till}\n\n"
     "Thanks & regards,\nJanyu Technologies Pvt Ltd"
 )
@@ -127,6 +131,12 @@ def generate_quote_release_docx(db, quote_id, enquiry_id, generated_by):
 
     doc = Document()
 
+    set_document_base_font(doc)
+    add_header_logo(doc)
+    add_cover_logo(doc)
+
+    format_state = {"active": True, "section_number": 0}
+
     for line in body.split("\n"):
 
         stripped = line.strip()
@@ -137,22 +147,11 @@ def generate_quote_release_docx(db, quote_id, enquiry_id, generated_by):
 
         elif stripped == "{commercial_table}":
 
-            description = (
-                f"{sales_survey.material_category} cleaning - {sales_survey.job_type}"
-                if sales_survey and sales_survey.material_category and sales_survey.job_type
-                else "Cleaning / sludge removal service"
-            )
-
-            build_commercial_table(
-                doc,
-                description,
-                sales_survey.estimated_volume if sales_survey else None,
-                quote.final_approved_value
-            )
+            build_techno_commercial_summary_table(doc, quote)
 
         else:
 
-            doc.add_paragraph(substitute_tokens(line, tokens))
+            add_body_paragraph(doc, substitute_tokens(line, tokens), format_state)
 
     folder = f"backend/uploads/quote_releases/{enquiry_id}"
     os.makedirs(folder, exist_ok=True)
@@ -215,18 +214,37 @@ SAMPLE_MACHINE = SimpleNamespace(
     hazard_rating="Standard"
 )
 
-SAMPLE_FINAL_VALUE = 2500000
+SAMPLE_QUOTE = SimpleNamespace(
+    mobilisation_cost_min=175000, mobilisation_cost_max=175000,
+    setup_cost_min=125000, setup_cost_max=125000,
+    execution_cost_min=375000, execution_cost_max=450000,
+    pump_addon_cost_min=10000, pump_addon_cost_max=15000,
+    documentation_buffer=15000,
+    access_support_buffer=25000,
+    overhead_cost_min=108750, overhead_cost_max=127500,
+    contingency_cost_min=72500, contingency_cost_max=85000,
+    margin_value_min=226563, margin_value_max=265625,
+    dewatering_addon_min=0, dewatering_addon_max=50000,
+    combined_budgetary_value_min=1132813, combined_budgetary_value_max=1333125,
+    final_approved_value=1200000
+)
 
 
 def generate_quote_template_preview_docx(template):
 
     doc = Document()
 
+    set_document_base_font(doc)
+    add_header_logo(doc)
+    add_cover_logo(doc)
+
     body = template.body or ""
 
     if not body.strip():
 
         doc.add_paragraph("This template has no body yet - add content via Edit first.")
+
+    format_state = {"active": True, "section_number": 0}
 
     for line in body.split("\n"):
 
@@ -238,18 +256,11 @@ def generate_quote_template_preview_docx(template):
 
         elif stripped == "{commercial_table}":
 
-            description = f"{SAMPLE_SALES_SURVEY.material_category} cleaning - {SAMPLE_SALES_SURVEY.job_type}"
-
-            build_commercial_table(
-                doc,
-                description,
-                SAMPLE_SALES_SURVEY.estimated_volume,
-                SAMPLE_FINAL_VALUE
-            )
+            build_techno_commercial_summary_table(doc, SAMPLE_QUOTE)
 
         else:
 
-            doc.add_paragraph(substitute_tokens(line, SAMPLE_TOKENS))
+            add_body_paragraph(doc, substitute_tokens(line, SAMPLE_TOKENS), format_state)
 
     buffer = io.BytesIO()
     doc.save(buffer)

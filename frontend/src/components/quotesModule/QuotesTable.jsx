@@ -1,5 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
+import { STAGE_LABELS } from "../../data/workflowStages";
+
+import { useAuth } from "../../contexts/AuthContext";
+
+import { generateQuoteReleaseUrl } from "../../services/quotesModuleService";
+
+const STAGE_ORDER = Object.keys(STAGE_LABELS);
+
 function inr(value){
 
     if(value===null || value===undefined) return "-";
@@ -8,11 +16,16 @@ function inr(value){
 
 }
 
-function statusClass(label){
+function stageClass(stage){
 
-    if(label==="Approved") return "quotes-status quotes-status-approved";
-    if(label==="Rejected") return "quotes-status quotes-status-rejected";
-    if(label==="Revision Requested") return "quotes-status quotes-status-revision";
+    if(stage==="QUOTE_RELEASED" || stage==="PO_RECEIVED" || stage==="JOB_CREATION" || stage==="EXECUTION" || stage==="COMPLETED"){
+        return "quotes-status quotes-status-approved";
+    }
+
+    if(stage==="COMMERCIAL_APPROVAL" || stage==="TECHNO_COMMERCIAL_APPROVAL"){
+        return "quotes-status quotes-status-revision";
+    }
+
     return "quotes-status quotes-status-default";
 
 }
@@ -28,6 +41,8 @@ export default function QuotesTable({
 }){
 
     const navigate = useNavigate();
+
+    const { user } = useAuth();
 
     function handleOpen(item){
 
@@ -70,7 +85,7 @@ export default function QuotesTable({
                             <th>Quote ID</th>
                             <th>Customer</th>
                             <th>Range</th>
-                            <th>Status</th>
+                            <th>Stage</th>
                             <th>PO</th>
                             <th></th>
                         </tr>
@@ -79,7 +94,13 @@ export default function QuotesTable({
                     <tbody>
 
                         {
-                            items.length ? items.map(item=>(
+                            items.length ? items.map(item=>{
+
+                                const stageIndex = STAGE_ORDER.indexOf(item.enquiry_stage);
+                                const quoteReleasedIndex = STAGE_ORDER.indexOf("QUOTE_RELEASED");
+                                const canGenerateRelease = item.enquiry_stage && stageIndex >= quoteReleasedIndex;
+
+                                return (
 
                                 <tr key={item.id}>
 
@@ -94,14 +115,14 @@ export default function QuotesTable({
                                     </td>
 
                                     <td>
-                                        <span className={statusClass(item.status_label)}>
-                                            {item.status_label}
+                                        <span className={stageClass(item.enquiry_stage)}>
+                                            {STAGE_LABELS[item.enquiry_stage] || item.enquiry_stage || "-"}
                                         </span>
                                     </td>
 
                                     <td>-</td>
 
-                                    <td>
+                                    <td style={{display:"flex", gap:8, alignItems:"center"}}>
 
                                         {
                                             item.enquiry_id ? (
@@ -125,11 +146,33 @@ export default function QuotesTable({
                                             )
                                         }
 
+                                        {
+                                            canGenerateRelease && (
+
+                                                <a
+
+                                                    className="quotes-open-btn"
+
+                                                    href={generateQuoteReleaseUrl(item.id, user?.name)}
+
+                                                    title="Generate the quote release document for this quote (uses the active Quote Template, with this enquiry's real tank/machine and rate data)"
+
+                                                >
+
+                                                    Generate Quote Release
+
+                                                </a>
+
+                                            )
+                                        }
+
                                     </td>
 
                                 </tr>
 
-                            )) : (
+                                );
+
+                            }) : (
 
                                 <tr>
                                     <td colSpan={6} className="quotes-empty">No quotes match.</td>

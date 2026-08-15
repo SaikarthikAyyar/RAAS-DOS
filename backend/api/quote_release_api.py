@@ -2,16 +2,24 @@
 # IMPORTS
 # ====================================
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
 
+from backend.models.enquiry import Enquiry
+
 from backend.repositories.quote_release_document_repository import (
     get_quote_release_document,
     get_latest_quote_release_document_by_quote
 )
+
+from backend.services.quote_release_service import generate_quote_release_docx
+
+from backend.services.workflow_service import WORKFLOW_ORDER, WorkflowStage
 
 
 router = APIRouter()
@@ -49,6 +57,57 @@ def download_quote_release_document(document_id: int, db: Session = Depends(get_
 
     if document is None:
         raise HTTPException(status_code=404, detail="Quote release document not found.")
+
+    return FileResponse(
+        document.file_path,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename=document.file_name
+    )
+
+
+# ====================================
+# GENERATE (from the Quotes module) - lets a real quote already at
+# QUOTE_RELEASED stage (or any later stage - a release stays valid
+# once reached) get its release document generated/regenerated on
+# demand, streamed straight back for immediate browser download. Calls
+# the exact same generate_quote_release_docx() the Commercial Approval
+# Accept flow uses - no separate content-generation path, so the
+# active Quote Template (edited only from Business Masters -> Quote
+# Templates) is the sole source of the document's structure; this
+# endpoint only supplies which enquiry's real data to assign into it.
+# ====================================
+
+@router.get("/quotes/{quote_id}/generate-quote-release")
+def generate_quote_release_for_quote(
+
+    quote_id: int,
+    generated_by: Optional[str] = None,
+    db: Session = Depends(get_db)
+
+):
+
+    enquiry = db.query(Enquiry).filter(Enquiry.quote_id == quote_id).first()
+
+    if enquiry is None:
+        raise HTTPException(status_code=422, detail="No enquiry is currently linked to this quote.")
+
+    try:
+        current_index = WORKFLOW_ORDER.index(enquiry.stage)
+    except ValueError:
+        current_index = -1
+
+    quote_released_index = WORKFLOW_ORDER.index(WorkflowStage.QUOTE_RELEASED.value)
+
+    if current_index < quote_released_index:
+        raise HTTPException(
+            status_code=422,
+            detail="This enquiry must reach Quote Released stage before a quote release document can be generated."
+        )
+
+    try:
+        document = generate_quote_release_docx(db, quote_id, enquiry.id, generated_by or "Quotes Module")
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error))
 
     return FileResponse(
         document.file_path,

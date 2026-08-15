@@ -239,6 +239,8 @@ class QuoteListItemSchema(BaseModel):
 
     enquiry_id: int | None = None
 
+    enquiry_stage: str | None = None
+
     revision_number: int | None = None
 
     workflow_status: str | None = None

@@ -50,3 +50,16 @@ export async function getQuotesList({
     return data;
 
 }
+
+
+// ====================================
+// GENERATE QUOTE RELEASE
+// ====================================
+
+export function generateQuoteReleaseUrl(quoteId, generatedBy){
+
+    const query = generatedBy ? `?generated_by=${encodeURIComponent(generatedBy)}` : "";
+
+    return `${API}/quotes/${quoteId}/generate-quote-release${query}`;
+
+}

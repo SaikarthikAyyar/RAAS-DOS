@@ -13,6 +13,7 @@ from backend.models.customer_requests import CustomerRequest
 from backend.models.enquiry import Enquiry
 
 from sqlalchemy import func, or_, and_, cast, String
+from sqlalchemy.orm import aliased
 
 
 logger = logging.getLogger(__name__)
@@ -564,6 +565,8 @@ def list_quotes(
 
     )
 
+    linked_enquiry = aliased(Enquiry)
+
     query = (
 
         db.query(
@@ -572,7 +575,9 @@ def list_quotes(
 
             CustomerRequest.company_name,
 
-            enquiry_link_subq.c.enquiry_id
+            enquiry_link_subq.c.enquiry_id,
+
+            linked_enquiry.stage
 
         )
 
@@ -591,6 +596,14 @@ def list_quotes(
             enquiry_link_subq,
 
             enquiry_link_subq.c.quote_id == Quote.id
+
+        )
+
+        .outerjoin(
+
+            linked_enquiry,
+
+            linked_enquiry.id == enquiry_link_subq.c.enquiry_id
 
         )
 
