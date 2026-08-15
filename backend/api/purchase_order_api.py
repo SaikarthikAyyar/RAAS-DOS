@@ -30,8 +30,6 @@ async def upload_purchase_order(
 
     enquiry_id: int,
     file: UploadFile = File(...),
-    po_number: Optional[str] = Form(None),
-    po_value: Optional[float] = Form(None),
     uploaded_by: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 
@@ -40,7 +38,7 @@ async def upload_purchase_order(
     try:
 
         return await upload_purchase_order_request(
-            db, enquiry_id, file, po_number, po_value, uploaded_by
+            db, enquiry_id, file, uploaded_by
         )
 
     except ValueError as error:

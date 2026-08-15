@@ -20,14 +20,12 @@ export async function listPurchaseOrders(enquiryId){
 }
 
 
-export async function uploadPurchaseOrder(enquiryId, { file, poNumber, poValue, uploadedBy }){
+export async function uploadPurchaseOrder(enquiryId, { file, uploadedBy }){
 
     const formData = new FormData();
 
     formData.append("file", file);
 
-    if(poNumber) formData.append("po_number", poNumber);
-    if(poValue!==undefined && poValue!==null && poValue!=="") formData.append("po_value", poValue);
     if(uploadedBy) formData.append("uploaded_by", uploadedBy);
 
     const response = await fetch(

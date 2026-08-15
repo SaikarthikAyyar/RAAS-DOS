@@ -31,10 +31,11 @@ function formatDate(value){
 
 // ====================================
 // COMPONENT
-// Upload requires the enquiry to have reached QUOTE_RELEASED. Every
-// row is independently deletable and re-uploadable - multiple real
-// POs can exist across multiple quote-release cycles, and deleting
-// one never regresses the enquiry's stage (matches the backend).
+// Upload requires the enquiry to have reached QUOTE_RELEASED, and only
+// while no PO is already on file - only one PO can be accepted at a
+// time (matches the backend). PO Number/Value are server-computed from
+// real enquiry/quote data, never typed here. Removing the on-file PO
+// re-enables the upload form; deleting never regresses stage.
 // ====================================
 
 export default function POSummary({
@@ -54,8 +55,6 @@ export default function POSummary({
     const [error, setError] = useState("");
 
     const [file, setFile] = useState(null);
-    const [poNumber, setPoNumber] = useState("");
-    const [poValue, setPoValue] = useState("");
     const [uploading, setUploading] = useState(false);
 
     async function load(){
@@ -133,15 +132,11 @@ export default function POSummary({
             await uploadPurchaseOrder(enquiry.id, {
 
                 file,
-                poNumber,
-                poValue,
                 uploadedBy: user?.name
 
             });
 
             setFile(null);
-            setPoNumber("");
-            setPoValue("");
 
             await load();
             reload?.();
@@ -257,31 +252,34 @@ export default function POSummary({
                     )
                 }
 
-                <h4 className="ops-subheading">Upload a PO</h4>
-
                 {
-                    canUpload ? (
+                    !canUpload ? (
 
                         <>
+                            <h4 className="ops-subheading">Upload a PO</h4>
+
+                            <p className="survey-empty">
+                                Waiting on the quote to be released (Commercial Approval) before a PO can be uploaded.
+                            </p>
+                        </>
+
+                    ) : orders.length > 0 ? (
+
+                        <p className="survey-empty" style={{marginTop:8}}>
+                            A PO is already on file. Remove it to upload a replacement.
+                        </p>
+
+                    ) : (
+
+                        <>
+
+                            <h4 className="ops-subheading">Upload a PO</h4>
 
                             <div className="ops-override-form">
 
                                 <input
                                     type="file"
                                     onChange={e=>setFile(e.target.files?.[0] || null)}
-                                />
-
-                                <input
-                                    placeholder="PO Number"
-                                    value={poNumber}
-                                    onChange={e=>setPoNumber(e.target.value)}
-                                />
-
-                                <input
-                                    type="number"
-                                    placeholder="PO Value (INR)"
-                                    value={poValue}
-                                    onChange={e=>setPoValue(e.target.value)}
                                 />
 
                             </div>
@@ -299,12 +297,6 @@ export default function POSummary({
                             </div>
 
                         </>
-
-                    ) : (
-
-                        <p className="survey-empty">
-                            Waiting on the quote to be released (Commercial Approval) before a PO can be uploaded.
-                        </p>
 
                     )
                 }
