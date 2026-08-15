@@ -122,6 +122,111 @@ def sync_asset_profile_from_survey(
 
 
 # ====================================
+# ASSET PROFILE -> SALES SURVEY PREFILL
+# The read side of SURVEY_PROFILE_FIELDS/sync_asset_profile_from_survey
+# above - maps a saved Asset.profile blob (keyed by SalesSurvey column
+# names) back into the {job, geometry, safety, pump} shape
+# get_sales_prefill() returns, so a repeat survey at a known asset
+# starts pre-filled with the site's last recorded details instead of
+# asking the field team to re-measure everything from scratch. Field
+# names differ in a few places between the SalesSurvey model (used to
+# build the stored profile) and the Sales Survey form's own section
+# field keys (used here) - tank_length/tank_width/tank_depth become
+# geometry.length_dia/width/sludge_depth; everything else matches 1:1.
+# ====================================
+
+PROFILE_FIELD_MAP = {
+    "material_category": ("job", "material_category"),
+    "sludge_hardness": ("job", "sludge_hardness"),
+    "debris_level": ("job", "debris_level"),
+    "water_visibility": ("job", "water_visibility"),
+    "hazard_level": ("job", "hazard_level"),
+    "abrasiveness": ("job", "abrasiveness"),
+
+    "tank_type": ("geometry", "tank_type"),
+    "tank_length": ("geometry", "length_dia"),
+    "tank_width": ("geometry", "width"),
+    "tank_depth": ("geometry", "sludge_depth"),
+    "opening_length": ("geometry", "opening_length"),
+    "opening_width": ("geometry", "opening_width"),
+    "opening_height": ("geometry", "opening_height"),
+    "height_from_ground": ("geometry", "height_from_ground"),
+    "drop_to_floor": ("geometry", "drop_to_floor"),
+    "setup_distance": ("geometry", "setup_distance"),
+    "vertical_lift": ("geometry", "vertical_lift"),
+    "hose_distance": ("geometry", "hose_distance"),
+    "access_path_width": ("geometry", "access_path_width"),
+    "access_support": ("geometry", "access_support"),
+    "customer_support": ("geometry", "customer_support"),
+    "access_type": ("geometry", "access_type"),
+    "equipment_nearby": ("geometry", "equipment_nearby"),
+    "scaffolding_needed": ("geometry", "scaffolding_needed"),
+    "crane_available": ("geometry", "crane_available"),
+    "tank_location": ("geometry", "tank_location"),
+    "setup_complexity": ("geometry", "setup_complexity"),
+
+    "power_available": ("safety", "power_available"),
+    "water_available": ("safety", "water_available"),
+    "air_supply_available": ("safety", "air_supply_available"),
+    "confined_space": ("safety", "confined_space"),
+    "ventilation_required": ("safety", "ventilation_required"),
+    "gas_testing_required": ("safety", "gas_testing_required"),
+    "ehs_restriction": ("safety", "ehs_restriction"),
+    "power_distance": ("safety", "power_distance"),
+
+    "ph_condition": ("pump", "ph_condition"),
+    "pump_power_source": ("pump", "pump_power_source"),
+    "discharge_medium": ("pump", "discharge_medium"),
+    "disposal_route": ("pump", "disposal_route"),
+    "disposal_responsibility": ("pump", "disposal_responsibility"),
+    "discharge_point_distance": ("pump", "discharge_point_distance"),
+}
+
+
+# Real Boolean columns on SalesSurvey - the live survey path
+# (sales_survey_service.py's own "safety"/"geometry" builders)
+# converts each of these to a "Yes"/"No" string before display rather
+# than passing the raw boolean through; matched here so a repeat
+# survey's prefilled values render identically to a submitted one.
+BOOLEAN_PROFILE_FIELDS = {
+    "water_available", "confined_space", "ventilation_required",
+    "gas_testing_required", "scaffolding_needed", "crane_available"
+}
+
+
+def build_prefill_from_asset_profile(profile):
+
+    sections = {"job": {}, "geometry": {}, "safety": {}, "pump": {}}
+
+    if not profile:
+        return sections
+
+    for profile_field, (section, prefill_key) in PROFILE_FIELD_MAP.items():
+
+        value = profile.get(profile_field)
+
+        if value is None:
+            continue
+
+        if profile_field in BOOLEAN_PROFILE_FIELDS:
+            value = "Yes" if value else "No"
+
+        sections[section][prefill_key] = value
+
+    return sections
+
+
+def get_asset_for_customer_request(db, customer_request_id):
+
+    enquiry = get_enquiry_by_customer_request(db, customer_request_id)
+
+    if not enquiry or not enquiry.asset_id:
+        return None
+
+    return get_asset(db, enquiry.asset_id)
+
+
+# ====================================
 # ASSET DETAIL (single asset - for the Enquiry Workspace's
 # Asset Profile card, shown before a Sales Survey has ever been
 # submitted for an enquiry linked to a known asset)

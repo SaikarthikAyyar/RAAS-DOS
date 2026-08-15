@@ -6,6 +6,8 @@ import {
     deletePurchaseOrder
 } from "../../../services/purchaseOrderService";
 
+import { advanceStageAtLeast } from "../../../services/enquiryWorkspaceService";
+
 import { STAGE_LABELS } from "../../../data/workflowStages";
 
 import { useAuth } from "../../../contexts/AuthContext";
@@ -56,6 +58,7 @@ export default function POSummary({
 
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
+    const [proceeding, setProceeding] = useState(false);
 
     async function load(){
 
@@ -113,7 +116,10 @@ export default function POSummary({
 
     const stageIndex = STAGE_ORDER.indexOf(enquiry.stage);
     const quoteReleasedIndex = STAGE_ORDER.indexOf("QUOTE_RELEASED");
+    const poReceivedIndex = STAGE_ORDER.indexOf("PO_RECEIVED");
+    const jobCreationIndex = STAGE_ORDER.indexOf("JOB_CREATION");
     const canUpload = stageIndex >= quoteReleasedIndex;
+    const canProceedToJobCreation = stageIndex >= poReceivedIndex && stageIndex < jobCreationIndex && orders.length > 0;
 
     async function handleUpload(){
 
@@ -175,6 +181,36 @@ export default function POSummary({
         catch(err){
 
             alert(err?.detail || "Unable to remove this PO.");
+
+        }
+
+    }
+
+    async function handleProceed(){
+
+        if(!window.confirm("Proceed to Job Creation? This advances the enquiry's stage.")){
+            return;
+        }
+
+        setProceeding(true);
+
+        try{
+
+            await advanceStageAtLeast(enquiry.id, "JOB_CREATION");
+
+            reload?.();
+
+        }
+
+        catch(err){
+
+            alert(err?.detail || "Unable to proceed to Job Creation.");
+
+        }
+
+        finally{
+
+            setProceeding(false);
 
         }
 
@@ -297,6 +333,24 @@ export default function POSummary({
                             </div>
 
                         </>
+
+                    )
+                }
+
+                {
+                    canProceedToJobCreation && (
+
+                        <div className="survey-actions" style={{marginTop:16}}>
+
+                            <button
+                                className="survey-action-button survey-action-button-orange"
+                                onClick={handleProceed}
+                                disabled={proceeding}
+                            >
+                                {proceeding ? "Proceeding..." : "Proceed to Job Creation"}
+                            </button>
+
+                        </div>
 
                     )
                 }

@@ -21,7 +21,11 @@ from backend.services.customer_master_service import (
 
     resolve_or_create_customer,
 
-    resolve_or_create_asset
+    resolve_or_create_asset,
+
+    get_asset_for_customer_request,
+
+    build_prefill_from_asset_profile
 
 )
 
@@ -243,10 +247,27 @@ def get_sales_prefill(
 
 
     # ====================================
+    # ASSET PROFILE OVERLAY
+    # If this Customer Request's Enquiry is linked to a known Asset
+    # that already has a saved profile (from a previous survey at the
+    # same site), that data takes precedence over these mostly-dead
+    # CustomerRequest columns for geometry/safety/pump - a repeat job
+    # at the same tank starts pre-filled with the site's last recorded
+    # details instead of asking the field team to re-measure everything.
+    # ====================================
+
+    asset = get_asset_for_customer_request(db, customer_request_id)
+
+    profile_overlay = build_prefill_from_asset_profile(
+        asset.profile if asset else None
+    )
+
+
+    # ====================================
     # RETURN SALES SURVEY STRUCTURE
     # ====================================
 
-    return {
+    result = {
 
 
         # ====================================
@@ -395,6 +416,13 @@ def get_sales_prefill(
         }
 
     }
+
+    result["job"] = {**result["job"], **profile_overlay["job"]}
+    result["geometry"] = {**result["geometry"], **profile_overlay["geometry"]}
+    result["safety"] = {**result["safety"], **profile_overlay["safety"]}
+    result["pump"] = {**result["pump"], **profile_overlay["pump"]}
+
+    return result
 
 # ====================================
 # GET ALL CUSTOMERS
