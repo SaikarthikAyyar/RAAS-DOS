@@ -239,6 +239,49 @@ export async function deleteCustomer(
 
 
 // ====================================
+// DELETE ASSET
+// ====================================
+
+export async function deleteAsset(
+
+    assetId,
+
+    actor,
+
+    remark
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/assets/${assetId}`,
+
+        {
+
+            method:"DELETE",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({ actor, remark })
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // CUSTOMER DETAIL (360)
 // ====================================
 

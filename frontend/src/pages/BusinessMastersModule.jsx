@@ -46,7 +46,9 @@ import {
 
     updateCustomer,
 
-    deleteCustomer
+    deleteCustomer,
+
+    deleteAsset
 
 } from "../services/customerMasterService";
 
@@ -269,6 +271,32 @@ function CustomersTab({
 
     }
 
+    async function handleDeleteAsset(assetId){
+
+        const remark = await promptForRemark("Removing this asset");
+
+        if(remark===null){
+            return;
+        }
+
+        try{
+
+            await deleteAsset(assetId, buildActor(user), remark);
+
+            loadDetail(selectedCustomerId);
+
+            onReload();
+
+        }
+
+        catch(err){
+
+            alert(err?.detail || "Unable to delete asset.");
+
+        }
+
+    }
+
     return(
 
         <>
@@ -298,6 +326,8 @@ function CustomersTab({
                         onEdit={()=>setShowEditCustomerModal(true)}
 
                         onDelete={handleDeleteCustomer}
+
+                        onDeleteAsset={handleDeleteAsset}
 
                     />
 

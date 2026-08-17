@@ -21,6 +21,8 @@ from backend.repositories.customer_master_repository import (
     find_asset_by_path,
     create_asset,
     update_asset_profile,
+    delete_asset,
+    get_enquiries_by_asset,
     set_asset_survey_profile,
     get_enquiry_by_customer_request,
     set_follow_up,
@@ -511,6 +513,55 @@ def delete_customer_request(
         actor_role=actor.role,
         title=f"{actor.name} deleted customer '{company_name}' from Business Masters",
         changes=[{"field": "company_name", "before": company_name, "after": None}],
+        remark=remark
+    )
+
+    return "deleted"
+
+
+# ====================================
+# DELETE ASSET (admin-only, gated client-side)
+# Blocked outright if any enquiry still references this asset -
+# Enquiry.asset_id has no ON DELETE CASCADE.
+# ====================================
+
+def delete_asset_request(
+        db,
+        asset_id,
+        actor,
+        remark
+):
+    asset = get_asset(db, asset_id)
+
+    if not asset:
+        return "not_found"
+
+    if get_enquiries_by_asset(db, asset_id):
+
+        raise ValueError(
+            "Cannot delete an asset with enquiries on file. Remove them first."
+        )
+
+    label = " → ".join(filter(None, [
+        asset.division, asset.plant, asset.department, asset.name
+    ])) or "Unnamed asset"
+
+    customer = get_customer(db, asset.customer_id) if asset.customer_id else None
+
+    delete_asset(db, asset)
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="DELETE",
+        actor_user_id=actor.user_id,
+        actor_name=actor.name,
+        actor_role=actor.role,
+        title=(
+            f"{actor.name} deleted asset '{label}' from "
+            f"{customer.company_name if customer else 'a customer'} in Business Masters"
+        ),
+        changes=[{"field": "asset", "before": label, "after": None}],
         remark=remark
     )
 

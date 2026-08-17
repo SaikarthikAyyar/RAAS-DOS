@@ -109,7 +109,9 @@ export default function CustomerDetailView({
 
     onEdit,
 
-    onDelete
+    onDelete,
+
+    onDeleteAsset
 
 }){
 
@@ -407,7 +409,7 @@ export default function CustomerDetailView({
                 <table>
 
                     <thead>
-                        <tr><th>Division</th><th>Plant</th><th>Department</th><th>Asset</th><th>Next due</th><th>Last verified</th></tr>
+                        <tr><th>Division</th><th>Plant</th><th>Department</th><th>Asset</th><th>Next due</th><th>Last verified</th>{isAdmin && <th></th>}</tr>
                     </thead>
 
                     <tbody>
@@ -416,7 +418,7 @@ export default function CustomerDetailView({
 
                             detail.assets.length===0 ? (
 
-                                <tr><td colSpan={6} className="bm-muted">No assets registered yet.</td></tr>
+                                <tr><td colSpan={isAdmin ? 7 : 6} className="bm-muted">No assets registered yet.</td></tr>
 
                             ) : detail.assets.map(a=>(
 
@@ -433,6 +435,32 @@ export default function CustomerDetailView({
                                     <td>{a.next_due || "—"}</td>
 
                                     <td>{a.last_verified ? `${a.last_verified} (${a.verified_by || "—"})` : "—"}</td>
+
+                                    {
+
+                                        isAdmin && (
+
+                                            <td>
+
+                                                <button
+
+                                                    className="bm-backlink"
+
+                                                    style={{color:"#991b1b"}}
+
+                                                    onClick={()=>onDeleteAsset(a.id)}
+
+                                                >
+
+                                                    Remove
+
+                                                </button>
+
+                                            </td>
+
+                                        )
+
+                                    }
 
                                 </tr>
 

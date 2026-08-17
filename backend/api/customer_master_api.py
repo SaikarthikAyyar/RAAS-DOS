@@ -33,6 +33,7 @@ from backend.services.customer_master_service import (
     update_customer_owner_request,
     update_customer_request,
     delete_customer_request,
+    delete_asset_request,
     get_customer_detail_request,
     add_contact_request,
     set_follow_up_request,
@@ -221,6 +222,36 @@ def get_asset_detail(
         )
 
     return asset
+
+
+# ====================================
+# DELETE ASSET
+# ====================================
+
+@router.delete(
+    "/business-master/assets/{asset_id}"
+)
+def delete_asset(
+        asset_id: int,
+        payload: BusinessMasterActionSchema,
+        db: Session = Depends(get_db)
+):
+    try:
+        result = delete_asset_request(db, asset_id, payload.actor, payload.remark)
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc)
+        )
+
+    if result == "not_found":
+        raise HTTPException(
+            status_code=404,
+            detail="Asset not found."
+        )
+
+    return {"success": True}
 
 
 # ====================================

@@ -391,6 +391,42 @@ def create_asset(
 
 
 # ====================================
+# ENQUIRIES LINKED TO AN ASSET
+# Used to block asset deletion - Enquiry.asset_id has no ON DELETE
+# CASCADE, so an asset still referenced by a real enquiry must never
+# be removed out from under it.
+# ====================================
+
+def get_enquiries_by_asset(
+        db,
+        asset_id
+):
+    return (
+        db.query(
+            Enquiry
+        )
+        .filter(
+            Enquiry.asset_id == asset_id
+        )
+        .all()
+    )
+
+
+# ====================================
+# DELETE ASSET
+# ====================================
+
+def delete_asset(
+        db,
+        asset
+):
+    db.delete(asset)
+    db.commit()
+
+    return True
+
+
+# ====================================
 # UPDATE ASSET PROFILE
 # Keeps a reused asset's mutable site-profile fields current with
 # whatever was just submitted, instead of leaving them frozen at
