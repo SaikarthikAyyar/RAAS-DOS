@@ -295,15 +295,23 @@ useEffect(() => {
 
             if(salesSurveyId){
 
-                const survey =
+                // The saved-survey payload has no enquiry_created_at
+                // field of its own (that's a prefill-only concept) -
+                // fetch it alongside so Survey Date's
+                // after-the-enquiry validation still applies when
+                // editing, not just on first fill.
+                const [survey, prefill] = await Promise.all([
 
-                    await getCustomerSurvey(
-
+                    getCustomerSurvey(
                         customerRequestId,
-
                         salesSurveyId
+                    ),
 
-                    );
+                    getSalesPrefill(
+                        customerRequestId
+                    )
+
+                ]);
 
                 setSelectedSurvey(
 
@@ -311,11 +319,13 @@ useEffect(() => {
 
                 );
 
-                setSurveyData(
+                setSurveyData({
 
-                    survey
+                    ...survey,
 
-                );
+                    enquiry_created_at: prefill.enquiry_created_at
+
+                });
 
             }
 
@@ -371,7 +381,12 @@ useEffect(() => {
 
 return(
 
-<div className="sales-survey-page" ref={pageRef}>
+// onBlurCapture (not a per-field onBlur) so leaving ANY field on this
+// form - not just the handful that already had their own validation
+// wired - is what reveals every still-empty compulsory field's error,
+// matching "select a later field and an earlier required one lights
+// up" without touching every field's JSX.
+<div className="sales-survey-page" ref={pageRef} onBlurCapture={()=>touchField("_form", "_any")}>
 
 
 <div className="survey-completion-card">

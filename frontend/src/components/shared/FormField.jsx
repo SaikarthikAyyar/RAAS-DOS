@@ -6,6 +6,47 @@
 // "error" prop switches it to orange via the "field-error" class.
 // ====================================
 
+// A "*" marks a compulsory field - styled orange on its own (not the
+// whole label) so required fields are identifiable at a glance without
+// the label text itself changing color. Two conventions coexist in
+// this codebase (Sales Survey labels it trailing - "Survey Date*";
+// Customer Request labels it leading - "*Company Name") - both are
+// handled here rather than picking one and leaving the other unstyled.
+function renderLabel(label){
+
+    if(typeof label !== "string"){
+        return label;
+    }
+
+    const trimmed = label.trim();
+
+    if(trimmed.endsWith("*")){
+
+        return(
+            <>
+                {label.slice(0, label.lastIndexOf("*"))}
+                <span className="required-asterisk">*</span>
+            </>
+        );
+
+    }
+
+    if(trimmed.startsWith("*")){
+
+        return(
+            <>
+                <span className="required-asterisk">*</span>
+                {label.slice(label.indexOf("*") + 1)}
+            </>
+        );
+
+    }
+
+    return label;
+
+}
+
+
 export function FieldInput({
 
     label,
@@ -29,7 +70,7 @@ export function FieldInput({
         <div className={error ? "survey-field field-error" : "survey-field"}>
 
             <label>
-                {label}
+                {renderLabel(label)}
             </label>
 
             <input
@@ -84,7 +125,7 @@ export function FieldSelect({
         <div className={error ? "survey-field field-error" : "survey-field"}>
 
             <label>
-                {label}
+                {renderLabel(label)}
             </label>
 
             <select

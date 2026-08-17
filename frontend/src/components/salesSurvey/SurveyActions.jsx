@@ -20,6 +20,8 @@ from "../../services/enquiryWorkspaceService";
 
 import { useAuth } from "../../contexts/AuthContext";
 
+import { useNavigate } from "react-router-dom";
+
 // ====================================
 // COMPONENT
 // ====================================
@@ -43,6 +45,8 @@ onBlockedSubmit
 }){
 
 const { user: currentUser } = useAuth();
+
+const navigate = useNavigate();
 
 
 async function submitSurvey(){
@@ -566,11 +570,26 @@ if(
 // deferred to here - nothing left to do for media at submit time.
 // ====================================
 
-alert(
+// If this survey was reached from a specific enquiry's Workspace
+// (Fill/Edit Survey), land back there on the Survey tab so the user
+// immediately sees the read-only summary reflect what they just
+// saved - instead of staying on this bare form with just an alert.
+// The fully-standalone entry (no enquiryId in state) has no
+// workspace to return to, so it keeps the alert-only behavior.
+if(enquiryId){
 
-    "Sales Survey Saved"
+    navigate(`/enquiries/workspace/${enquiryId}`, {
+        state:{ initialTab:"survey" }
+    });
 
-);
+}
+else{
+
+    alert(
+        "Sales Survey Saved"
+    );
+
+}
 
 }
 

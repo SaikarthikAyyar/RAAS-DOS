@@ -17,6 +17,8 @@ from backend.models.customer_requests import (
 
 from backend.services.enquiry_service import EnquiryService
 
+from backend.models.enquiry import Enquiry
+
 from backend.services.customer_master_service import (
 
     resolve_or_create_customer,
@@ -175,7 +177,7 @@ def create_customer_request(
     print("Creating Customer Request enquiry")
     print(enquiry_payload)
 
-    EnquiryService.create_customer_request_enquiry(
+    new_enquiry = EnquiryService.create_customer_request_enquiry(
 
         db=db,
 
@@ -199,6 +201,12 @@ def create_customer_request(
     print("=============================\n")
 
     db.refresh(customer_request)
+
+    # Dynamic attribute (not a real column on customer_requests) so the
+    # frontend can navigate straight into this new case's own Enquiry
+    # Workspace after creating it, instead of dumping the user back on
+    # the flat Enquiries list with no way to see what they just made.
+    customer_request.enquiry_id = new_enquiry.id
 
     return customer_request
 
@@ -247,7 +255,9 @@ def get_sales_prefill(
 
             "dewatering": {},
 
-            "insights": {}
+            "insights": {},
+
+            "enquiry_created_at": None
 
         }
 
@@ -427,6 +437,22 @@ def get_sales_prefill(
     result["geometry"] = {**result["geometry"], **profile_overlay["geometry"]}
     result["safety"] = {**result["safety"], **profile_overlay["safety"]}
     result["pump"] = {**result["pump"], **profile_overlay["pump"]}
+
+    # Sales Survey's own "Survey Date*" field must fall on or after the
+    # date this case (Enquiry) was actually created - surveying a job
+    # before it was ever raised makes no sense. Not part of the survey
+    # payload itself, purely a validation reference the frontend reads.
+    linked_enquiry = (
+        db.query(Enquiry)
+        .filter(Enquiry.customer_request_id == customer_request_id)
+        .first()
+    )
+
+    result["enquiry_created_at"] = (
+        linked_enquiry.created_at.date().isoformat()
+        if linked_enquiry and linked_enquiry.created_at
+        else None
+    )
 
     return result
 

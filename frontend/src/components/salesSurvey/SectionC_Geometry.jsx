@@ -32,9 +32,15 @@ const geometry =
 
 surveyData.geometry || {};
 
+// Once the user has interacted with ANY field on the form (not just
+// this one), a still-empty compulsory field starts showing its error -
+// moving on to a later field is exactly the signal that an earlier
+// required field was skipped.
+const anyFieldTouched = Object.keys(touched || {}).length > 0;
+
 function fieldError(field){
 
-    return errors?.[`geometry.${field}`] && (touched?.[`geometry.${field}`] || submitAttempted);
+    return errors?.[`geometry.${field}`] && (anyFieldTouched || submitAttempted);
 
 }
 

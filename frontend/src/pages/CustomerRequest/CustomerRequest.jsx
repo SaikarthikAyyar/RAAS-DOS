@@ -221,7 +221,18 @@ async function submit(){
 
       alert("Customer request has been created successfully.");
 
-     navigate("/enquiry");
+      // Land the user directly in the new case's own Enquiry Workspace
+      // (Survey tab - the next real stage after Customer Request) so
+      // they immediately see it reflected there, instead of the flat
+      // Enquiries list with no indication of what they just created.
+      if(response.enquiry_id){
+        navigate(`/enquiries/workspace/${response.enquiry_id}`, {
+          state:{ initialTab:"survey" }
+        });
+      }
+      else{
+        navigate("/enquiry");
+      }
 
     }
 
@@ -250,7 +261,12 @@ async function submit(){
 
   return(
 
-    <div className="sales-survey-page">
+    // onBlurCapture (not a per-field onBlur) so leaving ANY field on
+    // this form - not just the handful that already had their own
+    // validation wired - is what reveals every still-empty compulsory
+    // field's error, matching "select a later field and an earlier
+    // required one lights up" without touching every field's JSX.
+    <div className="sales-survey-page" onBlurCapture={()=>touchField("_form", "_any")}>
 
 <Section1_CustomerSite
 

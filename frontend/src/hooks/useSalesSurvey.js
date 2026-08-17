@@ -749,13 +749,28 @@ function isEmpty(value){
     return value === null || value === undefined || value === "";
 }
 
+// The Enquiry's own creation date - surveying a case before it was
+// ever raised makes no sense, so Survey Date is additionally checked
+// against this (not just required-non-empty like every other field
+// here). Sourced from get_sales_prefill's "enquiry_created_at", which
+// SalesSurvey.jsx keeps attached to surveyData even when editing an
+// already-submitted survey (whose own payload has no such field).
+const enquiryCreatedAt = surveyData.enquiry_created_at || null;
+
 const errors = {};
 
 REQUIRED_FIELD_KEYS.forEach(key => {
 
     const [section, field] = key.split(".");
 
-    errors[key] = isEmpty(surveyData[section]?.[field]);
+    const value = surveyData[section]?.[field];
+
+    if(key === "customer.survey_date"){
+        errors[key] = isEmpty(value) || Boolean(enquiryCreatedAt && value < enquiryCreatedAt);
+    }
+    else{
+        errors[key] = isEmpty(value);
+    }
 
 });
 

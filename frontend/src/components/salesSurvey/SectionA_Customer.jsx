@@ -39,9 +39,21 @@ submitAttempted
 
 const customer = surveyData.customer || {};
 
+const enquiryCreatedAt = surveyData.enquiry_created_at;
+
+const surveyDateBeforeEnquiry = Boolean(
+    customer.survey_date && enquiryCreatedAt && customer.survey_date < enquiryCreatedAt
+);
+
+// Once the user has interacted with ANY field on the form (not just
+// this one), a still-empty compulsory field starts showing its error -
+// moving on to a later field is exactly the signal that an earlier
+// required field was skipped.
+const anyFieldTouched = Object.keys(touched || {}).length > 0;
+
 function fieldError(field){
 
-    return errors?.[`customer.${field}`] && (touched?.[`customer.${field}`] || submitAttempted);
+    return errors?.[`customer.${field}`] && (anyFieldTouched || submitAttempted);
 
 }
 
@@ -290,7 +302,11 @@ onBlur={()=>touchField("customer", "survey_date")}
 
 error={fieldError("survey_date")}
 
-errorMessage="Survey Date is required."
+errorMessage={
+    surveyDateBeforeEnquiry
+        ? `Survey Date must be on or after the enquiry date (${enquiryCreatedAt}).`
+        : "Survey Date is required."
+}
 
 />
 

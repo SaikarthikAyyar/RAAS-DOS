@@ -28,9 +28,15 @@ submitAttempted
 
 const job = surveyData.job || {};
 
+// Once the user has interacted with ANY field on the form (not just
+// this one), a still-empty compulsory field starts showing its error -
+// moving on to a later field is exactly the signal that an earlier
+// required field was skipped.
+const anyFieldTouched = Object.keys(touched || {}).length > 0;
+
 function fieldError(field){
 
-    return errors?.[`job.${field}`] && (touched?.[`job.${field}`] || submitAttempted);
+    return errors?.[`job.${field}`] && (anyFieldTouched || submitAttempted);
 
 }
 

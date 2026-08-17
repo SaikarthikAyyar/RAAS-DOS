@@ -24,12 +24,16 @@ import {
 
 from "../services/opsSelectorService";
 
+import { useNavigate } from "react-router-dom";
+
 
 // ====================================
 // HOOK
 // ====================================
 
 export default function useOpsSelector(){
+
+    const navigate = useNavigate();
 
     const salesSurveyId = Number(
 
@@ -253,7 +257,25 @@ export default function useOpsSelector(){
 
             }
 
-            alert("Ops Selection Saved Successfully.");
+            // Land back on this enquiry's Ops Review tab so the user
+            // immediately sees the read-only summary reflect what was
+            // just saved - matches the same pattern as Sales Survey.
+            // enquiryId comes from localStorage (set when "Open Ops
+            // Selector" was clicked from the workspace) - 0 when this
+            // page was reached standalone, so that case keeps the
+            // alert-only behavior.
+            if(enquiryId){
+
+                navigate(`/enquiries/workspace/${enquiryId}`, {
+                    state:{ initialTab:"ops-review" }
+                });
+
+            }
+            else{
+
+                alert("Ops Selection Saved Successfully.");
+
+            }
 
         }
 

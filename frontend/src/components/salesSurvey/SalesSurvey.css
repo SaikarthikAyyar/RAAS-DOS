@@ -398,6 +398,16 @@ margin-top:3px;
 
 }
 
+.required-asterisk{
+
+color:var(--orange);
+
+font-weight:700;
+
+margin-left:1px;
+
+}
+
 
 /* ====================================
    MEDIA UPLOAD TOAST
