@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import * as XLSX from "xlsx";
@@ -91,17 +93,46 @@ export default function CustomerDetailView({
 
     loading,
 
+    allUsers,
+
     onBack,
 
     onAddContact,
 
     onSetFollowUp,
 
-    onSendReminder
+    onSendReminder,
+
+    onUpdateOwner
 
 }){
 
     const navigate = useNavigate();
+
+    const [editingOwner, setEditingOwner] = useState(false);
+
+    const [ownerDraft, setOwnerDraft] = useState("");
+
+    useEffect(()=>{
+
+        setOwnerDraft(detail?.owner_user_id || "");
+
+        setEditingOwner(false);
+
+    }, [detail?.id, detail?.owner_user_id]);
+
+    function handleSaveOwner(){
+
+        // Deliberately doesn't close the editor here - onUpdateOwner's
+        // remark prompt can be cancelled (same convention as every other
+        // Business Masters create/edit flow), in which case nothing
+        // should appear to have saved. The effect above closes the
+        // editor once `detail.owner_user_id` actually changes after a
+        // real save completes and the parent reloads.
+
+        onUpdateOwner(ownerDraft ? Number(ownerDraft) : null);
+
+    }
 
     if(loading || !detail){
 
@@ -175,7 +206,8 @@ export default function CustomerDetailView({
             ["Category", detail.category || ""],
             ["Industry", detail.industry || ""],
             ["Region", detail.region || ""],
-            ["Owner", detail.owner || ""],
+            ["Account Owner", detail.owner_name || detail.owner || ""],
+            ["Created By", detail.created_by_name || ""],
             ["GST Number", detail.gst_number || ""],
             ["Next Follow-up Date", detail.next_follow_up_date || ""],
             ["Next Follow-up Owner", detail.next_follow_up_owner || ""],
@@ -265,8 +297,31 @@ export default function CustomerDetailView({
                 </div>
 
                 <div className="bm-field-row">
-                    <span>Owner</span>
-                    <b>{detail.owner || "—"}</b>
+                    <span>Account Owner</span>
+                    {
+                        editingOwner ? (
+                            <span style={{display:"flex", gap:6, alignItems:"center"}}>
+                                <select value={ownerDraft} onChange={e=>setOwnerDraft(e.target.value)}>
+                                    <option value="">Select</option>
+                                    {(allUsers || []).map(u=>(
+                                        <option key={u.id} value={u.id}>{u.name}</option>
+                                    ))}
+                                </select>
+                                <button className="bm-btn bm-btn-xs" onClick={handleSaveOwner}>Save</button>
+                                <button className="bm-btn bm-btn-xs bm-btn-ghost" onClick={()=>setEditingOwner(false)}>Cancel</button>
+                            </span>
+                        ) : (
+                            <span style={{display:"flex", gap:6, alignItems:"center"}}>
+                                <b>{detail.owner_name || detail.owner || "—"}</b>
+                                <button className="bm-btn bm-btn-xs" onClick={()=>setEditingOwner(true)}>Reassign</button>
+                            </span>
+                        )
+                    }
+                </div>
+
+                <div className="bm-field-row">
+                    <span>Created By</span>
+                    <b>{detail.created_by_name || "—"}</b>
                 </div>
 
                 <h4>

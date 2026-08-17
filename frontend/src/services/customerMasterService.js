@@ -114,6 +114,47 @@ export async function createCustomer(
 
 
 // ====================================
+// REASSIGN ACCOUNT OWNER
+// ====================================
+
+export async function updateCustomerOwner(
+
+    customerId,
+
+    payload
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers/${customerId}/owner`,
+
+        {
+
+            method:"PATCH",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify(payload)
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // CUSTOMER DETAIL (360)
 // ====================================
 

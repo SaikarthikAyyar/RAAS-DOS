@@ -1,15 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import LookupSelect from "../../shared/LookupSelect";
+
+import { useAuth } from "../../../contexts/AuthContext";
+
+import { getUsers } from "../../../services/administrationUsersService";
 
 
 // ====================================
 // COMPONENT
-// Matches openNewCustomerModal()/submitNewCustomer(). One flagged
-// deviation: "Account owner" is a select of hardcoded fake sales-rep
-// names (synthOwners) in the wireframe — this app has no real master
-// list of sales reps yet, so it stays free text rather than baking
-// in demo names as if they were real structural options.
+// Matches openNewCustomerModal()/submitNewCustomer(). "Account owner"
+// is now a real dropdown of every application user (GET
+// /administration/users), auto-defaulted to whoever is creating the
+// customer but reassignable before submit - replacing the earlier
+// free-text field, which was a flagged deviation since this app had
+// no real personnel/sales-rep master list to back a dropdown yet.
 // ====================================
 
 export default function NewCustomerModal({
@@ -19,6 +24,8 @@ export default function NewCustomerModal({
     onCreate
 
 }){
+
+    const { user } = useAuth();
 
     const [companyName, setCompanyName] = useState("");
 
@@ -40,11 +47,21 @@ export default function NewCustomerModal({
 
     const [gstNumber, setGstNumber] = useState("");
 
-    const [owner, setOwner] = useState("");
+    const [allUsers, setAllUsers] = useState([]);
+
+    const [ownerUserId, setOwnerUserId] = useState(user?.id || "");
 
     const [saving, setSaving] = useState(false);
 
     const [error, setError] = useState("");
+
+    useEffect(()=>{
+
+        getUsers()
+            .then(setAllUsers)
+            .catch(err=>console.error(err));
+
+    }, []);
 
     async function handleSubmit(){
 
@@ -74,7 +91,7 @@ export default function NewCustomerModal({
 
                 gst_number:gstNumber || null,
 
-                owner:owner || null
+                owner_user_id:ownerUserId ? Number(ownerUserId) : null
 
             });
 
@@ -186,13 +203,23 @@ export default function NewCustomerModal({
 
                         <label>Account owner</label>
 
-                        <input
+                        <select
 
-                            value={owner}
+                            value={ownerUserId}
 
-                            onChange={e=>setOwner(e.target.value)}
+                            onChange={e=>setOwnerUserId(e.target.value)}
 
-                        />
+                        >
+
+                            <option value="">Select</option>
+
+                            {allUsers.map(u=>(
+
+                                <option key={u.id} value={u.id}>{u.name}</option>
+
+                            ))}
+
+                        </select>
 
                     </div>
 

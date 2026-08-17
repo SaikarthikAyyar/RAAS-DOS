@@ -63,6 +63,22 @@ class Customer(Base):
     )
 
     # ====================================
+    # OWNERSHIP / ATTRIBUTION
+    # owner_user_id ("Account Owner") is reassignable; created_by_user_id
+    # is set once at creation and never accepted on any update payload.
+    # ====================================
+
+    owner_user_id = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
+
+    created_by_user_id = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
+
+    # ====================================
     # NEXT FOLLOW-UP
     # ====================================
 

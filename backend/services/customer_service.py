@@ -47,6 +47,12 @@ def create_customer_request(
 
 ):
 
+    if not payload.customer_id:
+        raise ValueError(
+            "A real customer must be selected. Customer Request can no longer create "
+            "a new customer inline - use Business Masters > Customers to add one first."
+        )
+
     customer_request = create_customer(
 
         db,

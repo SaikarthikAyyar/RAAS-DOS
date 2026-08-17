@@ -11,6 +11,7 @@ from backend.repositories.customer_master_repository import (
     get_customer_by_company_name,
     create_customer,
     create_customer_minimal,
+    update_customer_owner,
     list_contacts,
     add_contact,
     list_assets,
@@ -25,6 +26,22 @@ from backend.repositories.customer_master_repository import (
 )
 
 from backend.repositories.notification_repository import record_change, record_business_master_change
+
+from backend.models.users import User
+
+
+# ====================================
+# USER NAME LOOKUP
+# One query for every customer list/detail read, rather than one
+# per row - resolves owner_user_id/created_by_user_id into display
+# names for the "Account Owner"/"Created By" fields.
+# ====================================
+
+def _user_name_map(db):
+    return {
+        user.id: user.name
+        for user in db.query(User).all()
+    }
 
 
 # ====================================
@@ -285,6 +302,37 @@ def _follow_up_bucket(
 
 
 # ====================================
+# CUSTOMER -> LIST ITEM DICT
+# Shared row-builder - used by list_customers_request (many rows) and
+# by the create-customer API route (one row, the just-created customer).
+# ====================================
+
+def build_customer_list_item(db, customer, user_names=None):
+
+    user_names = user_names if user_names is not None else _user_name_map(db)
+
+    return {
+        "id": customer.id,
+        "company_name": customer.company_name,
+        "category": customer.category,
+        "industry": customer.industry,
+        "region": customer.region,
+        "owner": customer.owner,
+        "owner_user_id": customer.owner_user_id,
+        "owner_name": user_names.get(customer.owner_user_id),
+        "created_by_user_id": customer.created_by_user_id,
+        "created_by_name": user_names.get(customer.created_by_user_id),
+        "assets_count": count_assets(db, customer.id),
+        "next_follow_up_date": (
+            customer.next_follow_up_date.isoformat()
+            if customer.next_follow_up_date else None
+        ),
+        "next_follow_up_note": customer.next_follow_up_note,
+        "follow_up_bucket": _follow_up_bucket(customer.next_follow_up_date)
+    }
+
+
+# ====================================
 # LIST CUSTOMERS
 # ====================================
 
@@ -293,27 +341,12 @@ def list_customers_request(
 ):
     customers = list_customers(db)
 
-    items = []
+    user_names = _user_name_map(db)
 
-    for customer in customers:
-
-        items.append({
-            "id": customer.id,
-            "company_name": customer.company_name,
-            "category": customer.category,
-            "industry": customer.industry,
-            "region": customer.region,
-            "owner": customer.owner,
-            "assets_count": count_assets(db, customer.id),
-            "next_follow_up_date": (
-                customer.next_follow_up_date.isoformat()
-                if customer.next_follow_up_date else None
-            ),
-            "next_follow_up_note": customer.next_follow_up_note,
-            "follow_up_bucket": _follow_up_bucket(customer.next_follow_up_date)
-        })
-
-    return items
+    return [
+        build_customer_list_item(db, customer, user_names)
+        for customer in customers
+    ]
 
 
 # ====================================
@@ -342,12 +375,53 @@ def create_customer_request(
                 {"field": "company_name", "before": None, "after": customer.company_name},
                 {"field": "category", "before": None, "after": customer.category},
                 {"field": "industry", "before": None, "after": customer.industry},
-                {"field": "region", "before": None, "after": customer.region}
+                {"field": "region", "before": None, "after": customer.region},
+                {"field": "created_by", "before": None, "after": payload.actor.name}
             ],
             remark=payload.remark
         )
 
     return customer
+
+
+# ====================================
+# UPDATE CUSTOMER OWNER (Account Owner reassignment)
+# ====================================
+
+def update_customer_owner_request(
+        db,
+        customer_id,
+        payload
+):
+    customer = get_customer(db, customer_id)
+
+    if not customer:
+        return None
+
+    user_names = _user_name_map(db)
+
+    before_name = user_names.get(customer.owner_user_id)
+    after_name = user_names.get(payload.owner_user_id)
+
+    updated = update_customer_owner(db, customer, payload.owner_user_id)
+
+    if before_name != after_name:
+
+        record_business_master_change(
+            db=db,
+            module="Business Masters",
+            action="UPDATE",
+            actor_user_id=payload.actor.user_id,
+            actor_name=payload.actor.name,
+            actor_role=payload.actor.role,
+            title=f"{payload.actor.name} reassigned the Account Owner for '{updated.company_name}' in Business Masters",
+            changes=[
+                {"field": "owner", "before": before_name, "after": after_name}
+            ],
+            remark=payload.remark
+        )
+
+    return updated
 
 
 # ====================================
@@ -362,6 +436,8 @@ def get_customer_detail_request(
 
     if not customer:
         return None
+
+    user_names = _user_name_map(db)
 
     contacts = list_contacts(db, customer_id)
 
@@ -422,6 +498,10 @@ def get_customer_detail_request(
         "region": customer.region,
         "gst_number": customer.gst_number,
         "owner": customer.owner,
+        "owner_user_id": customer.owner_user_id,
+        "owner_name": user_names.get(customer.owner_user_id),
+        "created_by_user_id": customer.created_by_user_id,
+        "created_by_name": user_names.get(customer.created_by_user_id),
         "assets_count": len(assets),
         "next_follow_up_date": (
             customer.next_follow_up_date.isoformat()

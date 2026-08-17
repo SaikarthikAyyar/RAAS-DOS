@@ -39,9 +39,13 @@ import {
 
     addContact,
 
-    setFollowUp
+    setFollowUp,
+
+    updateCustomerOwner
 
 } from "../services/customerMasterService";
+
+import { getUsers } from "../services/administrationUsersService";
 
 import { useAuth } from "../contexts/AuthContext";
 
@@ -82,9 +86,19 @@ function CustomersTab({
 
     const [showReminderModal, setShowReminderModal] = useState(false);
 
+    const [allUsers, setAllUsers] = useState([]);
+
     const { user } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
+
+    useEffect(()=>{
+
+        getUsers()
+            .then(setAllUsers)
+            .catch(err=>console.error(err));
+
+    }, []);
 
     const loadDetail = useCallback(async(id)=>{
 
@@ -188,6 +202,22 @@ function CustomersTab({
 
     }
 
+    async function handleUpdateOwner(ownerUserId){
+
+        const remark = await promptForRemark("Reassigning the Account Owner");
+
+        if(remark===null){
+            return;
+        }
+
+        await updateCustomerOwner(selectedCustomerId, { owner_user_id:ownerUserId, actor:buildActor(user), remark });
+
+        loadDetail(selectedCustomerId);
+
+        onReload();
+
+    }
+
     return(
 
         <>
@@ -202,6 +232,8 @@ function CustomersTab({
 
                         loading={detailLoading}
 
+                        allUsers={allUsers}
+
                         onBack={handleBack}
 
                         onAddContact={()=>setShowAddContactModal(true)}
@@ -209,6 +241,8 @@ function CustomersTab({
                         onSetFollowUp={()=>setShowFollowUpModal(true)}
 
                         onSendReminder={()=>setShowReminderModal(true)}
+
+                        onUpdateOwner={handleUpdateOwner}
 
                     />
 

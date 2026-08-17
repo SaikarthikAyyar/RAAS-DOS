@@ -69,10 +69,14 @@ def customer_request(
         payload: CustomerRequestSchema,
         db: Session = Depends(get_db)
 ):
-    customer = create_customer_request(
-        db,
-        payload
-    )
+    try:
+        customer = create_customer_request(
+            db,
+            payload
+        )
+
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error))
 
     return customer
 

@@ -27,6 +27,8 @@ class CustomerCreateSchema(BaseModel):
 
     owner: str | None = None
 
+    owner_user_id: int | None = None
+
     actor: ActorSchema
 
     remark: str
@@ -191,6 +193,19 @@ class FollowUpSchema(BaseModel):
 
 
 # ====================================
+# ACCOUNT OWNER REASSIGNMENT
+# ====================================
+
+class CustomerOwnerUpdateSchema(BaseModel):
+
+    owner_user_id: int | None = None
+
+    actor: ActorSchema
+
+    remark: str
+
+
+# ====================================
 # LIST ITEM
 # ====================================
 
@@ -207,6 +222,14 @@ class CustomerListItemSchema(BaseModel):
     region: str | None = None
 
     owner: str | None = None
+
+    owner_user_id: int | None = None
+
+    owner_name: str | None = None
+
+    created_by_user_id: int | None = None
+
+    created_by_name: str | None = None
 
     assets_count: int = 0
 

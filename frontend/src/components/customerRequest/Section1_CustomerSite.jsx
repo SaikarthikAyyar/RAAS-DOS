@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import {
 
 getCustomers,
@@ -20,21 +22,15 @@ from "../shared/FormField";
 
 import LookupSelect from "../shared/LookupSelect";
 
-import { useAuth } from "../../contexts/AuthContext";
-
 
 // ====================================
 // COMPONENT
-// Company field matches the wireframe's openNewEnquiryModal():
-// datalist-backed input (existing customer autocomplete, or type a
-// new one), an "Existing asset" dropdown scoped to whichever
-// customer resolves, driving whether NewSiteFields shows below.
-//
-// Only Admin gets the free-text datalist (typing an unmatched name
-// creates a new Business Master customer, per
-// resolve_or_create_customer -> create_customer_minimal). Every
-// other role is restricted to a plain select of existing customers -
-// no way to create a new one from here.
+// Company Name is a strict select of existing customers for every
+// role, no exceptions - Customer Request can no longer create a new
+// Customer inline (previously Admin could type an unmatched name to
+// auto-vivify one via resolve_or_create_customer -> create_customer_
+// minimal). "+ Add New Customer" (italic) instead navigates to
+// Business Masters -> Customers, which already defaults to that tab.
 // ====================================
 
 export default function Section1_CustomerSite({
@@ -53,11 +49,7 @@ submitAttempted
 
 }){
 
-const { user } = useAuth();
-
-const isAdmin = user?.role === "admin";
-
-const [addingNewCustomer, setAddingNewCustomer] = useState(false);
+const navigate = useNavigate();
 
 const customer=
 
@@ -98,22 +90,6 @@ useEffect(()=>{
         .catch(err=>console.error(err));
 
 }, [customer.customer_id]);
-
-function handleCompanyNameChange(value){
-
-    updateSection("customer", "company_name", value);
-
-    const match = allCustomers.find(
-
-        c=>c.company_name.toLowerCase()===value.trim().toLowerCase()
-
-    );
-
-    updateSection("customer", "customer_id", match ? match.id : null);
-
-    updateSection("customer", "existing_asset_id", null);
-
-}
 
 function handleExistingCustomerSelect(customerId){
 
@@ -215,93 +191,39 @@ Required
 <div className="survey-grid">
 
 
-{
+<div className={fieldError("company_name") ? "survey-field field-error" : "survey-field"}>
 
-    isAdmin && addingNewCustomer
+    <label>
+        *Company Name
+    </label>
 
-        ? (
+    <select
+        value={customer.customer_id || ""}
+        onChange={e=>{
+            if(e.target.value === "__new__"){
+                navigate("/business-master");
+                return;
+            }
+            handleExistingCustomerSelect(e.target.value);
+        }}
+        onBlur={()=>touchField("customer", "company_name")}
+    >
+        <option value="">Select</option>
+        <option value="__new__" style={{fontStyle:"italic"}}>+ Add New Customer</option>
+        {allCustomers.map(c=>(
+            <option key={c.id} value={c.id}>{c.company_name}</option>
+        ))}
+    </select>
 
-            <div className={fieldError("company_name") ? "survey-field field-error" : "survey-field"}>
-
-                <label>
-                    *Company Name
-                    <button
-                        type="button"
-                        className="field-inline-link"
-                        onClick={()=>{
-                            setAddingNewCustomer(false);
-                            updateSection("customer", "company_name", "");
-                            updateSection("customer", "customer_id", null);
-                            updateSection("customer", "existing_asset_id", null);
-                        }}
-                    >
-                        ← Choose existing customer
-                    </button>
-                </label>
-
-                <input
-                    value={customer.company_name || ""}
-                    autoComplete="off"
-                    placeholder="Type new company name"
-                    onChange={e=>handleCompanyNameChange(e.target.value)}
-                    onBlur={()=>touchField("customer", "company_name")}
-                />
-
-                {
-                    fieldError("company_name") && (
-                        <span className="field-error-message">
-                            Company Name is required.
-                        </span>
-                    )
-                }
-
-            </div>
-
+    {
+        fieldError("company_name") && (
+            <span className="field-error-message">
+                Company Name is required.
+            </span>
         )
-        : (
+    }
 
-            <div className={fieldError("company_name") ? "survey-field field-error" : "survey-field"}>
-
-                <label>
-                    *Company Name
-                </label>
-
-                <select
-                    value={customer.customer_id || ""}
-                    onChange={e=>{
-                        if(e.target.value === "__new__"){
-                            setAddingNewCustomer(true);
-                            updateSection("customer", "company_name", "");
-                            updateSection("customer", "customer_id", null);
-                            updateSection("customer", "existing_asset_id", null);
-                            return;
-                        }
-                        handleExistingCustomerSelect(e.target.value);
-                    }}
-                    onBlur={()=>touchField("customer", "company_name")}
-                >
-                    <option value="">Select</option>
-                    {isAdmin && (
-                        <option value="__new__">+ Add New Customer</option>
-                    )}
-                    {allCustomers.map(c=>(
-                        <option key={c.id} value={c.id}>{c.company_name}</option>
-                    ))}
-                </select>
-
-                {
-                    fieldError("company_name") && (
-                        <span className="field-error-message">
-                            Company Name is required.
-                        </span>
-                    )
-                }
-
-            </div>
-
-        )
-
-}
+</div>
 
 
 <LookupSelect

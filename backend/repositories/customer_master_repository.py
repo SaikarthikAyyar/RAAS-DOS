@@ -137,10 +137,30 @@ def create_customer(
         industry=payload.industry,
         region=payload.region,
         gst_number=payload.gst_number,
-        owner=payload.owner
+        owner=payload.owner,
+        owner_user_id=payload.owner_user_id or payload.actor.user_id,
+        created_by_user_id=payload.actor.user_id
     )
 
     db.add(customer)
+    db.commit()
+    db.refresh(customer)
+
+    return customer
+
+
+# ====================================
+# UPDATE CUSTOMER OWNER (Account Owner reassignment - created_by_user_id
+# is never touched here, it is permanent from creation)
+# ====================================
+
+def update_customer_owner(
+        db,
+        customer,
+        owner_user_id
+):
+    customer.owner_user_id = owner_user_id
+
     db.commit()
     db.refresh(customer)
 

@@ -83,7 +83,9 @@ export default function CustomerListView({
 
                                 <th>Category</th>
 
-                                <th>Owner</th>
+                                <th>Account Owner</th>
+
+                                <th>Created By</th>
 
                                 <th>Assets on file</th>
 
@@ -107,7 +109,9 @@ export default function CustomerListView({
 
                                         <td>{c.category || "—"}</td>
 
-                                        <td>{c.owner || "—"}</td>
+                                        <td>{c.owner_name || c.owner || "—"}</td>
+
+                                        <td>{c.created_by_name || "—"}</td>
 
                                         <td>{c.assets_count}</td>
 

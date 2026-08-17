@@ -15,6 +15,7 @@ from backend.schemas.customer_master_schema import (
     CustomerListItemSchema,
     CustomerListResponse,
     CustomerDetailSchema,
+    CustomerOwnerUpdateSchema,
     ContactCreateSchema,
     ContactSchema,
     FollowUpSchema,
@@ -25,6 +26,8 @@ from backend.schemas.customer_master_schema import (
 from backend.services.customer_master_service import (
     list_customers_request,
     create_customer_request,
+    build_customer_list_item,
+    update_customer_owner_request,
     get_customer_detail_request,
     add_contact_request,
     set_follow_up_request,
@@ -69,18 +72,31 @@ def create_customer(
 ):
     customer = create_customer_request(db, payload)
 
-    return {
-        "id": customer.id,
-        "company_name": customer.company_name,
-        "category": customer.category,
-        "industry": customer.industry,
-        "region": customer.region,
-        "owner": customer.owner,
-        "assets_count": 0,
-        "next_follow_up_date": None,
-        "next_follow_up_note": None,
-        "follow_up_bucket": None
-    }
+    return build_customer_list_item(db, customer)
+
+
+# ====================================
+# REASSIGN ACCOUNT OWNER
+# ====================================
+
+@router.patch(
+    "/business-master/customers/{customer_id}/owner",
+    response_model=CustomerListItemSchema
+)
+def update_customer_owner(
+        customer_id: int,
+        payload: CustomerOwnerUpdateSchema,
+        db: Session = Depends(get_db)
+):
+    customer = update_customer_owner_request(db, customer_id, payload)
+
+    if not customer:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found."
+        )
+
+    return build_customer_list_item(db, customer)
 
 
 # ====================================
