@@ -81,3 +81,52 @@ export async function saveNavMatrix(cells){
     return data;
 
 }
+
+
+// ====================================
+// TASK MATRIX (Phase 21D, admin-facing, editable, scoped to one role)
+// ====================================
+
+export async function getTaskMatrix(roleId){
+
+    const response = await fetch(
+
+        `${API}/role-permissions/task-matrix/${roleId}`
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+export async function saveTaskMatrix(roleId, tabs){
+
+    const response = await fetch(
+
+        `${API}/role-permissions/task-matrix/${roleId}`,
+
+        {
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({ tabs })
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}

@@ -42,7 +42,7 @@ export default function TemplateVariablesModal({
 
     const [saving, setSaving] = useState(false);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
@@ -222,35 +222,43 @@ export default function TemplateVariablesModal({
 
                                         ) : (
 
-                                            <button
+                                            hasTask("bm-tab-emailtemplates", "mark_variable_as_recipient") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>handleToggleRecipient(v)}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>handleToggleRecipient(v)}
 
-                                                Mark as recipient
+                                                >
 
-                                            </button>
+                                                    Mark as recipient
+
+                                                </button>
+
+                                            )
 
                                         )
 
                                     }
 
-                                    <button
+                                    {hasTask("bm-tab-emailtemplates", "remove_email_template_variable") && (
 
-                                        className="bm-backlink"
+                                        <button
 
-                                        style={{color:"#991b1b"}}
+                                            className="bm-backlink"
 
-                                        onClick={()=>handleRemove(v)}
+                                            style={{color:"#991b1b"}}
 
-                                    >
+                                            onClick={()=>handleRemove(v)}
 
-                                        Remove
+                                        >
 
-                                    </button>
+                                            Remove
+
+                                        </button>
+
+                                    )}
 
                                 </div>
 
@@ -336,23 +344,27 @@ export default function TemplateVariablesModal({
 
                 </div>
 
-                <div className="bm-modal-actions">
+                {hasTask("bm-tab-emailtemplates", "add_email_template_variable") && (
 
-                    <button
+                    <div className="bm-modal-actions">
 
-                        className="bm-btn bm-btn-primary bm-btn-xs"
+                        <button
 
-                        onClick={handleAdd}
+                            className="bm-btn bm-btn-primary bm-btn-xs"
 
-                        disabled={saving}
+                            onClick={handleAdd}
 
-                    >
+                            disabled={saving}
 
-                        + Add variable
+                        >
 
-                    </button>
+                            + Add variable
 
-                </div>
+                        </button>
+
+                    </div>
+
+                )}
 
                 <div className="bm-modal-actions">
 

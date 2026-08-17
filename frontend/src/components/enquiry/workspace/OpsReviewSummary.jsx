@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useState } from "react";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
 // "Open Ops Selector" lives inside OpsReviewDecisionCard now, alongside the
 // other decision buttons. This handler is only needed here for the
 // no-ops-selection-yet fallback further below.
@@ -31,6 +33,8 @@ export default function OpsReviewSummary({
 }){
 
     const navigate = useNavigate();
+
+    const { hasTask } = useAuth();
 
     const [overrideMachine, setOverrideMachine] = useState("");
 
@@ -283,19 +287,23 @@ export default function OpsReviewSummary({
 
                             />
 
-                            <button
+                            {hasTask("enquiry-tab-ops-review", "save_ops_override") && (
 
-                                className="survey-action-button survey-action-button-danger"
+                                <button
 
-                                onClick={handleSaveOverride}
+                                    className="survey-action-button survey-action-button-danger"
 
-                                disabled={saving}
+                                    onClick={handleSaveOverride}
 
-                            >
+                                    disabled={saving}
 
-                                {saving ? "Saving..." : "Save Override"}
+                                >
 
-                            </button>
+                                    {saving ? "Saving..." : "Save Override"}
+
+                                </button>
+
+                            )}
 
                         </div>
 
@@ -490,17 +498,21 @@ export default function OpsReviewSummary({
 
                                 </p>
 
-                                <button
+                                {hasTask("enquiry-tab-ops-review", "open_ops_selector") && (
 
-                                    className="survey-action-button"
+                                    <button
 
-                                    onClick={handleOpenOpsSelector}
+                                        className="survey-action-button"
 
-                                >
+                                        onClick={handleOpenOpsSelector}
 
-                                    Open Ops Selector
+                                    >
 
-                                </button>
+                                        Open Ops Selector
+
+                                    </button>
+
+                                )}
 
                             </div>
 

@@ -35,7 +35,7 @@ export default function SurveySummary({
 }){
     const navigate = useNavigate();
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     // Before a Sales Survey has ever been submitted, fall back to
     // the Customer-Request-derived prefill (same shape, same source
@@ -961,41 +961,49 @@ export default function SurveySummary({
 
                     <div className="survey-actions">
 
-                        <button
+                        {hasTask("enquiry-tab-survey", "fill_edit_survey") && (
 
-                            className="survey-action-button"
+                            <button
 
-                            onClick={handleFillEditSurvey}
+                                className="survey-action-button"
 
-                        >
+                                onClick={handleFillEditSurvey}
 
-                            {
+                            >
 
-                                hasRealSurvey
+                                {
 
-                                    ?
+                                    hasRealSurvey
 
-                                    "Edit Survey"
+                                        ?
 
-                                    :
+                                        "Edit Survey"
 
-                                    "Fill Survey"
+                                        :
 
-                            }
+                                        "Fill Survey"
 
-                        </button>
+                                }
 
-                        <button
+                            </button>
 
-                            className="survey-action-button survey-action-button-orange"
+                        )}
 
-                            onClick={handleRequestOpsReview}
+                        {hasTask("enquiry-tab-survey", "request_ops_review") && (
 
-                        >
+                            <button
 
-                            Request Ops Review
+                                className="survey-action-button survey-action-button-orange"
 
-                        </button>
+                                onClick={handleRequestOpsReview}
+
+                            >
+
+                                Request Ops Review
+
+                            </button>
+
+                        )}
 
                         {
                             opsReviewWaitingOnSelector && (
@@ -1018,33 +1026,41 @@ export default function SurveySummary({
 
                                         Reminder set — fires in {formatRemaining(reminderStatus.remaining_seconds)} · by {reminderStatus.set_by_name}
 
-                                        <button
+                                        {hasTask("enquiry-tab-survey", "cancel_survey_reminder") && (
 
-                                            className="survey-action-button"
+                                            <button
 
-                                            onClick={handleCancelReminder}
+                                                className="survey-action-button"
 
-                                        >
+                                                onClick={handleCancelReminder}
 
-                                            Cancel
+                                            >
 
-                                        </button>
+                                                Cancel
+
+                                            </button>
+
+                                        )}
 
                                     </span>
 
                                 ) : (
 
-                                    <button
+                                    hasTask("enquiry-tab-survey", "set_survey_reminder") && (
 
-                                        className="survey-action-button"
+                                        <button
 
-                                        onClick={()=>setShowReminderModal(true)}
+                                            className="survey-action-button"
 
-                                    >
+                                            onClick={()=>setShowReminderModal(true)}
 
-                                        ⏰ Set Reminder
+                                        >
 
-                                    </button>
+                                            ⏰ Set Reminder
+
+                                        </button>
+
+                                    )
 
                                 )
 

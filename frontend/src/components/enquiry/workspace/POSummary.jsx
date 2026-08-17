@@ -48,7 +48,7 @@ export default function POSummary({
 
 }){
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const [orders, setOrders] = useState([]);
 
@@ -268,12 +268,14 @@ export default function POSummary({
                                             <td>{formatDate(po.uploaded_at)}</td>
                                             <td>
 
-                                                <span
-                                                    style={{cursor:"pointer", color:"#991b1b", fontWeight:600}}
-                                                    onClick={()=>handleDelete(po)}
-                                                >
-                                                    Remove
-                                                </span>
+                                                {hasTask("enquiry-tab-po", "remove_po") && (
+                                                    <span
+                                                        style={{cursor:"pointer", color:"#991b1b", fontWeight:600}}
+                                                        onClick={()=>handleDelete(po)}
+                                                    >
+                                                        Remove
+                                                    </span>
+                                                )}
 
                                             </td>
                                         </tr>
@@ -322,13 +324,15 @@ export default function POSummary({
 
                             <div className="survey-actions" style={{marginTop:10}}>
 
-                                <button
-                                    className="survey-action-button survey-action-button-orange"
-                                    onClick={handleUpload}
-                                    disabled={uploading}
-                                >
-                                    {uploading ? "Uploading..." : "Upload PO"}
-                                </button>
+                                {hasTask("enquiry-tab-po", "upload_po") && (
+                                    <button
+                                        className="survey-action-button survey-action-button-orange"
+                                        onClick={handleUpload}
+                                        disabled={uploading}
+                                    >
+                                        {uploading ? "Uploading..." : "Upload PO"}
+                                    </button>
+                                )}
 
                             </div>
 
@@ -338,7 +342,7 @@ export default function POSummary({
                 }
 
                 {
-                    canProceedToJobCreation && (
+                    canProceedToJobCreation && hasTask("enquiry-tab-po", "proceed_to_job_creation") && (
 
                         <div className="survey-actions" style={{marginTop:16}}>
 

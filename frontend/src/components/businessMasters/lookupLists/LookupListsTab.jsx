@@ -19,6 +19,8 @@ import { buildActor } from "../../../utils/actor";
 
 function LookupListCard({ list, onAdd, onRemove }){
 
+    const { hasTask } = useAuth();
+
     return(
 
         <div className="bm-card bm-lookup-card">
@@ -61,17 +63,21 @@ function LookupListCard({ list, onAdd, onRemove }){
 
                                 {v.conditional_tag && <span className="bm-lookup-chip-badge">{v.conditional_tag}</span>}
 
-                                <span
+                                {hasTask("bm-tab-lists", "remove_lookup_value") && (
 
-                                    className="bm-lookup-chip-remove"
+                                    <span
 
-                                    onClick={()=>onRemove(list, v)}
+                                        className="bm-lookup-chip-remove"
 
-                                >
+                                        onClick={()=>onRemove(list, v)}
 
-                                    ×
+                                    >
 
-                                </span>
+                                        ×
+
+                                    </span>
+
+                                )}
 
                             </span>
 
@@ -83,17 +89,21 @@ function LookupListCard({ list, onAdd, onRemove }){
 
             </div>
 
-            <button
+            {hasTask("bm-tab-lists", "add_lookup_value") && (
 
-                className="bm-btn bm-btn-primary bm-btn-xs"
+                <button
 
-                onClick={()=>onAdd(list)}
+                    className="bm-btn bm-btn-primary bm-btn-xs"
 
-            >
+                    onClick={()=>onAdd(list)}
 
-                + Add
+                >
 
-            </button>
+                    + Add
+
+                </button>
+
+            )}
 
         </div>
 

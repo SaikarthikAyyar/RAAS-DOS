@@ -101,14 +101,14 @@ export function AuthProvider({
 
     ] = useState(
 
-        { navModules:[], workspaceTabs:[], landingPage:null }
+        { navModules:[], workspaceTabs:[], businessMasterTabs:[], tasks:{}, landingPage:null, loaded:false }
 
     );
 
     async function loadPermissions(role){
 
         if(!role){
-            setPermissions({ navModules:[], workspaceTabs:[], landingPage:null });
+            setPermissions({ navModules:[], workspaceTabs:[], businessMasterTabs:[], tasks:{}, landingPage:null, loaded:false });
             return null;
         }
 
@@ -120,11 +120,39 @@ export function AuthProvider({
 
             workspaceTabs: (response.workspace_tabs || []).map(m=>m.module_key),
 
-            landingPage: response.landing_page || null
+            businessMasterTabs: (response.business_master_tabs || []).map(m=>m.module_key),
+
+            // Phase 21E: module_key -> allowed task_key[], drives
+            // per-button gating across Business Masters + Enquiry
+            // Workspace tabs. Approve/Reject/Accept/Send-back-style
+            // buttons are never in here - those stay governed by each
+            // hub's approval standing (Phase 21C), untouched by this.
+            tasks: response.tasks || {},
+
+            landingPage: response.landing_page || null,
+
+            loaded: true
 
         });
 
         return response.landing_page || null;
+
+    }
+
+    // Phase 21E: true when permissions haven't loaded yet (fail-open,
+    // same accommodation WorkflowTabs.jsx already relies on for
+    // workspaceTabs - avoids a flash of every button disappearing
+    // during the brief window before the permissions fetch resolves),
+    // or when the loaded task list for this tab explicitly includes
+    // taskKey. A tab with zero task rows after loading (e.g. an
+    // unbuilt placeholder tab) correctly denies every task.
+    function hasTask(moduleKey, taskKey){
+
+        if(!permissions.loaded){
+            return true;
+        }
+
+        return (permissions.tasks[moduleKey] || []).includes(taskKey);
 
     }
 
@@ -217,7 +245,7 @@ export function AuthProvider({
 
         setPermissions(
 
-            { navModules:[], workspaceTabs:[] }
+            { navModules:[], workspaceTabs:[], businessMasterTabs:[], tasks:{}, landingPage:null, loaded:false }
 
         );
 
@@ -257,6 +285,8 @@ export function AuthProvider({
                 user,
 
                 permissions,
+
+                hasTask,
 
                 login,
 

@@ -428,6 +428,32 @@ export default function BusinessMastersModule(){
 
     const [activeTab, setActiveTab] = useState("customers");
 
+    const { permissions, hasTask } = useAuth();
+
+    // Phase 21E: which Business Masters tabs this role can even open.
+    // Falls back to "all tabs" pre-load, same accommodation already
+    // used by WorkflowTabs.jsx for the Enquiry Workspace tab strip.
+    const allowedBusinessMastersTabs = permissions?.businessMasterTabs?.length
+        ? businessMastersTabs.filter(([key])=>permissions.businessMasterTabs.includes(`bm-tab-${key}`))
+        : businessMastersTabs;
+
+    // If the active tab isn't in the allowed set once permissions have
+    // actually loaded (not just "still fetching"), the content area
+    // must not keep rendering it just because the tab button is
+    // hidden - land on the first tab this role can actually open.
+    useEffect(()=>{
+
+        if(!permissions?.loaded){
+            return;
+        }
+
+        if(!allowedBusinessMastersTabs.some(([key])=>key===activeTab)){
+            setActiveTab(allowedBusinessMastersTabs[0]?.[0] || null);
+        }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [permissions?.loaded, permissions?.businessMasterTabs]);
+
     const [customers, setCustomers] = useState([]);
 
     const [customersLoading, setCustomersLoading] = useState(true);
@@ -530,19 +556,23 @@ export default function BusinessMastersModule(){
 
                 </div>
 
-                <button
+                {hasTask(`bm-tab-${activeTab}`, "export_current_tab") && (
 
-                    className="bm-btn bm-btn-ghost"
+                    <button
 
-                    onClick={handleExportCurrentTab}
+                        className="bm-btn bm-btn-ghost"
 
-                    disabled={activeTab==="customers" && customersLoading}
+                        onClick={handleExportCurrentTab}
 
-                >
+                        disabled={activeTab==="customers" && customersLoading}
 
-                    ⬇ Export current tab
+                    >
 
-                </button>
+                        ⬇ Export current tab
+
+                    </button>
+
+                )}
 
             </div>
 
@@ -550,7 +580,7 @@ export default function BusinessMastersModule(){
 
                 {
 
-                    businessMastersTabs.map(([key, label])=>(
+                    allowedBusinessMastersTabs.map(([key, label])=>(
 
                         <button
 

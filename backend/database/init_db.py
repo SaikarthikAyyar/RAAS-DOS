@@ -66,6 +66,10 @@ from backend.models.purchase_order import PurchaseOrder
 from backend.models.survey_reminder import SurveyReminder
 
 from backend.models.hub import Hub
+from backend.models.hub_approver import HubApprover
+
+from backend.models.module_task import ModuleTask
+from backend.models.role_task_permission import RoleTaskPermission
 
 from backend.models.machines_pumps import Machine, Pump, MachinePumpCompatibility
 

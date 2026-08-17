@@ -41,7 +41,7 @@ export default function QuoteTemplateVariablesModal({
 
     const [saving, setSaving] = useState(false);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
@@ -182,19 +182,23 @@ export default function QuoteTemplateVariablesModal({
 
                                     <span style={{flex:1}}>{v.label}</span>
 
-                                    <button
+                                    {hasTask("bm-tab-quotetemplates", "remove_quote_template_variable") && (
 
-                                        className="bm-backlink"
+                                        <button
 
-                                        style={{color:"#991b1b"}}
+                                            className="bm-backlink"
 
-                                        onClick={()=>handleRemove(v)}
+                                            style={{color:"#991b1b"}}
 
-                                    >
+                                            onClick={()=>handleRemove(v)}
 
-                                        Remove
+                                        >
 
-                                    </button>
+                                            Remove
+
+                                        </button>
+
+                                    )}
 
                                 </div>
 
@@ -242,23 +246,27 @@ export default function QuoteTemplateVariablesModal({
 
                 </div>
 
-                <div className="bm-modal-actions">
+                {hasTask("bm-tab-quotetemplates", "add_quote_template_variable") && (
 
-                    <button
+                    <div className="bm-modal-actions">
 
-                        className="bm-btn bm-btn-primary bm-btn-xs"
+                        <button
 
-                        onClick={handleAdd}
+                            className="bm-btn bm-btn-primary bm-btn-xs"
 
-                        disabled={saving}
+                            onClick={handleAdd}
 
-                    >
+                            disabled={saving}
 
-                        + Add variable
+                        >
 
-                    </button>
+                            + Add variable
 
-                </div>
+                        </button>
+
+                    </div>
+
+                )}
 
                 <div className="bm-modal-actions">
 

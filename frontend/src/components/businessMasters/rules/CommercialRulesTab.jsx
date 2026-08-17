@@ -109,7 +109,7 @@ export default function CommercialRulesTab(){
 
     const [newCategoryMargin, setNewCategoryMargin] = useState("");
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
@@ -346,19 +346,23 @@ export default function CommercialRulesTab(){
 
                             {saveMessage && <p className="bm-modal-hint" style={{color:"#166534"}}>{saveMessage}</p>}
 
-                            <button
+                            {hasTask("bm-tab-rules", "save_commercial_rules") && (
 
-                                className="bm-btn bm-btn-primary"
+                                <button
 
-                                onClick={handleSaveRules}
+                                    className="bm-btn bm-btn-primary"
 
-                                disabled={saving}
+                                    onClick={handleSaveRules}
 
-                            >
+                                    disabled={saving}
 
-                                {saving ? "Saving..." : "Save changes"}
+                                >
 
-                            </button>
+                                    {saving ? "Saving..." : "Save changes"}
+
+                                </button>
+
+                            )}
 
                         </>
 
@@ -412,17 +416,21 @@ export default function CommercialRulesTab(){
 
                                                 <td>
 
-                                                    <button
+                                                    {hasTask("bm-tab-rules", "remove_customer_category") && (
 
-                                                        className="bm-backlink"
+                                                        <button
 
-                                                        onClick={()=>handleRemoveCategory(c.id)}
+                                                            className="bm-backlink"
 
-                                                    >
+                                                            onClick={()=>handleRemoveCategory(c.id)}
 
-                                                        Remove
+                                                        >
 
-                                                    </button>
+                                                            Remove
+
+                                                        </button>
+
+                                                    )}
 
                                                 </td>
 
@@ -466,17 +474,21 @@ export default function CommercialRulesTab(){
 
                                         <td>
 
-                                            <button
+                                            {hasTask("bm-tab-rules", "add_customer_category") && (
 
-                                                className="bm-btn bm-btn-primary bm-btn-xs"
+                                                <button
 
-                                                onClick={handleAddCategory}
+                                                    className="bm-btn bm-btn-primary bm-btn-xs"
 
-                                            >
+                                                    onClick={handleAddCategory}
 
-                                                + Add
+                                                >
 
-                                            </button>
+                                                    + Add
+
+                                                </button>
+
+                                            )}
 
                                         </td>
 

@@ -177,7 +177,7 @@ export default function ServiceConfigTab(){
 
     const [editing, setEditing] = useState(null);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
@@ -280,17 +280,21 @@ export default function ServiceConfigTab(){
 
                 Service configurations
 
-                <button
+                {hasTask("bm-tab-serviceconfig", "add_service_config") && (
 
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                    <button
 
-                    onClick={()=>{ setEditing(null); setShowModal(true); }}
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
 
-                >
+                        onClick={()=>{ setEditing(null); setShowModal(true); }}
 
-                    + Add
+                    >
 
-                </button>
+                        + Add
+
+                    </button>
+
+                )}
 
             </h3>
 
@@ -344,31 +348,39 @@ export default function ServiceConfigTab(){
 
                                         <td>
 
-                                            <button
+                                            {hasTask("bm-tab-serviceconfig", "edit_service_config") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>{ setEditing(c); setShowModal(true); }}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>{ setEditing(c); setShowModal(true); }}
 
-                                                Edit
+                                                >
 
-                                            </button>
+                                                    Edit
+
+                                                </button>
+
+                                            )}
 
                                             {" "}
 
-                                            <button
+                                            {hasTask("bm-tab-serviceconfig", "remove_service_config") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>handleRemove(c.id)}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>handleRemove(c.id)}
 
-                                                Remove
+                                                >
 
-                                            </button>
+                                                    Remove
+
+                                                </button>
+
+                                            )}
 
                                         </td>
 

@@ -13,13 +13,17 @@ from backend.database.connection import get_db
 from backend.schemas.role_permissions_schema import (
     RolePermissionsResponse,
     NavMatrixResponse,
-    NavMatrixSaveRequest
+    NavMatrixSaveRequest,
+    TaskMatrixResponse,
+    TaskMatrixSaveRequest
 )
 
 from backend.services.role_permissions_service import (
     get_role_permissions_request,
     get_nav_matrix_request,
-    save_nav_matrix_request
+    save_nav_matrix_request,
+    get_task_matrix_request,
+    save_task_matrix_request
 )
 
 # ====================================
@@ -87,3 +91,48 @@ def save_nav_matrix(
             status_code=400,
             detail=str(error)
         )
+
+
+# ====================================
+# TASK MATRIX (Phase 21D, admin-facing, editable)
+# Scoped to one role - drives the Role-based Access subtab once a role
+# is selected from the existing role list.
+# ====================================
+
+@router.get(
+    "/role-permissions/task-matrix/{role_id}",
+    response_model=TaskMatrixResponse
+)
+def get_task_matrix(
+        role_id: int,
+        db: Session = Depends(get_db)
+):
+    matrix = get_task_matrix_request(db, role_id)
+
+    if not matrix:
+        raise HTTPException(
+            status_code=404,
+            detail="Role not found."
+        )
+
+    return matrix
+
+
+@router.put(
+    "/role-permissions/task-matrix/{role_id}",
+    response_model=TaskMatrixResponse
+)
+def save_task_matrix(
+        role_id: int,
+        payload: TaskMatrixSaveRequest,
+        db: Session = Depends(get_db)
+):
+    matrix = save_task_matrix_request(db, role_id, payload)
+
+    if not matrix:
+        raise HTTPException(
+            status_code=404,
+            detail="Role not found."
+        )
+
+    return matrix

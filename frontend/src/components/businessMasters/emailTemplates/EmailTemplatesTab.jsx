@@ -76,7 +76,7 @@ export default function EmailTemplatesTab(){
 
     const [sendingTemplate, setSendingTemplate] = useState(null);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
@@ -176,17 +176,21 @@ export default function EmailTemplatesTab(){
 
                 Email templates
 
-                <button
+                {hasTask("bm-tab-emailtemplates", "add_email_template") && (
 
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                    <button
 
-                    onClick={()=>{ setEditingTemplate(null); setShowEditModal(true); }}
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
 
-                >
+                        onClick={()=>{ setEditingTemplate(null); setShowEditModal(true); }}
 
-                    + Add template
+                    >
 
-                </button>
+                        + Add template
+
+                    </button>
+
+                )}
 
             </h3>
 
@@ -248,58 +252,80 @@ export default function EmailTemplatesTab(){
 
                                         <td>
 
-                                            <span
+                                            {hasTask("bm-tab-emailtemplates", "toggle_email_template_active") ? (
 
-                                                className={t.is_active ? "bm-pill bm-pill-green" : "bm-pill bm-pill-gray"}
+                                                <span
 
-                                                style={{cursor:"pointer"}}
+                                                    className={t.is_active ? "bm-pill bm-pill-green" : "bm-pill bm-pill-gray"}
 
-                                                onClick={()=>handleToggleActive(t)}
+                                                    style={{cursor:"pointer"}}
 
-                                            >
+                                                    onClick={()=>handleToggleActive(t)}
 
-                                                {t.is_active ? "Active" : "Inactive"}
+                                                >
 
-                                            </span>
+                                                    {t.is_active ? "Active" : "Inactive"}
+
+                                                </span>
+
+                                            ) : (
+
+                                                <span className={t.is_active ? "bm-pill bm-pill-green" : "bm-pill bm-pill-gray"}>
+
+                                                    {t.is_active ? "Active" : "Inactive"}
+
+                                                </span>
+
+                                            )}
 
                                         </td>
 
                                         <td className="email-template-actions">
 
-                                            <ActionButton
-                                                icon={Pencil}
-                                                label="Edit"
-                                                className="email-template-edit"
-                                                onClick={()=>{ setEditingTemplate(t); setShowEditModal(true); }}
-                                            />
+                                            {hasTask("bm-tab-emailtemplates", "edit_email_template") && (
+                                                <ActionButton
+                                                    icon={Pencil}
+                                                    label="Edit"
+                                                    className="email-template-edit"
+                                                    onClick={()=>{ setEditingTemplate(t); setShowEditModal(true); }}
+                                                />
+                                            )}
 
-                                            <ActionButton
-                                                icon={Eye}
-                                                label="View body"
-                                                className="email-template-view"
-                                                onClick={()=>setViewingTemplate(t)}
-                                            />
+                                            {hasTask("bm-tab-emailtemplates", "view_email_template_body") && (
+                                                <ActionButton
+                                                    icon={Eye}
+                                                    label="View body"
+                                                    className="email-template-view"
+                                                    onClick={()=>setViewingTemplate(t)}
+                                                />
+                                            )}
 
-                                            <ActionButton
-                                                icon={SlidersHorizontal}
-                                                label="Details (variables)"
-                                                className="email-template-details"
-                                                onClick={()=>setDetailsTemplate(t)}
-                                            />
+                                            {hasTask("bm-tab-emailtemplates", "view_email_template_variables") && (
+                                                <ActionButton
+                                                    icon={SlidersHorizontal}
+                                                    label="Details (variables)"
+                                                    className="email-template-details"
+                                                    onClick={()=>setDetailsTemplate(t)}
+                                                />
+                                            )}
 
-                                            <ActionButton
-                                                icon={Send}
-                                                label="Send"
-                                                className="email-template-send"
-                                                onClick={()=>setSendingTemplate(t)}
-                                            />
+                                            {hasTask("bm-tab-emailtemplates", "send_email_template") && (
+                                                <ActionButton
+                                                    icon={Send}
+                                                    label="Send"
+                                                    className="email-template-send"
+                                                    onClick={()=>setSendingTemplate(t)}
+                                                />
+                                            )}
 
-                                            <ActionButton
-                                                icon={Trash2}
-                                                label="Remove"
-                                                className="email-template-delete"
-                                                onClick={()=>handleDelete(t)}
-                                            />
+                                            {hasTask("bm-tab-emailtemplates", "remove_email_template") && (
+                                                <ActionButton
+                                                    icon={Trash2}
+                                                    label="Remove"
+                                                    className="email-template-delete"
+                                                    onClick={()=>handleDelete(t)}
+                                                />
+                                            )}
 
                                         </td>
 

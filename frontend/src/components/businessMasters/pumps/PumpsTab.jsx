@@ -233,7 +233,7 @@ export default function PumpsTab(){
     const [showModal, setShowModal] = useState(false);
     const [editing, setEditing] = useState(null);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
     const load = useCallback(async()=>{
@@ -305,12 +305,14 @@ export default function PumpsTab(){
 
                 Pump Master
 
-                <button
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
-                    onClick={()=>{ setEditing(null); setShowModal(true); }}
-                >
-                    + Add
-                </button>
+                {hasTask("bm-tab-pumps", "add_pump") && (
+                    <button
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                        onClick={()=>{ setEditing(null); setShowModal(true); }}
+                    >
+                        + Add
+                    </button>
+                )}
 
             </h3>
 
@@ -369,21 +371,25 @@ export default function PumpsTab(){
 
                                         <td>
 
-                                            <button
-                                                className="bm-backlink"
-                                                onClick={()=>{ setEditing(p); setShowModal(true); }}
-                                            >
-                                                Edit
-                                            </button>
+                                            {hasTask("bm-tab-pumps", "edit_pump") && (
+                                                <button
+                                                    className="bm-backlink"
+                                                    onClick={()=>{ setEditing(p); setShowModal(true); }}
+                                                >
+                                                    Edit
+                                                </button>
+                                            )}
 
                                             {" "}
 
-                                            <button
-                                                className="bm-backlink"
-                                                onClick={()=>handleRemove(p.id)}
-                                            >
-                                                Remove
-                                            </button>
+                                            {hasTask("bm-tab-pumps", "remove_pump") && (
+                                                <button
+                                                    className="bm-backlink"
+                                                    onClick={()=>handleRemove(p.id)}
+                                                >
+                                                    Remove
+                                                </button>
+                                            )}
 
                                         </td>
 

@@ -102,7 +102,7 @@ export default function QuoteTemplatesTab(){
 
     const [detailsTemplate, setDetailsTemplate] = useState(null);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
@@ -202,17 +202,21 @@ export default function QuoteTemplatesTab(){
 
                 Quote templates
 
-                <button
+                {hasTask("bm-tab-quotetemplates", "add_quote_template") && (
 
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                    <button
 
-                    onClick={()=>{ setEditingTemplate(null); setShowEditModal(true); }}
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
 
-                >
+                        onClick={()=>{ setEditingTemplate(null); setShowEditModal(true); }}
 
-                    + Add template
+                    >
 
-                </button>
+                        + Add template
+
+                    </button>
+
+                )}
 
             </h3>
 
@@ -269,51 +273,71 @@ export default function QuoteTemplatesTab(){
 
                                         <td>
 
-                                            <span
+                                            {hasTask("bm-tab-quotetemplates", "toggle_quote_template_active") ? (
 
-                                                className={t.active ? "bm-pill bm-pill-green" : "bm-pill bm-pill-gray"}
+                                                <span
 
-                                                style={{cursor:"pointer"}}
+                                                    className={t.active ? "bm-pill bm-pill-green" : "bm-pill bm-pill-gray"}
 
-                                                onClick={()=>handleToggleActive(t)}
+                                                    style={{cursor:"pointer"}}
 
-                                            >
+                                                    onClick={()=>handleToggleActive(t)}
 
-                                                {t.active ? "Active" : "Inactive"}
+                                                >
 
-                                            </span>
+                                                    {t.active ? "Active" : "Inactive"}
+
+                                                </span>
+
+                                            ) : (
+
+                                                <span className={t.active ? "bm-pill bm-pill-green" : "bm-pill bm-pill-gray"}>
+
+                                                    {t.active ? "Active" : "Inactive"}
+
+                                                </span>
+
+                                            )}
 
                                         </td>
 
                                         <td className="email-template-actions">
 
-                                            <ActionButton
-                                                icon={Pencil}
-                                                label="Edit"
-                                                className="email-template-edit"
-                                                onClick={()=>{ setEditingTemplate(t); setShowEditModal(true); }}
-                                            />
+                                            {hasTask("bm-tab-quotetemplates", "edit_quote_template") && (
+                                                <ActionButton
+                                                    icon={Pencil}
+                                                    label="Edit"
+                                                    className="email-template-edit"
+                                                    onClick={()=>{ setEditingTemplate(t); setShowEditModal(true); }}
+                                                />
+                                            )}
 
-                                            <ActionButton
-                                                icon={SlidersHorizontal}
-                                                label="Details (variables)"
-                                                className="email-template-details"
-                                                onClick={()=>setDetailsTemplate(t)}
-                                            />
+                                            {hasTask("bm-tab-quotetemplates", "view_quote_template_variables") && (
+                                                <ActionButton
+                                                    icon={SlidersHorizontal}
+                                                    label="Details (variables)"
+                                                    className="email-template-details"
+                                                    onClick={()=>setDetailsTemplate(t)}
+                                                />
+                                            )}
 
-                                            <ActionLink
-                                                icon={FileDown}
-                                                label="Download sample .docx"
-                                                className="email-template-view"
-                                                href={quoteTemplatePreviewUrl(t.id)}
-                                            />
+                                            {hasTask("bm-tab-quotetemplates", "download_quote_template_sample") && (
+                                                <ActionLink
+                                                    icon={FileDown}
+                                                    label="Download sample .docx"
+                                                    className="email-template-view"
+                                                    href={quoteTemplatePreviewUrl(t.id)}
+                                                />
+                                            )}
 
-                                            <ActionButton
-                                                icon={Trash2}
-                                                label="Remove"
-                                                className="email-template-delete"
-                                                onClick={()=>handleDelete(t)}
-                                            />
+                                            {hasTask("bm-tab-quotetemplates", "remove_quote_template") && (
+                                                <ActionButton
+                                                    icon={Trash2}
+                                                    label="Remove"
+                                                    className="email-template-delete"
+                                                    onClick={()=>handleDelete(t)}
+                                                />
+                                            )}
 
                                         </td>
 

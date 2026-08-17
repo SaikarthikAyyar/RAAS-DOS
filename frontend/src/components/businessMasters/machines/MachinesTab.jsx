@@ -473,7 +473,7 @@ export default function MachinesTab(){
     const [showModal, setShowModal] = useState(false);
     const [editing, setEditing] = useState(null);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
     const load = useCallback(async()=>{
@@ -560,12 +560,14 @@ export default function MachinesTab(){
 
                 Machines / Fleet
 
-                <button
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
-                    onClick={()=>{ setEditing(null); setShowModal(true); }}
-                >
-                    + Add
-                </button>
+                {hasTask("bm-tab-machines", "add_machine") && (
+                    <button
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                        onClick={()=>{ setEditing(null); setShowModal(true); }}
+                    >
+                        + Add
+                    </button>
+                )}
 
             </h3>
 
@@ -622,21 +624,25 @@ export default function MachinesTab(){
 
                                         <td>
 
-                                            <button
-                                                className="bm-backlink"
-                                                onClick={()=>{ setEditing(m); setShowModal(true); }}
-                                            >
-                                                Edit
-                                            </button>
+                                            {hasTask("bm-tab-machines", "edit_machine") && (
+                                                <button
+                                                    className="bm-backlink"
+                                                    onClick={()=>{ setEditing(m); setShowModal(true); }}
+                                                >
+                                                    Edit
+                                                </button>
+                                            )}
 
                                             {" "}
 
-                                            <button
-                                                className="bm-backlink"
-                                                onClick={()=>handleRemove(m.id)}
-                                            >
-                                                Remove
-                                            </button>
+                                            {hasTask("bm-tab-machines", "remove_machine") && (
+                                                <button
+                                                    className="bm-backlink"
+                                                    onClick={()=>handleRemove(m.id)}
+                                                >
+                                                    Remove
+                                                </button>
+                                            )}
 
                                         </td>
 

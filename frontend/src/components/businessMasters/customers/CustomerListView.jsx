@@ -1,3 +1,6 @@
+import { useAuth } from "../../../contexts/AuthContext";
+
+
 // ====================================
 // PILL FOR FOLLOW-UP BUCKET
 // Matches the wireframe's pillForFU(): overdue=red, today=amber,
@@ -35,6 +38,8 @@ export default function CustomerListView({
 
 }){
 
+    const { hasTask } = useAuth();
+
     return(
 
         <div className="bm-card">
@@ -43,17 +48,21 @@ export default function CustomerListView({
 
                 Customer master (CRM)
 
-                <button
+                {hasTask("bm-tab-customers", "add_customer") && (
 
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                    <button
 
-                    onClick={onNewCustomer}
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
 
-                >
+                        onClick={onNewCustomer}
 
-                    + New customer
+                    >
 
-                </button>
+                        + New customer
+
+                    </button>
+
+                )}
 
             </h3>
 

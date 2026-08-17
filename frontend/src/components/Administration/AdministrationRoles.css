@@ -106,6 +106,19 @@
 }
 
 
+.role-card.selected{
+
+    border-color:#f58220;
+    box-shadow:0 0 0 1px #f58220 inset;
+
+}
+
+.role-card-content{
+
+    cursor:pointer;
+
+}
+
 .role-card:hover{
 
     transform:translateY(-2px);

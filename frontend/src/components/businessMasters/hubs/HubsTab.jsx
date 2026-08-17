@@ -7,6 +7,8 @@ import {
     deleteHub
 } from "../../../services/hubsService";
 
+import { getUsers } from "../../../services/administrationUsersService";
+
 import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
@@ -15,18 +17,70 @@ import { buildActor } from "../../../utils/actor";
 
 
 // ====================================
+// MULTI-SELECT CHECKBOX LIST
+// Same pattern as MachinesTab.jsx's CheckboxList - a hub can have
+// several real Ops Review owners and several Techno-Commercial
+// approvers; being listed here IS that user's real approval standing
+// for this hub, not just a display label.
+// ====================================
+
+function CheckboxList({ options, selected, onChange }){
+
+    function toggle(value){
+
+        if(selected.includes(value)){
+            onChange(selected.filter(v=>v!==value));
+        }
+        else{
+            onChange([...selected, value]);
+        }
+
+    }
+
+    return(
+
+        <div className="bm-checkbox-list">
+
+            {
+                options.length===0 ? (
+                    <span className="bm-muted">No users available yet.</span>
+                ) : options.map(opt=>(
+
+                    <label key={opt.id}>
+
+                        <input
+                            type="checkbox"
+                            checked={selected.includes(opt.id)}
+                            onChange={()=>toggle(opt.id)}
+                        />
+
+                        {opt.name}
+
+                    </label>
+
+                ))
+            }
+
+        </div>
+
+    );
+
+}
+
+
+// ====================================
 // ADD / EDIT MODAL
 // ====================================
 
-function HubModal({ editing, onClose, onSave }){
+function HubModal({ editing, allUsers, onClose, onSave }){
 
     const [hubName, setHubName] = useState(editing?.hub_name || "");
 
     const [region, setRegion] = useState(editing?.region || "");
 
-    const [opsOwner, setOpsOwner] = useState(editing?.ops_owner || "");
+    const [opsOwnerUserIds, setOpsOwnerUserIds] = useState(editing?.ops_owner_user_ids || []);
 
-    const [technoApprover, setTechnoApprover] = useState(editing?.techno_approver || "");
+    const [technoApproverUserIds, setTechnoApproverUserIds] = useState(editing?.techno_approver_user_ids || []);
 
     const [saving, setSaving] = useState(false);
 
@@ -52,8 +106,8 @@ function HubModal({ editing, onClose, onSave }){
 
                 hub_name: hubName.trim(),
                 region: region.trim() || null,
-                ops_owner: opsOwner.trim() || null,
-                techno_approver: technoApprover.trim() || null
+                ops_owner_user_ids: opsOwnerUserIds,
+                techno_approver_user_ids: technoApproverUserIds
 
             });
 
@@ -115,30 +169,26 @@ function HubModal({ editing, onClose, onSave }){
 
                     </div>
 
-                    <div>
+                    <div style={{gridColumn:"1 / -1"}}>
 
-                        <label>Ops owner</label>
+                        <label>Ops owners (real approval standing for this hub)</label>
 
-                        <input
-
-                            value={opsOwner}
-
-                            onChange={e=>setOpsOwner(e.target.value)}
-
+                        <CheckboxList
+                            options={allUsers}
+                            selected={opsOwnerUserIds}
+                            onChange={setOpsOwnerUserIds}
                         />
 
                     </div>
 
-                    <div>
+                    <div style={{gridColumn:"1 / -1"}}>
 
-                        <label>Techno-Commercial approver</label>
+                        <label>Techno-Commercial approvers (real approval standing for this hub)</label>
 
-                        <input
-
-                            value={technoApprover}
-
-                            onChange={e=>setTechnoApprover(e.target.value)}
-
+                        <CheckboxList
+                            options={allUsers}
+                            selected={technoApproverUserIds}
+                            onChange={setTechnoApproverUserIds}
                         />
 
                     </div>
@@ -190,9 +240,11 @@ export default function HubsTab(){
 
     const [editing, setEditing] = useState(null);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
+
+    const [allUsers, setAllUsers] = useState([]);
 
     const load = useCallback(async()=>{
 
@@ -224,6 +276,14 @@ export default function HubsTab(){
     }, []);
 
     useEffect(()=>{ load(); }, [load]);
+
+    useEffect(()=>{
+
+        getUsers()
+            .then(setAllUsers)
+            .catch(err=>console.error(err));
+
+    }, []);
 
     async function handleSave(payload){
 
@@ -284,22 +344,26 @@ export default function HubsTab(){
 
                 Hubs
 
-                <button
+                {hasTask("bm-tab-hubs", "add_hub") && (
 
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                    <button
 
-                    onClick={()=>{ setEditing(null); setShowModal(true); }}
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
 
-                >
+                        onClick={()=>{ setEditing(null); setShowModal(true); }}
 
-                    + Add
+                    >
 
-                </button>
+                        + Add
+
+                    </button>
+
+                )}
 
             </h3>
 
             <p className="bm-muted" style={{marginBottom:10}}>
-                Who owns Ops Review and Techno-Commercial Approval for each hub - feeds the Hub and Owner columns on the Reviews &amp; Approvals module.
+Who holds real Ops Review and Techno-Commercial Approval standing for each hub - a hub can have several of each. Feeds the Hub and Owner columns on the Reviews &amp; Approvals module.
             </p>
 
             {
@@ -328,9 +392,9 @@ export default function HubsTab(){
 
                                 <th>Region</th>
 
-                                <th>Ops owner</th>
+                                <th>Ops owners</th>
 
-                                <th>Techno-Commercial approver</th>
+                                <th>Techno-Commercial approvers</th>
 
                                 <th></th>
 
@@ -350,37 +414,45 @@ export default function HubsTab(){
 
                                         <td>{h.region || "—"}</td>
 
-                                        <td>{h.ops_owner || "—"}</td>
+                                        <td>{h.ops_owners?.length ? h.ops_owners.map(o=>o.name).join(", ") : "—"}</td>
 
-                                        <td>{h.techno_approver || "—"}</td>
+                                        <td>{h.techno_approvers?.length ? h.techno_approvers.map(o=>o.name).join(", ") : "—"}</td>
 
                                         <td>
 
-                                            <button
+                                            {hasTask("bm-tab-hubs", "edit_hub") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>{ setEditing(h); setShowModal(true); }}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>{ setEditing(h); setShowModal(true); }}
 
-                                                Edit
+                                                >
 
-                                            </button>
+                                                    Edit
+
+                                                </button>
+
+                                            )}
 
                                             {" "}
 
-                                            <button
+                                            {hasTask("bm-tab-hubs", "remove_hub") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>handleRemove(h.id)}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>handleRemove(h.id)}
 
-                                                Remove
+                                                >
 
-                                            </button>
+                                                    Remove
+
+                                                </button>
+
+                                            )}
 
                                         </td>
 
@@ -405,6 +477,8 @@ export default function HubsTab(){
                     <HubModal
 
                         editing={editing}
+
+                        allUsers={allUsers}
 
                         onClose={()=>{ setShowModal(false); setEditing(null); }}
 

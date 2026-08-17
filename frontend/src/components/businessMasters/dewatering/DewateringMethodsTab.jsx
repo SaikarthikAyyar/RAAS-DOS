@@ -213,7 +213,7 @@ export default function DewateringMethodsTab(){
 
     const [editing, setEditing] = useState(null);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
@@ -318,17 +318,21 @@ export default function DewateringMethodsTab(){
 
                 Dewatering methods
 
-                <button
+                {hasTask("bm-tab-dewatering", "add_dewatering_method") && (
 
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                    <button
 
-                    onClick={()=>{ setEditing(null); setShowModal(true); }}
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
 
-                >
+                        onClick={()=>{ setEditing(null); setShowModal(true); }}
 
-                    + Add
+                    >
 
-                </button>
+                        + Add
+
+                    </button>
+
+                )}
 
             </h3>
 
@@ -386,31 +390,39 @@ export default function DewateringMethodsTab(){
 
                                         <td>
 
-                                            <button
+                                            {hasTask("bm-tab-dewatering", "edit_dewatering_method") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>{ setEditing(m); setShowModal(true); }}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>{ setEditing(m); setShowModal(true); }}
 
-                                                Edit
+                                                >
 
-                                            </button>
+                                                    Edit
+
+                                                </button>
+
+                                            )}
 
                                             {" "}
 
-                                            <button
+                                            {hasTask("bm-tab-dewatering", "remove_dewatering_method") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>handleRemove(m.id)}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>handleRemove(m.id)}
 
-                                                Remove
+                                                >
 
-                                            </button>
+                                                    Remove
+
+                                                </button>
+
+                                            )}
 
                                         </td>
 

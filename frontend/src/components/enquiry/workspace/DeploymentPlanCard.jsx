@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
 import {
     saveDeploymentPlan
 } from "../../../services/opsSelectorService";
@@ -53,6 +55,8 @@ export default function DeploymentPlanCard({
     reload
 
 }){
+
+    const { hasTask } = useAuth();
 
     const [mobDays, setMobDays] = useState(opsSelection.mobilisation_days ?? 0);
 
@@ -309,13 +313,15 @@ export default function DeploymentPlanCard({
                                 </td>
 
                                 <td>
-                                    <button
-                                        className="ops-row-remove"
-                                        onClick={()=>removeCrewRow(index)}
-                                        type="button"
-                                    >
-                                        &times;
-                                    </button>
+                                    {hasTask("enquiry-tab-ops-review", "remove_crew_role") && (
+                                        <button
+                                            className="ops-row-remove"
+                                            onClick={()=>removeCrewRow(index)}
+                                            type="button"
+                                        >
+                                            &times;
+                                        </button>
+                                    )}
                                 </td>
 
                             </tr>
@@ -328,21 +334,25 @@ export default function DeploymentPlanCard({
 
             </table>
 
-            <button
+            {hasTask("enquiry-tab-ops-review", "add_crew_role") && (
 
-                type="button"
+                <button
 
-                className="survey-action-button survey-create-button"
+                    type="button"
 
-                onClick={addCrewRow}
+                    className="survey-action-button survey-create-button"
 
-                style={{marginTop:8}}
+                    onClick={addCrewRow}
 
-            >
+                    style={{marginTop:8}}
 
-                + Add Role
+                >
 
-            </button>
+                    + Add Role
+
+                </button>
+
+            )}
 
             <h4 className="ops-subheading">Accessories Needed</h4>
 
@@ -437,21 +447,25 @@ export default function DeploymentPlanCard({
 
             {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
 
-            <button
+            {hasTask("enquiry-tab-ops-review", "save_deployment_plan_generate_quote") && (
 
-                className="survey-action-button"
+                <button
 
-                onClick={handleSaveAndGenerateQuote}
+                    className="survey-action-button"
 
-                disabled={saving}
+                    onClick={handleSaveAndGenerateQuote}
 
-                style={{marginTop:12}}
+                    disabled={saving}
 
-            >
+                    style={{marginTop:12}}
 
-                {saving ? "Saving..." : "Save Deployment Plan & Generate Quote"}
+                >
 
-            </button>
+                    {saving ? "Saving..." : "Save Deployment Plan & Generate Quote"}
+
+                </button>
+
+            )}
 
         </div>
 

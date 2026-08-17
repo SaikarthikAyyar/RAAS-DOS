@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
 import {
     saveOpsReviewDecision
 } from "../../../services/opsSelectorService";
@@ -26,6 +28,8 @@ export default function OpsReviewDecisionCard({
 }){
 
     const navigate = useNavigate();
+
+    const { hasTask } = useAuth();
 
     const [quoteReady, setQuoteReady] = useState(false);
 
@@ -303,19 +307,23 @@ export default function OpsReviewDecisionCard({
 
                 </button>
 
-                <button
+                {hasTask("enquiry-tab-ops-review", "open_ops_selector") && (
 
-                    type="button"
+                    <button
 
-                    className="survey-action-button"
+                        type="button"
 
-                    onClick={handleOpenOpsSelector}
+                        className="survey-action-button"
 
-                >
+                        onClick={handleOpenOpsSelector}
 
-                    Open Ops Selector
+                    >
 
-                </button>
+                        Open Ops Selector
+
+                    </button>
+
+                )}
 
             </div>
 

@@ -30,13 +30,19 @@ from "./AdministrationRoleForm";
 import RoleNavigationMatrix
 from "./RoleNavigationMatrix";
 
+import HubApprovalStandingCard
+from "./HubApprovalStandingCard";
+
+import RoleTaskMatrix
+from "./RoleTaskMatrix";
+
 
 // Local to this screen only - not the outer Partners/Roles/Users strip
 // one level up in AdministrationPage.jsx. More subtabs (Restrictions,
 // Business Master Accessibility) join this array in later phases.
 const SUB_TABS = [
 
-    ["roles", "Roles"],
+    ["roles", "Role-based Access"],
     ["navigation", "Navigation Access"]
 
 ];
@@ -93,6 +99,14 @@ export default function AdministrationRoles({
         setActiveSubTab
 
     ] = useState("roles");
+
+    const [
+
+        selectedRole,
+
+        setSelectedRole
+
+    ] = useState(null);
 
 
     async function loadRoles(){
@@ -387,6 +401,7 @@ export default function AdministrationRoles({
 
             {
                 activeSubTab==="roles" && (
+                    <>
 
             <div className="administration-roles-sidebar">
 
@@ -432,6 +447,10 @@ export default function AdministrationRoles({
 
                                 onDelete={handleDelete}
 
+                                selected={selectedRole?.id===role.id}
+
+                                onSelect={setSelectedRole}
+
                             />
 
                         )
@@ -442,12 +461,26 @@ export default function AdministrationRoles({
 
             </div>
 
+            <p className="role-nav-matrix-hint" style={{marginTop:14}}>
+                Select a role above to view and edit its Business Masters + Enquiries task access.
+            </p>
+
+            {
+                selectedRole && (
+                    <RoleTaskMatrix role={selectedRole}/>
+                )
+            }
+
+                    </>
                 )
             }
 
             {
                 activeSubTab==="navigation" && (
-                    <RoleNavigationMatrix/>
+                    <>
+                        <HubApprovalStandingCard/>
+                        <RoleNavigationMatrix/>
+                    </>
                 )
             }
 

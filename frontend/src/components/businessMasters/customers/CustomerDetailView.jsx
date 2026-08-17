@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import * as XLSX from "xlsx";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
 
 // ====================================
 // FORMATTERS
@@ -108,6 +110,8 @@ export default function CustomerDetailView({
 }){
 
     const navigate = useNavigate();
+
+    const { hasTask } = useAuth();
 
     const [editingOwner, setEditingOwner] = useState(false);
 
@@ -313,7 +317,9 @@ export default function CustomerDetailView({
                         ) : (
                             <span style={{display:"flex", gap:6, alignItems:"center"}}>
                                 <b>{detail.owner_name || detail.owner || "—"}</b>
-                                <button className="bm-btn bm-btn-xs" onClick={()=>setEditingOwner(true)}>Reassign</button>
+                                {hasTask("bm-tab-customers", "reassign_account_owner") && (
+                                    <button className="bm-btn bm-btn-xs" onClick={()=>setEditingOwner(true)}>Reassign</button>
+                                )}
                             </span>
                         )
                     }
@@ -328,7 +334,9 @@ export default function CustomerDetailView({
 
                     Contacts
 
-                    <button className="bm-btn bm-btn-xs" onClick={onAddContact}>+ Add</button>
+                    {hasTask("bm-tab-customers", "add_contact") && (
+                        <button className="bm-btn bm-btn-xs" onClick={onAddContact}>+ Add</button>
+                    )}
 
                 </h4>
 
@@ -414,19 +422,23 @@ export default function CustomerDetailView({
 
                 </table>
 
-                <button
+                {hasTask("bm-tab-customers", "export_customer_360") && (
 
-                    className="bm-btn bm-btn-ghost"
+                    <button
 
-                    style={{marginTop:8}}
+                        className="bm-btn bm-btn-ghost"
 
-                    onClick={handleExportCustomer}
+                        style={{marginTop:8}}
 
-                >
+                        onClick={handleExportCustomer}
 
-                    ⬇ Export Current Customer
+                    >
 
-                </button>
+                        ⬇ Export Current Customer
+
+                    </button>
+
+                )}
 
             </div>
 
@@ -462,9 +474,13 @@ export default function CustomerDetailView({
 
                 <div style={{marginTop:10, display:"flex", gap:8}}>
 
-                    <button className="bm-btn" onClick={onSetFollowUp}>Set / update</button>
+                    {hasTask("bm-tab-customers", "set_follow_up") && (
+                        <button className="bm-btn" onClick={onSetFollowUp}>Set / update</button>
+                    )}
 
-                    <button className="bm-btn bm-btn-primary" onClick={onSendReminder}>Send reminder</button>
+                    {hasTask("bm-tab-customers", "send_reminder") && (
+                        <button className="bm-btn bm-btn-primary" onClick={onSendReminder}>Send reminder</button>
+                    )}
 
                 </div>
 

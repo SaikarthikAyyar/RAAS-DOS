@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
 import {
     getQuoteHistory,
     updateInternalExtra,
@@ -38,6 +40,8 @@ export default function QuoteCommercialSummary({
 }){
 
     const navigate = useNavigate();
+
+    const { hasTask } = useAuth();
 
     const [history, setHistory] = useState([]);
 
@@ -331,20 +335,24 @@ export default function QuoteCommercialSummary({
 
                 <div className="survey-actions" style={{marginTop:10}}>
 
-                    <button
-                        className="survey-action-button"
-                        onClick={handleSaveExtra}
-                        disabled={savingExtra}
-                    >
-                        {savingExtra ? "Saving..." : "Save internal addition"}
-                    </button>
+                    {hasTask("enquiry-tab-quote-commercial", "save_internal_addition") && (
+                        <button
+                            className="survey-action-button"
+                            onClick={handleSaveExtra}
+                            disabled={savingExtra}
+                        >
+                            {savingExtra ? "Saving..." : "Save internal addition"}
+                        </button>
+                    )}
 
-                    <button
-                        className="survey-action-button"
-                        onClick={()=>setShowPreview(v=>!v)}
-                    >
-                        {showPreview ? "Hide" : "Preview"} customer-facing quote
-                    </button>
+                    {hasTask("enquiry-tab-quote-commercial", "preview_customer_quote") && (
+                        <button
+                            className="survey-action-button"
+                            onClick={()=>setShowPreview(v=>!v)}
+                        >
+                            {showPreview ? "Hide" : "Preview"} customer-facing quote
+                        </button>
+                    )}
 
                 </div>
 
@@ -419,13 +427,15 @@ export default function QuoteCommercialSummary({
                                 onChange={e=>setValidTill(e.target.value)}
                                 style={{marginRight:8}}
                             />
-                            <button
-                                className="survey-action-button"
-                                onClick={handleSaveValidTill}
-                                disabled={savingValidTill}
-                            >
-                                {savingValidTill ? "Saving..." : "Save"}
-                            </button>
+                            {hasTask("enquiry-tab-quote-commercial", "save_valid_till") && (
+                                <button
+                                    className="survey-action-button"
+                                    onClick={handleSaveValidTill}
+                                    disabled={savingValidTill}
+                                >
+                                    {savingValidTill ? "Saving..." : "Save"}
+                                </button>
+                            )}
                         </span>
                     </div>
 
@@ -495,12 +505,14 @@ export default function QuoteCommercialSummary({
 
                 <div className="survey-actions" style={{flexWrap:"wrap", gap:8}}>
 
-                    <button
-                        className="survey-action-button"
-                        onClick={handleOpenQuotesModule}
-                    >
-                        Open Quotes Module
-                    </button>
+                    {hasTask("enquiry-tab-quote-commercial", "open_quotes_module") && (
+                        <button
+                            className="survey-action-button"
+                            onClick={handleOpenQuotesModule}
+                        >
+                            Open Quotes Module
+                        </button>
+                    )}
 
                     <input
                         placeholder="Your name"
@@ -509,32 +521,36 @@ export default function QuoteCommercialSummary({
                         style={{maxWidth:160}}
                     />
 
-                    <button
-                        className="survey-action-button survey-action-button-danger"
-                        onClick={handleRequestRevision}
-                        disabled={requestingRevision || quote.revision_requested}
-                    >
-                        {
-                            requestingRevision
-                                ? "Requesting..."
-                                : quote.revision_requested
-                                    ? "Revision already requested"
-                                    : "Request Revision"
-                        }
-                    </button>
+                    {hasTask("enquiry-tab-quote-commercial", "request_revision") && (
+                        <button
+                            className="survey-action-button survey-action-button-danger"
+                            onClick={handleRequestRevision}
+                            disabled={requestingRevision || quote.revision_requested}
+                        >
+                            {
+                                requestingRevision
+                                    ? "Requesting..."
+                                    : quote.revision_requested
+                                        ? "Revision already requested"
+                                        : "Request Revision"
+                            }
+                        </button>
+                    )}
 
-                    <button
-                        className="survey-action-button survey-action-button-orange"
-                        onClick={handleProceedToCommercialApproval}
-                        disabled={!!quote.revision_requested}
-                        title={
-                            quote.revision_requested
-                                ? "Save a new quote version first"
-                                : ""
-                        }
-                    >
-                        Proceed to Commercial Approval
-                    </button>
+                    {hasTask("enquiry-tab-quote-commercial", "proceed_to_commercial_approval") && (
+                        <button
+                            className="survey-action-button survey-action-button-orange"
+                            onClick={handleProceedToCommercialApproval}
+                            disabled={!!quote.revision_requested}
+                            title={
+                                quote.revision_requested
+                                    ? "Save a new quote version first"
+                                    : ""
+                            }
+                        >
+                            Proceed to Commercial Approval
+                        </button>
+                    )}
 
                 </div>
 

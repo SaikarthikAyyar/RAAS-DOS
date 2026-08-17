@@ -17,17 +17,59 @@ from backend.models.ops_selector import OpsSelection
 from backend.models.techno_commercial_quote import Quote
 from backend.models.approval_board import ApprovalBoard
 from backend.models.hub import Hub
+from backend.models.hub_approver import HubApprover
+from backend.models.users import User
 
 from backend.utils.aging import compute_aging_seconds, aging_seconds_to_days_display
 
 
 # ====================================
 # HUB LOOKUP
+# Owner display now comes from real per-user hub_approvers rows
+# (Phase 21C), not the old free-text Hub.ops_owner/techno_approver
+# columns - one batch query for all hubs/approvers, not N+1.
 # ====================================
+
+def _format_names(names):
+
+    if not names:
+        return None
+
+    if len(names) == 1:
+        return names[0]
+
+    return f"{names[0]} +{len(names) - 1} more"
+
 
 def _hub_map(db):
 
-    return {h.hub_name: h for h in db.query(Hub).all()}
+    hubs = db.query(Hub).all()
+
+    user_names = {u.id: u.name for u in db.query(User).all()}
+
+    approvers_by_hub = {}
+
+    for approver in db.query(HubApprover).all():
+
+        entry = approvers_by_hub.setdefault(approver.hub_id, {"ops_review": [], "techno_commercial": []})
+
+        name = user_names.get(approver.user_id)
+
+        if name:
+            entry[approver.approval_type].append(name)
+
+    result = {}
+
+    for hub in hubs:
+
+        entry = approvers_by_hub.get(hub.id, {"ops_review": [], "techno_commercial": []})
+
+        result[hub.hub_name] = {
+            "ops_owner_display": _format_names(entry["ops_review"]),
+            "techno_approver_display": _format_names(entry["techno_commercial"])
+        }
+
+    return result
 
 
 def _hub_for_enquiry(db, enquiry, hub_lookup):
@@ -91,7 +133,7 @@ def get_ops_review_queue(db):
             "enquiry_id": row["enquiry_id"],
             "customer_name": row["customer_name"],
             "hub": row["hub"],
-            "owner": row["_hub_row"].ops_owner if row["_hub_row"] else None,
+            "owner": row["_hub_row"]["ops_owner_display"] if row["_hub_row"] else None,
             "metric": row["aging_display"]
 
         })
@@ -136,7 +178,7 @@ def get_techno_queue(db):
             "enquiry_id": row["enquiry_id"],
             "customer_name": row["customer_name"],
             "hub": row["hub"],
-            "owner": row["_hub_row"].techno_approver if row["_hub_row"] else None,
+            "owner": row["_hub_row"]["techno_approver_display"] if row["_hub_row"] else None,
             "metric": metric
 
         })

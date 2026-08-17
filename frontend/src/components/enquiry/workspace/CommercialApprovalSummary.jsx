@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useAuth } from "../../../contexts/AuthContext";
+
 import {
     getApprovalHistory,
     recordCommercialApprovalDecision,
@@ -57,6 +59,8 @@ export default function CommercialApprovalSummary({
     reload
 
 }){
+
+    const { hasTask } = useAuth();
 
     const [history, setHistory] = useState([]);
 
@@ -458,21 +462,25 @@ export default function CommercialApprovalSummary({
 
                         <div className="survey-actions" style={{marginTop:10, marginBottom:10}}>
 
-                            <a
-                                className="survey-action-button"
-                                href={quoteReleaseDownloadUrl(releaseDocument.id)}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                Download quote document (.docx)
-                            </a>
+                            {hasTask("enquiry-tab-commercial-approval", "download_quote_document") && (
+                                <a
+                                    className="survey-action-button"
+                                    href={quoteReleaseDownloadUrl(releaseDocument.id)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    Download quote document (.docx)
+                                </a>
+                            )}
 
-                            <button
-                                className="survey-action-button survey-action-button-orange"
-                                onClick={handleOpenSendModal}
-                            >
-                                Send Quote Release Email
-                            </button>
+                            {hasTask("enquiry-tab-commercial-approval", "send_quote_release_email") && (
+                                <button
+                                    className="survey-action-button survey-action-button-orange"
+                                    onClick={handleOpenSendModal}
+                                >
+                                    Send Quote Release Email
+                                </button>
+                            )}
 
                         </div>
 

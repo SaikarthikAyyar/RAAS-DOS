@@ -187,3 +187,51 @@
     color:#c2570f;
 
 }
+
+/* ==========================================
+   Role Task Matrix (Phase 21D)
+   Reuses every class above as-is. Additions here are just the
+   group heading and the "Task Access" wrapping grid - two checkboxes
+   tall, flowing sideways as more tasks are added, per the confirmed
+   "keep two checkboxes vertically and just keep adding this two row
+   vertically columns" instruction.
+========================================== */
+
+.role-task-matrix-group{
+
+    margin-top:22px;
+
+}
+
+.role-task-matrix-group-title{
+
+    font-size:13px;
+    font-weight:700;
+    color:#334155;
+    margin:0 0 8px;
+
+}
+
+.role-task-matrix-table th,
+.role-task-matrix-table td{
+
+    vertical-align:top;
+
+}
+
+.role-task-matrix-task-cell{
+
+    padding:8px 12px;
+    min-width:260px;
+
+}
+
+.role-task-matrix-task-grid{
+
+    display:grid;
+    grid-template-rows:repeat(2, auto);
+    grid-auto-flow:column;
+    column-gap:18px;
+    row-gap:6px;
+
+}

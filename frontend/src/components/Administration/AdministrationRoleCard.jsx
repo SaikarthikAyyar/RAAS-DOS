@@ -42,7 +42,11 @@ export default function AdministrationRoleCard({
 
     onEdit,
 
-    onDelete
+    onDelete,
+
+    selected,
+
+    onSelect
 
 }){
 
@@ -90,13 +94,15 @@ export default function AdministrationRoleCard({
 
         <div
 
-            className="role-card"
+            className={selected ? "role-card selected" : "role-card"}
 
         >
 
             <div
 
                 className="role-card-content"
+
+                onClick={onSelect ? ()=>onSelect(role) : undefined}
 
             >
 

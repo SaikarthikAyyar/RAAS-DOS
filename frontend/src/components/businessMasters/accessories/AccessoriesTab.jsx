@@ -177,7 +177,7 @@ export default function AccessoriesTab(){
 
     const [editing, setEditing] = useState(null);
 
-    const { user } = useAuth();
+    const { user, hasTask } = useAuth();
 
     const { promptForRemark, remarkModal } = useRemarkPrompt();
 
@@ -280,17 +280,21 @@ export default function AccessoriesTab(){
 
                 Accessories
 
-                <button
+                {hasTask("bm-tab-accessories", "add_accessory") && (
 
-                    className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
+                    <button
 
-                    onClick={()=>{ setEditing(null); setShowModal(true); }}
+                        className="bm-btn bm-btn-primary bm-btn-xs bm-push-right"
 
-                >
+                        onClick={()=>{ setEditing(null); setShowModal(true); }}
 
-                    + Add
+                    >
 
-                </button>
+                        + Add
+
+                    </button>
+
+                )}
 
             </h3>
 
@@ -344,31 +348,39 @@ export default function AccessoriesTab(){
 
                                         <td>
 
-                                            <button
+                                            {hasTask("bm-tab-accessories", "edit_accessory") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>{ setEditing(a); setShowModal(true); }}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>{ setEditing(a); setShowModal(true); }}
 
-                                                Edit
+                                                >
 
-                                            </button>
+                                                    Edit
+
+                                                </button>
+
+                                            )}
 
                                             {" "}
 
-                                            <button
+                                            {hasTask("bm-tab-accessories", "remove_accessory") && (
 
-                                                className="bm-backlink"
+                                                <button
 
-                                                onClick={()=>handleRemove(a.id)}
+                                                    className="bm-backlink"
 
-                                            >
+                                                    onClick={()=>handleRemove(a.id)}
 
-                                                Remove
+                                                >
 
-                                            </button>
+                                                    Remove
+
+                                                </button>
+
+                                            )}
 
                                         </td>
 
