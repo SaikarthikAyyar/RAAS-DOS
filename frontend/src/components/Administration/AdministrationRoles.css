@@ -69,6 +69,38 @@
 
 }
 
+/* ==========================================
+   Role-based Access: role list beside its matrix, not stacked above
+   it - the role list is a fixed-width left rail, the matrix takes
+   whatever's left so it can actually breathe.
+========================================== */
+
+.role-based-access-layout{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:24px;
+
+}
+
+.role-based-access-sidebar{
+
+    flex:0 0 280px;
+
+    margin-top:20px;
+
+}
+
+.role-based-access-main{
+
+    flex:1 1 auto;
+
+    min-width:0;
+
+}
+
 
 /* ==========================================
    Role Card

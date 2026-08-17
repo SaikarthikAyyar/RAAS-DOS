@@ -10,15 +10,37 @@ import {
 import "./RoleNavigationMatrix.css";
 
 // ====================================
+// TASK PAIRING
+// Chunks a tab's task list into columns of (up to) 2, top-to-bottom -
+// "keep two checkboxes vertically and just keep adding this two row
+// vertically columns" per the original instruction. Each pair is its
+// own independent flex column (not a shared CSS Grid track), so one
+// tab's long/wrapping labels never distort another row's spacing -
+// every pair gets the exact same gap regardless of what else is on
+// the page.
+// ====================================
+
+function chunkPairs(tasks){
+
+    const pairs = [];
+
+    for(let i=0; i<tasks.length; i+=2){
+        pairs.push(tasks.slice(i, i+2));
+    }
+
+    return pairs;
+
+}
+
+
+// ====================================
 // COMPONENT
-// Scoped to one selected role - one table per module group ("Business
-// Masters", "Enquiries"), rows = that group's real tabs. Two columns
-// per row: "Tab Access" (a single checkbox, same can_view mechanism
-// already proven for workspace tabs since Phase 4) and "Task Access"
-// (every real action button in that tab as its own checkbox, wrapped
-// into a 2-row-tall grid so a long task list flows sideways instead
-// of down - per the exact "keep two checkboxes vertically and just
-// keep adding this two row vertically columns" instruction).
+// Scoped to one selected role - one group per module ("Business
+// Masters", "Enquiries"), rows = that group's real tabs. Each row is
+// a plain flex row (not an HTML <table>) so its width hugs its own
+// content - a table forces every row's Task Access column to share
+// the width of the row with the MOST tasks, leaving huge dead space
+// on every shorter row.
 // Approve/Reject/Accept/Send-back-style buttons are never represented
 // here - those are governed by hub_approvers (Phase 21C), not this
 // matrix. Reuses RoleNavigationMatrix's own CSS classes throughout,
@@ -191,96 +213,98 @@ export default function RoleTaskMatrix({ role }){
 
                         <h4 className="role-task-matrix-group-title">{group.group_name}</h4>
 
-                        <div className="role-nav-matrix-scroll">
+                        <div className="role-task-matrix-rows">
 
-                            <table className="role-nav-matrix-table role-task-matrix-table">
+                            <div className="role-task-matrix-header-row">
+                                <div className="role-task-matrix-col-tab">Tab</div>
+                                <div className="role-task-matrix-col-access">Tab Access</div>
+                                <div className="role-task-matrix-col-tasks">Task Access</div>
+                            </div>
 
-                                <thead>
+                            {
+                                group.tabs.map((tab, tabIndex)=>(
 
-                                    <tr>
-                                        <th className="role-nav-matrix-sticky-col">Tab</th>
-                                        <th>Tab Access</th>
-                                        <th>Task Access</th>
-                                    </tr>
+                                    <div key={tab.module_id} className="role-task-matrix-row">
 
-                                </thead>
+                                        <div className="role-task-matrix-col-tab">
+                                            <span className="role-nav-matrix-role-name">{tab.module_name}</span>
+                                        </div>
 
-                                <tbody>
+                                        <div className="role-task-matrix-col-access">
 
-                                    {
-                                        group.tabs.map((tab, tabIndex)=>(
+                                            <label className="role-nav-matrix-checkbox-row">
 
-                                            <tr key={tab.module_id}>
+                                                <input
 
-                                                <td className="role-nav-matrix-sticky-col">
-                                                    <span className="role-nav-matrix-role-name">{tab.module_name}</span>
-                                                </td>
+                                                    type="checkbox"
+                                                    checked={tab.can_view}
+                                                    onChange={()=>toggleTabAccess(groupIndex, tabIndex)}
 
-                                                <td className="role-nav-matrix-cell">
+                                                />
 
-                                                    <label className="role-nav-matrix-checkbox-row">
+                                                <span>Accessible</span>
 
-                                                        <input
+                                            </label>
 
-                                                            type="checkbox"
-                                                            checked={tab.can_view}
-                                                            onChange={()=>toggleTabAccess(groupIndex, tabIndex)}
+                                        </div>
 
-                                                        />
+                                        <div className="role-task-matrix-col-tasks">
 
-                                                        <span>Accessible</span>
+                                            {
+                                                tab.tasks.length===0 ? (
+                                                    <span className="role-nav-matrix-role-type">No tasks yet.</span>
+                                                ) : (
 
-                                                    </label>
+                                                    <div className="role-task-matrix-task-flow">
 
-                                                </td>
+                                                        {
+                                                            chunkPairs(tab.tasks).map((pair, pairIndex)=>(
 
-                                                <td className="role-task-matrix-task-cell">
+                                                                <div key={pairIndex} className="role-task-matrix-task-pair">
 
-                                                    {
-                                                        tab.tasks.length===0 ? (
-                                                            <span className="role-nav-matrix-role-type">No tasks yet.</span>
-                                                        ) : (
+                                                                    {
+                                                                        pair.map(task=>(
 
-                                                            <div className="role-task-matrix-task-grid">
+                                                                            <label
+                                                                                key={task.module_task_id}
+                                                                                className="role-nav-matrix-checkbox-row"
+                                                                            >
 
-                                                                {
-                                                                    tab.tasks.map((task, taskIndex)=>(
+                                                                                <input
 
-                                                                        <label
-                                                                            key={task.module_task_id}
-                                                                            className="role-nav-matrix-checkbox-row"
-                                                                        >
+                                                                                    type="checkbox"
+                                                                                    checked={task.allowed}
+                                                                                    onChange={()=>toggleTask(
+                                                                                        groupIndex,
+                                                                                        tabIndex,
+                                                                                        tab.tasks.indexOf(task)
+                                                                                    )}
 
-                                                                            <input
+                                                                                />
 
-                                                                                type="checkbox"
-                                                                                checked={task.allowed}
-                                                                                onChange={()=>toggleTask(groupIndex, tabIndex, taskIndex)}
+                                                                                <span>{task.task_label}</span>
 
-                                                                            />
+                                                                            </label>
 
-                                                                            <span>{task.task_label}</span>
+                                                                        ))
+                                                                    }
 
-                                                                        </label>
+                                                                </div>
 
-                                                                    ))
-                                                                }
+                                                            ))
+                                                        }
 
-                                                            </div>
+                                                    </div>
 
-                                                        )
-                                                    }
+                                                )
+                                            }
 
-                                                </td>
+                                        </div>
 
-                                            </tr>
+                                    </div>
 
-                                        ))
-                                    }
-
-                                </tbody>
-
-                            </table>
+                                ))
+                            }
 
                         </div>
 

@@ -189,12 +189,18 @@
 }
 
 /* ==========================================
-   Role Task Matrix (Phase 21D)
-   Reuses every class above as-is. Additions here are just the
-   group heading and the "Task Access" wrapping grid - two checkboxes
-   tall, flowing sideways as more tasks are added, per the confirmed
-   "keep two checkboxes vertically and just keep adding this two row
-   vertically columns" instruction.
+   Role Task Matrix (Phase 21D/21E)
+   Plain flex rows, not an HTML <table> - a table forces every row's
+   Task Access column to share the width of the widest row (e.g. Email
+   Templates), leaving large dead space on every shorter row. Each row
+   here hugs only its own content and wraps within whatever width the
+   two-column Role-based Access layout gives it.
+   Task Access itself: two checkboxes tall, flowing sideways as more
+   tasks are added, per the confirmed "keep two checkboxes vertically
+   and just keep adding this two row vertically columns" instruction -
+   each pair is its own flex column (not a shared grid track), so
+   every pair gets an identical gap regardless of any other pair's
+   label length or wrapping.
 ========================================== */
 
 .role-task-matrix-group{
@@ -212,26 +218,85 @@
 
 }
 
-.role-task-matrix-table th,
-.role-task-matrix-table td{
+.role-task-matrix-rows{
 
-    vertical-align:top;
-
-}
-
-.role-task-matrix-task-cell{
-
-    padding:8px 12px;
-    min-width:260px;
+    border:1px solid #dcdcdc;
+    border-radius:8px;
+    overflow:hidden;
 
 }
 
-.role-task-matrix-task-grid{
+.role-task-matrix-header-row{
 
-    display:grid;
-    grid-template-rows:repeat(2, auto);
-    grid-auto-flow:column;
-    column-gap:18px;
-    row-gap:6px;
+    display:flex;
+    width:100%;
+    box-sizing:border-box;
+    background:#f8fafc;
+    padding:10px 12px;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    color:#334155;
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+/* width:fit-content (capped at the panel's own width) instead of
+   stretching to 100% - a row with 2 tasks must end where its 2
+   checkboxes end, not keep going to match whichever other row in
+   this group happens to have the most tasks. */
+.role-task-matrix-row{
+
+    display:flex;
+    align-items:flex-start;
+    width:fit-content;
+    max-width:100%;
+    box-sizing:border-box;
+    padding:10px 12px;
+    border-top:1px solid #edf1f5;
+
+}
+
+.role-task-matrix-row:hover{
+
+    background:#fffaf3;
+
+}
+
+.role-task-matrix-col-tab{
+
+    flex:0 0 170px;
+    min-width:0;
+
+}
+
+.role-task-matrix-col-access{
+
+    flex:0 0 110px;
+
+}
+
+.role-task-matrix-col-tasks{
+
+    flex:0 1 auto;
+    min-width:0;
+
+}
+
+.role-task-matrix-task-flow{
+
+    display:flex;
+    flex-wrap:wrap;
+    column-gap:20px;
+    row-gap:10px;
+
+}
+
+.role-task-matrix-task-pair{
+
+    display:flex;
+    flex-direction:column;
+    gap:8px;
 
 }

@@ -141,6 +141,20 @@ export default function AdministrationRoles({
 
             );
 
+            // Default to the "admin" role once loaded (if nothing is
+            // already selected) so the matrix is visible immediately -
+            // otherwise a user landing on this tab for the first time
+            // has no way to know this per-role task view even exists.
+            setSelectedRole(prev=>{
+
+                if(prev){
+                    return prev;
+                }
+
+                return response.find(r=>r.name==="admin") || response[0] || null;
+
+            });
+
         }
 
         catch(
@@ -401,9 +415,9 @@ export default function AdministrationRoles({
 
             {
                 activeSubTab==="roles" && (
-                    <>
+                    <div className="role-based-access-layout">
 
-            <div className="administration-roles-sidebar">
+            <div className="administration-roles-sidebar role-based-access-sidebar">
 
             <button
 
@@ -461,26 +475,29 @@ export default function AdministrationRoles({
 
             </div>
 
-            <p className="role-nav-matrix-hint" style={{marginTop:14}}>
-                Select a role above to view and edit its Business Masters + Enquiries task access.
-            </p>
+            <div className="role-based-access-main">
 
-            {
-                selectedRole && (
-                    <RoleTaskMatrix role={selectedRole}/>
-                )
-            }
+                <HubApprovalStandingCard/>
 
-                    </>
+                {
+                    selectedRole ? (
+                        <RoleTaskMatrix role={selectedRole}/>
+                    ) : (
+                        <p className="role-nav-matrix-hint">
+                            Select a role to view and edit its Business Masters + Enquiries task access.
+                        </p>
+                    )
+                }
+
+            </div>
+
+                    </div>
                 )
             }
 
             {
                 activeSubTab==="navigation" && (
-                    <>
-                        <HubApprovalStandingCard/>
-                        <RoleNavigationMatrix/>
-                    </>
+                    <RoleNavigationMatrix/>
                 )
             }
 
