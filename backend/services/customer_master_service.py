@@ -11,7 +11,9 @@ from backend.repositories.customer_master_repository import (
     get_customer_by_company_name,
     create_customer,
     create_customer_minimal,
+    update_customer,
     update_customer_owner,
+    delete_customer,
     list_contacts,
     add_contact,
     list_assets,
@@ -422,6 +424,97 @@ def update_customer_owner_request(
         )
 
     return updated
+
+
+# ====================================
+# UPDATE CUSTOMER (full edit - admin-only, gated client-side)
+# ====================================
+
+def update_customer_request(
+        db,
+        customer_id,
+        payload
+):
+    customer = get_customer(db, customer_id)
+
+    if not customer:
+        return None
+
+    before = {
+        "company_name": customer.company_name,
+        "category": customer.category,
+        "industry": customer.industry,
+        "region": customer.region,
+        "gst_number": customer.gst_number
+    }
+
+    updated = update_customer(db, customer, payload)
+
+    changes = [
+        {"field": field, "before": before_value, "after": getattr(updated, field)}
+        for field, before_value in before.items()
+        if before_value != getattr(updated, field)
+    ]
+
+    if changes:
+
+        record_business_master_change(
+            db=db,
+            module="Business Masters",
+            action="UPDATE",
+            actor_user_id=payload.actor.user_id,
+            actor_name=payload.actor.name,
+            actor_role=payload.actor.role,
+            title=f"{payload.actor.name} updated customer '{updated.company_name}' in Business Masters",
+            changes=changes,
+            remark=payload.remark
+        )
+
+    return updated
+
+
+# ====================================
+# DELETE CUSTOMER (admin-only, gated client-side)
+# Blocked outright if the customer has any assets or linked
+# enquiries on file - neither is cascaded, both are real records
+# other parts of the app depend on (Enquiry.customer_id/asset_id
+# have no ON DELETE CASCADE).
+# ====================================
+
+def delete_customer_request(
+        db,
+        customer_id,
+        actor,
+        remark
+):
+    customer = get_customer(db, customer_id)
+
+    if not customer:
+        return "not_found"
+
+    if count_assets(db, customer_id) or list_linked_enquiries(db, customer.company_name):
+
+        raise ValueError(
+            "Cannot delete a customer with assets or enquiries on file. Remove them first."
+        )
+
+    company_name = customer.company_name
+
+    delete_customer(db, customer)
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="DELETE",
+        actor_user_id=actor.user_id,
+        actor_name=actor.name,
+        actor_role=actor.role,
+        title=f"{actor.name} deleted customer '{company_name}' from Business Masters",
+        changes=[{"field": "company_name", "before": company_name, "after": None}],
+        remark=remark
+    )
+
+    return "deleted"
 
 
 # ====================================

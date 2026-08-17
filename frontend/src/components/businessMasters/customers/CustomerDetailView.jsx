@@ -105,13 +105,19 @@ export default function CustomerDetailView({
 
     onSendReminder,
 
-    onUpdateOwner
+    onUpdateOwner,
+
+    onEdit,
+
+    onDelete
 
 }){
 
     const navigate = useNavigate();
 
-    const { hasTask } = useAuth();
+    const { hasTask, user } = useAuth();
+
+    const isAdmin = user?.role === "admin";
 
     const [editingOwner, setEditingOwner] = useState(false);
 
@@ -283,7 +289,23 @@ export default function CustomerDetailView({
 
             <div className="bm-card">
 
-                <h3>{detail.company_name}</h3>
+                <h3>
+
+                    {detail.company_name}
+
+                    {isAdmin && (
+
+                        <span style={{display:"inline-flex", gap:6, marginLeft:10}}>
+
+                            <button className="bm-btn bm-btn-xs" onClick={onEdit}>Edit</button>
+
+                            <button className="bm-btn bm-btn-xs bm-btn-ghost" style={{color:"#991b1b"}} onClick={onDelete}>Delete</button>
+
+                        </span>
+
+                    )}
+
+                </h3>
 
                 <div className="bm-field-row">
                     <span>Category</span>

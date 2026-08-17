@@ -168,6 +168,53 @@ def update_customer_owner(
 
 
 # ====================================
+# UPDATE CUSTOMER (full edit - company_name/category/industry/
+# region/gst_number only; owner_user_id has its own dedicated
+# reassignment flow, created_by_user_id is permanent)
+# ====================================
+
+def update_customer(
+        db,
+        customer,
+        payload
+):
+    customer.company_name = normalize_company_name(payload.company_name)
+    customer.category = payload.category
+    customer.industry = payload.industry
+    customer.region = payload.region
+    customer.gst_number = payload.gst_number
+
+    db.commit()
+    db.refresh(customer)
+
+    return customer
+
+
+# ====================================
+# DELETE CUSTOMER
+# Contacts have no other FK pointing at them, so they're cascaded
+# here directly - assets/linked enquiries are NOT cascaded (the
+# service layer blocks the delete entirely if either exist, since
+# both are real records other parts of the app depend on).
+# ====================================
+
+def delete_customer(
+        db,
+        customer
+):
+    (
+        db.query(CustomerContact)
+        .filter(CustomerContact.customer_id == customer.id)
+        .delete()
+    )
+
+    db.delete(customer)
+    db.commit()
+
+    return True
+
+
+# ====================================
 # CREATE CUSTOMER (MINIMAL - auto-vivified from Customer Request,
 # mirrors findOrCreateAssetPath()'s inline customer creation)
 # ====================================

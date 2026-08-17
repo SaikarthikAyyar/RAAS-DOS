@@ -15,6 +15,7 @@ import { businessMastersTabs } from "../data/businessMastersTabs";
 import CustomerListView from "../components/businessMasters/customers/CustomerListView";
 import CustomerDetailView from "../components/businessMasters/customers/CustomerDetailView";
 import NewCustomerModal from "../components/businessMasters/customers/NewCustomerModal";
+import EditCustomerModal from "../components/businessMasters/customers/EditCustomerModal";
 import AddContactModal from "../components/businessMasters/customers/AddContactModal";
 import SetFollowUpModal from "../components/businessMasters/customers/SetFollowUpModal";
 import SendReminderModal from "../components/businessMasters/customers/SendReminderModal";
@@ -41,7 +42,11 @@ import {
 
     setFollowUp,
 
-    updateCustomerOwner
+    updateCustomerOwner,
+
+    updateCustomer,
+
+    deleteCustomer
 
 } from "../services/customerMasterService";
 
@@ -79,6 +84,8 @@ function CustomersTab({
     const [detailLoading, setDetailLoading] = useState(false);
 
     const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
+
+    const [showEditCustomerModal, setShowEditCustomerModal] = useState(false);
 
     const [showAddContactModal, setShowAddContactModal] = useState(false);
 
@@ -218,6 +225,50 @@ function CustomersTab({
 
     }
 
+    async function handleEditCustomer(fields){
+
+        const remark = await promptForRemark("Editing this customer");
+
+        if(remark===null){
+            return;
+        }
+
+        await updateCustomer(selectedCustomerId, { ...fields, actor:buildActor(user), remark });
+
+        setShowEditCustomerModal(false);
+
+        loadDetail(selectedCustomerId);
+
+        onReload();
+
+    }
+
+    async function handleDeleteCustomer(){
+
+        const remark = await promptForRemark("Deleting this customer");
+
+        if(remark===null){
+            return;
+        }
+
+        try{
+
+            await deleteCustomer(selectedCustomerId, buildActor(user), remark);
+
+            handleBack();
+
+            onReload();
+
+        }
+
+        catch(err){
+
+            alert(err?.detail || "Unable to delete customer.");
+
+        }
+
+    }
+
     return(
 
         <>
@@ -243,6 +294,10 @@ function CustomersTab({
                         onSendReminder={()=>setShowReminderModal(true)}
 
                         onUpdateOwner={handleUpdateOwner}
+
+                        onEdit={()=>setShowEditCustomerModal(true)}
+
+                        onDelete={handleDeleteCustomer}
 
                     />
 
@@ -275,6 +330,24 @@ function CustomersTab({
                         onClose={()=>setShowNewCustomerModal(false)}
 
                         onCreate={handleCreateCustomer}
+
+                    />
+
+                )
+
+            }
+
+            {
+
+                showEditCustomerModal && detail && (
+
+                    <EditCustomerModal
+
+                        detail={detail}
+
+                        onClose={()=>setShowEditCustomerModal(false)}
+
+                        onSave={handleEditCustomer}
 
                     />
 

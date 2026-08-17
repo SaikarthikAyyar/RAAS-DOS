@@ -155,6 +155,90 @@ export async function updateCustomerOwner(
 
 
 // ====================================
+// UPDATE CUSTOMER (full edit)
+// ====================================
+
+export async function updateCustomer(
+
+    customerId,
+
+    payload
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers/${customerId}`,
+
+        {
+
+            method:"PUT",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify(payload)
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// DELETE CUSTOMER
+// ====================================
+
+export async function deleteCustomer(
+
+    customerId,
+
+    actor,
+
+    remark
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers/${customerId}`,
+
+        {
+
+            method:"DELETE",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({ actor, remark })
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // CUSTOMER DETAIL (360)
 // ====================================
 

@@ -206,6 +206,29 @@ class CustomerOwnerUpdateSchema(BaseModel):
 
 
 # ====================================
+# EDIT CUSTOMER (admin-only, gated client-side - company_name/
+# category/industry/region/gst_number only; owner_user_id and
+# created_by_user_id keep their own dedicated flows/permanence)
+# ====================================
+
+class CustomerUpdateSchema(BaseModel):
+
+    company_name: str
+
+    category: str | None = None
+
+    industry: str | None = None
+
+    region: str | None = None
+
+    gst_number: str | None = None
+
+    actor: ActorSchema
+
+    remark: str
+
+
+# ====================================
 # LIST ITEM
 # ====================================
 

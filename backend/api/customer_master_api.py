@@ -16,6 +16,7 @@ from backend.schemas.customer_master_schema import (
     CustomerListResponse,
     CustomerDetailSchema,
     CustomerOwnerUpdateSchema,
+    CustomerUpdateSchema,
     ContactCreateSchema,
     ContactSchema,
     FollowUpSchema,
@@ -23,11 +24,15 @@ from backend.schemas.customer_master_schema import (
     AssetSchema
 )
 
+from backend.schemas.notification_schema import BusinessMasterActionSchema
+
 from backend.services.customer_master_service import (
     list_customers_request,
     create_customer_request,
     build_customer_list_item,
     update_customer_owner_request,
+    update_customer_request,
+    delete_customer_request,
     get_customer_detail_request,
     add_contact_request,
     set_follow_up_request,
@@ -97,6 +102,60 @@ def update_customer_owner(
         )
 
     return build_customer_list_item(db, customer)
+
+
+# ====================================
+# UPDATE CUSTOMER (full edit)
+# ====================================
+
+@router.put(
+    "/business-master/customers/{customer_id}",
+    response_model=CustomerListItemSchema
+)
+def update_customer(
+        customer_id: int,
+        payload: CustomerUpdateSchema,
+        db: Session = Depends(get_db)
+):
+    customer = update_customer_request(db, customer_id, payload)
+
+    if not customer:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found."
+        )
+
+    return build_customer_list_item(db, customer)
+
+
+# ====================================
+# DELETE CUSTOMER
+# ====================================
+
+@router.delete(
+    "/business-master/customers/{customer_id}"
+)
+def delete_customer(
+        customer_id: int,
+        payload: BusinessMasterActionSchema,
+        db: Session = Depends(get_db)
+):
+    try:
+        result = delete_customer_request(db, customer_id, payload.actor, payload.remark)
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc)
+        )
+
+    if result == "not_found":
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found."
+        )
+
+    return {"success": True}
 
 
 # ====================================
