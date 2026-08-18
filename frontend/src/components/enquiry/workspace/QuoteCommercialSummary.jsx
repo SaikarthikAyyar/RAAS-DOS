@@ -52,7 +52,6 @@ export default function QuoteCommercialSummary({
 
     const [history, setHistory] = useState([]);
 
-    const [revisionRequestedBy, setRevisionRequestedBy] = useState("");
     const [requestingRevision, setRequestingRevision] = useState(false);
 
     const [extraEnabled, setExtraEnabled] = useState(false);
@@ -208,19 +207,12 @@ export default function QuoteCommercialSummary({
 
     async function handleRequestRevision(){
 
-        if(!revisionRequestedBy.trim()){
-
-            setError("Enter your name before requesting a revision.");
-            return;
-
-        }
-
         setRequestingRevision(true);
         setError("");
 
         try{
 
-            await flagQuoteRevisionRequested(quote.id, revisionRequestedBy);
+            await flagQuoteRevisionRequested(quote.id, user?.name);
 
             reload();
 

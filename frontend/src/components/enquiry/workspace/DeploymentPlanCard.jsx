@@ -56,7 +56,7 @@ export default function DeploymentPlanCard({
 
 }){
 
-    const { hasTask } = useAuth();
+    const { hasTask, user } = useAuth();
 
     const [mobDays, setMobDays] = useState(opsSelection.mobilisation_days ?? 0);
 
@@ -99,8 +99,6 @@ export default function DeploymentPlanCard({
     const [saving, setSaving] = useState(false);
 
     const [error, setError] = useState("");
-
-    const [createdBy, setCreatedBy] = useState("");
 
     function updateCrewField(index, field, value){
 
@@ -150,13 +148,6 @@ export default function DeploymentPlanCard({
 
     async function handleSaveAndGenerateQuote(){
 
-        if(!createdBy.trim()){
-
-            setError("Enter your name before saving.");
-            return;
-
-        }
-
         setSaving(true);
 
         setError("");
@@ -203,7 +194,7 @@ export default function DeploymentPlanCard({
 
                 enquiry_id:enquiry?.id,
 
-                created_by:createdBy,
+                created_by:user?.name,
 
                 reason:"Generated from Ops Deployment Plan"
 

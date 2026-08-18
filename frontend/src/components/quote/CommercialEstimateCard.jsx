@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
 import {
 
@@ -42,7 +42,7 @@ export default function CommercialEstimateCard({
 
 }){
 
-const [createdBy, setCreatedBy] = useState("");
+const { user } = useAuth();
 
 function updateField(key, value){
 
@@ -71,13 +71,6 @@ async function handleSave(){
 
     }
 
-    if(!createdBy.trim()){
-
-        alert("Enter your name before saving the quote.");
-        return;
-
-    }
-
     try{
 
         const payload = {
@@ -86,7 +79,7 @@ async function handleSave(){
 
             enquiry_id: enquiryId,
 
-            created_by: createdBy,
+            created_by: user?.name,
 
             reason: "Manually saved from Quote page"
 
