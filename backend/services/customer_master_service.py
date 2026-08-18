@@ -281,6 +281,14 @@ def get_asset_detail_request(
 
 from backend.models.techno_commercial_quote import Quote
 
+from backend.models.enquiry import Enquiry
+
+from backend.models.asset import Asset
+
+from backend.models.customer_master import CustomerContact
+
+from backend.services.workflow_service import WorkflowStage, WORKFLOW_ORDER
+
 
 # ====================================
 # FOLLOW-UP BUCKET
@@ -874,3 +882,205 @@ def resolve_or_create_asset(
         can_place_equipment_nearby,
         pain_point
     )
+
+
+# ====================================
+# CUSTOMERS REPORT (3-sheet Excel export for the Customers tab)
+#
+# Definitions confirmed with the user before building this:
+# - "Closed job" = an enquiry whose stage reached COMPLETED (not the
+#   separate manual "Close enquiry" lifecycle action, which can be
+#   applied at any stage and would over-count unfinished jobs).
+# - "Invoice value" - this app has no literal monetary invoice table;
+#   it maps to Quote.final_approved_value, counted only once a quote
+#   has actually been through Commercial Approval (blank/0 before
+#   that - no fallback to the pre-approval budgetary range).
+# - "Open enquiry" = stage is anywhere from Customer Request through
+#   PO Received inclusive (WORKFLOW_ORDER indices 0-6); Job Creation/
+#   Execution/Completed are not counted as open.
+# - Sheet 2's per-asset "Enquiry Stage" = the stage of that asset's
+#   currently-open enquiry (most recently created if more than one is
+#   open at once); blank if none are open.
+#
+# Attribution caveat (not a bug, a real historical-data limit):
+# Enquiry.customer_id/asset_id only exist and get populated from
+# Phase 2 onward (2026-08-04) - any enquiry created before that has
+# both null and cannot be attributed to a customer/asset here.
+# ====================================
+
+_OPEN_STAGE_VALUES = {
+    stage.value for stage in WORKFLOW_ORDER[:WORKFLOW_ORDER.index(WorkflowStage.PO_RECEIVED) + 1]
+}
+
+_CLOSED_STAGE_VALUE = WorkflowStage.COMPLETED.value
+
+
+def build_customers_report(
+        db
+):
+    customers = list_customers(db)
+
+    assets = (
+        db.query(Asset)
+        .order_by(Asset.id)
+        .all()
+    )
+
+    enquiries = (
+        db.query(Enquiry)
+        .filter(Enquiry.customer_id.isnot(None))
+        .all()
+    )
+
+    quote_ids = {
+        enquiry.quote_id
+        for enquiry in enquiries
+        if enquiry.quote_id
+    }
+
+    quotes_by_id = {
+        quote.id: quote
+        for quote in (
+            db.query(Quote).filter(Quote.id.in_(quote_ids)).all()
+            if quote_ids else []
+        )
+    }
+
+    user_names = _user_name_map(db)
+
+    contacts_by_customer = {}
+
+    for contact in db.query(CustomerContact).order_by(CustomerContact.id).all():
+        contacts_by_customer.setdefault(contact.customer_id, []).append(contact)
+
+    enquiries_by_customer = {}
+    enquiries_by_asset = {}
+
+    for enquiry in enquiries:
+
+        enquiries_by_customer.setdefault(enquiry.customer_id, []).append(enquiry)
+
+        if enquiry.asset_id:
+            enquiries_by_asset.setdefault(enquiry.asset_id, []).append(enquiry)
+
+    assets_by_customer = {}
+
+    for asset in assets:
+        assets_by_customer.setdefault(asset.customer_id, []).append(asset)
+
+    def approved_value_sum(enquiry_list):
+
+        total = 0.0
+        found_any = False
+
+        for enquiry in enquiry_list:
+
+            quote = quotes_by_id.get(enquiry.quote_id)
+
+            if quote and quote.final_approved_value is not None:
+                total += float(quote.final_approved_value)
+                found_any = True
+
+        return total if found_any else None
+
+    summary_rows = []
+    asset_rows = []
+    contact_rows = []
+
+    for customer in customers:
+
+        customer_enquiries = enquiries_by_customer.get(customer.id, [])
+
+        account_manager = user_names.get(customer.owner_user_id)
+
+        total_closed_jobs = sum(
+            1 for e in customer_enquiries if e.stage == _CLOSED_STAGE_VALUE
+        )
+
+        summary_rows.append({
+            "company": customer.company_name,
+            "industry": customer.industry,
+            "location": customer.region,
+            "account_manager": account_manager,
+            "total_enquiries": len(customer_enquiries),
+            "total_closed_jobs": total_closed_jobs,
+            "invoice_value": approved_value_sum(customer_enquiries)
+        })
+
+        customer_assets = assets_by_customer.get(customer.id, [])
+
+        for asset in customer_assets:
+
+            asset_enquiries = enquiries_by_asset.get(asset.id, [])
+
+            closed = [e for e in asset_enquiries if e.stage == _CLOSED_STAGE_VALUE]
+            open_ = [e for e in asset_enquiries if e.stage in _OPEN_STAGE_VALUES]
+
+            active_stage = None
+
+            if open_:
+                latest_open = max(open_, key=lambda e: e.created_at or datetime.min)
+                active_stage = latest_open.stage
+
+            last_closed_date = None
+
+            if closed:
+                last_closed = max(closed, key=lambda e: e.stage_entered_at or datetime.min)
+                last_closed_date = (
+                    last_closed.stage_entered_at.date().isoformat()
+                    if last_closed.stage_entered_at else None
+                )
+
+            asset_rows.append({
+                "company_name": customer.company_name,
+                "asset_name": asset.name,
+                "closed_jobs_count": len(closed),
+                "open_enquiries_count": len(open_),
+                "enquiry_stage": active_stage,
+                "last_closed_job_date": last_closed_date,
+                "next_follow_up_date": (
+                    customer.next_follow_up_date.isoformat()
+                    if customer.next_follow_up_date else None
+                ),
+                "invoice_value": approved_value_sum(asset_enquiries),
+                "account_manager": account_manager
+            })
+
+        customer_contacts = contacts_by_customer.get(customer.id, [])
+
+        base_row = {
+            "company_name": customer.company_name,
+            "category": customer.category,
+            "industry": customer.industry,
+            "region": customer.region,
+            "gst_number": customer.gst_number,
+            "account_manager": account_manager
+        }
+
+        if not customer_contacts:
+
+            contact_rows.append({
+                **base_row,
+                "poc_name": None,
+                "poc_designation": None,
+                "poc_email": None,
+                "poc_phone": None
+            })
+
+        else:
+
+            for contact in customer_contacts:
+
+                contact_rows.append({
+                    **base_row,
+                    "poc_name": contact.name,
+                    "poc_designation": contact.designation,
+                    "poc_email": contact.email,
+                    "poc_phone": contact.phone
+                })
+
+    return {
+        "summary": summary_rows,
+        "assets": asset_rows,
+        "contacts": contact_rows
+    }

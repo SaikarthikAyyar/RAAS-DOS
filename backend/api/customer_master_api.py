@@ -34,6 +34,7 @@ from backend.services.customer_master_service import (
     update_customer_request,
     delete_customer_request,
     delete_asset_request,
+    build_customers_report,
     get_customer_detail_request,
     add_contact_request,
     set_follow_up_request,
@@ -157,6 +158,19 @@ def delete_customer(
         )
 
     return {"success": True}
+
+
+# ====================================
+# CUSTOMERS REPORT (3-sheet Excel export - Summary/Assets/Contacts)
+# ====================================
+
+@router.get(
+    "/business-master/customers-report"
+)
+def get_customers_report(
+        db: Session = Depends(get_db)
+):
+    return build_customers_report(db)
 
 
 # ====================================

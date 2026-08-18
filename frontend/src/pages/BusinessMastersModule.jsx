@@ -8,6 +8,8 @@ import {
 
 } from "react";
 
+import * as XLSX from "xlsx";
+
 import "../components/businessMasters/BusinessMasters.css";
 
 import { businessMastersTabs } from "../data/businessMastersTabs";
@@ -48,9 +50,13 @@ import {
 
     deleteCustomer,
 
-    deleteAsset
+    deleteAsset,
+
+    getCustomersReport
 
 } from "../services/customerMasterService";
+
+import { exportTab } from "../services/businessMastersExportService";
 
 import { getUsers } from "../services/administrationUsersService";
 
@@ -480,44 +486,54 @@ function PlaceholderTab({ label }){
 
 
 // ====================================
-// CSV EXPORT (client-side, matches wireframe's exportCSV())
+// XLSX EXPORT HELPERS
 // ====================================
 
-function downloadCSV(filename, headers, rows){
+// JSONB array/object columns (Machine.preferred_job_types etc.) come
+// back as real arrays/objects - XLSX.utils.json_to_sheet would render
+// those as "[object Object]", so flatten them to readable text first.
+// Every other value (including raw FK ids and timestamp strings) is
+// passed through untouched - the whole point of this export is to
+// show the real DB column values, not a display-formatted version.
+function sanitizeRowsForExport(rows){
 
-    const escapeCell = value=>{
+    return rows.map(row=>{
 
-        const text = value===null || value===undefined ? "" : String(value);
+        const clean = {};
 
-        return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+        for(const key of Object.keys(row)){
 
-    };
+            const value = row[key];
 
-    const csv = [
+            if(Array.isArray(value)){
+                clean[key] = value.join(", ");
+            }
+            else if(value !== null && typeof value === "object"){
+                clean[key] = JSON.stringify(value);
+            }
+            else{
+                clean[key] = value;
+            }
 
-        headers.map(escapeCell).join(","),
+        }
 
-        ...rows.map(row=>row.map(escapeCell).join(","))
+        return clean;
 
-    ].join("\n");
+    });
 
-    const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
+}
 
-    const url = URL.createObjectURL(blob);
+function downloadWorkbook(workbook, filename){
 
-    const link = document.createElement("a");
+    XLSX.writeFile(workbook, filename);
 
-    link.href = url;
+}
 
-    link.download = filename;
+// Excel sheet names cap at 31 chars and can't contain []:*?/\ -
+// same truncation convention already used for the Customer 360 export.
+function safeSheetName(name){
 
-    document.body.appendChild(link);
-
-    link.click();
-
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
+    return name.replace(/[\[\]:*?/\\]/g, "").slice(0, 31);
 
 }
 
@@ -599,49 +615,154 @@ export default function BusinessMastersModule(){
 
     }, [loadCustomers]);
 
-    function handleExportCurrentTab(){
+    const [exporting, setExporting] = useState(false);
 
-        if(activeTab==="customers"){
+    async function handleExportCustomersReport(){
 
-            if(customersLoading){
+        const report = await getCustomersReport();
 
-                alert("Customers are still loading — try again in a moment.");
+        const workbook = XLSX.utils.book_new();
 
-                return;
+        const summarySheet = XLSX.utils.aoa_to_sheet([
 
-            }
+            ["Company", "Industry", "Location", "Account Manager", "Total Enquiries", "Total Closed Jobs", "Invoice Value"],
 
-            if(customers.length===0){
+            ...report.summary.map(r=>[
+                r.company, r.industry, r.location, r.account_manager,
+                r.total_enquiries, r.total_closed_jobs, r.invoice_value
+            ])
 
-                alert("No customers to export yet.");
+        ]);
 
-                return;
+        const assetsSheet = XLSX.utils.aoa_to_sheet([
 
-            }
+            [
+                "Company Name", "Asset Name", "Closed Jobs till date (Count)",
+                "Open Enquiries (Till PO Received)", "Enquiry Stage",
+                "Last Closed Job Date", "Next Follow-up Date", "Invoice Value",
+                "Account Manager"
+            ],
 
-            downloadCSV(
+            ...report.assets.map(r=>[
+                r.company_name, r.asset_name, r.closed_jobs_count,
+                r.open_enquiries_count, r.enquiry_stage,
+                r.last_closed_job_date, r.next_follow_up_date, r.invoice_value,
+                r.account_manager
+            ])
 
-                "Customers.csv",
+        ]);
 
-                ["Company","Category","Owner"],
+        const contactsSheet = XLSX.utils.aoa_to_sheet([
 
-                customers.map(c=>[c.company_name, c.category, c.owner])
+            [
+                "Company Name", "Category", "Industry", "Region", "GST Number",
+                "Account Manager", "POC Name", "POC Designation", "POC Email", "POC Phone"
+            ],
 
-            );
+            ...report.contacts.map(r=>[
+                r.company_name, r.category, r.industry, r.region, r.gst_number,
+                r.account_manager, r.poc_name, r.poc_designation, r.poc_email, r.poc_phone
+            ])
+
+        ]);
+
+        XLSX.utils.book_append_sheet(workbook, summarySheet, "Customer Summary");
+        XLSX.utils.book_append_sheet(workbook, assetsSheet, "Assets");
+        XLSX.utils.book_append_sheet(workbook, contactsSheet, "Company & POC");
+
+        downloadWorkbook(workbook, "Customers_Report.xlsx");
+
+    }
+
+    async function handleExportSimpleTab(){
+
+        const label = businessMastersTabs.find(([key])=>key===activeTab)?.[1] || activeTab;
+
+        let data;
+
+        try{
+
+            data = await exportTab(activeTab);
+
+        }
+
+        catch(err){
+
+            alert(err?.detail || "Nothing to export for this tab yet.");
 
             return;
 
         }
 
-        downloadCSV(
+        if(!data.sheets || data.sheets.every(sheet=>sheet.rows.length===0)){
 
-            "Export.csv",
+            alert("No data to export for this tab yet.");
 
-            ["Note"],
+            return;
 
-            [["Use the tab-specific export for full detail."]]
+        }
 
-        );
+        const workbook = XLSX.utils.book_new();
+
+        data.sheets.forEach(sheet=>{
+
+            const rows = sanitizeRowsForExport(sheet.rows);
+
+            const worksheet = rows.length
+                ? XLSX.utils.json_to_sheet(rows)
+                : XLSX.utils.aoa_to_sheet([["No rows yet."]]);
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName(sheet.name));
+
+        });
+
+        downloadWorkbook(workbook, `${label.replace(/\s+/g, "_")}.xlsx`);
+
+    }
+
+    async function handleExportCurrentTab(){
+
+        setExporting(true);
+
+        try{
+
+            if(activeTab==="customers"){
+
+                if(customersLoading){
+                    alert("Customers are still loading — try again in a moment.");
+                    return;
+                }
+
+                if(customers.length===0){
+                    alert("No customers to export yet.");
+                    return;
+                }
+
+                await handleExportCustomersReport();
+
+            }
+
+            else{
+
+                await handleExportSimpleTab();
+
+            }
+
+        }
+
+        catch(err){
+
+            console.error(err);
+
+            alert("Unable to export this tab right now.");
+
+        }
+
+        finally{
+
+            setExporting(false);
+
+        }
 
     }
 
@@ -667,11 +788,11 @@ export default function BusinessMastersModule(){
 
                         onClick={handleExportCurrentTab}
 
-                        disabled={activeTab==="customers" && customersLoading}
+                        disabled={exporting || (activeTab==="customers" && customersLoading)}
 
                     >
 
-                        ⬇ Export current tab
+                        {exporting ? "Exporting..." : "⬇ Export current tab"}
 
                     </button>
 
