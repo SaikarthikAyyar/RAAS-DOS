@@ -324,11 +324,55 @@ def request_ops_review(
     db.commit()
     db.refresh(enquiry)
 
+    # If nobody has run the Ops Selector algorithm for this enquiry yet,
+    # run it right now, automatically, server-side - "Request Ops
+    # Review" no longer waits on a separate manual Ops Selector step.
+    # create_ops_selection_request() (invoked with no user-supplied
+    # overrides, purely from this enquiry's own Sales Survey data) has
+    # its own mirror-guard that advances SALES_SURVEY -> OPS_REVIEW the
+    # instant it sees ops_review_requested_at already set (which it now
+    # is, from the commit just above) - so this one call both generates
+    # the recommendation AND completes the stage transition. The
+    # standalone Ops Selector page remains fully available afterward
+    # for a user who wants to override machine/pump/accessory choices -
+    # it updates this same row in place, it does not create a second one.
+    if (
+        enquiry.stage == WorkflowStage.SALES_SURVEY.value
+        and enquiry.ops_selector_id is None
+    ):
+
+        if not enquiry.sales_survey_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This enquiry has no linked Sales Survey yet - cannot generate a recommendation."
+            )
+
+        # Deferred import - ops_selector_service.py already imports
+        # update_module_reference from this module at its own top
+        # level, so importing it back here at module load time would
+        # be circular. Safe at call time, once both modules are loaded.
+        from backend.services.ops_selector_service import create_ops_selection_request
+        from backend.schemas.ops_selector_schema import OpsSelectorSchema
+
+        create_ops_selection_request(
+            db,
+            OpsSelectorSchema(
+                sales_survey_id=enquiry.sales_survey_id,
+                enquiry_id=enquiry.id
+            )
+        )
+
+        db.refresh(enquiry)
+
+        return enquiry
+
     # Only actually enter Ops Review once BOTH halves are true: the
     # request was just made AND an OpsSelection already exists for this
-    # enquiry (the algorithm has run and produced a recommendation).
-    # A stale click on an enquiry that's already moved past Sales Survey
-    # (the button isn't stage-gated in the UI) is a safe no-op here.
+    # enquiry (the algorithm has run and produced a recommendation - via
+    # the standalone Ops Selector page, run before this button was
+    # clicked). A stale click on an enquiry that's already moved past
+    # Sales Survey (the button isn't stage-gated in the UI) is a safe
+    # no-op here.
     if (
         enquiry.stage == WorkflowStage.SALES_SURVEY.value
         and enquiry.ops_selector_id is not None
@@ -339,6 +383,29 @@ def request_ops_review(
         )
 
     return enquiry
+
+
+# ====================================
+# APPROVAL STANDING (read-only)
+# ====================================
+
+def get_enquiry_approval_standing_request(
+    db,
+    enquiry_id,
+    user_id
+):
+
+    from backend.services.hub_approval_service import get_enquiry_approval_standing
+
+    enquiry = repository.get_enquiry(db, enquiry_id)
+
+    if not enquiry:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Enquiry not found."
+        )
+
+    return get_enquiry_approval_standing(db, enquiry, user_id)
 
 
 # ====================================

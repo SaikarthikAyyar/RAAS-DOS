@@ -233,9 +233,11 @@ opsSelectorId,
 
 status,
 
-reviewedBy,
+reviewNote,
 
-reviewNote
+enquiryId,
+
+actor
 
 ){
 
@@ -257,9 +259,11 @@ body:JSON.stringify({
 
 status,
 
-reviewed_by:reviewedBy,
+review_note:reviewNote,
 
-review_note:reviewNote
+enquiry_id:enquiryId ?? null,
+
+actor:actor ?? null
 
 })
 

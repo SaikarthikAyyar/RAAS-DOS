@@ -201,13 +201,13 @@ export async function recordCommercialApprovalDecision(
 
     decision,
 
-    approvedBy,
-
     note,
 
     finalApprovedValue,
 
-    enquiryId
+    enquiryId,
+
+    actor
 
 ){
 
@@ -223,13 +223,13 @@ export async function recordCommercialApprovalDecision(
 
             body:JSON.stringify({
 
-                approved_by:approvedBy,
-
                 note,
 
                 final_approved_value:finalApprovedValue,
 
-                enquiry_id:enquiryId
+                enquiry_id:enquiryId,
+
+                actor:actor ?? null
 
             })
 
@@ -254,11 +254,11 @@ export async function sendBackCommercialApproval(
 
     quoteId,
 
-    approvedBy,
-
     note,
 
-    enquiryId
+    enquiryId,
+
+    actor
 
 ){
 
@@ -274,11 +274,11 @@ export async function sendBackCommercialApproval(
 
             body:JSON.stringify({
 
-                approved_by:approvedBy,
-
                 note,
 
-                enquiry_id:enquiryId
+                enquiry_id:enquiryId,
+
+                actor:actor ?? null
 
             })
 

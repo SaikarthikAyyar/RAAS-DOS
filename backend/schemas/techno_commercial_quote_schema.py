@@ -6,6 +6,8 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 # ====================================
 # CREATE
@@ -145,13 +147,13 @@ class QuoteResponseSchema(
     combined_budgetary_value_min: float | None = None
     combined_budgetary_value_max: float | None = None
 
-    techno_status: str | None = None
+    quote_commercial_status: str | None = None
 
-    techno_approved_by: str | None = None
+    quote_commercial_approved_by: str | None = None
 
-    techno_approved_date: str | None = None
+    quote_commercial_approved_date: str | None = None
 
-    techno_note: str | None = None
+    quote_commercial_note: str | None = None
 
     internal_extra_enabled: bool | None = None
 
@@ -183,16 +185,21 @@ class QuoteResponseSchema(
 
 
 # ====================================
-# TECHNO-COMMERCIAL APPROVAL DECISION
+# QUOTE & COMMERCIAL GATE DECISION (Phase 22)
+# Replaces the retired Techno-Commercial approval decision - no typed
+# "your name" field, identity comes purely from actor (the logged-in
+# user).
 # ====================================
 
-class TechnoApprovalDecisionSchema(BaseModel):
+class QuoteCommercialDecisionSchema(BaseModel):
 
     status: str
 
-    approved_by: str
-
     note: str | None = None
+
+    enquiry_id: int | None = None
+
+    actor: ActorSchema | None = None
 
 
 # ====================================

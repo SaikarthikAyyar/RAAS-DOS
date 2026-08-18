@@ -36,11 +36,16 @@ from backend.models.enquiry import Enquiry
 
 from backend.services.enquiry_consolidated_service import update_module_reference
 
-from backend.services.workflow_service import advance_stage_at_least, update_stage, WorkflowStage
-
-from backend.services.ops_selector_service import save_ops_review_decision
+from backend.services.workflow_service import advance_stage_at_least, WorkflowStage
 
 from backend.services.quote_release_service import generate_quote_release_docx
+
+from backend.services.hub_approval_service import (
+    verify_approval_action,
+    verify_stage_action,
+    regress_to_ops_review,
+    COMMERCIAL_APPROVAL
+)
 
 from datetime import date
 
@@ -323,37 +328,13 @@ def get_approval_board_by_quote_request(
 
 
 # ====================================
-# SHARED: REGRESS TO OPS REVIEW
-# Factored out of send_back_commercial_approval_request so the
-# REJECTED decision path (below) can reuse the exact same stage-
-# regression + review-status-reset mechanics without duplicating them.
-# ====================================
-
-def _regress_to_ops_review(db, ops, target_enquiry, actor_name, note):
-
-    if target_enquiry:
-
-        update_stage(
-            db,
-            target_enquiry.id,
-            WorkflowStage.OPS_REVIEW.value
-        )
-
-    # Ops Review must show a clean, unapproved state when the case
-    # lands back there - not the stale "Approved" from before.
-    if ops is not None:
-
-        save_ops_review_decision(
-            db,
-            ops.id,
-            "Pending",
-            actor_name,
-            note
-        )
-
-
-# ====================================
 # COMMERCIAL APPROVAL TAB
+# Regressions (Reject, Send back) both route through the shared
+# hub_approval_service.regress_to_ops_review helper (Phase 22) - one
+# function, reused by every "send this case back to Ops Review" path
+# across all 3 gates, resetting both OpsSelection.review_status AND
+# Quote.quote_commercial_status together so re-entering either gate
+# after a real regression never shows a stale "already approved".
 # ====================================
 
 def get_approval_history_request(
@@ -381,13 +362,13 @@ def record_commercial_approval_decision_request(
 
     decision,
 
-    approved_by,
-
     note,
 
     final_approved_value,
 
-    enquiry_id=None
+    enquiry_id=None,
+
+    actor=None
 
 ):
 
@@ -405,12 +386,12 @@ def record_commercial_approval_decision_request(
 
         raise ValueError("Quote not found.")
 
-    if quote.techno_status != "Approved":
+    if quote.quote_commercial_status != "Approved":
 
         raise ValueError(
 
-            "Quote must be Techno-Commercial Approved before it can go "
-            "through Commercial Approval."
+            "Quote must be approved through Quote & Commercial review "
+            "before it can go through Commercial Approval."
 
         )
 
@@ -422,20 +403,6 @@ def record_commercial_approval_decision_request(
             "version before recording a Commercial Approval decision."
 
         )
-
-    approval = record_commercial_approval_decision(
-
-        db,
-
-        quote_id,
-
-        decision,
-
-        approved_by,
-
-        note
-
-    )
 
     ops = get_ops_selection(db, quote.ops_selection_id)
 
@@ -468,6 +435,29 @@ def record_commercial_approval_decision_request(
             .first()
 
         )
+
+    # Verified before anything is written - a failed check must never
+    # leave a decision recorded behind it. Stage check first (more
+    # informative than "no standing" when the case simply isn't at
+    # Commercial Approval right now).
+    verify_stage_action(target_enquiry, WorkflowStage.COMMERCIAL_APPROVAL)
+    verify_approval_action(db, target_enquiry, actor, COMMERCIAL_APPROVAL)
+
+    approved_by = actor.name if actor else None
+
+    approval = record_commercial_approval_decision(
+
+        db,
+
+        quote_id,
+
+        decision,
+
+        approved_by,
+
+        note
+
+    )
 
     generated_document = None
 
@@ -549,7 +539,7 @@ def record_commercial_approval_decision_request(
         # Direct instruction: Reject must still route the case back to
         # Ops Review, same as Send Back - just recorded under the
         # REJECTED label instead of SENT_BACK for the decision history.
-        _regress_to_ops_review(db, ops, target_enquiry, approved_by, note)
+        regress_to_ops_review(db, ops, quote, target_enquiry, approved_by, note)
 
     return {
         "approval": approval,
@@ -573,11 +563,11 @@ def send_back_commercial_approval_request(
 
     quote_id,
 
-    sent_back_by,
-
     note,
 
-    enquiry_id=None
+    enquiry_id=None,
+
+    actor=None
 
 ):
 
@@ -587,26 +577,12 @@ def send_back_commercial_approval_request(
 
         raise ValueError("Quote not found.")
 
-    if quote.techno_status != "Approved":
+    if quote.quote_commercial_status != "Approved":
 
         raise ValueError(
-            "Quote must be Techno-Commercial Approved before it can go "
-            "through Commercial Approval."
+            "Quote must be approved through Quote & Commercial review "
+            "before it can go through Commercial Approval."
         )
-
-    approval = record_commercial_approval_decision(
-
-        db,
-
-        quote_id,
-
-        "SENT_BACK",
-
-        sent_back_by,
-
-        note
-
-    )
 
     ops = get_ops_selection(db, quote.ops_selection_id)
 
@@ -636,6 +612,27 @@ def send_back_commercial_approval_request(
 
         )
 
+    # Verified before anything is written - a failed check must never
+    # leave a decision recorded behind it.
+    verify_stage_action(target_enquiry, WorkflowStage.COMMERCIAL_APPROVAL)
+    verify_approval_action(db, target_enquiry, actor, COMMERCIAL_APPROVAL)
+
+    sent_back_by = actor.name if actor else None
+
+    approval = record_commercial_approval_decision(
+
+        db,
+
+        quote_id,
+
+        "SENT_BACK",
+
+        sent_back_by,
+
+        note
+
+        )
+
     if target_enquiry:
 
         update_module_reference(
@@ -650,31 +647,6 @@ def send_back_commercial_approval_request(
 
         )
 
-        update_stage(
-
-            db,
-
-            target_enquiry.id,
-
-            WorkflowStage.OPS_REVIEW.value
-
-        )
-
-    # Ops Review must show a clean, unapproved state when the case lands
-    # back there - not the stale "Approved" from before this send-back.
-    if ops is not None:
-
-        save_ops_review_decision(
-
-            db,
-
-            ops.id,
-
-            "Pending",
-
-            sent_back_by,
-            "Reset - sent back from Commercial Approval"
-
-        )
+    regress_to_ops_review(db, ops, quote, target_enquiry, sent_back_by, "Reset - sent back from Commercial Approval")
 
     return approval

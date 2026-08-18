@@ -359,6 +359,32 @@ def get_quote_by_ops_selection(
 
 
 # ====================================
+# RESET QUOTE & COMMERCIAL GATE STATUS
+# Used on regression (Reject/Send back landing the case back at Ops
+# Review) - a stale "Approved" would otherwise survive the regression
+# and refuse to re-open when Quote & Commercial's gate needs to fire
+# again after a real re-walk.
+# ====================================
+
+def reset_quote_commercial_status(db, quote_id, note):
+
+    quote = db.query(Quote).filter(Quote.id == quote_id).first()
+
+    if quote is None:
+        return None
+
+    quote.quote_commercial_status = "Pending"
+    quote.quote_commercial_approved_by = None
+    quote.quote_commercial_approved_date = None
+    quote.quote_commercial_note = note
+
+    db.commit()
+    db.refresh(quote)
+
+    return quote
+
+
+# ====================================
 # LIST OPS SELECTIONS
 # ====================================
 

@@ -47,6 +47,18 @@ from backend.repositories.business_masters_pricing_repository import (
     get_margin_for_category
 )
 
+from backend.services.workflow_service import (
+    advance_stage_at_least,
+    WorkflowStage
+)
+
+from backend.services.hub_approval_service import (
+    verify_approval_action,
+    verify_stage_action,
+    regress_to_ops_review,
+    QUOTE_COMMERCIAL
+)
+
 
 def create_quote_request(
 
@@ -655,54 +667,64 @@ def request_quote_revision(
 
 
 # ====================================
-# SAVE TECHNO-COMMERCIAL APPROVAL DECISION
+# QUOTE & COMMERCIAL GATE DECISION (Phase 22)
+# Replaces the retired Techno-Commercial standalone approval - this is
+# the real, hub-gated, stage-advancing decision for the Quote &
+# Commercial tab now. Atomic and backend-orchestrated, mirroring the
+# same pattern used for Ops Review and Commercial Approval: verify
+# stage + hub standing, apply the decision, move the stage, all in one
+# call. "Pending" is never sent through this function's public entry
+# point - the shared regress_to_ops_review helper resets this quote's
+# status via its own dedicated repository call instead.
 # ====================================
 
-def save_techno_approval_decision(
+def record_quote_commercial_decision_request(db, quote_id, status, note, actor, enquiry_id):
 
-    db,
-
-    quote_id,
-
-    status,
-
-    approved_by,
-
-    note
-
-):
-
-    quote = get_quote(
-
-        db,
-
-        quote_id
-
-    )
+    quote = get_quote(db, quote_id)
 
     if quote is None:
+        raise ValueError("Quote not found.")
 
-        raise ValueError(
+    target_enquiry = (
+        db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
+        if enquiry_id else None
+    )
 
-            "Quote not found."
+    if target_enquiry is None:
 
+        ops = get_ops_selection(db, quote.ops_selection_id)
+
+        target_enquiry = (
+            db.query(Enquiry).filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+            .order_by(Enquiry.id.desc()).first()
+            if ops else None
         )
 
-    quote.techno_status = status
+    if status in ("Approved", "Sent back"):
 
-    quote.techno_approved_by = approved_by
+        verify_stage_action(target_enquiry, WorkflowStage.QUOTE_COMMERCIAL_REVIEW)
+        verify_approval_action(db, target_enquiry, actor, QUOTE_COMMERCIAL)
 
-    quote.techno_approved_date = date.today().isoformat()
+        if status == "Approved" and quote.revision_requested:
+            raise ValueError("Save a new quote version first.")
 
-    quote.techno_note = note
+    if status == "Sent back":
+
+        ops = get_ops_selection(db, quote.ops_selection_id)
+        regress_to_ops_review(db, ops, quote, target_enquiry, actor.name if actor else None, note)
+
+        return get_quote(db, quote_id)
+
+    quote.quote_commercial_status = status
+    quote.quote_commercial_approved_by = actor.name if actor else None
+    quote.quote_commercial_approved_date = date.today().isoformat()
+    quote.quote_commercial_note = note
 
     db.commit()
+    db.refresh(quote)
 
-    db.refresh(
-
-        quote
-
-    )
+    if status == "Approved" and target_enquiry:
+        advance_stage_at_least(db, target_enquiry.id, WorkflowStage.COMMERCIAL_APPROVAL.value)
 
     return quote
 

@@ -8,7 +8,8 @@ import "./RoleNavigationMatrix.css";
 // READ-ONLY: who holds real approval standing per hub
 // Purely a display of what the Hubs tab (Business Masters) already
 // sets - no write path here. Reuses GET /hubs, already enriched with
-// ops_owners/techno_approvers (Phase 21C), so no new endpoint needed.
+// ops_owners/quote_commercial_approvers (Phase 21C/22), so no new
+// endpoint needed.
 // ====================================
 
 export default function HubApprovalStandingCard(){
@@ -37,7 +38,7 @@ export default function HubApprovalStandingCard(){
             </div>
 
             <p className="role-nav-matrix-hint">
-                Who currently holds real Ops Review and Techno-Commercial Approval standing for each hub.
+                Who currently holds real Ops Review and Quote &amp; Commercial approval standing for each hub.
                 Set from Business Masters &rarr; Hubs, shown here read-only.
             </p>
 
@@ -58,7 +59,7 @@ export default function HubApprovalStandingCard(){
                                     <th className="role-nav-matrix-sticky-col">Hub</th>
                                     <th>Region</th>
                                     <th>Ops Review owners</th>
-                                    <th>Techno-Commercial approvers</th>
+                                    <th>Quote &amp; Commercial approvers</th>
                                 </tr>
 
                             </thead>
@@ -81,7 +82,7 @@ export default function HubApprovalStandingCard(){
                                             </td>
 
                                             <td className="role-nav-matrix-cell">
-                                                {h.techno_approvers?.length ? h.techno_approvers.map(o=>o.name).join(", ") : "—"}
+                                                {h.quote_commercial_approvers?.length ? h.quote_commercial_approvers.map(o=>o.name).join(", ") : "—"}
                                             </td>
 
                                         </tr>

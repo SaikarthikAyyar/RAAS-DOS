@@ -9,7 +9,7 @@ const WORKFLOW_STAGES = [
     { key: "CUSTOMER_REQUEST", label: "Customer Request" },
     { key: "SALES_SURVEY", label: "Sales Survey" },
     { key: "OPS_REVIEW", label: "Ops Review" },
-    { key: "TECHNO_COMMERCIAL_APPROVAL", label: "Techno-Commercial Approval" },
+    { key: "QUOTE_COMMERCIAL_REVIEW", label: "Quote & Commercial" },
     { key: "COMMERCIAL_APPROVAL", label: "Commercial Approval" },
     { key: "QUOTE_RELEASED", label: "Quote Released" },
     { key: "PO_RECEIVED", label: "PO Received" },

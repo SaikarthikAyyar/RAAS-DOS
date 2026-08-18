@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import useApprovalStanding from "../../../hooks/useApprovalStanding";
+
+import { buildActor } from "../../../utils/actor";
+
+import { computeGateStatus } from "../../../utils/gateStatus";
+
 import {
     getApprovalHistory,
     recordCommercialApprovalDecision,
@@ -60,11 +66,12 @@ export default function CommercialApprovalSummary({
 
 }){
 
-    const { hasTask } = useAuth();
+    const { user, hasTask } = useAuth();
+
+    const standing = useApprovalStanding(enquiry?.id, user?.id);
 
     const [history, setHistory] = useState([]);
 
-    const [approvedBy, setApprovedBy] = useState("");
     const [note, setNote] = useState("");
     const [finalValue, setFinalValue] = useState("");
     const [saving, setSaving] = useState(false);
@@ -166,7 +173,7 @@ export default function CommercialApprovalSummary({
 
                     <p className="survey-empty">
                         Nothing to review yet - complete Survey, Ops Review,
-                        Techno-Commercial Approval, and generate a quote first.
+                        Quote &amp; Commercial approval, and generate a quote first.
                     </p>
 
                 </div>
@@ -179,6 +186,20 @@ export default function CommercialApprovalSummary({
 
     const decisionForThisRevision = history.find(row => row.quote_id === quote.id);
 
+    // Real, server-re-verified gate: stage must genuinely be
+    // COMMERCIAL_APPROVAL right now AND the logged-in user must hold
+    // real commercial_approval hub standing - no typed name, identity
+    // comes purely from being logged in.
+    const gate = computeGateStatus(
+        enquiry,
+        "COMMERCIAL_APPROVAL",
+        standing?.commercial_approval,
+        "Commercial Approval",
+        standing?.hub_name
+    );
+
+    const canDecide = gate.canDecide;
+
     async function handleDecision(decision){
 
         if(decision==="REJECTED"){
@@ -189,9 +210,9 @@ export default function CommercialApprovalSummary({
 
         }
 
-        if(!approvedBy.trim()){
+        if(!canDecide){
 
-            setError("Enter your name before recording a decision.");
+            setError(gate.reason || "You are not authorized to record this decision.");
             return;
 
         }
@@ -240,10 +261,10 @@ export default function CommercialApprovalSummary({
 
                 quote.id,
                 decision,
-                approvedBy,
                 note,
                 decision==="APPROVED" ? Number(finalValue) : null,
-                enquiry?.id
+                enquiry?.id,
+                buildActor(user)
 
             );
 
@@ -274,9 +295,9 @@ export default function CommercialApprovalSummary({
 
     async function handleSendBack(){
 
-        if(!approvedBy.trim()){
+        if(!canDecide){
 
-            setError("Enter your name before sending this back.");
+            setError(gate.reason || "You are not authorized to send this back.");
             return;
 
         }
@@ -296,9 +317,9 @@ export default function CommercialApprovalSummary({
             await sendBackCommercialApproval(
 
                 quote.id,
-                approvedBy,
                 note,
-                enquiry?.id
+                enquiry?.id,
+                buildActor(user)
 
             );
 
@@ -354,7 +375,7 @@ export default function CommercialApprovalSummary({
 
         { label:"Survey", value: survey ? "Complete" : "Pending" },
         { label:"Ops Review", value: opsSelection?.review_status ?? "Pending" },
-        { label:"Techno-Comm.", value: quote.techno_status ?? "Pending" },
+        { label:"Quote & Comm.", value: quote.quote_commercial_status ?? "Pending" },
         { label:"Quote", value: quote.workflow_status ?? "-" },
         { label:"PO", value: "Not started" }
 
@@ -384,7 +405,11 @@ export default function CommercialApprovalSummary({
                 <h3 className="survey-summary-title">
                     Commercial Approval
                     <span className="workspace-header-pill gray" style={{marginLeft:8}}>
-                        Owner: Business Manager
+                        Owner: {
+                            standing?.commercial_approval_approvers?.length
+                                ? standing.commercial_approval_approvers.join(", ")
+                                : "Unassigned"
+                        }
                     </span>
                 </h3>
 
@@ -552,10 +577,10 @@ export default function CommercialApprovalSummary({
                             on a new version before Commercial Approval can act.
                         </p>
 
-                    ) : quote.techno_status !== "Approved" ? (
+                    ) : quote.quote_commercial_status !== "Approved" ? (
 
                         <p className="survey-empty" style={{marginTop:10}}>
-                            Waiting on Techno-Commercial Approval.
+                            Waiting on Quote &amp; Commercial approval.
                         </p>
 
                     ) : (
@@ -563,12 +588,6 @@ export default function CommercialApprovalSummary({
                         <>
 
                             <div className="ops-override-form" style={{marginTop:12}}>
-
-                                <input
-                                    placeholder="Your name"
-                                    value={approvedBy}
-                                    onChange={e=>setApprovedBy(e.target.value)}
-                                />
 
                                 <input
                                     placeholder="Note - why this value / decision"
@@ -585,6 +604,8 @@ export default function CommercialApprovalSummary({
 
                             </div>
 
+                            {gate.reason && <div className="survey-empty" style={{marginTop:8}}>{gate.reason}</div>}
+
                             {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
 
                             <div className="survey-actions" style={{marginTop:10}}>
@@ -592,7 +613,8 @@ export default function CommercialApprovalSummary({
                                 <button
                                     className="survey-action-button survey-action-button-orange"
                                     onClick={()=>handleDecision("APPROVED")}
-                                    disabled={saving}
+                                    disabled={saving || !canDecide}
+                                    title={!canDecide ? gate.reason : undefined}
                                 >
                                     {saving ? "Saving..." : "Accept and Generate Quote Release"}
                                 </button>
@@ -600,7 +622,8 @@ export default function CommercialApprovalSummary({
                                 <button
                                     className="survey-action-button survey-action-button-danger"
                                     onClick={()=>handleDecision("REJECTED")}
-                                    disabled={saving}
+                                    disabled={saving || !canDecide}
+                                    title={!canDecide ? gate.reason : undefined}
                                 >
                                     Reject
                                 </button>
@@ -608,8 +631,8 @@ export default function CommercialApprovalSummary({
                                 <button
                                     className="survey-action-button"
                                     onClick={handleSendBack}
-                                    disabled={saving}
-                                    title="Use Request Revision on the Quote & Commercial tab"
+                                    disabled={saving || !canDecide}
+                                    title={!canDecide ? gate.reason : "Use Request Revision on the Quote & Commercial tab"}
                                 >
                                     Send back for review
                                 </button>

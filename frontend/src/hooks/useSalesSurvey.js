@@ -4,6 +4,8 @@
 
 import { useState } from "react";
 
+import { getSurveyCompletenessErrors } from "../utils/surveyCompleteness";
+
 
 // ====================================
 // HOOK
@@ -709,46 +711,6 @@ Object.entries(
 
 
 
-// ====================================
-// REQUIRED FIELD KEYS
-// Single source of truth for which Sales Survey fields are required
-// (Sections A/B/C only - matches the "*" labels already on those
-// fields; D-H have none). Both the canSubmit gate below and the
-// per-field error highlighting derive from this same list, so they
-// can never drift apart.
-// ====================================
-
-const REQUIRED_FIELD_KEYS = [
-
-    // Section A
-    "customer.company_name",
-    "customer.plant_site_location",
-    "customer.contact_person",
-    "customer.contact_number",
-    "customer.nearest_hub",
-    "customer.urgency",
-    "customer.survey_date",
-
-    // Section B
-    "job.job_type",
-    "job.material_category",
-    "job.sludge_hardness",
-    "job.debris_level",
-    "job.cleaning_date",
-    "job.cleaning_frequency",
-
-    // Section C
-    "geometry.tank_type",
-    "geometry.length_dia",
-    "geometry.width",
-    "geometry.sludge_depth"
-
-];
-
-function isEmpty(value){
-    return value === null || value === undefined || value === "";
-}
-
 // The Enquiry's own creation date - surveying a case before it was
 // ever raised makes no sense, so Survey Date is additionally checked
 // against this (not just required-non-empty like every other field
@@ -757,24 +719,7 @@ function isEmpty(value){
 // already-submitted survey (whose own payload has no such field).
 const enquiryCreatedAt = surveyData.enquiry_created_at || null;
 
-const errors = {};
-
-REQUIRED_FIELD_KEYS.forEach(key => {
-
-    const [section, field] = key.split(".");
-
-    const value = surveyData[section]?.[field];
-
-    if(key === "customer.survey_date"){
-        errors[key] = isEmpty(value) || Boolean(enquiryCreatedAt && value < enquiryCreatedAt);
-    }
-    else{
-        errors[key] = isEmpty(value);
-    }
-
-});
-
-const canSubmit = Object.values(errors).every(hasError => !hasError);
+const { errors, canSubmit } = getSurveyCompletenessErrors(surveyData, enquiryCreatedAt);
 
 const completion = Math.min(
     100,

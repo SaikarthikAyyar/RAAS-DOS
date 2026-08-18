@@ -4,11 +4,18 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import useApprovalStanding from "../../../hooks/useApprovalStanding";
+
+import { buildActor } from "../../../utils/actor";
+
+import { computeGateStatus } from "../../../utils/gateStatus";
+
 import {
     getQuoteHistory,
     updateInternalExtra,
     updateValidTill,
-    flagQuoteRevisionRequested
+    flagQuoteRevisionRequested,
+    saveQuoteCommercialDecision
 } from "../../../services/technoCommercialQuoteService";
 
 function inr(value){
@@ -33,15 +40,15 @@ export default function QuoteCommercialSummary({
 
     quote,
 
-    onTabChange,
-
     reload
 
 }){
 
     const navigate = useNavigate();
 
-    const { hasTask } = useAuth();
+    const { user, hasTask } = useAuth();
+
+    const standing = useApprovalStanding(enquiry?.id, user?.id);
 
     const [history, setHistory] = useState([]);
 
@@ -57,6 +64,9 @@ export default function QuoteCommercialSummary({
     const [savingValidTill, setSavingValidTill] = useState(false);
 
     const [showPreview, setShowPreview] = useState(false);
+
+    const [decisionNote, setDecisionNote] = useState("");
+    const [deciding, setDeciding] = useState(false);
 
     const [error, setError] = useState("");
 
@@ -231,13 +241,61 @@ export default function QuoteCommercialSummary({
 
     }
 
-    function handleProceedToCommercialApproval(){
+    // Real, server-re-verified gate: stage must genuinely be
+    // QUOTE_COMMERCIAL_REVIEW right now AND the logged-in user must
+    // hold real quote_commercial hub standing - no typed name, identity
+    // comes purely from being logged in.
+    const gate = computeGateStatus(
+        enquiry,
+        "QUOTE_COMMERCIAL_REVIEW",
+        standing?.quote_commercial,
+        "Quote & Commercial",
+        standing?.hub_name
+    );
 
-        if(quote.revision_requested){
+    const canDecide = gate.canDecide && !quote.revision_requested;
+
+    const decisionDisabledReason =
+        quote.revision_requested
+            ? "Save a new quote version first."
+            : gate.reason;
+
+    async function handleDecision(status){
+
+        if(!canDecide){
+            setError(decisionDisabledReason || "You are not authorized to record this decision.");
             return;
         }
 
-        onTabChange?.("commercial-approval");
+        setDeciding(true);
+        setError("");
+
+        try{
+
+            await saveQuoteCommercialDecision(
+                quote.id,
+                status,
+                decisionNote,
+                enquiry?.id,
+                buildActor(user)
+            );
+
+            reload();
+
+        }
+
+        catch(err){
+
+            console.error(err);
+            setError(err?.detail || "Unable to save the decision.");
+
+        }
+
+        finally{
+
+            setDeciding(false);
+
+        }
 
     }
 
@@ -487,7 +545,7 @@ export default function QuoteCommercialSummary({
 
             <div className="survey-summary-card" style={{gridColumn:"1 / -1"}}>
 
-                <h3 className="survey-summary-title">Revise &amp; proceed</h3>
+                <h3 className="survey-summary-title">Revise &amp; approve</h3>
 
                 {
                     quote.revision_requested && (
@@ -496,8 +554,8 @@ export default function QuoteCommercialSummary({
                             Revision requested by {quote.revision_requested_by} on{" "}
                             {quote.revision_requested_date} - go to Sales Survey,
                             Ops Selector, or the Quotes module, make your changes,
-                            and save a new quote version. Proceeding to Commercial
-                            Approval is blocked until then.
+                            and save a new quote version. Approving here is
+                            blocked until then.
                         </p>
 
                     )
@@ -537,18 +595,43 @@ export default function QuoteCommercialSummary({
                         </button>
                     )}
 
+                </div>
+
+                <h4 className="ops-subheading" style={{marginTop:14}}>Quote &amp; Commercial decision</h4>
+
+                <div className="ops-override-form" style={{marginTop:4}}>
+
+                    <input
+                        placeholder="Note (optional)"
+                        value={decisionNote}
+                        onChange={e=>setDecisionNote(e.target.value)}
+                    />
+
+                </div>
+
+                {decisionDisabledReason && <div className="survey-empty" style={{marginTop:8}}>{decisionDisabledReason}</div>}
+
+                <div className="survey-actions" style={{flexWrap:"wrap", gap:8, marginTop:8}}>
+
                     {hasTask("enquiry-tab-quote-commercial", "proceed_to_commercial_approval") && (
                         <button
                             className="survey-action-button survey-action-button-orange"
-                            onClick={handleProceedToCommercialApproval}
-                            disabled={!!quote.revision_requested}
-                            title={
-                                quote.revision_requested
-                                    ? "Save a new quote version first"
-                                    : ""
-                            }
+                            onClick={()=>handleDecision("Approved")}
+                            disabled={deciding || !canDecide}
+                            title={!canDecide ? decisionDisabledReason : undefined}
                         >
-                            Proceed to Commercial Approval
+                            {deciding ? "Saving..." : "Approve & Send to Commercial Approval"}
+                        </button>
+                    )}
+
+                    {hasTask("enquiry-tab-quote-commercial", "request_revision") && (
+                        <button
+                            className="survey-action-button survey-action-button-danger"
+                            onClick={()=>handleDecision("Sent back")}
+                            disabled={deciding || !canDecide}
+                            title={!canDecide ? decisionDisabledReason : undefined}
+                        >
+                            {deciding ? "Saving..." : "Send Back to Ops Review"}
                         </button>
                     )}
 

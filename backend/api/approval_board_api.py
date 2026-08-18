@@ -33,6 +33,8 @@ from backend.services.approval_board_service import (
     send_back_commercial_approval_request
 )
 
+from backend.services.hub_approval_service import ApprovalVerificationError
+
 # ====================================
 # ROUTER
 # ====================================
@@ -250,13 +252,13 @@ def post_commercial_approval_decision(
 
             decision.upper(),
 
-            payload.approved_by,
-
             payload.note,
 
             payload.final_approved_value,
 
-            payload.enquiry_id
+            payload.enquiry_id,
+
+            payload.actor
 
         )
 
@@ -269,6 +271,10 @@ def post_commercial_approval_decision(
             "quote_release_document_id": result["quote_release_document_id"]
 
         }
+
+    except ApprovalVerificationError as e:
+
+        raise HTTPException(status_code=403, detail=str(e))
 
     except ValueError as e:
 
@@ -304,11 +310,11 @@ def post_send_back_commercial_approval(
 
             quote_id,
 
-            payload.approved_by,
-
             payload.note,
 
-            payload.enquiry_id
+            payload.enquiry_id,
+
+            payload.actor
 
         )
 
@@ -319,6 +325,10 @@ def post_send_back_commercial_approval(
             "approval_id": approval.id
 
         }
+
+    except ApprovalVerificationError as e:
+
+        raise HTTPException(status_code=403, detail=str(e))
 
     except ValueError as e:
 

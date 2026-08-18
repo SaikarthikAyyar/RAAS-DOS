@@ -6,6 +6,8 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 # ====================================
 # OPS SELECTOR INPUT SCHEMA
@@ -112,6 +114,17 @@ class OpsReviewDecisionSchema(BaseModel):
 
     status: str
 
-    reviewed_by: str
-
     review_note: Optional[str] = None
+
+    # Optional at the schema level so the internal "Pending" reset (the
+    # shared regress_to_ops_review helper cleaning up a stale "Approved"
+    # state) keeps working unchanged - the service layer only requires/
+    # verifies these when status is a genuine Approve/Send-back
+    # decision, not a system-triggered reset.
+    #
+    # Phase 22: no typed "your name" field anymore - identity comes
+    # purely from actor (the logged-in user), never a separate typed
+    # string that could drift from it.
+    enquiry_id: Optional[int] = None
+
+    actor: Optional[ActorSchema] = None

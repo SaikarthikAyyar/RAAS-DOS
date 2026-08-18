@@ -4,6 +4,12 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import useApprovalStanding from "../../../hooks/useApprovalStanding";
+
+import { buildActor } from "../../../utils/actor";
+
+import { computeGateStatus } from "../../../utils/gateStatus";
+
 import {
     saveOpsReviewDecision
 } from "../../../services/opsSelectorService";
@@ -11,11 +17,6 @@ import {
 import {
     getQuote
 } from "../../../services/technoCommercialQuoteService";
-
-import {
-    advanceStageAtLeast,
-    setEnquiryStage
-} from "../../../services/enquiryWorkspaceService";
 
 export default function OpsReviewDecisionCard({
 
@@ -29,11 +30,11 @@ export default function OpsReviewDecisionCard({
 
     const navigate = useNavigate();
 
-    const { hasTask } = useAuth();
+    const { user, hasTask } = useAuth();
+
+    const standing = useApprovalStanding(enquiry?.id, user?.id);
 
     const [quoteReady, setQuoteReady] = useState(false);
-
-    const [reviewedBy, setReviewedBy] = useState("");
 
     const [reviewNote, setReviewNote] = useState("");
 
@@ -99,11 +100,27 @@ export default function OpsReviewDecisionCard({
 
     }
 
+    // Real, server-re-verified gate: stage must genuinely be OPS_REVIEW
+    // right now AND the logged-in user must hold real ops_review hub
+    // standing - no typed name anymore, identity comes purely from
+    // being logged in. Once a decision has moved the stage on, this
+    // same gate correctly greys the buttons out instead of leaving
+    // them clickable.
+    const gate = computeGateStatus(
+        enquiry,
+        "OPS_REVIEW",
+        standing?.ops_review,
+        "Ops Review",
+        standing?.hub_name
+    );
+
+    const canDecide = gate.canDecide;
+
     async function handleDecision(status, nextStage){
 
-        if(!reviewedBy.trim()){
+        if(!canDecide){
 
-            setError("Enter your name in \"Reviewed by\" before deciding.");
+            setError(gate.reason || "You are not authorized to record this decision.");
 
             return;
 
@@ -121,22 +138,13 @@ export default function OpsReviewDecisionCard({
 
                 status,
 
-                reviewedBy,
+                reviewNote,
 
-                reviewNote
+                enquiry.id,
+
+                buildActor(user)
 
             );
-
-            if(status==="Approved"){
-
-                await advanceStageAtLeast(enquiry.id, "TECHNO_COMMERCIAL_APPROVAL");
-
-            }
-            else{
-
-                await setEnquiryStage(enquiry.id, nextStage);
-
-            }
 
             reload();
 
@@ -223,16 +231,6 @@ export default function OpsReviewDecisionCard({
 
                 <input
 
-                    placeholder="Reviewed by (your name)"
-
-                    value={reviewedBy}
-
-                    onChange={e=>setReviewedBy(e.target.value)}
-
-                />
-
-                <input
-
                     placeholder="Note (e.g. Machine, pump and manpower confirmed workable)"
 
                     value={reviewNote}
@@ -242,6 +240,8 @@ export default function OpsReviewDecisionCard({
                 />
 
             </div>
+
+            {gate.reason && <div className="survey-empty" style={{marginTop:8}}>{gate.reason}</div>}
 
             {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
 
@@ -273,11 +273,13 @@ export default function OpsReviewDecisionCard({
 
                             onClick={()=>handleDecision("Approved")}
 
-                            disabled={saving}
+                            disabled={saving || !canDecide}
+
+                            title={!canDecide ? gate.reason : undefined}
 
                         >
 
-                            {saving ? "Saving..." : "Approve & Send to Techno-Commercial"}
+                            {saving ? "Saving..." : "Approve & Send to Quote & Commercial"}
 
                         </button>
 
@@ -299,7 +301,9 @@ export default function OpsReviewDecisionCard({
 
                     onClick={()=>handleDecision("Sent back", "SALES_SURVEY")}
 
-                    disabled={saving}
+                    disabled={saving || !canDecide}
+
+                    title={!canDecide ? gate.reason : undefined}
 
                 >
 

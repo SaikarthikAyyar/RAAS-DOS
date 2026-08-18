@@ -289,25 +289,27 @@ class Quote(Base):
 
 
     # ====================================
-    # TECHNO-COMMERCIAL APPROVAL DECISION
-    # (Techno-Commercial Approval tab -
-    # wireframe parity)
+    # QUOTE & COMMERCIAL GATE DECISION
+    # (Phase 22 - was "Techno-Commercial
+    # Approval"; the same columns are reused,
+    # renamed, since the Quote & Commercial
+    # tab now owns this decision instead)
     # ====================================
 
-    techno_status = Column(
+    quote_commercial_status = Column(
         String(50),
         default="Pending"
     )
 
-    techno_approved_by = Column(
+    quote_commercial_approved_by = Column(
         String(100)
     )
 
-    techno_approved_date = Column(
+    quote_commercial_approved_date = Column(
         String(20)
     )
 
-    techno_note = Column(
+    quote_commercial_note = Column(
         String(500)
     )
 

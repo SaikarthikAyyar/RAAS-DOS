@@ -4,7 +4,7 @@
 # Each function returns only the enquiries currently pending at that
 # specific gate. Queue membership is decided by real per-gate status
 # fields (enquiry.stage plus OpsSelection.review_status / Quote.
-# techno_status / revision_requested / decision history), not by
+# quote_commercial_status / revision_requested / decision history), not by
 # `enquiry.stage` alone - Quote & Commercial and Commercial Approval
 # both sit at the same COMMERCIAL_APPROVAL stage, so they're told
 # apart by whether a commercial-approval decision has been recorded
@@ -47,26 +47,29 @@ def _hub_map(db):
 
     user_names = {u.id: u.name for u in db.query(User).all()}
 
+    empty_entry = lambda: {"ops_review": [], "quote_commercial": [], "commercial_approval": []}
+
     approvers_by_hub = {}
 
     for approver in db.query(HubApprover).all():
 
-        entry = approvers_by_hub.setdefault(approver.hub_id, {"ops_review": [], "techno_commercial": []})
+        entry = approvers_by_hub.setdefault(approver.hub_id, empty_entry())
 
         name = user_names.get(approver.user_id)
 
-        if name:
+        if name and approver.approval_type in entry:
             entry[approver.approval_type].append(name)
 
     result = {}
 
     for hub in hubs:
 
-        entry = approvers_by_hub.get(hub.id, {"ops_review": [], "techno_commercial": []})
+        entry = approvers_by_hub.get(hub.id, empty_entry())
 
         result[hub.hub_name] = {
             "ops_owner_display": _format_names(entry["ops_review"]),
-            "techno_approver_display": _format_names(entry["techno_commercial"])
+            "quote_commercial_approver_display": _format_names(entry["quote_commercial"]),
+            "commercial_approver_display": _format_names(entry["commercial_approval"])
         }
 
     return result
@@ -142,7 +145,14 @@ def get_ops_review_queue(db):
 
 
 # ====================================
-# TECHNO-COMMERCIAL QUEUE
+# QUOTE & COMMERCIAL GATE QUEUE
+# Cases sitting at the QUOTE_COMMERCIAL_REVIEW stage, waiting on the
+# real Quote & Commercial approval (the gate Techno-Commercial's old
+# standalone approval used to own - see Phase 22). Function name kept
+# as get_techno_queue for now since this Reviews & Approvals module's
+# own tab structure (a separate page from the Enquiry Workspace tabs)
+# wasn't part of Phase 22's explicit scope - flagged as a fast-follow
+# if its tab labels also need reconciling with the new gate names.
 # ====================================
 
 def get_techno_queue(db):
@@ -151,7 +161,7 @@ def get_techno_queue(db):
 
     enquiries = (
         db.query(Enquiry)
-        .filter(Enquiry.stage == "TECHNO_COMMERCIAL_APPROVAL")
+        .filter(Enquiry.stage == "QUOTE_COMMERCIAL_REVIEW")
         .filter(Enquiry.status == "OPEN")
         .order_by(Enquiry.id.desc())
         .all()
@@ -178,7 +188,7 @@ def get_techno_queue(db):
             "enquiry_id": row["enquiry_id"],
             "customer_name": row["customer_name"],
             "hub": row["hub"],
-            "owner": row["_hub_row"]["techno_approver_display"] if row["_hub_row"] else None,
+            "owner": row["_hub_row"]["quote_commercial_approver_display"] if row["_hub_row"] else None,
             "metric": metric
 
         })
@@ -213,7 +223,7 @@ def get_quote_commercial_queue(db):
 
         quote = db.query(Quote).filter(Quote.id == enquiry.quote_id).first()
 
-        if not quote or quote.techno_status != "Approved":
+        if not quote or quote.quote_commercial_status != "Approved":
             continue
 
         decided = (
@@ -244,6 +254,8 @@ def get_quote_commercial_queue(db):
 
 # ====================================
 # COMMERCIAL APPROVAL QUEUE
+# Owner column resolved from real hub_approvers rows (commercial_
+# approval type), matching Ops Review/Techno-Commercial.
 # ====================================
 
 def get_commercial_queue(db):
@@ -267,7 +279,7 @@ def get_commercial_queue(db):
 
         quote = db.query(Quote).filter(Quote.id == enquiry.quote_id).first()
 
-        if not quote or quote.techno_status != "Approved" or quote.revision_requested:
+        if not quote or quote.quote_commercial_status != "Approved" or quote.revision_requested:
             continue
 
         decided = (
@@ -289,7 +301,7 @@ def get_commercial_queue(db):
             "enquiry_id": row["enquiry_id"],
             "customer_name": row["customer_name"],
             "hub": row["hub"],
-            "owner": None,
+            "owner": row["_hub_row"]["commercial_approver_display"] if row["_hub_row"] else None,
             "metric": metric
 
         })

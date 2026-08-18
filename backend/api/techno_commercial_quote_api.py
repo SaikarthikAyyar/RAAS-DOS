@@ -14,19 +14,21 @@ from backend.database.connection import get_db
 from backend.schemas.techno_commercial_quote_schema import (
     QuoteCreateSchema,
     QuoteResponseSchema,
-    TechnoApprovalDecisionSchema,
+    QuoteCommercialDecisionSchema,
     InternalExtraSchema,
     ValidTillSchema,
     RequestRevisionFlagSchema,
     QuoteListResponse
 )
 
+from backend.services.hub_approval_service import ApprovalVerificationError
+
 from backend.services.techno_commercial_quote_service import (
     approve_quote_by_customer,
     create_quote_request,
     get_quote_preview_request,
     request_quote_revision,
-    save_techno_approval_decision,
+    record_quote_commercial_decision_request,
     get_quote_history_request,
     update_internal_extra_request,
     update_valid_till_request,
@@ -236,27 +238,34 @@ def request_revision(
 
 
 # ====================================
-# SAVE TECHNO-COMMERCIAL APPROVAL DECISION
+# QUOTE & COMMERCIAL GATE DECISION (Phase 22)
+# The real, hub-gated, stage-advancing decision for the Quote &
+# Commercial tab - replaces the retired Techno-Commercial standalone
+# approval. Verification (stage + hub standing) and the stage move
+# both happen inside record_quote_commercial_decision_request, in one
+# atomic call.
 # ====================================
 
 @router.put(
 
-    "/quote/{quote_id}/techno-approval"
+    "/quote/{quote_id}/commercial-review"
 
 )
-def put_techno_approval(
+def put_quote_commercial_decision(
 
     quote_id: int,
 
-    payload: TechnoApprovalDecisionSchema,
+    payload: QuoteCommercialDecisionSchema,
 
     db: Session = Depends(get_db)
 
 ):
 
+    from fastapi import HTTPException
+
     try:
 
-        return save_techno_approval_decision(
+        return record_quote_commercial_decision_request(
 
             db,
 
@@ -264,15 +273,19 @@ def put_techno_approval(
 
             payload.status,
 
-            payload.approved_by,
+            payload.note,
 
-            payload.note
+            payload.actor,
+
+            payload.enquiry_id
 
         )
 
-    except ValueError as e:
+    except ApprovalVerificationError as e:
 
-        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail=str(e))
+
+    except ValueError as e:
 
         raise HTTPException(
 

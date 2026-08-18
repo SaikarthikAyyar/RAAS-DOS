@@ -80,7 +80,9 @@ function HubModal({ editing, allUsers, onClose, onSave }){
 
     const [opsOwnerUserIds, setOpsOwnerUserIds] = useState(editing?.ops_owner_user_ids || []);
 
-    const [technoApproverUserIds, setTechnoApproverUserIds] = useState(editing?.techno_approver_user_ids || []);
+    const [quoteCommercialApproverUserIds, setQuoteCommercialApproverUserIds] = useState(editing?.quote_commercial_approver_user_ids || []);
+
+    const [commercialApproverUserIds, setCommercialApproverUserIds] = useState(editing?.commercial_approver_user_ids || []);
 
     const [saving, setSaving] = useState(false);
 
@@ -107,7 +109,8 @@ function HubModal({ editing, allUsers, onClose, onSave }){
                 hub_name: hubName.trim(),
                 region: region.trim() || null,
                 ops_owner_user_ids: opsOwnerUserIds,
-                techno_approver_user_ids: technoApproverUserIds
+                quote_commercial_approver_user_ids: quoteCommercialApproverUserIds,
+                commercial_approver_user_ids: commercialApproverUserIds
 
             });
 
@@ -183,12 +186,24 @@ function HubModal({ editing, allUsers, onClose, onSave }){
 
                     <div style={{gridColumn:"1 / -1"}}>
 
-                        <label>Techno-Commercial approvers (real approval standing for this hub)</label>
+                        <label>Quote &amp; Commercial approvers (real approval standing for this hub)</label>
 
                         <CheckboxList
                             options={allUsers}
-                            selected={technoApproverUserIds}
-                            onChange={setTechnoApproverUserIds}
+                            selected={quoteCommercialApproverUserIds}
+                            onChange={setQuoteCommercialApproverUserIds}
+                        />
+
+                    </div>
+
+                    <div style={{gridColumn:"1 / -1"}}>
+
+                        <label>Commercial Approval approvers (real approval standing for this hub)</label>
+
+                        <CheckboxList
+                            options={allUsers}
+                            selected={commercialApproverUserIds}
+                            onChange={setCommercialApproverUserIds}
                         />
 
                     </div>
@@ -363,7 +378,7 @@ export default function HubsTab(){
             </h3>
 
             <p className="bm-muted" style={{marginBottom:10}}>
-Who holds real Ops Review and Techno-Commercial Approval standing for each hub - a hub can have several of each. Feeds the Hub and Owner columns on the Reviews &amp; Approvals module.
+Who holds real Ops Review, Quote &amp; Commercial, and Commercial Approval standing for each hub - a hub can have several of each. Feeds the Hub and Owner columns on the Reviews &amp; Approvals module, and gates who can actually approve at each stage.
             </p>
 
             {
@@ -394,7 +409,9 @@ Who holds real Ops Review and Techno-Commercial Approval standing for each hub -
 
                                 <th>Ops owners</th>
 
-                                <th>Techno-Commercial approvers</th>
+                                <th>Quote &amp; Commercial approvers</th>
+
+                                <th>Commercial Approval approvers</th>
 
                                 <th></th>
 
@@ -416,7 +433,9 @@ Who holds real Ops Review and Techno-Commercial Approval standing for each hub -
 
                                         <td>{h.ops_owners?.length ? h.ops_owners.map(o=>o.name).join(", ") : "—"}</td>
 
-                                        <td>{h.techno_approvers?.length ? h.techno_approvers.map(o=>o.name).join(", ") : "—"}</td>
+                                        <td>{h.quote_commercial_approvers?.length ? h.quote_commercial_approvers.map(o=>o.name).join(", ") : "—"}</td>
+
+                                        <td>{h.commercial_approvers?.length ? h.commercial_approvers.map(o=>o.name).join(", ") : "—"}</td>
 
                                         <td>
 

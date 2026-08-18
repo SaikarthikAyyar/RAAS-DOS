@@ -20,7 +20,7 @@ const WORKFLOW_TABS = [
 
     {
         id: "techno-commercial-approval",
-        label: "Techno-Commercial Approval"
+        label: "Techno-Commercial Review"
     },
 
     {

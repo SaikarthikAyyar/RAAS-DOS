@@ -22,14 +22,18 @@ def get_hub_by_name(db, hub_name):
     return db.query(Hub).filter(Hub.hub_name == hub_name).first()
 
 
-_HUB_PAYLOAD_EXCLUDE = {"actor", "remark", "ops_owner_user_ids", "techno_approver_user_ids"}
+_HUB_PAYLOAD_EXCLUDE = {
+    "actor", "remark",
+    "ops_owner_user_ids", "quote_commercial_approver_user_ids", "commercial_approver_user_ids"
+}
 
 
 # actor/remark (Phase 15) ride along on every Business Masters payload
 # for the notification layer only - excluded here so they never reach
 # the ORM constructor/setattr loop (which would otherwise choke on
-# unknown columns). ops_owner_user_ids/techno_approver_user_ids are
-# handled separately below (a real many-to-many, not a Hub column).
+# unknown columns). ops_owner_user_ids/quote_commercial_approver_user_ids/
+# commercial_approver_user_ids are handled separately below (a real
+# many-to-many, not a Hub column).
 def create_hub(db, payload):
     row = Hub(**payload.model_dump(exclude=_HUB_PAYLOAD_EXCLUDE))
     db.add(row)
@@ -39,8 +43,11 @@ def create_hub(db, payload):
     if payload.ops_owner_user_ids:
         _set_hub_approvers(db, row.id, "ops_review", payload.ops_owner_user_ids)
 
-    if payload.techno_approver_user_ids:
-        _set_hub_approvers(db, row.id, "techno_commercial", payload.techno_approver_user_ids)
+    if payload.quote_commercial_approver_user_ids:
+        _set_hub_approvers(db, row.id, "quote_commercial", payload.quote_commercial_approver_user_ids)
+
+    if payload.commercial_approver_user_ids:
+        _set_hub_approvers(db, row.id, "commercial_approval", payload.commercial_approver_user_ids)
 
     db.commit()
 
@@ -58,8 +65,11 @@ def update_hub(db, hub_id, payload):
     if "ops_owner_user_ids" in payload.model_fields_set:
         _set_hub_approvers(db, hub_id, "ops_review", payload.ops_owner_user_ids or [])
 
-    if "techno_approver_user_ids" in payload.model_fields_set:
-        _set_hub_approvers(db, hub_id, "techno_commercial", payload.techno_approver_user_ids or [])
+    if "quote_commercial_approver_user_ids" in payload.model_fields_set:
+        _set_hub_approvers(db, hub_id, "quote_commercial", payload.quote_commercial_approver_user_ids or [])
+
+    if "commercial_approver_user_ids" in payload.model_fields_set:
+        _set_hub_approvers(db, hub_id, "commercial_approval", payload.commercial_approver_user_ids or [])
 
     db.commit()
     db.refresh(row)

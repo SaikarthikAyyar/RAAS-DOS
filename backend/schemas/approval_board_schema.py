@@ -6,6 +6,8 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 # ====================================
 # APPROVAL CARD
@@ -39,13 +41,15 @@ class ApprovalCardSchema(
 
 class CommercialApprovalDecisionSchema(BaseModel):
 
-    approved_by: str
-
+    # Phase 22: no typed "your name" field anymore - identity comes
+    # purely from actor (the logged-in user).
     note: str
 
     final_approved_value: float | None = None
 
     enquiry_id: int | None = None
+
+    actor: ActorSchema | None = None
 
 
 class ApprovalHistoryRowSchema(BaseModel):

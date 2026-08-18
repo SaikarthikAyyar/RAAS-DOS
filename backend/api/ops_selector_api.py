@@ -43,7 +43,7 @@ from backend.services.ops_selector_service import (
 
     save_deployment_plan,
 
-    save_ops_review_decision
+    record_ops_review_decision_request
 
 )
 
@@ -54,6 +54,8 @@ from backend.repositories.ops_selector_repository import (
     get_ops_selection
 
 )
+
+from backend.services.hub_approval_service import ApprovalVerificationError
 
 # ====================================
 # ROUTER
@@ -365,9 +367,19 @@ def put_ops_review_decision(
 
 ):
 
+    # Real approve/send-back decisions are verified against the
+    # enquiry's hub approvers AND the enquiry's current stage inside
+    # record_ops_review_decision_request - a "Pending" status is a
+    # system-triggered reset (the shared regress_to_ops_review helper
+    # cleaning up a stale "Approved" state here) and is never a human
+    # approval action, so it's left unverified there, same as before.
+    #
+    # This one merged decision now covers both what Ops Review and the
+    # retired Techno-Commercial approval used to require separately -
+    # approving here advances stage straight to QUOTE_COMMERCIAL_REVIEW.
     try:
 
-        return save_ops_review_decision(
+        return record_ops_review_decision_request(
 
             db,
 
@@ -375,11 +387,17 @@ def put_ops_review_decision(
 
             payload.status,
 
-            payload.reviewed_by,
+            payload.review_note,
 
-            payload.review_note
+            payload.actor,
+
+            payload.enquiry_id
 
         )
+
+    except ApprovalVerificationError as e:
+
+        raise HTTPException(status_code=403, detail=str(e))
 
     except ValueError as e:
 

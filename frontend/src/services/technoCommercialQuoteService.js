@@ -103,24 +103,29 @@ return response.json();
 
 
 // ====================================
-// SAVE TECHNO-COMMERCIAL APPROVAL DECISION
+// SAVE QUOTE & COMMERCIAL GATE DECISION (Phase 22)
+// Replaces the retired Techno-Commercial approval - this is the real
+// hub-gated decision for the Quote & Commercial tab now. No typed
+// name - identity comes from actor (the logged-in user).
 // ====================================
 
-export async function saveTechnoApproval(
+export async function saveQuoteCommercialDecision(
 
 quoteId,
 
 status,
 
-approvedBy,
+note,
 
-note
+enquiryId,
+
+actor
 
 ){
 
 const response = await fetch(
 
-`${API}/quote/${quoteId}/techno-approval`,
+`${API}/quote/${quoteId}/commercial-review`,
 
 {
 
@@ -136,9 +141,11 @@ body:JSON.stringify({
 
 status,
 
-approved_by:approvedBy,
+note,
 
-note
+enquiry_id:enquiryId ?? null,
+
+actor:actor ?? null
 
 })
 

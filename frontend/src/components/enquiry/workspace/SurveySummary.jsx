@@ -20,6 +20,8 @@ import {
 }
 from "../../../services/surveyReminderService";
 
+import { getSurveyCompletenessErrors } from "../../../utils/surveyCompleteness";
+
 export default function SurveySummary({
 
     enquiry,
@@ -50,6 +52,8 @@ export default function SurveySummary({
     const [reminderStatus, setReminderStatus] = useState(null);
 
     const [showReminderModal, setShowReminderModal] = useState(false);
+
+    const [requestingOpsReview, setRequestingOpsReview] = useState(false);
 
     useEffect(()=>{
 
@@ -134,9 +138,33 @@ export default function SurveySummary({
 
     async function handleRequestOpsReview(){
 
-        await requestOpsReview(enquiry.id);
+        if(!surveyComplete || enquiry.stage !== "SALES_SURVEY"){
+            return;
+        }
 
-        reload();
+        setRequestingOpsReview(true);
+
+        try{
+
+            await requestOpsReview(enquiry.id);
+
+            reload();
+
+        }
+
+        catch(err){
+
+            console.error(err);
+
+            alert(err?.detail || "Unable to request Ops Review.");
+
+        }
+
+        finally{
+
+            setRequestingOpsReview(false);
+
+        }
 
     }
 
@@ -147,6 +175,22 @@ export default function SurveySummary({
         Boolean(enquiry.ops_review_requested_at) &&
 
         !enquiry.ops_selector_id;
+
+    // Blocked until the compulsory Sections A/B/C fields are actually
+    // filled, and only ever active while the enquiry is genuinely
+    // still at Survey - once it's moved on, this same button must
+    // grey out instead of staying clickable indefinitely.
+    const { canSubmit: surveyComplete } = getSurveyCompletenessErrors(
+        survey,
+        survey?.enquiry_created_at
+    );
+
+    const requestOpsReviewDisabledReason =
+        enquiry.stage !== "SALES_SURVEY"
+            ? "Already requested - this case has moved past Survey."
+            : !surveyComplete
+                ? "Complete all compulsory survey fields before requesting Ops Review."
+                : null;
 
     return(
 
@@ -997,9 +1041,13 @@ export default function SurveySummary({
 
                                 onClick={handleRequestOpsReview}
 
+                                disabled={requestingOpsReview || !!requestOpsReviewDisabledReason}
+
+                                title={requestOpsReviewDisabledReason || undefined}
+
                             >
 
-                                Request Ops Review
+                                {requestingOpsReview ? "Requesting..." : "Request Ops Review"}
 
                             </button>
 

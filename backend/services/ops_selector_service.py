@@ -40,11 +40,21 @@ from backend.services.enquiry_consolidated_service import update_module_referenc
 
 from backend.services.workflow_service import (
     advance_to_next_stage,
+    advance_stage_at_least,
+    update_stage,
     WorkflowStage
 )
 
 from backend.repositories.machine_repository import list_active_machines_as_dicts
 from backend.repositories.pump_repository import list_active_pumps_as_dicts
+
+from backend.services.hub_approval_service import (
+    verify_approval_action,
+    verify_stage_action,
+    OPS_REVIEW
+)
+
+from backend.repositories.techno_commercial_quote_repository import get_quote_by_ops_selection
 
 
 
@@ -743,3 +753,59 @@ def save_ops_review_decision(
     )
 
     return ops
+
+
+# ====================================
+# RECORD OPS REVIEW DECISION (Phase 22)
+# Atomic, backend-orchestrated version of the Ops Review gate - this
+# is the ONE approval that now covers both what Ops Review and the
+# retired Techno-Commercial approval used to require separately.
+# Verifies stage + hub standing, applies the decision, and moves the
+# stage in the SAME call (no more separate frontend save-then-advance
+# round trip, matching the pattern Commercial Approval already used
+# correctly). "Pending" resets (the internal reset the shared
+# regress_to_ops_review helper triggers) skip verification entirely -
+# never a human decision, always a system-triggered cleanup.
+# ====================================
+
+def record_ops_review_decision_request(db, ops_selection_id, status, note, actor, enquiry_id):
+
+    ops = get_ops_selection(db, ops_selection_id)
+
+    if ops is None:
+        raise ValueError("Ops Selection not found.")
+
+    target_enquiry = (
+        db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
+        if enquiry_id else
+        db.query(Enquiry).filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+        .order_by(Enquiry.id.desc()).first()
+    )
+
+    if status in ("Approved", "Sent back"):
+
+        verify_stage_action(target_enquiry, WorkflowStage.OPS_REVIEW)
+        verify_approval_action(db, target_enquiry, actor, OPS_REVIEW)
+
+        if status == "Approved":
+
+            quote = get_quote_by_ops_selection(db, ops_selection_id)
+
+            if quote is None:
+                raise ValueError(
+                    "Generate a quote via the Deployment Plan before approving."
+                )
+
+    reviewed_by = actor.name if actor else None
+
+    result = save_ops_review_decision(db, ops_selection_id, status, reviewed_by, note)
+
+    if target_enquiry:
+
+        if status == "Approved":
+            advance_stage_at_least(db, target_enquiry.id, WorkflowStage.QUOTE_COMMERCIAL_REVIEW.value)
+
+        elif status == "Sent back":
+            update_stage(db, target_enquiry.id, WorkflowStage.SALES_SURVEY.value)
+
+    return result

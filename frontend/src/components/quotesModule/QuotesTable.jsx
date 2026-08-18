@@ -22,7 +22,7 @@ function stageClass(stage){
         return "quotes-status quotes-status-approved";
     }
 
-    if(stage==="COMMERCIAL_APPROVAL" || stage==="TECHNO_COMMERCIAL_APPROVAL"){
+    if(stage==="COMMERCIAL_APPROVAL" || stage==="QUOTE_COMMERCIAL_REVIEW"){
         return "quotes-status quotes-status-revision";
     }
 

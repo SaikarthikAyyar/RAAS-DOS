@@ -4,7 +4,7 @@ import SurveyWorkspace from "./SurveyWorkspace";
 
 import OpsReviewSummary from "./OpsReviewSummary";
 
-import TechnoCommercialApprovalSummary from "./TechnoCommercialApprovalSummary";
+import TechnoCommercialReviewSummary from "./TechnoCommercialReviewSummary";
 
 import QuoteCommercialSummary from "./QuoteCommercialSummary";
 
@@ -93,15 +93,11 @@ export default function WorkspaceContent({
 
             return(
 
-                <TechnoCommercialApprovalSummary
-
-                    enquiry={enquiry}
+                <TechnoCommercialReviewSummary
 
                     opsSelection={opsSelection}
 
                     quote={quote}
-
-                    reload={reload}
 
                 />
 

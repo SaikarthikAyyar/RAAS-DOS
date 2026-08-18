@@ -26,7 +26,7 @@ def _user_name_map(db):
 
 # ====================================
 # HUB -> RESPONSE DICT
-# Resolves ops_owner_user_ids/techno_approver_user_ids into display
+# Resolves ops_owner_user_ids/quote_commercial_approver_user_ids into display
 # names - built here (not left to Pydantic's from_attributes) since
 # the approver lists come from a separate table, not Hub's own columns.
 # ====================================
@@ -38,7 +38,8 @@ def _build_hub_dict(db, hub, user_names=None):
     approvers = list_hub_approvers(db, hub.id)
 
     ops_owner_ids = [a.user_id for a in approvers if a.approval_type == "ops_review"]
-    techno_ids = [a.user_id for a in approvers if a.approval_type == "techno_commercial"]
+    quote_commercial_ids = [a.user_id for a in approvers if a.approval_type == "quote_commercial"]
+    commercial_ids = [a.user_id for a in approvers if a.approval_type == "commercial_approval"]
 
     return {
         "id": hub.id,
@@ -48,8 +49,10 @@ def _build_hub_dict(db, hub, user_names=None):
         "techno_approver": hub.techno_approver,
         "ops_owner_user_ids": ops_owner_ids,
         "ops_owners": [{"id": uid, "name": user_names.get(uid)} for uid in ops_owner_ids],
-        "techno_approver_user_ids": techno_ids,
-        "techno_approvers": [{"id": uid, "name": user_names.get(uid)} for uid in techno_ids]
+        "quote_commercial_approver_user_ids": quote_commercial_ids,
+        "quote_commercial_approvers": [{"id": uid, "name": user_names.get(uid)} for uid in quote_commercial_ids],
+        "commercial_approver_user_ids": commercial_ids,
+        "commercial_approvers": [{"id": uid, "name": user_names.get(uid)} for uid in commercial_ids]
     }
 
 
@@ -108,11 +111,18 @@ def create_hub_request(db, payload):
             "after": ", ".join(o["name"] for o in hub_dict["ops_owners"] if o["name"])
         })
 
-    if hub_dict["techno_approvers"]:
+    if hub_dict["quote_commercial_approvers"]:
         changes.append({
-            "field": "techno_approvers",
+            "field": "quote_commercial_approvers",
             "before": None,
-            "after": ", ".join(o["name"] for o in hub_dict["techno_approvers"] if o["name"])
+            "after": ", ".join(o["name"] for o in hub_dict["quote_commercial_approvers"] if o["name"])
+        })
+
+    if hub_dict["commercial_approvers"]:
+        changes.append({
+            "field": "commercial_approvers",
+            "before": None,
+            "after": ", ".join(o["name"] for o in hub_dict["commercial_approvers"] if o["name"])
         })
 
     record_business_master_change(
@@ -148,7 +158,8 @@ def update_hub_request(db, hub_id, payload):
 
     before_approvers = list_hub_approvers(db, hub_id)
     before_ops_ids = [a.user_id for a in before_approvers if a.approval_type == "ops_review"]
-    before_techno_ids = [a.user_id for a in before_approvers if a.approval_type == "techno_commercial"]
+    before_quote_commercial_ids = [a.user_id for a in before_approvers if a.approval_type == "quote_commercial"]
+    before_commercial_ids = [a.user_id for a in before_approvers if a.approval_type == "commercial_approval"]
 
     row = update_hub(db, hub_id, payload)
 
@@ -163,15 +174,26 @@ def update_hub_request(db, hub_id, payload):
                 "after": _names_display(after_ops_ids, user_names)
             })
 
-    if "techno_approver_user_ids" in payload.model_fields_set:
+    if "quote_commercial_approver_user_ids" in payload.model_fields_set:
 
-        after_techno_ids = payload.techno_approver_user_ids or []
+        after_quote_commercial_ids = payload.quote_commercial_approver_user_ids or []
 
-        if set(before_techno_ids) != set(after_techno_ids):
+        if set(before_quote_commercial_ids) != set(after_quote_commercial_ids):
             changes.append({
-                "field": "techno_approvers",
-                "before": _names_display(before_techno_ids, user_names),
-                "after": _names_display(after_techno_ids, user_names)
+                "field": "quote_commercial_approvers",
+                "before": _names_display(before_quote_commercial_ids, user_names),
+                "after": _names_display(after_quote_commercial_ids, user_names)
+            })
+
+    if "commercial_approver_user_ids" in payload.model_fields_set:
+
+        after_commercial_ids = payload.commercial_approver_user_ids or []
+
+        if set(before_commercial_ids) != set(after_commercial_ids):
+            changes.append({
+                "field": "commercial_approvers",
+                "before": _names_display(before_commercial_ids, user_names),
+                "after": _names_display(after_commercial_ids, user_names)
             })
 
     if changes:

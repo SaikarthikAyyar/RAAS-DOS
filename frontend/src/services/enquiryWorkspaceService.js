@@ -126,6 +126,28 @@ export async function requestOpsReview(
 
 }
 
+// ====================================
+// APPROVAL STANDING
+// For the frontend to pre-disable Approve/Send-back/Reject buttons -
+// resolves the enquiry's hub and reports whether the given user
+// holds real hub_approvers standing for each of the 3 approval gates.
+// ====================================
+
+export async function getEnquiryApprovalStanding(
+    enquiryId,
+    userId
+){
+
+    const response = await fetch(
+
+        `${API}/enquiry-consolidated/${enquiryId}/approval-standing?user_id=${userId}`
+
+    );
+
+    return response.json();
+
+}
+
 export async function setEnquiryStage(
     enquiryId,
     stage

@@ -316,6 +316,29 @@ def request_ops_review(
 
 
 # ====================================
+# APPROVAL STANDING
+# For the frontend to pre-disable Approve/Send-back/Reject buttons
+# before the user even attempts an action - resolves this enquiry's
+# hub (via its Sales Survey's nearest_hub) and reports whether the
+# given user holds real hub_approvers standing for each gate.
+# ====================================
+
+@router.get(
+    "/{enquiry_id}/approval-standing"
+)
+def get_approval_standing(
+    enquiry_id: int,
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    return service.get_enquiry_approval_standing_request(
+        db,
+        enquiry_id,
+        user_id
+    )
+
+
+# ====================================
 # SET STAGE
 # ====================================
 
