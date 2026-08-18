@@ -438,12 +438,7 @@ export default function DeploymentPlanCard({
 
             </div>
 
-            <input
-                placeholder="Your name"
-                value={createdBy}
-                onChange={e=>setCreatedBy(e.target.value)}
-                style={{marginTop:12}}
-            />
+
 
             {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
 

@@ -28,7 +28,9 @@ getSalesPrefill,
 
 getCustomerSurveys,
 
-getCustomerSurvey
+getCustomerSurvey,
+
+getCustomers
 
 }
 
@@ -232,6 +234,24 @@ useState(
 );
 
 
+// ====================================
+// CUSTOMER REQUEST OPTIONS
+// Real list, fetched once - powers the "Customer Request*" dropdown
+// when this page is reached directly (no location.state), instead of
+// the single fake entry it was previously stuck rendering.
+// ====================================
+
+const [customerRequestOptions, setCustomerRequestOptions] = useState([]);
+
+useEffect(() => {
+
+    getCustomers()
+        .then(data => setCustomerRequestOptions(Array.isArray(data) ? data : []))
+        .catch(error => console.log(error));
+
+}, []);
+
+
 const [
 
 selectedSurvey,
@@ -261,103 +281,83 @@ const {
 } = location.state || {};
 
 
-useEffect(() => {
+// ====================================
+// LOAD A CUSTOMER REQUEST'S SURVEY DATA
+// Shared by the deep-link path (Enquiry Workspace's Fill/Edit Survey
+// button, which arrives with location.state already set) and the
+// standalone-page path (picking a Customer Request directly from this
+// page's own dropdown, previously a no-op that left the four readOnly
+// contact fields permanently blank).
+// ====================================
 
-    async function initializeSurvey(){
+async function loadCustomerRequest(id, forceSurveyId){
 
-        try{
+    if(!id){
+        return;
+    }
 
-            if(!customerRequestId){
+    try{
 
-                return;
+        const surveys = await getCustomerSurveys(id);
 
-            }
+        setCustomerSurveys(surveys);
 
-            setSelectedCustomer(
+        if(forceSurveyId){
 
-                customerRequestId
+            // The saved-survey payload has no enquiry_created_at
+            // field of its own (that's a prefill-only concept) -
+            // fetch it alongside so Survey Date's
+            // after-the-enquiry validation still applies when
+            // editing, not just on first fill.
+            const [survey, prefill] = await Promise.all([
 
-            );
+                getCustomerSurvey(id, forceSurveyId),
 
-            const surveys =
+                getSalesPrefill(id)
 
-                await getCustomerSurveys(
+            ]);
 
-                    customerRequestId
+            setSelectedSurvey(forceSurveyId);
 
-                );
+            setSurveyData({
 
-            setCustomerSurveys(
+                ...survey,
 
-                surveys
+                enquiry_created_at: prefill.enquiry_created_at
 
-            );
-
-            if(salesSurveyId){
-
-                // The saved-survey payload has no enquiry_created_at
-                // field of its own (that's a prefill-only concept) -
-                // fetch it alongside so Survey Date's
-                // after-the-enquiry validation still applies when
-                // editing, not just on first fill.
-                const [survey, prefill] = await Promise.all([
-
-                    getCustomerSurvey(
-                        customerRequestId,
-                        salesSurveyId
-                    ),
-
-                    getSalesPrefill(
-                        customerRequestId
-                    )
-
-                ]);
-
-                setSelectedSurvey(
-
-                    salesSurveyId
-
-                );
-
-                setSurveyData({
-
-                    ...survey,
-
-                    enquiry_created_at: prefill.enquiry_created_at
-
-                });
-
-            }
-
-            else{
-
-                const prefill =
-
-                    await getSalesPrefill(
-
-                        customerRequestId
-
-                    );
-
-                setSurveyData(
-
-                    prefill
-
-                );
-
-            }
+            });
 
         }
 
-        catch(error){
+        else{
 
-            console.log(error);
+            setSelectedSurvey("");
+
+            const prefill = await getSalesPrefill(id);
+
+            setSurveyData(prefill);
 
         }
 
     }
 
-    initializeSurvey();
+    catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
+useEffect(() => {
+
+    if(!customerRequestId){
+        return;
+    }
+
+    setSelectedCustomer(customerRequestId);
+
+    loadCustomerRequest(customerRequestId, salesSurveyId);
 
 },
 
@@ -368,6 +368,34 @@ useEffect(() => {
     salesSurveyId
 
 ]);
+
+function handleSelectCustomer(id){
+
+    setSelectedCustomer(id);
+
+    if(!id){
+
+        setCustomerSurveys([]);
+
+        setSelectedSurvey("");
+
+        setSurveyData({
+            customer:{},
+            job:{},
+            geometry:{},
+            safety:{},
+            pump:{},
+            dewatering:{},
+            insights:{}
+        });
+
+        return;
+
+    }
+
+    loadCustomerRequest(id);
+
+}
 
 
 
@@ -414,21 +442,11 @@ surveyData={surveyData}
 
 updateSection={updateSection}
 
-customers={[
-
-{
-
-id:selectedCustomer,
-
-company_name:surveyData.customer?.company_name
-
-}
-
-]}
+customers={customerRequestOptions}
 
 selectedCustomer={selectedCustomer}
 
-setSelectedCustomer={()=>{}}
+setSelectedCustomer={handleSelectCustomer}
 
 customerSurveys={customerSurveys}
 

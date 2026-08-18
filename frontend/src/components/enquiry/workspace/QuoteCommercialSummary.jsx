@@ -572,12 +572,7 @@ export default function QuoteCommercialSummary({
                         </button>
                     )}
 
-                    <input
-                        placeholder="Your name"
-                        value={revisionRequestedBy}
-                        onChange={e=>setRevisionRequestedBy(e.target.value)}
-                        style={{maxWidth:160}}
-                    />
+
 
                     {hasTask("enquiry-tab-quote-commercial", "request_revision") && (
                         <button

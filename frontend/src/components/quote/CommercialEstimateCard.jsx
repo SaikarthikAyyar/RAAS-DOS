@@ -225,14 +225,7 @@ Commercial Estimate
 
 <div className="quote-actions">
 
-<input
-    type="text"
-    className="quote-input"
-    placeholder="Your name"
-    value={createdBy}
-    onChange={e=>setCreatedBy(e.target.value)}
-    style={{marginRight:8}}
-/>
+
 
 <button
 

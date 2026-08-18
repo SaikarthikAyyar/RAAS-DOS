@@ -549,6 +549,10 @@ if(
 
     !salesSurveyId
 
+    &&
+
+    enquiryId
+
 ){
 
     await updateModuleReference(
