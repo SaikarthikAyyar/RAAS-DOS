@@ -544,6 +544,7 @@ const SURVEY_STRUCTURE = {
         "hazard_level",
         "ph_min",
         "ph_max",
+        "material_ph_condition",
         "flow_after_agitation",
         "temperature_range",
         "sample_available",

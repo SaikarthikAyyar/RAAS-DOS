@@ -8,6 +8,12 @@ from "../shared/FormField";
 
 import LookupSelect from "../shared/LookupSelect";
 
+const PH_RANGE_BY_CONDITION = {
+    "Acidic": { min: 1, max: 6 },
+    "Low / Neutral": { min: 7, max: 7 },
+    "Alkaline": { min: 8, max: 14 }
+};
+
 
 export default function SectionB_JobSludge({
 
@@ -27,6 +33,33 @@ submitAttempted
 
 
 const job = surveyData.job || {};
+
+// ====================================
+// pH / Corrosiveness -> pH Min/Max autofill
+// Chemistry: neutral sits at exactly 7, acidic is below 7, alkaline
+// (basic) is above 7. This is a genuinely SEPARATE measurement from
+// Section E's own "pH / Corrosiveness" field (pump.ph_condition,
+// a pump-selection-context corrosiveness reading already wired into
+// the Customer 360 prefill) - material_ph_condition describes the
+// sludge material itself and only drives this section's own pH Min/
+// Max autofill. The two number fields stay editable afterward (same
+// "autofill, don't lock" convention already used for Customer
+// Request's existing-asset autofill), so a user can still fine-tune
+// the exact value for this specific site.
+// ====================================
+
+function handleMaterialPhConditionChange(section, field, value){
+
+    updateSection(section, field, value);
+
+    const range = PH_RANGE_BY_CONDITION[value];
+
+    if(range){
+        updateSection("job", "ph_min", range.min);
+        updateSection("job", "ph_max", range.max);
+    }
+
+}
 
 // Once the user has interacted with ANY field on the form (not just
 // this one), a still-empty compulsory field starts showing its error -
@@ -186,6 +219,16 @@ value={job.hazard_level}
 section="job"
 field="hazard_level"
 updateSection={updateSection}
+/>
+
+
+<LookupSelect
+listKey="ph"
+label="pH / Corrosiveness (Material)"
+value={job.material_ph_condition}
+section="job"
+field="material_ph_condition"
+updateSection={handleMaterialPhConditionChange}
 />
 
 

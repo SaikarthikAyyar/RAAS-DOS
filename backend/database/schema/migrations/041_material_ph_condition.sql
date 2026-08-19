@@ -1,0 +1,13 @@
+-- Sales Survey pH measurements are two genuinely separate things,
+-- kept as two separate columns per direct instruction:
+--   ph_condition          - the existing Pump Selection Inputs field
+--                            (corrosiveness reading relevant to pump
+--                            material/discharge selection - already
+--                            wired into the Customer 360 "Survey: pH
+--                            Condition" prefill display).
+--   material_ph_condition - a NEW field for Job / Material Details -
+--                            the sludge material's own pH category,
+--                            used to auto-fill pH Min/Max there.
+-- Both are free-typed against the same "ph" Lookup List
+-- (Acidic / Low / Neutral / Alkaline) but are independently editable.
+ALTER TABLE sales_surveys ADD COLUMN IF NOT EXISTS material_ph_condition VARCHAR(100);

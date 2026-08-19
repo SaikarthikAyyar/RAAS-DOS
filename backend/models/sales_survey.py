@@ -160,6 +160,12 @@ class SalesSurvey(Base):
 
     ph_max = Column(Float)
 
+    # The sludge material's own pH category (Acidic/Low-Neutral/
+    # Alkaline) - distinct from Section E's ph_condition (a
+    # pump-selection-context corrosiveness reading). Drives Job/
+    # Material Details' pH Min/Max autofill on the frontend.
+    material_ph_condition = Column(String(100))
+
     flow_after_agitation = Column(String(100))
 
 

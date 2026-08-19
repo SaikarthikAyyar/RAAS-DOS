@@ -371,6 +371,10 @@ def get_customer_survey_request(
 
             survey.ph_max,
 
+            "material_ph_condition":
+
+            survey.material_ph_condition,
+
             "flow_after_agitation":
 
             survey.flow_after_agitation,

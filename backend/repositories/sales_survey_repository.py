@@ -134,6 +134,9 @@ def create_sales_survey(
         ph_max=
         payload.ph_max,
 
+        material_ph_condition=
+        payload.material_ph_condition,
+
         flow_after_agitation=
         payload.flow_after_agitation,
 
@@ -535,6 +538,8 @@ def update_sales_survey(
     survey.ph_min = payload.ph_min
 
     survey.ph_max = payload.ph_max
+
+    survey.material_ph_condition = payload.material_ph_condition
 
     survey.flow_after_agitation = payload.flow_after_agitation
 

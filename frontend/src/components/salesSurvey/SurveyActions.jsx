@@ -180,6 +180,9 @@ Number(surveyData.job?.ph_min) || null,
 ph_max:
 Number(surveyData.job?.ph_max) || null,
 
+material_ph_condition:
+surveyData.job?.material_ph_condition,
+
 flow_after_agitation:
 surveyData.job?.flow_after_agitation,
 

@@ -97,6 +97,7 @@ class SalesSurveySchema(BaseModel):
     large_object_type: Optional[str] = None
     ph_min: Optional[float] = None
     ph_max: Optional[float] = None
+    material_ph_condition: Optional[str] = None
     flow_after_agitation: Optional[str] = None
 
     temperature_range: Optional[str] = None
@@ -310,6 +311,7 @@ class JobSection(BaseModel):
     hazard_level: Optional[str]
     ph_min: Optional[float]
     ph_max: Optional[float]
+    material_ph_condition: Optional[str] = None
     flow_after_agitation: Optional[str]
     temperature_range: Optional[str]
     sample_available: Optional[str]
