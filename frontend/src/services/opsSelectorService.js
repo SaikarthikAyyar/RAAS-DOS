@@ -176,7 +176,11 @@ opsSelectorId,
 
 overrideMachine,
 
-overrideReason
+overrideReason,
+
+enquiryId,
+
+actor
 
 ){
 
@@ -198,7 +202,11 @@ body:JSON.stringify({
 
 override_machine:overrideMachine,
 
-override_reason:overrideReason
+override_reason:overrideReason,
+
+enquiry_id:enquiryId,
+
+actor
 
 })
 

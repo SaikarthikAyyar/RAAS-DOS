@@ -8,6 +8,8 @@ import {
 
 import { advanceStageAtLeast } from "../../../services/enquiryWorkspaceService";
 
+import { buildActor } from "../../../utils/actor";
+
 import { STAGE_LABELS } from "../../../data/workflowStages";
 
 import { useAuth } from "../../../contexts/AuthContext";
@@ -138,7 +140,8 @@ export default function POSummary({
             await uploadPurchaseOrder(enquiry.id, {
 
                 file,
-                uploadedBy: user?.name
+                uploadedBy: user?.name,
+                actor: buildActor(user)
 
             });
 
@@ -172,7 +175,7 @@ export default function POSummary({
 
         try{
 
-            await deletePurchaseOrder(po.id);
+            await deletePurchaseOrder(po.id, buildActor(user));
 
             await load();
 

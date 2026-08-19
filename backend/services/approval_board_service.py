@@ -47,7 +47,32 @@ from backend.services.hub_approval_service import (
     COMMERCIAL_APPROVAL
 )
 
+from backend.repositories.notification_repository import record_workflow_change
+
 from datetime import date
+
+
+# ====================================
+# NOTIFICATION HELPER (Phase 26)
+# ====================================
+
+def _notify_commercial_approval_change(db, target_enquiry, actor, changes, title):
+
+    if not target_enquiry or not changes:
+        return
+
+    record_workflow_change(
+        db,
+        "Commercial Approval",
+        "UPDATE",
+        actor.user_id if actor else None,
+        actor.name if actor else None,
+        actor.role if actor else None,
+        target_enquiry.id,
+        target_enquiry.customer_name,
+        title,
+        changes
+    )
 
 
 
@@ -445,6 +470,8 @@ def record_commercial_approval_decision_request(
 
     approved_by = actor.name if actor else None
 
+    stage_before = target_enquiry.stage if target_enquiry else None
+
     approval = record_commercial_approval_decision(
 
         db,
@@ -541,6 +568,22 @@ def record_commercial_approval_decision_request(
         # REJECTED label instead of SENT_BACK for the decision history.
         regress_to_ops_review(db, ops, quote, target_enquiry, approved_by, note)
 
+    _notify_commercial_approval_change(
+        db, target_enquiry, actor,
+        [
+            c for c in [
+                {"field": "commercial_approval_decision", "before": None, "after": decision},
+                {"field": "note", "before": None, "after": note},
+                {"field": "final_approved_value", "before": None, "after": final_approved_value}
+                if decision == "APPROVED" else None,
+                {"field": "stage", "before": stage_before, "after": target_enquiry.stage if target_enquiry else None}
+            ] if c
+        ],
+        f"{approved_by or 'Someone'} {'approved' if decision == 'APPROVED' else 'rejected'} "
+        f"the Commercial Approval for Enquiry #{target_enquiry.id if target_enquiry else quote_id}"
+        f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
+    )
+
     return {
         "approval": approval,
         "quote_release_document_id": generated_document.id if generated_document else None
@@ -619,6 +662,8 @@ def send_back_commercial_approval_request(
 
     sent_back_by = actor.name if actor else None
 
+    stage_before = target_enquiry.stage if target_enquiry else None
+
     approval = record_commercial_approval_decision(
 
         db,
@@ -648,5 +693,17 @@ def send_back_commercial_approval_request(
         )
 
     regress_to_ops_review(db, ops, quote, target_enquiry, sent_back_by, "Reset - sent back from Commercial Approval")
+
+    _notify_commercial_approval_change(
+        db, target_enquiry, actor,
+        [
+            {"field": "commercial_approval_decision", "before": None, "after": "SENT_BACK"},
+            {"field": "note", "before": None, "after": note},
+            {"field": "stage", "before": stage_before, "after": target_enquiry.stage if target_enquiry else None}
+        ],
+        f"{sent_back_by or 'Someone'} sent the case back to Ops Review from Commercial Approval "
+        f"for Enquiry #{target_enquiry.id if target_enquiry else quote_id}"
+        f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
+    )
 
     return approval

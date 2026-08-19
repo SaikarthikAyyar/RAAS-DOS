@@ -55,6 +55,8 @@ class OpsSelectorSchema(BaseModel):
 
     selection_reason: Optional[str] = None
 
+    actor: Optional[ActorSchema] = None
+
 
 # ====================================
 # OPS OVERRIDE SCHEMA
@@ -65,6 +67,10 @@ class OpsOverrideSchema(BaseModel):
     override_machine: str
 
     override_reason: str
+
+    enquiry_id: Optional[int] = None
+
+    actor: Optional[ActorSchema] = None
 
 
 # ====================================
@@ -104,6 +110,10 @@ class DeploymentPlanSchema(BaseModel):
     dewatering_method_min: Optional[str] = None
 
     dewatering_method_max: Optional[str] = None
+
+    enquiry_id: Optional[int] = None
+
+    actor: Optional[ActorSchema] = None
 
 
 # ====================================

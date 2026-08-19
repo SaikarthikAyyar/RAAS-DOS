@@ -22,7 +22,14 @@ export default function NotificationToast({
     notification,
 
     onClose,
-    onClick
+    onClick,
+
+    // Login-time unread replay (Phase 26) overrides the default
+    // auto-dismiss timing to a fixed 3s, and sets a "leaving" class
+    // instead of an instant unmount so the queue's backfill has time
+    // to animate the outgoing toast before the next one takes its slot.
+    durationMs,
+    leaving = false
 
 }){
 
@@ -30,7 +37,9 @@ export default function NotificationToast({
 
     useEffect(()=>{
 
-        const timer = setTimeout(onClose, isImportant ? AUTO_DISMISS_MS_IMPORTANT : AUTO_DISMISS_MS);
+        const delay = durationMs ?? (isImportant ? AUTO_DISMISS_MS_IMPORTANT : AUTO_DISMISS_MS);
+
+        const timer = setTimeout(onClose, delay);
 
         return ()=>clearTimeout(timer);
 
@@ -39,7 +48,16 @@ export default function NotificationToast({
 
     return(
 
-        <div className={isImportant ? "notif-toast important" : "notif-toast"} onClick={onClick}>
+        <div
+            className={
+                [
+                    "notif-toast",
+                    isImportant ? "important" : "",
+                    leaving ? "leaving" : ""
+                ].filter(Boolean).join(" ")
+            }
+            onClick={onClick}
+        >
 
             <div className="notif-toast-body">
 

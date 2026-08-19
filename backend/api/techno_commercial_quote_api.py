@@ -355,7 +355,11 @@ def put_internal_extra(
 
             payload.amount,
 
-            payload.note
+            payload.note,
+
+            payload.enquiry_id,
+
+            payload.actor
 
         )
 
@@ -391,7 +395,11 @@ def put_valid_till(
 
             quote_id,
 
-            payload.valid_till
+            payload.valid_till,
+
+            payload.enquiry_id,
+
+            payload.actor
 
         )
 
@@ -428,7 +436,11 @@ def post_request_revision_flag(
 
             quote_id,
 
-            payload.requested_by
+            payload.requested_by,
+
+            payload.enquiry_id,
+
+            payload.actor
 
         )
 

@@ -214,10 +214,18 @@ class InternalExtraSchema(BaseModel):
 
     note: str | None = None
 
+    enquiry_id: int | None = None
+
+    actor: ActorSchema | None = None
+
 
 class ValidTillSchema(BaseModel):
 
     valid_till: str | None = None
+
+    enquiry_id: int | None = None
+
+    actor: ActorSchema | None = None
 
 
 class ReleaseQuoteSchema(BaseModel):
@@ -228,6 +236,10 @@ class ReleaseQuoteSchema(BaseModel):
 class RequestRevisionFlagSchema(BaseModel):
 
     requested_by: str
+
+    enquiry_id: int | None = None
+
+    actor: ActorSchema | None = None
 
 
 # ====================================

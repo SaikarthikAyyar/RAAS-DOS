@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
 
-from backend.schemas.purchase_order_schema import PurchaseOrderResponse
+from backend.schemas.purchase_order_schema import PurchaseOrderResponse, PurchaseOrderDeleteSchema
 
 from backend.services.purchase_order_service import (
     list_purchase_orders_request,
@@ -31,6 +31,8 @@ async def upload_purchase_order(
     enquiry_id: int,
     file: UploadFile = File(...),
     uploaded_by: Optional[str] = Form(None),
+    actor_user_id: Optional[int] = Form(None),
+    actor_role: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 
 ):
@@ -38,7 +40,7 @@ async def upload_purchase_order(
     try:
 
         return await upload_purchase_order_request(
-            db, enquiry_id, file, uploaded_by
+            db, enquiry_id, file, uploaded_by, actor_user_id, actor_role
         )
 
     except ValueError as error:
@@ -47,11 +49,11 @@ async def upload_purchase_order(
 
 
 @router.delete("/purchase-orders/{po_id}")
-def delete_purchase_order(po_id: int, db: Session = Depends(get_db)):
+def delete_purchase_order(po_id: int, payload: PurchaseOrderDeleteSchema = PurchaseOrderDeleteSchema(), db: Session = Depends(get_db)):
 
     try:
 
-        delete_purchase_order_request(db, po_id)
+        delete_purchase_order_request(db, po_id, payload.actor)
 
     except ValueError as error:
 

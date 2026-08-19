@@ -334,7 +334,11 @@ export async function updateInternalExtra(
 
     amount,
 
-    note
+    note,
+
+    enquiryId,
+
+    actor
 
 ){
 
@@ -348,7 +352,7 @@ export async function updateInternalExtra(
 
             headers:{"Content-Type":"application/json"},
 
-            body:JSON.stringify({enabled, amount, note})
+            body:JSON.stringify({enabled, amount, note, enquiry_id:enquiryId, actor})
 
         }
 
@@ -371,7 +375,11 @@ export async function updateValidTill(
 
     quoteId,
 
-    validTill
+    validTill,
+
+    enquiryId,
+
+    actor
 
 ){
 
@@ -385,7 +393,7 @@ export async function updateValidTill(
 
             headers:{"Content-Type":"application/json"},
 
-            body:JSON.stringify({valid_till:validTill})
+            body:JSON.stringify({valid_till:validTill, enquiry_id:enquiryId, actor})
 
         }
 
@@ -416,7 +424,11 @@ export async function flagQuoteRevisionRequested(
 
     quoteId,
 
-    requestedBy
+    requestedBy,
+
+    enquiryId,
+
+    actor
 
 ){
 
@@ -430,7 +442,7 @@ export async function flagQuoteRevisionRequested(
 
             headers:{"Content-Type":"application/json"},
 
-            body:JSON.stringify({requested_by:requestedBy})
+            body:JSON.stringify({requested_by:requestedBy, enquiry_id:enquiryId, actor})
 
         }
 

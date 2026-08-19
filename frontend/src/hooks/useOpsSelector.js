@@ -26,6 +26,10 @@ from "../services/opsSelectorService";
 
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext";
+
+import { buildActor } from "../utils/actor";
+
 
 // ====================================
 // HOOK
@@ -34,6 +38,8 @@ import { useNavigate } from "react-router-dom";
 export default function useOpsSelector(){
 
     const navigate = useNavigate();
+
+    const { user } = useAuth();
 
     const salesSurveyId = Number(
 
@@ -227,6 +233,8 @@ export default function useOpsSelector(){
                 customer_request_id: customerRequestId,
 
                 enquiry_id: enquiryId,
+
+                actor: buildActor(user),
 
                 // Convert accessories only if needed
                 accessories:

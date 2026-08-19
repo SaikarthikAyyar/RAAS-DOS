@@ -19,6 +19,16 @@ export const NOTIFICATIONS_REFRESH_EVENT = "notifications:refresh";
 
 const POLL_INTERVAL_MS = 30000;
 
+// Login-time unread replay (Phase 26): every unread notification at
+// login replays as a toast, up to REPLAY_VISIBLE_SLOTS at once, each
+// shown for REPLAY_DURATION_MS before animating out one by one and
+// backfilling from the rest of the queue - distinct from (and never
+// double-fired alongside) the ongoing "toast on genuinely new arrival"
+// mechanism below, which still baselines on this same first load.
+const REPLAY_VISIBLE_SLOTS = 5;
+const REPLAY_DURATION_MS = 3000;
+const REPLAY_LEAVE_ANIMATION_MS = 250;
+
 export default function Topbar({
 
     onMenuClick
@@ -53,6 +63,41 @@ export default function Topbar({
 
     const knownIdsRef = useRef(null);
 
+    // Login-time replay queue: { visible: [{toastId, notification, leaving}], queue: [notification, ...] }
+    const [replayState, setReplayState] = useState({ visible: [], queue: [] });
+
+    function advanceReplay(toastId){
+
+        setReplayState(prev=>{
+
+            const remainingVisible = prev.visible.filter(t=>t.toastId !== toastId);
+
+            if(prev.queue.length === 0){
+                return { visible: remainingVisible, queue: [] };
+            }
+
+            const [next, ...restQueue] = prev.queue;
+
+            return {
+                visible: [...remainingVisible, { toastId: next.id, notification: next, leaving: false }],
+                queue: restQueue
+            };
+
+        });
+
+    }
+
+    function startLeavingReplay(toastId){
+
+        setReplayState(prev=>({
+            ...prev,
+            visible: prev.visible.map(t=>t.toastId===toastId ? { ...t, leaving:true } : t)
+        }));
+
+        setTimeout(()=>advanceReplay(toastId), REPLAY_LEAVE_ANIMATION_MS);
+
+    }
+
     function handleLogout(){
 
         logout();
@@ -77,6 +122,19 @@ export default function Topbar({
             if(knownIdsRef.current === null){
 
                 knownIdsRef.current = currentIds;
+
+                if(data.length > 0){
+
+                    setReplayState({
+                        visible: data.slice(0, REPLAY_VISIBLE_SLOTS).map(n=>({
+                            toastId: n.id,
+                            notification: n,
+                            leaving: false
+                        })),
+                        queue: data.slice(REPLAY_VISIBLE_SLOTS)
+                    });
+
+                }
 
             }
             else{
@@ -384,7 +442,7 @@ export default function Topbar({
         </div>
 
         {
-            toasts.length > 0 && (
+            (toasts.length > 0 || replayState.visible.length > 0) && (
 
                 <div className="notif-toast-stack">
 
@@ -397,6 +455,26 @@ export default function Topbar({
                                 notification={notification}
                                 onClose={()=>dismissToast(toastId)}
                                 onClick={()=>handleToastClick(toastId, notification)}
+
+                            />
+
+                        ))
+                    }
+
+                    {
+                        replayState.visible.map(({ toastId, notification, leaving })=>(
+
+                            <NotificationToast
+
+                                key={`replay-${toastId}`}
+                                notification={notification}
+                                durationMs={REPLAY_DURATION_MS}
+                                leaving={leaving}
+                                onClose={()=>startLeavingReplay(toastId)}
+                                onClick={()=>{
+                                    startLeavingReplay(toastId);
+                                    handleNotificationClick(notification);
+                                }}
 
                             />
 

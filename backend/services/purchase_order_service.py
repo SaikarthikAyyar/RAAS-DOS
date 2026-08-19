@@ -21,6 +21,31 @@ from backend.services.workflow_service import (
     advance_stage_at_least
 )
 
+from backend.repositories.notification_repository import record_workflow_change
+
+
+# ====================================
+# NOTIFICATION HELPER (Phase 26)
+# ====================================
+
+def _notify_po_change(db, enquiry, actor_user_id, actor_name, actor_role, action, changes, title):
+
+    if not enquiry or not changes:
+        return
+
+    record_workflow_change(
+        db,
+        "PO",
+        action,
+        actor_user_id,
+        actor_name,
+        actor_role,
+        enquiry.id,
+        enquiry.customer_name,
+        title,
+        changes
+    )
+
 
 # ====================================
 # LIST
@@ -67,7 +92,7 @@ def _compute_po_value(quote):
 # stage to PO_RECEIVED (guarded to fire only once).
 # ====================================
 
-async def upload_purchase_order_request(db, enquiry_id, file, uploaded_by):
+async def upload_purchase_order_request(db, enquiry_id, file, uploaded_by, actor_user_id=None, actor_role=None):
 
     enquiry = db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
 
@@ -111,6 +136,17 @@ async def upload_purchase_order_request(db, enquiry_id, file, uploaded_by):
 
     advance_stage_at_least(db, enquiry_id, WorkflowStage.PO_RECEIVED.value)
 
+    _notify_po_change(
+        db, enquiry, actor_user_id, uploaded_by, actor_role, "CREATE",
+        [
+            {"field": "file_name", "before": None, "after": row.file_name},
+            {"field": "po_number", "before": None, "after": row.po_number},
+            {"field": "po_value", "before": None, "after": row.po_value}
+        ],
+        f"{uploaded_by or 'Someone'} uploaded a PO for Enquiry #{enquiry.id}"
+        f"{' - ' + enquiry.customer_name if enquiry.customer_name else ''}"
+    )
+
     return row
 
 
@@ -122,14 +158,35 @@ async def upload_purchase_order_request(db, enquiry_id, file, uploaded_by):
 # workflow state.
 # ====================================
 
-def delete_purchase_order_request(db, po_id):
+def delete_purchase_order_request(db, po_id, actor=None):
 
     po = get_purchase_order(db, po_id)
 
     if po is None:
         raise ValueError("PO not found.")
 
+    enquiry = db.query(Enquiry).filter(Enquiry.id == po.enquiry_id).first()
+
+    file_name = po.file_name
+    po_number = po.po_number
+    po_value = po.po_value
+
     if os.path.exists(po.file_path):
         os.remove(po.file_path)
 
     delete_purchase_order(db, po)
+
+    _notify_po_change(
+        db, enquiry,
+        actor.user_id if actor else None,
+        actor.name if actor else None,
+        actor.role if actor else None,
+        "DELETE",
+        [
+            {"field": "file_name", "before": file_name, "after": None},
+            {"field": "po_number", "before": po_number, "after": None},
+            {"field": "po_value", "before": po_value, "after": None}
+        ],
+        f"{actor.name if actor else 'Someone'} removed the PO for Enquiry #{enquiry.id if enquiry else po.enquiry_id}"
+        f"{' - ' + enquiry.customer_name if enquiry and enquiry.customer_name else ''}"
+    )

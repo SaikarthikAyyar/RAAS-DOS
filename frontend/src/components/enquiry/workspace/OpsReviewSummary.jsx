@@ -10,6 +10,8 @@ import { useState } from "react";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import { buildActor } from "../../../utils/actor";
+
 // "Open Ops Selector" lives inside OpsReviewDecisionCard now, alongside the
 // other decision buttons. This handler is only needed here for the
 // no-ops-selection-yet fallback further below.
@@ -34,7 +36,7 @@ export default function OpsReviewSummary({
 
     const navigate = useNavigate();
 
-    const { hasTask } = useAuth();
+    const { hasTask, user } = useAuth();
 
     const [overrideMachine, setOverrideMachine] = useState("");
 
@@ -100,7 +102,11 @@ export default function OpsReviewSummary({
 
                 overrideMachine,
 
-                overrideReason
+                overrideReason,
+
+                enquiry.id,
+
+                buildActor(user)
 
             );
 

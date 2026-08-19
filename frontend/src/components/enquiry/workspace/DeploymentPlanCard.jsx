@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import { buildActor } from "../../../utils/actor";
+
 import {
     saveDeploymentPlan
 } from "../../../services/opsSelectorService";
@@ -182,7 +184,11 @@ export default function DeploymentPlanCard({
 
                     dewatering_method_min:dewMin || null,
 
-                    dewatering_method_max:dewMax || null
+                    dewatering_method_max:dewMax || null,
+
+                    enquiry_id:enquiry?.id,
+
+                    actor:buildActor(user)
 
                 }
 

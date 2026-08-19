@@ -56,6 +56,42 @@ from backend.services.hub_approval_service import (
 
 from backend.repositories.techno_commercial_quote_repository import get_quote_by_ops_selection
 
+from backend.repositories.notification_repository import record_workflow_change
+
+
+# ====================================
+# NOTIFICATION HELPERS (Phase 26)
+# Fields worth surfacing when the Ops Selection row changes - a
+# curated subset, not every column (workflow_status/ops_engine_version
+# etc. are bookkeeping, not something a user needs a notification for).
+# ====================================
+
+OPS_SELECTION_NOTIFY_FIELDS = [
+    "doability", "service_configuration", "recommended_machine",
+    "pump_hose_package", "accessories", "mobilisation_days",
+    "setup_days", "execution_days", "demob_days", "total_job_days",
+    "manpower_required", "approval_gate", "selection_reason"
+]
+
+
+def _notify_ops_review_change(db, target_enquiry, actor, action, changes, title):
+
+    if not target_enquiry or not changes:
+        return
+
+    record_workflow_change(
+        db,
+        "Ops Review",
+        action,
+        actor.user_id if actor else None,
+        actor.name if actor else None,
+        actor.role if actor else None,
+        target_enquiry.id,
+        target_enquiry.customer_name,
+        title,
+        changes
+    )
+
 
 
 
@@ -240,6 +276,11 @@ def create_ops_selection_request(
 
         print(f"[OPS] Updating Existing OPS Selection : {existing.id}")
 
+        old_values = {
+            key: getattr(existing, key)
+            for key in OPS_SELECTION_NOTIFY_FIELDS
+        }
+
         for key, value in ops_payload.items():
 
             setattr(
@@ -262,9 +303,13 @@ def create_ops_selection_request(
 
         ops = existing
 
+        is_new_ops_selection = False
+
     else:
 
         print("[OPS] Creating New OPS Selection")
+
+        old_values = {}
 
         ops = create_ops_selection(
 
@@ -273,6 +318,8 @@ def create_ops_selection_request(
             ops_payload
 
         )
+
+        is_new_ops_selection = True
     
     print("\n========== OPS WORKFLOW ==========")
 
@@ -381,6 +428,33 @@ def create_ops_selection_request(
         )
 
     if target_enquiry:
+
+        if is_new_ops_selection:
+
+            changes = [
+                {"field": field, "before": None, "after": ops_payload.get(field)}
+                for field in OPS_SELECTION_NOTIFY_FIELDS
+                if ops_payload.get(field) is not None
+            ]
+
+        else:
+
+            changes = [
+                {"field": field, "before": old_values.get(field), "after": ops_payload.get(field)}
+                for field in OPS_SELECTION_NOTIFY_FIELDS
+                if old_values.get(field) != ops_payload.get(field)
+            ]
+
+        _notify_ops_review_change(
+            db,
+            target_enquiry,
+            getattr(payload, "actor", None),
+            "CREATE" if is_new_ops_selection else "UPDATE",
+            changes,
+            f"{getattr(getattr(payload, 'actor', None), 'name', None) or 'Someone'} "
+            f"ran the Ops Selector for Enquiry #{target_enquiry.id}"
+            f"{' - ' + target_enquiry.customer_name if target_enquiry.customer_name else ''}"
+        )
 
         update_module_reference(
 
@@ -593,7 +667,11 @@ def save_ops_override(
 
         override_machine,
 
-        override_reason
+        override_reason,
+
+        enquiry_id=None,
+
+        actor=None
 
 ):
 
@@ -613,6 +691,9 @@ def save_ops_override(
 
         )
 
+    old_machine = ops.override_machine
+    old_reason = ops.override_reason
+
     ops.override_machine = override_machine
 
     ops.override_reason = override_reason
@@ -623,6 +704,31 @@ def save_ops_override(
 
         ops
 
+    )
+
+    target_enquiry = (
+        db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
+        if enquiry_id else None
+    )
+
+    changes = [
+        c for c in [
+            {"field": "override_machine", "before": old_machine, "after": override_machine}
+            if old_machine != override_machine else None,
+            {"field": "override_reason", "before": old_reason, "after": override_reason}
+            if old_reason != override_reason else None
+        ] if c
+    ]
+
+    _notify_ops_review_change(
+        db,
+        target_enquiry,
+        actor,
+        "UPDATE",
+        changes,
+        f"{actor.name if actor else 'Someone'} overrode the recommended machine "
+        f"for Enquiry #{target_enquiry.id if target_enquiry else ops_selection_id}"
+        f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
     )
 
     return ops
@@ -657,6 +763,17 @@ def save_deployment_plan(
             "Ops Selection not found."
 
         )
+
+    old_values = {
+        "mobilisation_days": ops.mobilisation_days,
+        "setup_days": ops.setup_days,
+        "execution_days": ops.execution_days,
+        "demob_days": ops.demob_days,
+        "crew_plan": ops.crew_plan,
+        "accessories_plan": ops.accessories_plan,
+        "dewatering_method_min": ops.dewatering_method_min,
+        "dewatering_method_max": ops.dewatering_method_max
+    }
 
     ops.mobilisation_days = payload.mobilisation_days
 
@@ -697,6 +814,42 @@ def save_deployment_plan(
 
         ops
 
+    )
+
+    new_values = {
+        "mobilisation_days": ops.mobilisation_days,
+        "setup_days": ops.setup_days,
+        "execution_days": ops.execution_days,
+        "demob_days": ops.demob_days,
+        "crew_plan": ops.crew_plan,
+        "accessories_plan": ops.accessories_plan,
+        "dewatering_method_min": ops.dewatering_method_min,
+        "dewatering_method_max": ops.dewatering_method_max
+    }
+
+    actor = getattr(payload, "actor", None)
+    enquiry_id = getattr(payload, "enquiry_id", None)
+
+    target_enquiry = (
+        db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
+        if enquiry_id else None
+    )
+
+    changes = [
+        {"field": field, "before": old_values[field], "after": new_values[field]}
+        for field in old_values
+        if old_values[field] != new_values[field]
+    ]
+
+    _notify_ops_review_change(
+        db,
+        target_enquiry,
+        actor,
+        "UPDATE",
+        changes,
+        f"{actor.name if actor else 'Someone'} saved the Deployment Plan "
+        f"for Enquiry #{target_enquiry.id if target_enquiry else ops_selection_id}"
+        f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
     )
 
     return ops
@@ -798,6 +951,8 @@ def record_ops_review_decision_request(db, ops_selection_id, status, note, actor
 
     reviewed_by = actor.name if actor else None
 
+    stage_before = target_enquiry.stage if target_enquiry else None
+
     result = save_ops_review_decision(db, ops_selection_id, status, reviewed_by, note)
 
     if target_enquiry:
@@ -807,5 +962,27 @@ def record_ops_review_decision_request(db, ops_selection_id, status, note, actor
 
         elif status == "Sent back":
             update_stage(db, target_enquiry.id, WorkflowStage.SALES_SURVEY.value)
+
+    # "Pending" is a system-triggered reset (regress_to_ops_review cleaning
+    # up a stale "Approved" state from a regression further down the
+    # workflow) - never a human decision, so it's not separately notified
+    # here; the regression's own outer function (Quote & Commercial /
+    # Commercial Approval send-back or reject) reports it instead.
+    if status in ("Approved", "Sent back"):
+
+        _notify_ops_review_change(
+            db,
+            target_enquiry,
+            actor,
+            "UPDATE",
+            [
+                {"field": "review_status", "before": None, "after": status},
+                {"field": "review_note", "before": None, "after": note},
+                {"field": "stage", "before": stage_before, "after": target_enquiry.stage if target_enquiry else None}
+            ],
+            f"{reviewed_by or 'Someone'} {'approved' if status == 'Approved' else 'sent back'} "
+            f"Ops Review for Enquiry #{target_enquiry.id if target_enquiry else ops_selection_id}"
+            f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
+        )
 
     return result

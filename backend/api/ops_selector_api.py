@@ -332,7 +332,11 @@ def put_ops_override(
 
             payload.override_machine,
 
-            payload.override_reason
+            payload.override_reason,
+
+            payload.enquiry_id,
+
+            payload.actor
 
         )
 

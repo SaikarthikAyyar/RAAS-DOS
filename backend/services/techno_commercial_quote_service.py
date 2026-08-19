@@ -59,6 +59,45 @@ from backend.services.hub_approval_service import (
     QUOTE_COMMERCIAL
 )
 
+from backend.repositories.notification_repository import record_workflow_change
+
+
+# ====================================
+# NOTIFICATION HELPER (Phase 26)
+# ====================================
+
+def _notify_quote_commercial_change(db, target_enquiry, actor, action, changes, title):
+
+    if not target_enquiry or not changes:
+        return
+
+    record_workflow_change(
+        db,
+        "Quote & Commercial",
+        action,
+        actor.user_id if actor else None,
+        actor.name if actor else None,
+        actor.role if actor else None,
+        target_enquiry.id,
+        target_enquiry.customer_name,
+        title,
+        changes
+    )
+
+
+def _resolve_enquiry_for_quote(db, quote, enquiry_id):
+
+    if enquiry_id:
+        return db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
+
+    ops = get_ops_selection(db, quote.ops_selection_id)
+
+    return (
+        db.query(Enquiry).filter(Enquiry.sales_survey_id == ops.sales_survey_id)
+        .order_by(Enquiry.id.desc()).first()
+        if ops else None
+    )
+
 
 def create_quote_request(
 
@@ -708,12 +747,27 @@ def record_quote_commercial_decision_request(db, quote_id, status, note, actor, 
         if status == "Approved" and quote.revision_requested:
             raise ValueError("Save a new quote version first.")
 
+    stage_before = target_enquiry.stage if target_enquiry else None
+
     if status == "Sent back":
 
         ops = get_ops_selection(db, quote.ops_selection_id)
         regress_to_ops_review(db, ops, quote, target_enquiry, actor.name if actor else None, note)
 
-        return get_quote(db, quote_id)
+        result = get_quote(db, quote_id)
+
+        _notify_quote_commercial_change(
+            db, target_enquiry, actor, "UPDATE",
+            [
+                {"field": "quote_commercial_status", "before": "Approved", "after": "Sent back"},
+                {"field": "stage", "before": stage_before, "after": target_enquiry.stage if target_enquiry else None}
+            ],
+            f"{actor.name if actor else 'Someone'} sent the quote back to Ops Review "
+            f"for Enquiry #{target_enquiry.id if target_enquiry else quote_id}"
+            f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
+        )
+
+        return result
 
     quote.quote_commercial_status = status
     quote.quote_commercial_approved_by = actor.name if actor else None
@@ -725,6 +779,18 @@ def record_quote_commercial_decision_request(db, quote_id, status, note, actor, 
 
     if status == "Approved" and target_enquiry:
         advance_stage_at_least(db, target_enquiry.id, WorkflowStage.COMMERCIAL_APPROVAL.value)
+
+    _notify_quote_commercial_change(
+        db, target_enquiry, actor, "UPDATE",
+        [
+            {"field": "quote_commercial_status", "before": None, "after": status},
+            {"field": "quote_commercial_note", "before": None, "after": note},
+            {"field": "stage", "before": stage_before, "after": target_enquiry.stage if target_enquiry else None}
+        ],
+        f"{actor.name if actor else 'Someone'} approved the quote at Quote & Commercial "
+        f"for Enquiry #{target_enquiry.id if target_enquiry else quote_id}"
+        f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
+    )
 
     return quote
 
@@ -764,7 +830,11 @@ def update_internal_extra_request(
 
     amount,
 
-    note
+    note,
+
+    enquiry_id=None,
+
+    actor=None
 
 ):
 
@@ -784,7 +854,13 @@ def update_internal_extra_request(
 
         raise ValueError("Quote not found.")
 
-    return update_internal_extra(
+    old = {
+        "internal_extra_enabled": quote.internal_extra_enabled,
+        "internal_extra_amount": quote.internal_extra_amount,
+        "internal_extra_note": quote.internal_extra_note
+    }
+
+    result = update_internal_extra(
 
         db,
 
@@ -798,6 +874,28 @@ def update_internal_extra_request(
 
     )
 
+    target_enquiry = _resolve_enquiry_for_quote(db, quote, enquiry_id)
+
+    changes = [
+        c for c in [
+            {"field": "internal_extra_enabled", "before": old["internal_extra_enabled"], "after": enabled}
+            if old["internal_extra_enabled"] != enabled else None,
+            {"field": "internal_extra_amount", "before": old["internal_extra_amount"], "after": amount}
+            if old["internal_extra_amount"] != amount else None,
+            {"field": "internal_extra_note", "before": old["internal_extra_note"], "after": note}
+            if old["internal_extra_note"] != note else None
+        ] if c
+    ]
+
+    _notify_quote_commercial_change(
+        db, target_enquiry, actor, "UPDATE", changes,
+        f"{actor.name if actor else 'Someone'} saved an internal addition on the quote "
+        f"for Enquiry #{target_enquiry.id if target_enquiry else quote_id}"
+        f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
+    )
+
+    return result
+
 
 def update_valid_till_request(
 
@@ -805,7 +903,11 @@ def update_valid_till_request(
 
     quote_id,
 
-    valid_till
+    valid_till,
+
+    enquiry_id=None,
+
+    actor=None
 
 ):
 
@@ -825,7 +927,9 @@ def update_valid_till_request(
 
         raise ValueError("Quote not found.")
 
-    return update_valid_till(
+    old_valid_till = quote.valid_till
+
+    result = update_valid_till(
 
         db,
 
@@ -835,6 +939,22 @@ def update_valid_till_request(
 
     )
 
+    target_enquiry = _resolve_enquiry_for_quote(db, quote, enquiry_id)
+
+    changes = (
+        [{"field": "valid_till", "before": old_valid_till, "after": valid_till}]
+        if old_valid_till != valid_till else []
+    )
+
+    _notify_quote_commercial_change(
+        db, target_enquiry, actor, "UPDATE", changes,
+        f"{actor.name if actor else 'Someone'} saved the valid-till date on the quote "
+        f"for Enquiry #{target_enquiry.id if target_enquiry else quote_id}"
+        f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
+    )
+
+    return result
+
 
 def flag_quote_revision_requested_request(
 
@@ -842,7 +962,11 @@ def flag_quote_revision_requested_request(
 
     quote_id,
 
-    requested_by
+    requested_by,
+
+    enquiry_id=None,
+
+    actor=None
 
 ):
 
@@ -862,7 +986,7 @@ def flag_quote_revision_requested_request(
 
         raise ValueError("Quote not found.")
 
-    return flag_revision_requested(
+    result = flag_revision_requested(
 
         db,
 
@@ -873,6 +997,19 @@ def flag_quote_revision_requested_request(
         date.today().isoformat()
 
     )
+
+    target_enquiry = _resolve_enquiry_for_quote(db, quote, enquiry_id)
+
+    _notify_quote_commercial_change(
+        db, target_enquiry, actor, "UPDATE",
+        [{"field": "revision_requested", "before": False, "after": True},
+         {"field": "revision_requested_by", "before": None, "after": requested_by}],
+        f"{actor.name if actor else requested_by or 'Someone'} requested a revision on the quote "
+        f"for Enquiry #{target_enquiry.id if target_enquiry else quote_id}"
+        f"{' - ' + target_enquiry.customer_name if target_enquiry and target_enquiry.customer_name else ''}"
+    )
+
+    return result
 
 
 # ====================================

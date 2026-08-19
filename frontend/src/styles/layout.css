@@ -746,6 +746,21 @@ margin-left:auto;
 
     animation:notif-toast-in .18s ease-out;
 
+    transition:opacity .25s ease-in, transform .25s ease-in;
+
+}
+
+/* Login-time unread replay (Phase 26) - a toast animates out via this
+   class (instead of an instant unmount) before the queue backfills its
+   slot, giving the 5-at-a-time cycling a visible transition. */
+.notif-toast.leaving{
+
+    opacity:0;
+
+    transform:translateX(16px);
+
+    pointer-events:none;
+
 }
 
 .notif-toast:hover{

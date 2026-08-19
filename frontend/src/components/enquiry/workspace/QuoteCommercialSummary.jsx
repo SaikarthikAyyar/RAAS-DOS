@@ -144,7 +144,9 @@ export default function QuoteCommercialSummary({
                 quote.id,
                 extraEnabled,
                 extraEnabled ? (Number(extraAmount) || 0) : null,
-                extraEnabled ? extraNote : null
+                extraEnabled ? extraNote : null,
+                enquiry?.id,
+                buildActor(user)
             );
 
             reload();
@@ -173,7 +175,7 @@ export default function QuoteCommercialSummary({
 
         try{
 
-            await updateValidTill(quote.id, validTill || null);
+            await updateValidTill(quote.id, validTill || null, enquiry?.id, buildActor(user));
 
             reload();
 
@@ -212,7 +214,7 @@ export default function QuoteCommercialSummary({
 
         try{
 
-            await flagQuoteRevisionRequested(quote.id, user?.name);
+            await flagQuoteRevisionRequested(quote.id, user?.name, enquiry?.id, buildActor(user));
 
             reload();
 

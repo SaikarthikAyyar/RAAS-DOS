@@ -137,6 +137,56 @@ def record_business_master_change(
 
 
 # ====================================
+# RECORD WORKFLOW CHANGE
+# Policy for every DB-changing action from Ops Review onward (data
+# saves AND approval decisions alike) - the deliberate reverse of
+# record_business_master_change(): every user, INCLUDING the actor who
+# made the change, sees it (exclude_actor=False), still flagged
+# important (these are workflow-critical), but with no remark-prompt
+# gate - every one of these actions already has its own purpose-built
+# UI (several already collect a note/review_note that becomes part of
+# the diff itself), so a second forced free-text prompt on top would be
+# redundant. enquiry_id/customer_name are always populated (unlike
+# Business Masters' None/None) since every one of these actions is
+# enquiry-scoped - this is what routes them into the right per-case
+# sheet in the Audit Trail's Excel export with zero export-layer changes.
+# ====================================
+
+def record_workflow_change(
+
+        db,
+        module,
+        action,
+        actor_user_id,
+        actor_name,
+        actor_role,
+        enquiry_id,
+        customer_name,
+        title,
+        changes
+
+):
+
+    return record_change(
+
+        db,
+        module,
+        action,
+        actor_user_id,
+        actor_name,
+        actor_role,
+        enquiry_id,
+        customer_name,
+        title,
+        changes,
+        is_important=True,
+        remark=None,
+        exclude_actor=False
+
+    )
+
+
+# ====================================
 # LIST NOTIFICATIONS (Audit Trail module)
 # Filtered by date range only, newest first, with is_read computed
 # per the requesting user.

@@ -20,13 +20,17 @@ export async function listPurchaseOrders(enquiryId){
 }
 
 
-export async function uploadPurchaseOrder(enquiryId, { file, uploadedBy }){
+export async function uploadPurchaseOrder(enquiryId, { file, uploadedBy, actor }){
 
     const formData = new FormData();
 
     formData.append("file", file);
 
     if(uploadedBy) formData.append("uploaded_by", uploadedBy);
+
+    if(actor?.user_id) formData.append("actor_user_id", actor.user_id);
+
+    if(actor?.role) formData.append("actor_role", actor.role);
 
     const response = await fetch(
 
@@ -50,13 +54,17 @@ export async function uploadPurchaseOrder(enquiryId, { file, uploadedBy }){
 }
 
 
-export async function deletePurchaseOrder(poId){
+export async function deletePurchaseOrder(poId, actor){
 
     const response = await fetch(
 
         `${API}/purchase-orders/${poId}`,
 
-        { method:"DELETE" }
+        {
+            method:"DELETE",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ actor })
+        }
 
     );
 
