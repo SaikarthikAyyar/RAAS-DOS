@@ -22,7 +22,9 @@ from backend.schemas.enquiry_consolidated_schema import (
 
     ModuleReferenceUpdateRequest,
 
-    SetStageRequest
+    SetStageRequest,
+
+    RequestApprovalSchema
 
 )
 
@@ -335,6 +337,31 @@ def get_approval_standing(
         db,
         enquiry_id,
         user_id
+    )
+
+
+# ====================================
+# REQUEST APPROVAL (Phase 27)
+# The "please review this" ping - notifies every real hub-approver for
+# the given gate, no state change of its own. Available on every tab
+# that has a real approval gate (Ops Review, Quote & Commercial,
+# Commercial Approval).
+# ====================================
+
+@router.post(
+    "/{enquiry_id}/request-approval"
+)
+def post_request_approval(
+    enquiry_id: int,
+    payload: RequestApprovalSchema,
+    db: Session = Depends(get_db)
+):
+
+    return service.request_approval_request(
+        db,
+        enquiry_id,
+        payload.approval_type,
+        payload.actor
     )
 
 

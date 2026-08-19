@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -8,21 +8,23 @@ import useApprovalStanding from "../../../hooks/useApprovalStanding";
 
 import { buildActor } from "../../../utils/actor";
 
-import { computeGateStatus } from "../../../utils/gateStatus";
+import { computeGateStatus, computeStageOnly } from "../../../utils/gateStatus";
 
 import {
     saveOpsReviewDecision
 } from "../../../services/opsSelectorService";
 
 import {
-    getQuote
-} from "../../../services/technoCommercialQuoteService";
+    requestApproval
+} from "../../../services/enquiryWorkspaceService";
 
 export default function OpsReviewDecisionCard({
 
     enquiry,
 
     opsSelection,
+
+    quote,
 
     reload
 
@@ -34,7 +36,10 @@ export default function OpsReviewDecisionCard({
 
     const standing = useApprovalStanding(enquiry?.id, user?.id);
 
-    const [quoteReady, setQuoteReady] = useState(false);
+    // Lifted to OpsReviewSummary (Phase 27) - fetched once there and
+    // passed down, since DeploymentPlanCard now also needs it (for its
+    // own has-anything-changed comparison against the quote's snapshot).
+    const quoteReady = Boolean(quote?.id);
 
     const [reviewNote, setReviewNote] = useState("");
 
@@ -42,29 +47,9 @@ export default function OpsReviewDecisionCard({
 
     const [error, setError] = useState("");
 
-    useEffect(()=>{
+    const [requesting, setRequesting] = useState(false);
 
-        let cancelled = false;
-
-        getQuote(opsSelection.id)
-            .then(data=>{
-
-                if(!cancelled){
-                    setQuoteReady(Boolean(data?.id));
-                }
-
-            })
-            .catch(()=>{
-
-                if(!cancelled){
-                    setQuoteReady(false);
-                }
-
-            });
-
-        return ()=>{ cancelled = true; };
-
-    },[opsSelection.id]);
+    const [requestMessage, setRequestMessage] = useState("");
 
     function handleOpenOpsSelector(){
 
@@ -115,6 +100,57 @@ export default function OpsReviewDecisionCard({
     );
 
     const canDecide = gate.canDecide;
+
+    // "Please review this" ping - anyone can request it (not just
+    // someone who already holds standing), gated only on the case
+    // genuinely being at this gate's stage right now.
+    const requestGate = computeStageOnly(enquiry, "OPS_REVIEW");
+
+    async function handleRequestApproval(){
+
+        if(!requestGate.canRequest){
+
+            setRequestMessage(requestGate.reason || "Approval cannot be requested right now.");
+
+            return;
+
+        }
+
+        setRequesting(true);
+
+        setRequestMessage("");
+
+        try{
+
+            const result = await requestApproval(
+
+                enquiry.id,
+
+                "ops_review",
+
+                buildActor(user)
+
+            );
+
+            setRequestMessage(`Requested approval from ${result.requested_to} approver(s).`);
+
+        }
+
+        catch(err){
+
+            console.error(err);
+
+            setRequestMessage(err?.detail || "Unable to request approval.");
+
+        }
+
+        finally{
+
+            setRequesting(false);
+
+        }
+
+    }
 
     async function handleDecision(status, nextStage){
 
@@ -245,7 +281,27 @@ export default function OpsReviewDecisionCard({
 
             {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
 
+            {requestMessage && <div className="survey-empty" style={{marginTop:8}}>{requestMessage}</div>}
+
             <div className="survey-actions" style={{marginTop:12}}>
+
+                <button
+
+                    type="button"
+
+                    className="survey-action-button"
+
+                    onClick={handleRequestApproval}
+
+                    disabled={requesting || !requestGate.canRequest}
+
+                    title={!requestGate.canRequest ? requestGate.reason : "Notify every Ops Review approver for this hub"}
+
+                >
+
+                    {requesting ? "Requesting..." : "Request Approval"}
+
+                </button>
 
                 <button
 

@@ -4,6 +4,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from backend.schemas.notification_schema import ActorSchema
+
 
 
 # ============================================================
@@ -152,3 +154,17 @@ class ModuleReferenceUpdateRequest(BaseModel):
 class SetStageRequest(BaseModel):
 
     stage: EnquiryStage
+
+
+# ====================================
+# REQUEST APPROVAL (Phase 27)
+# The "please review this" ping available on every tab with a real
+# approval gate - approval_type matches hub_approval_service's
+# OPS_REVIEW/QUOTE_COMMERCIAL/COMMERCIAL_APPROVAL constants exactly.
+# ====================================
+
+class RequestApprovalSchema(BaseModel):
+
+    approval_type: str
+
+    actor: Optional[ActorSchema] = None

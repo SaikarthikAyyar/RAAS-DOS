@@ -44,6 +44,7 @@ class NotificationSchema(BaseModel):
 
     is_important: bool = False
     remark: str | None = None
+    is_approval: bool = False
 
     changes: list[NotificationChangeSchema] = []
 

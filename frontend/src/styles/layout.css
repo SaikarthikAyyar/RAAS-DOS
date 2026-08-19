@@ -679,6 +679,52 @@ margin-left:auto;
 
 }
 
+/* Approval-gate notifications (Phase 27) - a distinct blue accent so
+   they read as a different category from Business Masters' red
+   "Important" at a glance, even though both share the same
+   grow-to-fit-remark row treatment. Takes precedence over .important
+   when a notification is flagged both is_approval and is_important
+   (every real approval-gate notification always is). */
+.notif-panel-row.approval{
+
+    height:auto;
+
+    min-height:42px;
+
+    padding:8px 14px;
+
+    border-left:3px solid #1d4ed8;
+
+    white-space:normal;
+
+}
+
+.notif-approval-badge{
+
+    display:inline-block;
+
+    font-size:9px;
+
+    font-weight:800;
+
+    text-transform:uppercase;
+
+    letter-spacing:.3px;
+
+    color:#fff;
+
+    background:#1d4ed8;
+
+    border-radius:4px;
+
+    padding:1px 5px;
+
+    margin-right:6px;
+
+    vertical-align:middle;
+
+}
+
 .notif-panel-empty{
 
     padding:20px 14px;
@@ -778,6 +824,21 @@ margin-left:auto;
 .notif-toast.important:hover{
 
     border-color:#b91c1c;
+
+}
+
+/* Approval-gate toasts (Phase 27) - same blue accent as the bell
+   panel's .approval row, taking precedence over .important since
+   every real approval-gate notification is flagged both. */
+.notif-toast.approval{
+
+    border-left-color:#1d4ed8;
+
+}
+
+.notif-toast.approval:hover{
+
+    border-color:#1d4ed8;
 
 }
 

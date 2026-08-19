@@ -44,6 +44,129 @@ function defaultAccessoriesPlan(finalMachine, opsScoring){
 
 }
 
+// ====================================
+// HAS-CHANGES DETECTION (Phase 27)
+// The Save Deployment Plan & Generate Quote button should only be
+// enabled when there's a real, unsaved change to the ops selection -
+// from the Ops Selector module re-running, a Machine Override save,
+// or an edit made right here in the Deployment Plan form (days/crew/
+// accessories/dewatering range).
+//
+// Machine-derived fields (final machine, service configuration, pump
+// package) are compared against the QUOTE's own persisted snapshot -
+// not local state - because that snapshot is a real, independent
+// signal of "what was actually used to generate the currently-existing
+// quote," set once at generation time and never silently rewritten by
+// an override save or an Ops Selector re-run. Comparing against local
+// state instead would break across a full remount (e.g. navigating to
+// /ops-selector and back), where local state and any local baseline
+// would reset together and wrongly look unchanged.
+//
+// Deployment-plan-proper fields (days/crew/accessories/dewatering)
+// have no equivalent on the Quote row, so they're compared directly
+// against the OpsSelection's own persisted values instead - correct
+// because saveDeploymentPlan and saveQuote below are always called
+// together in one action, so "differs from what's on OpsSelection"
+// and "differs from what's on the Quote" agree for these fields.
+// ====================================
+
+function normalizeCrewPlan(plan){
+
+    return (plan ?? []).map(row=>({
+
+        role: row.role || "",
+        qty_min: Number(row.qty_min) || 0,
+        qty_max: Number(row.qty_max) || 0
+
+    }));
+
+}
+
+function normalizeAccessoriesPlan(plan){
+
+    return (plan ?? []).map(row=>({ name: row.name, needed: row.needed }));
+
+}
+
+function computeHasChanges({
+
+    quote,
+    opsSelection,
+    finalMachine,
+    opsScoring,
+    mobDays,
+    setupDays,
+    execDays,
+    demobDays,
+    crewPlan,
+    accessoriesPlan,
+    dewMin,
+    dewMax
+
+}){
+
+    // No quote yet at all - the very first save is always a real,
+    // meaningful action (there's nothing to compare against).
+    if(!quote?.id){
+        return true;
+    }
+
+    if(finalMachine !== quote.recommended_machine){
+        return true;
+    }
+
+    if((opsSelection.service_configuration ?? null) !== (quote.service_configuration ?? null)){
+        return true;
+    }
+
+    if((opsSelection.pump_hose_package ?? null) !== (quote.pump_hose_package ?? null)){
+        return true;
+    }
+
+    if((Number(mobDays) || 0) !== (opsSelection.mobilisation_days ?? 0)){
+        return true;
+    }
+
+    if((Number(setupDays) || 0) !== (opsSelection.setup_days ?? 0)){
+        return true;
+    }
+
+    if((Number(execDays) || 0) !== (opsSelection.execution_days ?? 0)){
+        return true;
+    }
+
+    if((Number(demobDays) || 0) !== (opsSelection.demob_days ?? 0)){
+        return true;
+    }
+
+    const savedCrewPlan = opsSelection.crew_plan?.length
+        ? opsSelection.crew_plan
+        : defaultCrewPlan(opsSelection.manpower_required);
+
+    if(JSON.stringify(normalizeCrewPlan(crewPlan)) !== JSON.stringify(normalizeCrewPlan(savedCrewPlan))){
+        return true;
+    }
+
+    const savedAccessoriesPlan = opsSelection.accessories_plan?.length
+        ? opsSelection.accessories_plan
+        : defaultAccessoriesPlan(finalMachine, opsScoring);
+
+    if(JSON.stringify(normalizeAccessoriesPlan(accessoriesPlan)) !== JSON.stringify(normalizeAccessoriesPlan(savedAccessoriesPlan))){
+        return true;
+    }
+
+    if((dewMin || null) !== (opsSelection.dewatering_method_min ?? null)){
+        return true;
+    }
+
+    if((dewMax || null) !== (opsSelection.dewatering_method_max ?? null)){
+        return true;
+    }
+
+    return false;
+
+}
+
 export default function DeploymentPlanCard({
 
     enquiry,
@@ -53,6 +176,8 @@ export default function DeploymentPlanCard({
     opsScoring = [],
 
     finalMachine,
+
+    quote,
 
     reload
 
@@ -101,6 +226,28 @@ export default function DeploymentPlanCard({
     const [saving, setSaving] = useState(false);
 
     const [error, setError] = useState("");
+
+    // Save Deployment Plan & Generate Quote is only enabled when there's
+    // a real, unsaved change - from the Ops Selector re-running, a
+    // Machine Override save, or an edit made in this form. Recomputed
+    // every render (cheap - a handful of scalar/array comparisons), so
+    // it reflects both local edits and freshly-reloaded props.
+    const hasChanges = computeHasChanges({
+
+        quote,
+        opsSelection,
+        finalMachine,
+        opsScoring,
+        mobDays,
+        setupDays,
+        execDays,
+        demobDays,
+        crewPlan,
+        accessoriesPlan,
+        dewMin,
+        dewMax
+
+    });
 
     function updateCrewField(index, field, value){
 
@@ -447,7 +594,9 @@ export default function DeploymentPlanCard({
 
                     onClick={handleSaveAndGenerateQuote}
 
-                    disabled={saving}
+                    disabled={saving || !hasChanges}
+
+                    title={!hasChanges ? "No changes to save - edit the machine, crew, accessories, or dewatering range first." : undefined}
 
                     style={{marginTop:12}}
 

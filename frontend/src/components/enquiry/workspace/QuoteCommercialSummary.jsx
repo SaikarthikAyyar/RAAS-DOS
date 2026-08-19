@@ -8,7 +8,7 @@ import useApprovalStanding from "../../../hooks/useApprovalStanding";
 
 import { buildActor } from "../../../utils/actor";
 
-import { computeGateStatus } from "../../../utils/gateStatus";
+import { computeGateStatus, computeStageOnly } from "../../../utils/gateStatus";
 
 import {
     getQuoteHistory,
@@ -17,6 +17,10 @@ import {
     flagQuoteRevisionRequested,
     saveQuoteCommercialDecision
 } from "../../../services/technoCommercialQuoteService";
+
+import {
+    requestApproval
+} from "../../../services/enquiryWorkspaceService";
 
 function inr(value){
 
@@ -68,6 +72,9 @@ export default function QuoteCommercialSummary({
     const [deciding, setDeciding] = useState(false);
 
     const [error, setError] = useState("");
+
+    const [requesting, setRequesting] = useState(false);
+    const [requestMessage, setRequestMessage] = useState("");
 
     useEffect(()=>{
 
@@ -253,6 +260,43 @@ export default function QuoteCommercialSummary({
         quote.revision_requested
             ? "Save a new quote version first."
             : gate.reason;
+
+    // "Please review this" ping - anyone can request it, gated only on
+    // the case genuinely being at this gate's stage right now.
+    const requestGate = computeStageOnly(enquiry, "QUOTE_COMMERCIAL_REVIEW");
+
+    async function handleRequestApproval(){
+
+        if(!requestGate.canRequest){
+            setRequestMessage(requestGate.reason || "Approval cannot be requested right now.");
+            return;
+        }
+
+        setRequesting(true);
+        setRequestMessage("");
+
+        try{
+
+            const result = await requestApproval(enquiry?.id, "quote_commercial", buildActor(user));
+
+            setRequestMessage(`Requested approval from ${result.requested_to} approver(s).`);
+
+        }
+
+        catch(err){
+
+            console.error(err);
+            setRequestMessage(err?.detail || "Unable to request approval.");
+
+        }
+
+        finally{
+
+            setRequesting(false);
+
+        }
+
+    }
 
     async function handleDecision(status){
 
@@ -599,8 +643,18 @@ export default function QuoteCommercialSummary({
                 </div>
 
                 {decisionDisabledReason && <div className="survey-empty" style={{marginTop:8}}>{decisionDisabledReason}</div>}
+                {requestMessage && <div className="survey-empty" style={{marginTop:8}}>{requestMessage}</div>}
 
                 <div className="survey-actions" style={{flexWrap:"wrap", gap:8, marginTop:8}}>
+
+                    <button
+                        className="survey-action-button"
+                        onClick={handleRequestApproval}
+                        disabled={requesting || !requestGate.canRequest}
+                        title={!requestGate.canRequest ? requestGate.reason : "Notify every Quote & Commercial approver for this hub"}
+                    >
+                        {requesting ? "Requesting..." : "Request Approval"}
+                    </button>
 
                     {hasTask("enquiry-tab-quote-commercial", "proceed_to_commercial_approval") && (
                         <button

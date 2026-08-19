@@ -35,6 +35,7 @@ def _serialize_entry(entry):
         "is_read": entry.get("is_read", False),
         "is_important": notification.is_important,
         "remark": notification.remark,
+        "is_approval": notification.is_approval,
         "changes": [
             {
                 "field_name": change.field_name,
@@ -64,6 +65,7 @@ def _serialize_notification_only(notification):
         "is_read": False,
         "is_important": notification.is_important,
         "remark": notification.remark,
+        "is_approval": notification.is_approval,
         "changes": []
 
     }

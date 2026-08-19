@@ -6,7 +6,7 @@ import OpsReviewDecisionCard from "./OpsReviewDecisionCard";
 
 import { useNavigate } from "react-router-dom";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
@@ -19,6 +19,10 @@ import { buildActor } from "../../../utils/actor";
 import {
     saveOpsOverride
 } from "../../../services/opsSelectorService";
+
+import {
+    getQuote
+} from "../../../services/technoCommercialQuoteService";
 
 export default function OpsReviewSummary({
 
@@ -45,6 +49,47 @@ export default function OpsReviewSummary({
     const [saving, setSaving] = useState(false);
 
     const [error, setError] = useState("");
+
+    // Lifted here (Phase 27) rather than fetched independently by
+    // OpsReviewDecisionCard and DeploymentPlanCard - both need to know
+    // "does a quote already exist, and what does it snapshot" (the
+    // former for its quoteReady gate, the latter for its own
+    // has-anything-changed comparison), so one fetch feeds both.
+    const [quote, setQuote] = useState(null);
+
+    useEffect(()=>{
+
+        if(!opsSelection?.id){
+            setQuote(null);
+            return;
+        }
+
+        let cancelled = false;
+
+        getQuote(opsSelection.id)
+            .then(data=>{
+
+                if(!cancelled){
+                    setQuote(data?.id ? data : null);
+                }
+
+            })
+            .catch(()=>{
+
+                if(!cancelled){
+                    setQuote(null);
+                }
+
+            });
+
+        return ()=>{ cancelled = true; };
+
+        // Depends on the whole opsSelection reference (not individual
+        // fields) - a fresh reload() at the workspace level always
+        // produces a new object, which is exactly the signal needed to
+        // re-check whether a new quote now exists / has changed.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[opsSelection]);
 
     function handleOpenOpsSelector(){
 
@@ -439,6 +484,8 @@ export default function OpsReviewSummary({
 
                 finalMachine={finalMachine}
 
+                quote={quote}
+
                 reload={reload}
 
             />
@@ -448,6 +495,8 @@ export default function OpsReviewSummary({
                 enquiry={enquiry}
 
                 opsSelection={opsSelection}
+
+                quote={quote}
 
                 reload={reload}
 

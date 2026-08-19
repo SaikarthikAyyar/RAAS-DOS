@@ -44,16 +44,24 @@ from backend.services.hub_approval_service import (
     verify_approval_action,
     verify_stage_action,
     regress_to_ops_review,
+    resolve_enquiry_hub,
+    get_approver_user_ids,
     COMMERCIAL_APPROVAL
 )
 
-from backend.repositories.notification_repository import record_workflow_change
+from backend.repositories.notification_repository import record_approval_change
 
 from datetime import date
 
 
 # ====================================
-# NOTIFICATION HELPER (Phase 26)
+# NOTIFICATION HELPER (Phase 26, retargeted Phase 27)
+# Both call sites in this file are real gate DECISIONS (Accept/Reject/
+# Send back on Commercial Approval), so unlike Ops Review's and Quote &
+# Commercial's equivalents (which also have broadcast, non-decision
+# changes to report), this one function only ever needs the targeted,
+# approvers-only treatment - notifies real commercial_approval
+# hub-approvers for this enquiry's hub, not everyone.
 # ====================================
 
 def _notify_commercial_approval_change(db, target_enquiry, actor, changes, title):
@@ -61,7 +69,17 @@ def _notify_commercial_approval_change(db, target_enquiry, actor, changes, title
     if not target_enquiry or not changes:
         return
 
-    record_workflow_change(
+    hub = resolve_enquiry_hub(db, target_enquiry)
+
+    if not hub:
+        return
+
+    approver_ids = get_approver_user_ids(db, hub.id, COMMERCIAL_APPROVAL)
+
+    if not approver_ids:
+        return
+
+    record_approval_change(
         db,
         "Commercial Approval",
         "UPDATE",
@@ -71,7 +89,8 @@ def _notify_commercial_approval_change(db, target_enquiry, actor, changes, title
         target_enquiry.id,
         target_enquiry.customer_name,
         title,
-        changes
+        changes,
+        approver_ids
     )
 
 

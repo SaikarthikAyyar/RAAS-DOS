@@ -54,6 +54,12 @@ class Notification(Base):
     remark = Column(Text, nullable=True)
     exclude_actor = Column(Boolean, nullable=False, default=False)
 
+    # Phase 27: a real approval-gate decision (Approve/Reject/Sent back)
+    # or a "Request Approval" ping - more specific than is_important,
+    # and always paired with recipient_user_id set (one row per real
+    # hub-approver for that gate), never broadcast.
+    is_approval = Column(Boolean, nullable=False, default=False)
+
     created_at = Column(DateTime, server_default=func.now())
 
 

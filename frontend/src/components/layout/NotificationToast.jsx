@@ -34,6 +34,7 @@ export default function NotificationToast({
 }){
 
     const isImportant = !!notification.is_important;
+    const isApproval = !!notification.is_approval;
 
     useEffect(()=>{
 
@@ -52,7 +53,7 @@ export default function NotificationToast({
             className={
                 [
                     "notif-toast",
-                    isImportant ? "important" : "",
+                    isApproval ? "approval" : (isImportant ? "important" : ""),
                     leaving ? "leaving" : ""
                 ].filter(Boolean).join(" ")
             }
@@ -61,7 +62,11 @@ export default function NotificationToast({
 
             <div className="notif-toast-body">
 
-                {isImportant && <span className="notif-important-badge">Important</span>}
+                {
+                    isApproval
+                        ? <span className="notif-approval-badge">Approval</span>
+                        : (isImportant && <span className="notif-important-badge">Important</span>)
+                }
 
                 <span className="notif-toast-module">{notification.module}</span>
 

@@ -148,6 +148,45 @@ export async function getEnquiryApprovalStanding(
 
 }
 
+// ====================================
+// REQUEST APPROVAL (Phase 27)
+// The "please review this" ping - notifies every real hub-approver
+// for the given gate (approvalType matches hub_approval_service's
+// OPS_REVIEW/QUOTE_COMMERCIAL/COMMERCIAL_APPROVAL constants exactly),
+// no state change of its own.
+// ====================================
+
+export async function requestApproval(
+    enquiryId,
+    approvalType,
+    actor
+){
+
+    const response = await fetch(
+
+        `${API}/enquiry-consolidated/${enquiryId}/request-approval`,
+
+        {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+                approval_type:approvalType,
+                actor
+            })
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
 export async function setEnquiryStage(
     enquiryId,
     stage

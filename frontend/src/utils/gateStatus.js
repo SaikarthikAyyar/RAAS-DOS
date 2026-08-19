@@ -57,3 +57,40 @@ export function computeGateStatus(enquiry, requiredStage, standingFlag, gateLabe
     return { canDecide: true, reason: null };
 
 }
+
+
+// ====================================
+// STAGE-ONLY STATUS (Phase 27)
+// Gates the new "Request Approval" ping - unlike a real decision,
+// anyone should be able to request approval (not just users who
+// already hold standing), but only while the case is genuinely
+// sitting at that gate's stage. Reuses the same stage-comparison
+// logic as computeGateStatus above, just without the standing check.
+// ====================================
+
+export function computeStageOnly(enquiry, requiredStage){
+
+    if(!enquiry){
+        return { canRequest: false, reason: null };
+    }
+
+    if(enquiry.stage !== requiredStage){
+
+        const currentIndex = STAGE_ORDER.indexOf(enquiry.stage);
+        const requiredIndex = STAGE_ORDER.indexOf(requiredStage);
+
+        const requiredLabel = STAGE_LABELS[requiredStage] ?? requiredStage;
+        const currentLabel = STAGE_LABELS[enquiry.stage] ?? enquiry.stage;
+
+        const reason =
+            currentIndex > requiredIndex
+                ? `Already decided - this case has moved on to ${currentLabel}.`
+                : `This case hasn't reached ${requiredLabel} yet - it's currently at ${currentLabel}.`;
+
+        return { canRequest: false, reason };
+
+    }
+
+    return { canRequest: true, reason: null };
+
+}

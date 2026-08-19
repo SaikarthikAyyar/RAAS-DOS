@@ -48,12 +48,76 @@ def record_change(
         # existing caller omits these and gets today's exact behavior.
         is_important=False,
         remark=None,
-        exclude_actor=False
+        exclude_actor=False,
+
+        # Phase 27: approval-gate decisions/requests only. When
+        # provided (a non-empty list of user_ids), this becomes a
+        # genuinely TARGETED notification - one row per recipient,
+        # each with recipient_user_id set to that one user, instead of
+        # the single broadcast row every other caller gets. Every
+        # existing call site omits this and keeps today's exact
+        # single-notification return shape and behavior.
+        is_approval=False,
+        recipient_user_ids=None
 
 ):
 
     if not changes:
         return None
+
+    if recipient_user_ids is not None:
+
+        if not recipient_user_ids:
+            return []
+
+        created = []
+
+        for recipient_id in recipient_user_ids:
+
+            notification = Notification(
+
+                title=title,
+                module=module,
+                action=action,
+                user_id=actor_user_id,
+                user_name=actor_name,
+                user_role=actor_role,
+                enquiry_id=enquiry_id,
+                customer_name=customer_name,
+                is_important=is_important,
+                remark=remark,
+                exclude_actor=exclude_actor,
+                is_approval=is_approval,
+                recipient_user_id=recipient_id
+
+            )
+
+            db.add(notification)
+            db.flush()
+
+            for change in changes:
+
+                db.add(NotificationChange(
+
+                    notification_id=notification.id,
+                    field_name=change["field"],
+                    previous_value=(
+                        str(change["before"]) if change.get("before") is not None else None
+                    ),
+                    updated_value=(
+                        str(change["after"]) if change.get("after") is not None else None
+                    )
+
+                ))
+
+            created.append(notification)
+
+        db.commit()
+
+        for notification in created:
+            db.refresh(notification)
+
+        return created
 
     notification = Notification(
 
@@ -67,7 +131,8 @@ def record_change(
         customer_name=customer_name,
         is_important=is_important,
         remark=remark,
-        exclude_actor=exclude_actor
+        exclude_actor=exclude_actor,
+        is_approval=is_approval
 
     )
 
@@ -182,6 +247,55 @@ def record_workflow_change(
         is_important=True,
         remark=None,
         exclude_actor=False
+
+    )
+
+
+# ====================================
+# RECORD APPROVAL CHANGE
+# Policy for real approval-gate events specifically (a genuine Approve
+# /Reject/Sent-back decision, or a "Request Approval" ping) - the one
+# other case, alongside record_workflow_change, that touches
+# enquiry_id/customer_name. Unlike record_workflow_change (broadcast to
+# everyone), this is always TARGETED to recipient_user_ids - the real
+# hub-approvers for that specific gate, resolved by the caller. is_
+# approval=True takes visual precedence over is_important on the
+# frontend (a distinct "Approval" badge, not "Important").
+# ====================================
+
+def record_approval_change(
+
+        db,
+        module,
+        action,
+        actor_user_id,
+        actor_name,
+        actor_role,
+        enquiry_id,
+        customer_name,
+        title,
+        changes,
+        recipient_user_ids
+
+):
+
+    return record_change(
+
+        db,
+        module,
+        action,
+        actor_user_id,
+        actor_name,
+        actor_role,
+        enquiry_id,
+        customer_name,
+        title,
+        changes,
+        is_important=True,
+        remark=None,
+        exclude_actor=False,
+        is_approval=True,
+        recipient_user_ids=recipient_user_ids
 
     )
 

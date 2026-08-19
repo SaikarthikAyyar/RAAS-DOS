@@ -51,12 +51,14 @@ from backend.repositories.pump_repository import list_active_pumps_as_dicts
 from backend.services.hub_approval_service import (
     verify_approval_action,
     verify_stage_action,
+    resolve_enquiry_hub,
+    get_approver_user_ids,
     OPS_REVIEW
 )
 
 from backend.repositories.techno_commercial_quote_repository import get_quote_by_ops_selection
 
-from backend.repositories.notification_repository import record_workflow_change
+from backend.repositories.notification_repository import record_workflow_change, record_approval_change
 
 
 # ====================================
@@ -93,6 +95,44 @@ def _notify_ops_review_change(db, target_enquiry, actor, action, changes, title)
     )
 
 
+# ====================================
+# APPROVAL-DECISION NOTIFICATION (Phase 27)
+# The real Approve/Sent-back DECISION on this gate is not a broadcast
+# like every other Ops Review change above - only the users who hold
+# real ops_review hub-approver standing for this enquiry's hub get
+# notified, via the targeted record_approval_change pipeline. Falls
+# back to a silent no-op if the hub/approvers can't be resolved -
+# the decision itself must never be blocked by a notification gap.
+# ====================================
+
+def _notify_ops_review_decision(db, target_enquiry, actor, changes, title):
+
+    if not target_enquiry or not changes:
+        return
+
+    hub = resolve_enquiry_hub(db, target_enquiry)
+
+    if not hub:
+        return
+
+    approver_ids = get_approver_user_ids(db, hub.id, OPS_REVIEW)
+
+    if not approver_ids:
+        return
+
+    record_approval_change(
+        db,
+        "Ops Review",
+        "UPDATE",
+        actor.user_id if actor else None,
+        actor.name if actor else None,
+        actor.role if actor else None,
+        target_enquiry.id,
+        target_enquiry.customer_name,
+        title,
+        changes,
+        approver_ids
+    )
 
 
 
@@ -970,11 +1010,10 @@ def record_ops_review_decision_request(db, ops_selection_id, status, note, actor
     # Commercial Approval send-back or reject) reports it instead.
     if status in ("Approved", "Sent back"):
 
-        _notify_ops_review_change(
+        _notify_ops_review_decision(
             db,
             target_enquiry,
             actor,
-            "UPDATE",
             [
                 {"field": "review_status", "before": None, "after": status},
                 {"field": "review_note", "before": None, "after": note},

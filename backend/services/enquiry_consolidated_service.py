@@ -409,6 +409,31 @@ def get_enquiry_approval_standing_request(
 
 
 # ====================================
+# REQUEST APPROVAL (Phase 27)
+# ====================================
+
+def request_approval_request(
+    db,
+    enquiry_id,
+    approval_type,
+    actor
+):
+
+    from backend.services.hub_approval_service import request_approval_request as _request_approval
+
+    try:
+
+        return _request_approval(db, enquiry_id, approval_type, actor)
+
+    except ValueError as error:
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
+
+
+# ====================================
 # SET STAGE
 # (used by "Send back to Sales" on the
 # Ops Review decision card - reverts the

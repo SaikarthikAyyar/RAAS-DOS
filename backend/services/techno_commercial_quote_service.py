@@ -56,10 +56,12 @@ from backend.services.hub_approval_service import (
     verify_approval_action,
     verify_stage_action,
     regress_to_ops_review,
+    resolve_enquiry_hub,
+    get_approver_user_ids,
     QUOTE_COMMERCIAL
 )
 
-from backend.repositories.notification_repository import record_workflow_change
+from backend.repositories.notification_repository import record_workflow_change, record_approval_change
 
 
 # ====================================
@@ -82,6 +84,43 @@ def _notify_quote_commercial_change(db, target_enquiry, actor, action, changes, 
         target_enquiry.customer_name,
         title,
         changes
+    )
+
+
+# ====================================
+# APPROVAL-DECISION NOTIFICATION (Phase 27)
+# Same targeted-only-to-real-approvers treatment as Ops Review's own
+# decision notifier - the real Approve/Sent-back call on this gate
+# notifies only quote_commercial hub-approvers, not everyone.
+# ====================================
+
+def _notify_quote_commercial_decision(db, target_enquiry, actor, changes, title):
+
+    if not target_enquiry or not changes:
+        return
+
+    hub = resolve_enquiry_hub(db, target_enquiry)
+
+    if not hub:
+        return
+
+    approver_ids = get_approver_user_ids(db, hub.id, QUOTE_COMMERCIAL)
+
+    if not approver_ids:
+        return
+
+    record_approval_change(
+        db,
+        "Quote & Commercial",
+        "UPDATE",
+        actor.user_id if actor else None,
+        actor.name if actor else None,
+        actor.role if actor else None,
+        target_enquiry.id,
+        target_enquiry.customer_name,
+        title,
+        changes,
+        approver_ids
     )
 
 
@@ -756,8 +795,8 @@ def record_quote_commercial_decision_request(db, quote_id, status, note, actor, 
 
         result = get_quote(db, quote_id)
 
-        _notify_quote_commercial_change(
-            db, target_enquiry, actor, "UPDATE",
+        _notify_quote_commercial_decision(
+            db, target_enquiry, actor,
             [
                 {"field": "quote_commercial_status", "before": "Approved", "after": "Sent back"},
                 {"field": "stage", "before": stage_before, "after": target_enquiry.stage if target_enquiry else None}
@@ -780,8 +819,8 @@ def record_quote_commercial_decision_request(db, quote_id, status, note, actor, 
     if status == "Approved" and target_enquiry:
         advance_stage_at_least(db, target_enquiry.id, WorkflowStage.COMMERCIAL_APPROVAL.value)
 
-    _notify_quote_commercial_change(
-        db, target_enquiry, actor, "UPDATE",
+    _notify_quote_commercial_decision(
+        db, target_enquiry, actor,
         [
             {"field": "quote_commercial_status", "before": None, "after": status},
             {"field": "quote_commercial_note", "before": None, "after": note},

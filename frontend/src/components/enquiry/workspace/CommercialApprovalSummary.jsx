@@ -6,13 +6,17 @@ import useApprovalStanding from "../../../hooks/useApprovalStanding";
 
 import { buildActor } from "../../../utils/actor";
 
-import { computeGateStatus } from "../../../utils/gateStatus";
+import { computeGateStatus, computeStageOnly } from "../../../utils/gateStatus";
 
 import {
     getApprovalHistory,
     recordCommercialApprovalDecision,
     sendBackCommercialApproval
 } from "../../../services/approvalBoardService";
+
+import {
+    requestApproval
+} from "../../../services/enquiryWorkspaceService";
 
 import {
     quoteReleaseDownloadUrl,
@@ -76,6 +80,9 @@ export default function CommercialApprovalSummary({
     const [finalValue, setFinalValue] = useState("");
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+
+    const [requesting, setRequesting] = useState(false);
+    const [requestMessage, setRequestMessage] = useState("");
 
     const [releaseDocument, setReleaseDocument] = useState(null);
     const [quoteReleaseEmailTemplate, setQuoteReleaseEmailTemplate] = useState(null);
@@ -342,6 +349,45 @@ export default function CommercialApprovalSummary({
 
     }
 
+    // "Please review this" ping - gated on stage-match only (anyone can
+    // request it, not just users who already hold standing), unlike
+    // the nested visibility rules further below which are about
+    // whether a DECISION can be recorded right now.
+    const requestGate = computeStageOnly(enquiry, "COMMERCIAL_APPROVAL");
+
+    async function handleRequestApproval(){
+
+        if(!requestGate.canRequest){
+            setRequestMessage(requestGate.reason || "Approval cannot be requested right now.");
+            return;
+        }
+
+        setRequesting(true);
+        setRequestMessage("");
+
+        try{
+
+            const result = await requestApproval(enquiry?.id, "commercial_approval", buildActor(user));
+
+            setRequestMessage(`Requested approval from ${result.requested_to} approver(s).`);
+
+        }
+
+        catch(err){
+
+            console.error(err);
+            setRequestMessage(err?.detail || "Unable to request approval.");
+
+        }
+
+        finally{
+
+            setRequesting(false);
+
+        }
+
+    }
+
     async function handleOpenSendModal(){
 
         try{
@@ -429,6 +475,21 @@ export default function CommercialApprovalSummary({
                     }
 
                 </div>
+
+                <div className="survey-actions" style={{marginBottom:10}}>
+
+                    <button
+                        className="survey-action-button"
+                        onClick={handleRequestApproval}
+                        disabled={requesting || !requestGate.canRequest}
+                        title={!requestGate.canRequest ? requestGate.reason : "Notify every Commercial Approval approver for this hub"}
+                    >
+                        {requesting ? "Requesting..." : "Request Approval"}
+                    </button>
+
+                </div>
+
+                {requestMessage && <div className="survey-empty" style={{marginBottom:10}}>{requestMessage}</div>}
 
                 <h4 className="ops-subheading">Finalized quote lines</h4>
 
