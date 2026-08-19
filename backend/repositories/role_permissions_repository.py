@@ -662,15 +662,37 @@ def save_nav_matrix(db, cells):
 
 
 # ====================================
-# GET TASK MATRIX (Phase 21D)
+# DERIVED NAV MODULES (Phase 25)
+# Nav module_key -> the module_type of the tab group it derives its own
+# Accessible state from. A role can see "/business-master" in the
+# sidebar iff at least one of its business_master_tab tabs is
+# accessible; same for "/enquiry" via workspace_tab. Every other nav
+# module has no tab breakdown at all and stays directly, independently
+# settable (exactly like the old standalone Navigation Access matrix).
+# ====================================
+
+DERIVED_NAV_MODULES = {
+    "/business-master": "business_master_tab",
+    "/enquiry": "workspace_tab"
+}
+
+_NAV_KEY_BY_CHILD_TYPE = {v: k for k, v in DERIVED_NAV_MODULES.items()}
+
+
+# ====================================
+# GET TASK MATRIX (Phase 21D, merged with nav access - Phase 25)
 # Scoped to a single role. Two groups by module_type - "Business
 # Masters" (business_master_tab) and "Enquiries" (workspace_tab).
 # Each tab-row carries its own Tab Access flag (RolePermission.can_view
 # for that tab's module row - the exact same per-tab mechanism already
 # proven for workspace tabs since Phase 4) plus its real task list,
 # each defaulting to unchecked if no RoleTaskPermission row exists yet
-# (mirrors get_nav_matrix's "full cross-product, unset = unchecked"
+# (mirrors the old nav matrix's "full cross-product, unset = unchecked"
 # convention, so a brand-new role/task shows up ready to configure).
+#
+# nav_modules carries every nav-type module for this role - derived
+# ones (see DERIVED_NAV_MODULES) get their can_view computed live from
+# the tab groups above rather than read from their own stored row.
 # ====================================
 
 def get_task_matrix(db, role_id):
@@ -685,10 +707,10 @@ def get_task_matrix(db, role_id):
         ("Enquiries", "workspace_tab")
     ]
 
-    can_view_by_module = {
-        p.module_id: bool(p.can_view)
-        for p in db.query(RolePermission).filter(RolePermission.role_id == role_id).all()
-    }
+    permission_rows = db.query(RolePermission).filter(RolePermission.role_id == role_id).all()
+
+    can_view_by_module = {p.module_id: bool(p.can_view) for p in permission_rows}
+    landing_by_module = {p.module_id: bool(p.is_landing_page) for p in permission_rows}
 
     allowed_by_task = {
         p.module_task_id: bool(p.allowed)
@@ -696,6 +718,11 @@ def get_task_matrix(db, role_id):
     }
 
     groups = []
+
+    # Tracks, per child module_type, whether ANY tab of that type is
+    # accessible - this is exactly the "derived" Accessible value for
+    # the matching nav module.
+    any_tab_view_by_type = {}
 
     for group_name, module_type in groups_spec:
 
@@ -717,11 +744,13 @@ def get_task_matrix(db, role_id):
                 .all()
             )
 
+            tab_can_view = can_view_by_module.get(module.id, False)
+
             tabs.append({
                 "module_id": module.id,
                 "module_key": module.module_key,
                 "module_name": module.module_name,
-                "can_view": can_view_by_module.get(module.id, False),
+                "can_view": tab_can_view,
                 "tasks": [
                     {
                         "module_task_id": task.id,
@@ -733,28 +762,99 @@ def get_task_matrix(db, role_id):
                 ]
             })
 
+        any_tab_view_by_type[module_type] = any(tab["can_view"] for tab in tabs)
+
         groups.append({
             "group_name": group_name,
             "tabs": tabs
         })
 
+    nav_modules = []
+
+    for module in db.query(Module).filter(Module.module_type == "nav").order_by(Module.id).all():
+
+        is_derived = module.module_key in DERIVED_NAV_MODULES
+
+        if is_derived:
+            child_type = DERIVED_NAV_MODULES[module.module_key]
+            can_view = any_tab_view_by_type.get(child_type, False)
+        else:
+            can_view = can_view_by_module.get(module.id, False)
+
+        nav_modules.append({
+            "module_id": module.id,
+            "module_key": module.module_key,
+            "module_name": module.module_name,
+            "can_view": can_view,
+            "is_landing_page": landing_by_module.get(module.id, False),
+            "derived": is_derived
+        })
+
     return {
         "role_id": role.id,
         "role_name": role.name,
-        "groups": groups
+        "groups": groups,
+        "nav_modules": nav_modules
     }
 
 
 # ====================================
-# SAVE TASK MATRIX (Phase 21D)
+# SAVE TASK MATRIX (Phase 21D, merged with nav access - Phase 25)
 # Upserts RolePermission.can_view for each tab and RoleTaskPermission
-# .allowed for each task, scoped to one role. Configuration only - does
-# not itself gate anything (Phase 21E wires enforcement).
+# .allowed for each task, scoped to one role. Also upserts every nav
+# module's Accessible/Landing page for the same role in one call, so
+# the whole Role-based Access screen saves as a single atomic action.
+#
+# Tab -> task cascade is enforced here too, not just client-side: a tab
+# saved with can_view=False forces every one of its tasks to
+# allowed=False regardless of what the payload sent, so a stale/buggy
+# client can never leave "phantom" allowed tasks under an inaccessible
+# tab. Checking a tab back on never force-sets its tasks server-side
+# (the frontend already defaults them to allowed=True on check and lets
+# the user immediately uncheck specific ones before saving) - only the
+# off-direction is a hard invariant.
+#
+# Nav module derivation: "/business-master"/"/enquiry" ignore whatever
+# can_view the client sent and get it recomputed from the tabs payload
+# in this same request - never independently written. Landing page is
+# validated at most once per role before anything is written (a bad
+# payload never partially commits), and is force-cleared server-side
+# for any module whose resulting can_view is False (a role can't land
+# on a page it can't see) as a defense-in-depth mirror of the same rule
+# already enforced client-side.
 # ====================================
 
-def save_task_matrix(db, role_id, tabs):
+def save_task_matrix(db, role_id, tabs, nav_modules=None):
+
+    nav_modules = nav_modules or []
+
+    landing_pages_in_payload = [n for n in nav_modules if n.is_landing_page]
+
+    if len(landing_pages_in_payload) > 1:
+        raise ValueError(
+            f"Role {role_id} has more than one landing page in this save request."
+        )
+
+    # Which tab-module ids belong to which child module_type, so the
+    # nav derivation below can compute "any tab of this type accessible"
+    # directly from the incoming payload rather than re-querying.
+    tab_module_ids = [tab.module_id for tab in tabs]
+
+    tab_modules_by_id = {
+        m.id: m
+        for m in db.query(Module).filter(Module.id.in_(tab_module_ids)).all()
+    } if tab_module_ids else {}
+
+    any_tab_view_by_type = {}
 
     for tab in tabs:
+
+        module = tab_modules_by_id.get(tab.module_id)
+
+        if module:
+            any_tab_view_by_type[module.module_type] = (
+                any_tab_view_by_type.get(module.module_type, False) or bool(tab.can_view)
+            )
 
         permission = (
             db.query(RolePermission)
@@ -786,6 +886,72 @@ def save_task_matrix(db, role_id, tabs):
                 )
                 db.add(task_permission)
 
-            task_permission.allowed = task.allowed
+            # Hard invariant: an inaccessible tab can never leave a
+            # task marked allowed. Accessible tabs respect whatever the
+            # payload sent (the user's own per-task choices).
+            task_permission.allowed = bool(task.allowed) if tab.can_view else False
+
+    db.flush()
+
+    if nav_modules:
+
+        nav_module_objs = {
+            m.id: m
+            for m in db.query(Module).filter(
+                Module.id.in_([n.module_id for n in nav_modules])
+            ).all()
+        }
+
+        resolved = []
+
+        for nav in nav_modules:
+
+            module = nav_module_objs.get(nav.module_id)
+
+            if not module:
+                continue
+
+            if module.module_key in DERIVED_NAV_MODULES:
+                child_type = DERIVED_NAV_MODULES[module.module_key]
+                can_view = any_tab_view_by_type.get(child_type, False)
+            else:
+                can_view = bool(nav.can_view)
+
+            # A role can't land on a page it can't see - clear it
+            # server-side too, mirroring the frontend's own guard.
+            is_landing_page = bool(nav.is_landing_page) and can_view
+
+            resolved.append((nav.module_id, can_view, is_landing_page))
+
+        permissions_by_module = {}
+
+        # Pass 1: upsert can_view, unconditionally clear is_landing_page
+        # first - two passes so a landing page moving from one module to
+        # another never transiently holds two True rows at once, which
+        # would trip the partial unique index regardless of payload order.
+        for module_id, can_view, _is_landing_page in resolved:
+
+            permission = (
+                db.query(RolePermission)
+                .filter(RolePermission.role_id == role_id, RolePermission.module_id == module_id)
+                .first()
+            )
+
+            if not permission:
+                permission = RolePermission(role_id=role_id, module_id=module_id)
+                db.add(permission)
+
+            permission.can_view = can_view
+            permission.is_landing_page = False
+
+            permissions_by_module[module_id] = permission
+
+        db.flush()
+
+        # Pass 2: set the one True flag, if any.
+        for module_id, _can_view, is_landing_page in resolved:
+
+            if is_landing_page:
+                permissions_by_module[module_id].is_landing_page = True
 
     db.commit()

@@ -35,56 +35,11 @@ export async function getRolePermissions(
 
 
 // ====================================
-// NAV MATRIX (admin-facing, editable)
-// ====================================
-
-export async function getNavMatrix(){
-
-    const response = await fetch(
-
-        `${API}/role-permissions/nav-matrix`
-
-    );
-
-    const data = await response.json();
-
-    if(!response.ok){
-        throw data;
-    }
-
-    return data;
-
-}
-
-export async function saveNavMatrix(cells){
-
-    const response = await fetch(
-
-        `${API}/role-permissions/nav-matrix`,
-
-        {
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({ cells })
-        }
-
-    );
-
-    const data = await response.json();
-
-    if(!response.ok){
-        throw data;
-    }
-
-    return data;
-
-}
-
-
-// ====================================
-// TASK MATRIX (Phase 21D, admin-facing, editable, scoped to one role)
+// TASK MATRIX (Phase 21D, merged with nav access - Phase 25 -
+// admin-facing, editable, scoped to one role). The old standalone
+// nav-matrix endpoints/getNavMatrix/saveNavMatrix were removed once
+// Navigation Access folded into this same screen - every role's nav
+// access + task access now saves in one call.
 // ====================================
 
 export async function getTaskMatrix(roleId){
@@ -105,7 +60,7 @@ export async function getTaskMatrix(roleId){
 
 }
 
-export async function saveTaskMatrix(roleId, tabs){
+export async function saveTaskMatrix(roleId, tabs, navModules = []){
 
     const response = await fetch(
 
@@ -116,7 +71,7 @@ export async function saveTaskMatrix(roleId, tabs){
             headers:{
                 "Content-Type":"application/json"
             },
-            body:JSON.stringify({ tabs })
+            body:JSON.stringify({ tabs, nav_modules:navModules })
         }
 
     );

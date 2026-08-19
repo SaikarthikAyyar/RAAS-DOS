@@ -27,9 +27,6 @@ from "./AdministrationRoleDialog";
 import AdministrationRoleForm
 from "./AdministrationRoleForm";
 
-import RoleNavigationMatrix
-from "./RoleNavigationMatrix";
-
 import HubApprovalStandingCard
 from "./HubApprovalStandingCard";
 
@@ -37,15 +34,11 @@ import RoleTaskMatrix
 from "./RoleTaskMatrix";
 
 
-// Local to this screen only - not the outer Partners/Roles/Users strip
-// one level up in AdministrationPage.jsx. More subtabs (Restrictions,
-// Business Master Accessibility) join this array in later phases.
-const SUB_TABS = [
-
-    ["roles", "Role-based Access"],
-    ["navigation", "Navigation Access"]
-
-];
+// Role-based Access is the only screen under Administration -> Roles &
+// Permissions (Navigation Access folded into it - selecting a role
+// below now shows both its nav access and its tab/task access in one
+// place, with nav access to Business Masters/Enquiries derived live
+// from their tabs rather than set independently).
 
 
 export default function AdministrationRoles({
@@ -91,14 +84,6 @@ export default function AdministrationRoles({
         setEditingRole
 
     ] = useState(null);
-
-    const [
-
-        activeSubTab,
-
-        setActiveSubTab
-
-    ] = useState("roles");
 
     const [
 
@@ -386,36 +371,7 @@ export default function AdministrationRoles({
 
         <>
 
-            <div className="administration-subtabs">
-
-                {
-                    SUB_TABS.map(([key, label])=>(
-
-                        <button
-
-                            key={key}
-                            type="button"
-                            className={
-                                activeSubTab===key
-                                    ? "administration-subtab active"
-                                    : "administration-subtab"
-                            }
-                            onClick={()=>setActiveSubTab(key)}
-
-                        >
-
-                            {label}
-
-                        </button>
-
-                    ))
-                }
-
-            </div>
-
-            {
-                activeSubTab==="roles" && (
-                    <div className="role-based-access-layout">
+            <div className="role-based-access-layout">
 
             <div className="administration-roles-sidebar role-based-access-sidebar">
 
@@ -484,22 +440,14 @@ export default function AdministrationRoles({
                         <RoleTaskMatrix role={selectedRole}/>
                     ) : (
                         <p className="role-nav-matrix-hint">
-                            Select a role to view and edit its Business Masters + Enquiries task access.
+                            Select a role to view and edit its navigation, tab, and task access.
                         </p>
                     )
                 }
 
             </div>
 
-                    </div>
-                )
-            }
-
-            {
-                activeSubTab==="navigation" && (
-                    <RoleNavigationMatrix/>
-                )
-            }
+            </div>
 
             <AdministrationRoleDialog
 

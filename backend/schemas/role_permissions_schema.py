@@ -96,16 +96,23 @@ class NavMatrixSaveRequest(BaseModel):
 
 
 # ====================================
-# TASK ACCESS MATRIX (Phase 21D)
-# Scoped to one role at a time (unlike the nav matrix, which is every
-# role at once) - selecting a role in the Role-based Access subtab
+# TASK ACCESS MATRIX (Phase 21D, merged with nav access - Phase 25)
+# Scoped to one role at a time (unlike the old nav matrix, which was
+# every role at once) - selecting a role in the Role-based Access tab
 # loads this. Two module_type groups: "business_master_tab" (14 tabs)
-# and "workspace_tab" (9 tabs, reusing the same rows the Navigation
-# Access matrix's workspace_tab modules already use). Each tab-row
-# carries its own Tab Access flag (role_permissions.can_view) plus a
-# list of that tab's real task checkboxes (role_task_permissions).
-# Approve/Reject/Accept/Send-back-style buttons are never represented
-# here - those are governed by hub_approvers (Phase 21C), not this.
+# and "workspace_tab" (9 tabs). Each tab-row carries its own Tab Access
+# flag (role_permissions.can_view) plus a list of that tab's real task
+# checkboxes (role_task_permissions). Approve/Reject/Accept/Send-back
+# -style buttons are never represented here - those are governed by
+# hub_approvers (Phase 21C), not this.
+#
+# nav_modules carries every nav-type module for this role. For the two
+# modules that decompose into tabs above ("/business-master" and
+# "/enquiry", derived=true), can_view is DERIVED - computed server-side
+# as "is at least one of this module's tabs accessible" - and is never
+# independently settable; every other nav module (derived=false) keeps
+# a plain, directly-settable Accessible + Landing page pair, same as
+# the old standalone Navigation Access matrix.
 # ====================================
 
 class TaskEntry(BaseModel):
@@ -139,6 +146,23 @@ class TaskMatrixGroup(BaseModel):
     tabs: list[TaskMatrixTabRow]
 
 
+class NavModuleRow(BaseModel):
+
+    module_id: int
+
+    module_key: str
+
+    module_name: str
+
+    can_view: bool
+
+    is_landing_page: bool
+
+    # True for "/business-master" and "/enquiry" - can_view is derived
+    # from the tab groups above, not independently editable.
+    derived: bool
+
+
 class TaskMatrixResponse(BaseModel):
 
     role_id: int
@@ -146,6 +170,8 @@ class TaskMatrixResponse(BaseModel):
     role_name: str
 
     groups: list[TaskMatrixGroup]
+
+    nav_modules: list[NavModuleRow] = []
 
 
 class TaskMatrixTaskSave(BaseModel):
@@ -164,6 +190,19 @@ class TaskMatrixTabSave(BaseModel):
     tasks: list[TaskMatrixTaskSave]
 
 
+class NavModuleSave(BaseModel):
+
+    module_id: int
+
+    # Ignored server-side for derived modules (recomputed from `tabs`
+    # in the same request) - only meaningful for standalone nav modules.
+    can_view: bool
+
+    is_landing_page: bool
+
+
 class TaskMatrixSaveRequest(BaseModel):
 
     tabs: list[TaskMatrixTabSave]
+
+    nav_modules: list[NavModuleSave] = []

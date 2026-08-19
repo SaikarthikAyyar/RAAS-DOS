@@ -189,6 +189,95 @@
 }
 
 /* ==========================================
+   Navigation Access section (Phase 25)
+   Every nav module for the selected role, as a responsive card grid -
+   Business Masters/Enquiries render a read-only derived badge instead
+   of a checkbox, since their Accessible state comes from the tab
+   groups below rather than being independently settable here.
+========================================== */
+
+.role-nav-section{
+
+    margin-top:18px;
+    margin-bottom:24px;
+
+}
+
+.role-nav-grid{
+
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
+    gap:10px;
+    margin-top:8px;
+
+}
+
+.role-nav-cell{
+
+    border:1px solid #dcdcdc;
+    border-radius:8px;
+    padding:10px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    background:#fff;
+
+}
+
+.role-nav-cell.derived{
+
+    background:#f8fafc;
+    border-style:dashed;
+
+}
+
+.role-nav-cell-title{
+
+    font-size:12px;
+    font-weight:700;
+    color:#222;
+
+}
+
+.role-nav-derived-badge{
+
+    font-size:10.5px;
+    font-weight:600;
+    border-radius:999px;
+    padding:2px 8px;
+    width:fit-content;
+
+}
+
+.role-nav-derived-badge.on{
+
+    background:#e6f4ea;
+    color:#1b5e20;
+
+}
+
+.role-nav-derived-badge.off{
+
+    background:#f1f1f1;
+    color:#666;
+
+}
+
+.role-nav-matrix-checkbox-row.disabled{
+
+    opacity:0.5;
+    cursor:not-allowed;
+
+}
+
+.role-nav-matrix-landing.disabled{
+
+    cursor:not-allowed;
+
+}
+
+
+/* ==========================================
    Role Task Matrix (Phase 21D/21E)
    Plain flex rows, not an HTML <table> - a table forces every row's
    Task Access column to share the width of the widest row (e.g. Email
@@ -209,12 +298,68 @@
 
 }
 
+.role-task-matrix-group-header{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:8px;
+
+}
+
 .role-task-matrix-group-title{
 
     font-size:13px;
     font-weight:700;
     color:#334155;
-    margin:0 0 8px;
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+}
+
+.role-task-matrix-group-count{
+
+    font-size:10.5px;
+    font-weight:600;
+    color:#666;
+    text-transform:none;
+    letter-spacing:normal;
+
+}
+
+.role-task-matrix-bulk-actions{
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+}
+
+.role-task-matrix-bulk-link{
+
+    background:none;
+    border:none;
+    padding:0;
+    font-size:10.5px;
+    font-weight:700;
+    color:#f58220;
+    cursor:pointer;
+    text-decoration:underline;
+
+}
+
+.role-task-matrix-bulk-link:hover{
+
+    color:#c2570f;
+
+}
+
+.role-task-matrix-row .role-nav-matrix-checkbox-row.disabled input{
+
+    cursor:not-allowed;
 
 }
 

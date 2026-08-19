@@ -170,6 +170,6 @@ def save_task_matrix_request(db, role_id, payload):
     if repository.get_task_matrix(db, role_id) is None:
         return None
 
-    repository.save_task_matrix(db, role_id, payload.tabs)
+    repository.save_task_matrix(db, role_id, payload.tabs, payload.nav_modules)
 
     return repository.get_task_matrix(db, role_id)

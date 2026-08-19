@@ -127,7 +127,14 @@ def save_task_matrix(
         payload: TaskMatrixSaveRequest,
         db: Session = Depends(get_db)
 ):
-    matrix = save_task_matrix_request(db, role_id, payload)
+    try:
+        matrix = save_task_matrix_request(db, role_id, payload)
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
 
     if not matrix:
         raise HTTPException(
