@@ -22,6 +22,8 @@ from "../shared/FormField";
 
 import LookupSelect from "../shared/LookupSelect";
 
+import PhoneInput from "../shared/PhoneInput";
+
 
 // ====================================
 // COMPONENT
@@ -264,7 +266,7 @@ updateSection={updateSection}
 />
 
 
-<FieldInput
+<PhoneInput
 
 label="Client Site Contact Number"
 
@@ -274,15 +276,13 @@ section="customer"
 
 field="contact_number"
 
-placeholder="e.g. +91 98200 11223"
-
 updateSection={updateSection}
 
 onBlur={()=>touchField("customer", "contact_number")}
 
 error={fieldError("contact_number")}
 
-errorMessage="Enter a valid 10-digit mobile number (e.g. +91 98200 11223)."
+errorMessage="Enter a valid 10-digit mobile number."
 
 />
 

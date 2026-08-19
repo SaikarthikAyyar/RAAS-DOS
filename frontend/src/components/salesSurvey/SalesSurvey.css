@@ -371,6 +371,43 @@ outline:none;
 
 
 /* ===================================
+   PHONE INPUT
+   Country-code select + a fixed-width digits field, sitting side by
+   side inside the same .survey-field wrapper every other field uses.
+=================================== */
+
+.phone-input-row{
+
+display:flex;
+
+gap:6px;
+
+}
+
+.phone-input-country{
+
+flex:0 0 110px;
+
+width:110px;
+
+min-width:0;
+
+max-width:110px;
+
+}
+
+.phone-input-digits{
+
+flex:1 1 auto;
+
+min-width:0;
+
+letter-spacing:0.5px;
+
+}
+
+
+/* ===================================
    FIELD ERROR
    Orange border + small inline message - the one signal reserved
    for "this field is missing or malformed".

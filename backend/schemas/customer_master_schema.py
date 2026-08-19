@@ -4,9 +4,11 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from backend.schemas.notification_schema import ActorSchema
+
+from backend.utils.contact_validation import validate_phone_format, validate_email_format
 
 
 # ====================================
@@ -51,6 +53,16 @@ class ContactCreateSchema(BaseModel):
     actor: ActorSchema
 
     remark: str
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value):
+        return validate_email_format(value)
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, value):
+        return validate_phone_format(value)
 
 
 class ContactSchema(BaseModel):

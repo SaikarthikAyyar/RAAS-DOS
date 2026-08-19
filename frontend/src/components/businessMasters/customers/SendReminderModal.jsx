@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { isValidEmail } from "../../../utils/validators";
+
 
 // ====================================
 // COMPONENT
@@ -22,13 +24,25 @@ export default function SendReminderModal({
 
     const [subject, setSubject] = useState(`Follow-up: ${detail.company_name}`);
 
-    const [to, setTo] = useState(contactEmail || "(no contact email on file)");
+    const [to, setTo] = useState(contactEmail || "");
 
     const [cc, setCc] = useState(detail.owner || "");
+
+    const [error, setError] = useState("");
 
     const preview = `Hi, checking in on ${detail.company_name} — ${detail.next_follow_up_note || ""}.`;
 
     function handleSend(){
+
+        if(!to.trim() || !isValidEmail(to)){
+
+            setError("Enter a valid email address for \"To\".");
+
+            return;
+
+        }
+
+        setError("");
 
         onSent();
 
@@ -44,6 +58,8 @@ export default function SendReminderModal({
 
                 <p className="bm-modal-hint">Recipients are pre-filled from what we know for this customer — add or change anyone before sending.</p>
 
+                {error && <p className="bm-modal-hint" style={{color:"#991b1b"}}>{error}</p>}
+
                 <div className="bm-formgrid single">
 
                     <div>
@@ -58,7 +74,7 @@ export default function SendReminderModal({
 
                         <label>To</label>
 
-                        <input value={to} onChange={e=>setTo(e.target.value)} />
+                        <input value={to} onChange={e=>setTo(e.target.value)} placeholder="name@example.com" />
 
                     </div>
 

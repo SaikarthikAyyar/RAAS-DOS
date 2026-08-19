@@ -20,13 +20,15 @@ export function isValidEmail(value) {
 
 // ====================================
 // PHONE
-// Indian mobile convention (matches the wireframe's own contact
-// data, e.g. "+91 98200 11223"): optional "+91" country code,
-// then exactly 10 digits starting 6-9. Spaces/dashes in the typed
-// value are stripped before checking.
+// Matches the shared PhoneInput component's output exactly: a real
+// country dial code (1-4 digits, "+" prefixed) + a space + exactly 10
+// digits - e.g. "+91 9876543210". PhoneInput itself only ever emits
+// this shape (its digits field is hard-capped at 10 characters), so
+// this validator mainly guards against stale/hand-typed data that
+// predates PhoneInput, or an empty selection.
 // ====================================
 
-const PHONE_PATTERN = /^(\+91)?[6-9]\d{9}$/;
+const PHONE_PATTERN = /^\+\d{1,4} \d{10}$/;
 
 export function isValidPhone(value) {
 
@@ -34,9 +36,7 @@ export function isValidPhone(value) {
         return true;
     }
 
-    const normalized = value.trim().replace(/[\s-]/g, "");
-
-    return PHONE_PATTERN.test(normalized);
+    return PHONE_PATTERN.test(value.trim());
 
 }
 

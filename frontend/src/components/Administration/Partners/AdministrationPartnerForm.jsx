@@ -6,6 +6,10 @@ import {
 
 } from "react";
 
+import PhoneInput from "../../shared/PhoneInput";
+
+import { isValidEmail, isValidPhone } from "../../../utils/validators";
+
 export default function AdministrationPartnerForm({
 
     initialData,
@@ -136,6 +140,14 @@ export default function AdministrationPartnerForm({
 
     );
 
+    const [formError, setFormError] = useState("");
+
+    function updatePhone(_section, _field, value){
+
+        setForm(previous=>({ ...previous, phone:value }));
+
+    }
+
     function handleChange(
 
         event
@@ -198,6 +210,24 @@ export default function AdministrationPartnerForm({
 
         event.preventDefault();
 
+        if(!isValidEmail(form.email)){
+
+            setFormError("Enter a valid email address.");
+
+            return;
+
+        }
+
+        if(!isValidPhone(form.phone)){
+
+            setFormError("Enter a valid 10-digit phone number.");
+
+            return;
+
+        }
+
+        setFormError("");
+
         console.log(
 
             "[AdministrationPartnerForm] Submit",
@@ -223,6 +253,8 @@ export default function AdministrationPartnerForm({
             className="administration-form"
 
         >
+
+            {formError && <p className="administration-error">{formError}</p>}
 
             <div
 
@@ -322,6 +354,8 @@ export default function AdministrationPartnerForm({
 
                         onChange={handleChange}
 
+                        placeholder="name@example.com"
+
                         required
 
                     />
@@ -333,33 +367,19 @@ export default function AdministrationPartnerForm({
                 {/* PHONE */}
                 {/* ===================================== */}
 
-                <div
+                <PhoneInput
 
-                    className="administration-form-group"
+                    label="Phone"
 
-                >
+                    value={form.phone}
 
-                    <label>
+                    section="partner"
 
-                        Phone
+                    field="phone"
 
-                    </label>
+                    updateSection={updatePhone}
 
-                    <input
-
-                        type="text"
-
-                        name="phone"
-
-                        value={form.phone}
-
-                        onChange={handleChange}
-
-                        required
-
-                    />
-
-                </div>
+                />
 
 
                 {/* ===================================== */}

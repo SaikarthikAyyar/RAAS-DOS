@@ -7,6 +7,8 @@ import {
 
 } from "../../../services/emailTemplatesService";
 
+import { isValidEmail } from "../../../utils/validators";
+
 
 // ====================================
 // COMPONENT
@@ -97,6 +99,14 @@ export default function SendTemplateModal({
         if(recipientVariable && !values[recipientVariable.key]?.trim()){
 
             setError(`"${recipientVariable.label}" is required.`);
+
+            return;
+
+        }
+
+        if(recipientVariable && !isValidEmail(values[recipientVariable.key])){
+
+            setError(`"${recipientVariable.label}" must be a valid email address.`);
 
             return;
 

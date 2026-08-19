@@ -6,6 +6,8 @@ import {
 
 } from "react";
 
+import { isJanyutechEmail } from "../../../utils/validators";
+
 export default function AdministrationUserForm({
 
     initialData,
@@ -108,6 +110,8 @@ export default function AdministrationUserForm({
 
     );
 
+    const [formError, setFormError] = useState("");
+
     function handleChange(
 
         event
@@ -158,6 +162,16 @@ export default function AdministrationUserForm({
 
         event.preventDefault();
 
+        if(!isJanyutechEmail(form.email)){
+
+            setFormError("Only @janyutech.com email addresses are allowed for user accounts.");
+
+            return;
+
+        }
+
+        setFormError("");
+
         console.log(
 
             "[AdministrationUserForm] Submit",
@@ -183,6 +197,8 @@ export default function AdministrationUserForm({
             className="administration-form"
 
         >
+
+        {formError && <p className="administration-error">{formError}</p>}
 
         <div className="administration-form-grid">
 
@@ -236,6 +252,8 @@ export default function AdministrationUserForm({
                     value={form.email}
 
                     onChange={handleChange}
+
+                    placeholder="name@janyutech.com"
 
                     required
 

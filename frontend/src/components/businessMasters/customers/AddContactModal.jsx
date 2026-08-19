@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+import PhoneInput from "../../shared/PhoneInput";
+
+import { isValidEmail, isValidPhone } from "../../../utils/validators";
+
 
 // ====================================
 // COMPONENT
@@ -25,11 +29,31 @@ export default function AddContactModal({
 
     const [error, setError] = useState("");
 
+    function updatePhone(_section, _field, value){
+        setPhone(value);
+    }
+
     async function handleSubmit(){
 
         if(!name.trim()){
 
             setError("Name required.");
+
+            return;
+
+        }
+
+        if(!isValidEmail(email)){
+
+            setError("Enter a valid email address.");
+
+            return;
+
+        }
+
+        if(!isValidPhone(phone)){
+
+            setError("Enter a valid 10-digit phone number.");
 
             return;
 
@@ -101,17 +125,23 @@ export default function AddContactModal({
 
                         <label>Email</label>
 
-                        <input value={email} onChange={e=>setEmail(e.target.value)} />
+                        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com" />
 
                     </div>
 
-                    <div>
+                    <PhoneInput
 
-                        <label>Phone</label>
+                        label="Phone"
 
-                        <input value={phone} onChange={e=>setPhone(e.target.value)} />
+                        value={phone}
 
-                    </div>
+                        section="contact"
+
+                        field="phone"
+
+                        updateSection={updatePhone}
+
+                    />
 
                 </div>
 

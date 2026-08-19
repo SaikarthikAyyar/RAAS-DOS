@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from pydantic import ConfigDict
+
+from backend.utils.contact_validation import validate_phone_format, validate_email_format
 
 
 # ==========================================================
@@ -27,6 +29,16 @@ class AdministrationPartnerCreate(BaseModel):
 
     is_active: bool = True
 
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value):
+        return validate_email_format(value)
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, value):
+        return validate_phone_format(value)
+
 
 # ==========================================================
 # UPDATE
@@ -47,6 +59,16 @@ class AdministrationPartnerUpdate(BaseModel):
     linked_customer_company_record: Optional[str] = None
 
     is_active: Optional[bool] = None
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value):
+        return validate_email_format(value)
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, value):
+        return validate_phone_format(value)
 
 
 # ==========================================================

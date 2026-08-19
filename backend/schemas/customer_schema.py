@@ -2,24 +2,13 @@
 # IMPORTS
 # ====================================
 
-import re
-
 from pydantic import BaseModel, field_validator
 
 from typing import Optional
 
 from datetime import date
 
-
-# ====================================
-# CONTACT FORMAT PATTERNS
-# Mirrors frontend/src/utils/validators.js exactly - client and
-# server both defend the same rule.
-# ====================================
-
-PHONE_PATTERN = re.compile(r"^(\+91)?[6-9]\d{9}$")
-
-EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+from backend.utils.contact_validation import validate_phone_format, validate_email_format
 
 
 # ====================================
@@ -154,27 +143,9 @@ class CustomerRequestSchema(BaseModel):
     @field_validator("contact_number")
     @classmethod
     def validate_contact_number(cls, value):
-
-        if not value:
-            return value
-
-        normalized = value.strip().replace(" ", "").replace("-", "")
-
-        if not PHONE_PATTERN.match(normalized):
-            raise ValueError(
-                "Enter a valid 10-digit mobile number (e.g. +91 98200 11223)."
-            )
-
-        return value
+        return validate_phone_format(value)
 
     @field_validator("client_contact_email")
     @classmethod
     def validate_client_contact_email(cls, value):
-
-        if not value:
-            return value
-
-        if not EMAIL_PATTERN.match(value.strip()):
-            raise ValueError("Enter a valid email address.")
-
-        return value
+        return validate_email_format(value)
