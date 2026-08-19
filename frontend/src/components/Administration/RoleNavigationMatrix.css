@@ -205,8 +205,8 @@
 
 .role-nav-grid{
 
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
+    display:flex;
+    flex-wrap:wrap;
     gap:10px;
     margin-top:8px;
 
@@ -214,6 +214,8 @@
 
 .role-nav-cell{
 
+    flex:0 0 auto;
+    width:180px;
     border:1px solid #dcdcdc;
     border-radius:8px;
     padding:10px 12px;
