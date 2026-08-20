@@ -39,6 +39,8 @@ export default function Sidebar({
 
                             onClick={onNavigate}
 
+                            data-guide-id={item.path==="/audit-trail" ? "nav-audit-trail" : undefined}
+
                             className={({isActive})=>
 
                                 isActive

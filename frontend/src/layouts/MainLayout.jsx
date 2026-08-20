@@ -10,6 +10,8 @@ import Sidebar from "../components/layout/Sidebar";
 
 import Topbar from "../components/layout/Topbar";
 
+import SpotlightTour from "../components/guide/SpotlightTour";
+
 
 // ====================================
 // COMPONENT
@@ -67,6 +69,8 @@ export default function MainLayout(){
                 </div>
 
             </div>
+
+            <SpotlightTour/>
 
         </div>
 

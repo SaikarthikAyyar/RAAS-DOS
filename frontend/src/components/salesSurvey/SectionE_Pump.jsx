@@ -4,6 +4,8 @@
 
 import LookupSelect from "../shared/LookupSelect";
 
+import { formatPhOptionLabel } from "../../data/phRanges";
+
 
 // ====================================
 // COMPONENT
@@ -102,6 +104,7 @@ value={pump.ph_condition}
 section="pump"
 field="ph_condition"
 updateSection={updateSection}
+formatOption={formatPhOptionLabel}
 />
 
 

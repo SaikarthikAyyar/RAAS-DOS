@@ -542,8 +542,6 @@ const SURVEY_STRUCTURE = {
         "pumpable",
         "large_object_type",
         "hazard_level",
-        "ph_min",
-        "ph_max",
         "material_ph_condition",
         "flow_after_agitation",
         "temperature_range",

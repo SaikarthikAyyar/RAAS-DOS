@@ -174,12 +174,6 @@ surveyData.job?.pumpable,
 large_object_type:
 surveyData.job?.large_object_type,
 
-ph_min:
-Number(surveyData.job?.ph_min) || null,
-
-ph_max:
-Number(surveyData.job?.ph_max) || null,
-
 material_ph_condition:
 surveyData.job?.material_ph_condition,
 

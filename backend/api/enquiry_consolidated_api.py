@@ -24,7 +24,9 @@ from backend.schemas.enquiry_consolidated_schema import (
 
     SetStageRequest,
 
-    RequestApprovalSchema
+    RequestApprovalSchema,
+
+    RequestOpsReviewSchema
 
 )
 
@@ -308,12 +310,14 @@ def create_survey_branch(
 )
 def request_ops_review(
     enquiry_id: int,
+    payload: RequestOpsReviewSchema = RequestOpsReviewSchema(),
     db: Session = Depends(get_db)
 ):
 
     return service.request_ops_review(
         db,
-        enquiry_id
+        enquiry_id,
+        payload.actor
     )
 
 

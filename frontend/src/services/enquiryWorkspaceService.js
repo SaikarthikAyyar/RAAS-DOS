@@ -109,7 +109,8 @@ export async function updateModuleReference(
 }
 
 export async function requestOpsReview(
-    enquiryId
+    enquiryId,
+    actor
 ){
 
     const response = await fetch(
@@ -117,12 +118,26 @@ export async function requestOpsReview(
         `${API}/enquiry-consolidated/${enquiryId}/request-ops-review`,
 
         {
-            method:"PUT"
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                actor:actor || null
+            })
         }
 
     );
 
-    return response.json();
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
 
 }
 

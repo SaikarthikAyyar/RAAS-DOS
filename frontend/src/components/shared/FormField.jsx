@@ -116,7 +116,8 @@ export function FieldSelect({
     onBlur,
     error,
     errorMessage,
-    disabled
+    disabled,
+    formatOption
 
 }) {
 
@@ -152,7 +153,7 @@ export function FieldSelect({
                                 key={item}
                                 value={item}
                             >
-                                {item}
+                                {formatOption ? formatOption(item) : item}
                             </option>
                         )
                     )

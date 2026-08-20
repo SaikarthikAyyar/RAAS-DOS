@@ -24,6 +24,8 @@ import {
     getQuote
 } from "../../../services/technoCommercialQuoteService";
 
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 export default function OpsReviewSummary({
 
     enquiry,
@@ -205,7 +207,9 @@ export default function OpsReviewSummary({
             {/* wireframe's opsReviewTab() layout      */}
             {/* ==================================== */}
 
-            <div className="survey-summary-card ops-recommendation-card">
+            <div className="survey-summary-card ops-recommendation-card" data-guide-id="ops-review-scoring" style={{position:"relative"}}>
+
+                <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-scoring" floating/>
 
                 <h3 className="survey-summary-title">
 
@@ -290,7 +294,9 @@ export default function OpsReviewSummary({
 
                     opsScoring.length > 0 && (
 
-                        <div className="ops-override-form">
+                        <div className="ops-override-form" data-guide-id="ops-review-override" style={{position:"relative"}}>
+
+                            <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-override" floating/>
 
                             <h4 className="ops-subheading">Override Machine</h4>
 

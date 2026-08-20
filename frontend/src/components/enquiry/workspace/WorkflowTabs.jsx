@@ -4,6 +4,8 @@
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import GuideTriggerIcon from "../../guide/GuideTriggerIcon";
+
 // Order and labels match the RAAS DOS wireframe's TABS array
 // exactly (opsReviewTab()'s [id].js source).
 const WORKFLOW_TABS = [
@@ -126,6 +128,8 @@ export default function WorkflowTabs({
                 )
 
             }
+
+            <GuideTriggerIcon activeTab={activeTab}/>
 
         </div>
 

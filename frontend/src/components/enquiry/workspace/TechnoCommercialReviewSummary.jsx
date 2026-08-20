@@ -1,3 +1,5 @@
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 function inr(value){
 
     if(value===null || value===undefined) return "-";
@@ -70,7 +72,9 @@ export default function TechnoCommercialReviewSummary({
 
         <div className="survey-summary-grid">
 
-            <div className="survey-summary-card ops-recommendation-card">
+            <div className="survey-summary-card ops-recommendation-card" data-guide-id="tcr-bifurcation-table" style={{position:"relative"}}>
+
+                <ComponentExplainerIcon tabId="techno-commercial-approval" componentId="tcr-bifurcation-table" floating/>
 
                 <h3 className="survey-summary-title">
 

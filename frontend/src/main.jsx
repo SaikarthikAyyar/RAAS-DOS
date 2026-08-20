@@ -25,6 +25,8 @@ from "./contexts/AuthContext";
 
 import { LookupListsProvider } from "./context/LookupListsContext";
 
+import { GuideProvider } from "./contexts/GuideContext";
+
 createRoot(document.getElementById("root")).render(
 
 <React.StrictMode>
@@ -35,7 +37,11 @@ createRoot(document.getElementById("root")).render(
 
 <WorkflowProvider>
 
+<GuideProvider>
+
 <App />
+
+</GuideProvider>
 
 </WorkflowProvider>
 

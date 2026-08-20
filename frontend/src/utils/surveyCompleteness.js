@@ -5,15 +5,18 @@
 // fields; D-H have none). Shared by useSalesSurvey.js's own submit
 // gate and SurveySummary.jsx's "Request Ops Review" gate, so both
 // read the exact same completeness rule and can never drift apart.
+//
+// Deliberately excluded: Section A's Company Name / Site / Plant /
+// Person Of Contact / Contact Number are readOnly - populated only as
+// a side effect of picking a Customer Request above them, never
+// directly typed on this form. Gating submission on them blocked
+// users with no way to fix the flagged field themselves; compulsory
+// checks here only apply to fields the user can actually input.
 // ====================================
 
 export const REQUIRED_FIELD_KEYS = [
 
     // Section A
-    "customer.company_name",
-    "customer.plant_site_location",
-    "customer.contact_person",
-    "customer.contact_number",
     "customer.nearest_hub",
     "customer.urgency",
     "customer.survey_date",

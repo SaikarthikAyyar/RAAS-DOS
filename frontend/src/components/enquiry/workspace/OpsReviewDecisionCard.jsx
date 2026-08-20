@@ -18,6 +18,8 @@ import {
     requestApproval
 } from "../../../services/enquiryWorkspaceService";
 
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 export default function OpsReviewDecisionCard({
 
     enquiry,
@@ -217,7 +219,9 @@ export default function OpsReviewDecisionCard({
 
     return(
 
-        <div className="survey-summary-card ops-decision-card">
+        <div className="survey-summary-card ops-decision-card" data-guide-id="ops-review-decision" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-decision" floating/>
 
             <h3 className="survey-summary-title">
 
@@ -285,6 +289,8 @@ export default function OpsReviewDecisionCard({
 
             <div className="survey-actions" style={{marginTop:12}}>
 
+                <span data-guide-id="ops-review-request-approval" style={{display:"inline-flex", alignItems:"center"}}>
+
                 <button
 
                     type="button"
@@ -302,6 +308,10 @@ export default function OpsReviewDecisionCard({
                     {requesting ? "Requesting..." : "Request Approval"}
 
                 </button>
+
+                <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-request-approval"/>
+
+                </span>
 
                 <button
 

@@ -306,7 +306,8 @@ def create_survey_branch(
 
 def request_ops_review(
     db,
-    enquiry_id
+    enquiry_id,
+    actor=None
 ):
 
     enquiry = repository.get_enquiry(db, enquiry_id)
@@ -358,7 +359,8 @@ def request_ops_review(
             db,
             OpsSelectorSchema(
                 sales_survey_id=enquiry.sales_survey_id,
-                enquiry_id=enquiry.id
+                enquiry_id=enquiry.id,
+                actor=actor
             )
         )
 

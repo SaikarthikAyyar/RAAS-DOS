@@ -29,7 +29,8 @@ export default function LookupSelect({
     disabled,
     error,
     errorMessage,
-    onBlur
+    onBlur,
+    formatOption
 
 }){
 
@@ -150,6 +151,7 @@ export default function LookupSelect({
             error={error}
             errorMessage={errorMessage}
             onBlur={onBlur}
+            formatOption={formatOption}
 
         />
 

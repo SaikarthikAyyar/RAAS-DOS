@@ -22,6 +22,10 @@ from "../../../services/surveyReminderService";
 
 import { getSurveyCompletenessErrors } from "../../../utils/surveyCompleteness";
 
+import { buildActor } from "../../../utils/actor";
+
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 export default function SurveySummary({
 
     enquiry,
@@ -146,7 +150,7 @@ export default function SurveySummary({
 
         try{
 
-            await requestOpsReview(enquiry.id);
+            await requestOpsReview(enquiry.id, buildActor(user));
 
             reload();
 
@@ -198,6 +202,8 @@ export default function SurveySummary({
 
             {
                 assetProfile && (
+                    <div data-guide-id="survey-asset-profile" style={{position:"relative"}}>
+                    <ComponentExplainerIcon tabId="survey" componentId="survey-asset-profile" floating/>
                     <SurveySummaryCard
                         title="Asset Profile"
                         fields={[
@@ -221,12 +227,14 @@ export default function SurveySummary({
                             { label:"Last Verified", value:assetProfile.last_verified }
                         ]}
                     />
+                    </div>
                 )
             }
 
             {
                 survey && (
-                <>
+                <div data-guide-id="survey-details" style={{position:"relative"}}>
+                    <ComponentExplainerIcon tabId="survey" componentId="survey-details" floating/>
                                <SurveySummaryCard
 
                 title="Customer Details"
@@ -333,17 +341,9 @@ export default function SurveySummary({
 
                     {
 
-                        label:"pH Min",
+                        label:"pH / Corrosiveness (Material)",
 
-                        value:survey.job.ph_min
-
-                    },
-
-                    {
-
-                        label:"pH Max",
-
-                        value:survey.job.ph_max
+                        value:survey.job.material_ph_condition
 
                     },
 
@@ -992,7 +992,7 @@ export default function SurveySummary({
                 customerRequestId={enquiry.customer_request_id}
 
             />
-                </>
+                </div>
 
                 )
             }
@@ -1006,6 +1006,8 @@ export default function SurveySummary({
                     <div className="survey-actions">
 
                         {hasTask("enquiry-tab-survey", "fill_edit_survey") && (
+
+                            <span data-guide-id="survey-fill-edit" style={{display:"inline-flex", alignItems:"center"}}>
 
                             <button
 
@@ -1031,9 +1033,15 @@ export default function SurveySummary({
 
                             </button>
 
+                            <ComponentExplainerIcon tabId="survey" componentId="survey-fill-edit"/>
+
+                            </span>
+
                         )}
 
                         {hasTask("enquiry-tab-survey", "request_ops_review") && (
+
+                            <span data-guide-id="survey-request-ops-review" style={{display:"inline-flex", alignItems:"center"}}>
 
                             <button
 
@@ -1050,6 +1058,10 @@ export default function SurveySummary({
                                 {requestingOpsReview ? "Requesting..." : "Request Ops Review"}
 
                             </button>
+
+                            <ComponentExplainerIcon tabId="survey" componentId="survey-request-ops-review"/>
+
+                            </span>
 
                         )}
 
@@ -1068,6 +1080,9 @@ export default function SurveySummary({
                         {
                             inSurveyStage && reminderStatus && (
 
+                                <span data-guide-id="survey-reminder" style={{display:"inline-flex", alignItems:"center"}}>
+
+                                {
                                 reminderStatus.active ? (
 
                                     <span className="survey-reminder-status">
@@ -1111,6 +1126,11 @@ export default function SurveySummary({
                                     )
 
                                 )
+                                }
+
+                                <ComponentExplainerIcon tabId="survey" componentId="survey-reminder"/>
+
+                                </span>
 
                             )
                         }

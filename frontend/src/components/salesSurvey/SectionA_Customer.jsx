@@ -148,7 +148,7 @@ value={customer.id}
 
 <label>
 
-Company Name*
+Company Name
 
 </label>
 
@@ -170,7 +170,7 @@ readOnly
 
 <label>
 
-Site / Plant*
+Site / Plant
 
 </label>
 
@@ -192,7 +192,7 @@ readOnly
 
 <label>
 
-Person Of Contact*
+Person Of Contact
 
 </label>
 
@@ -214,7 +214,7 @@ readOnly
 
 <label>
 
-Contact Number*
+Contact Number
 
 </label>
 

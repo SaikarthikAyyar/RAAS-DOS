@@ -1,0 +1,265 @@
+/* ====================================
+   GUIDE — trigger icon, component-explainer icon/popover, spotlight tour.
+   Reuses the app's existing --orange/--ink tokens (declared globally
+   in styles/layout.css) rather than introducing a new palette.
+   ==================================== */
+
+/* ---- Trigger icon (workflow explainer) ---- */
+
+.guide-trigger-wrap{
+    position:relative;
+    display:inline-flex;
+    margin-left:10px;
+}
+
+.guide-trigger-icon{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1.5px solid var(--orange);
+    background:#fff;
+    color:var(--orange);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s ease,color .15s ease;
+}
+
+.guide-trigger-icon:hover:not(:disabled){
+    background:var(--orange);
+    color:#fff;
+}
+
+.guide-trigger-icon:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.guide-trigger-tooltip{
+    position:absolute;
+    top:calc(100% + 8px);
+    left:0;
+    background:var(--ink);
+    color:#fff;
+    font-size:11px;
+    font-weight:600;
+    padding:6px 10px;
+    border-radius:6px;
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    transform:translateY(-2px);
+    transition:opacity .15s ease,transform .15s ease;
+    z-index:60;
+}
+
+.guide-trigger-wrap:hover .guide-trigger-tooltip{
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* ---- Component explainer icon + popover ---- */
+
+.guide-explainer-wrap{
+    position:relative;
+    display:inline-flex;
+    margin-left:6px;
+    vertical-align:middle;
+}
+
+/* Used when the icon has to float over an existing card whose own
+   markup we don't want to modify - the wrapping element around the
+   card needs position:relative for this to anchor correctly. */
+.guide-explainer-floating{
+    position:absolute;
+    top:8px;
+    right:8px;
+    margin-left:0;
+    z-index:5;
+}
+
+.guide-explainer-icon{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    border:1.5px solid #cbd5e1;
+    background:#fff;
+    color:#64748b;
+    cursor:pointer;
+    padding:0;
+    transition:border-color .15s ease,color .15s ease;
+}
+
+.guide-explainer-icon:hover{
+    border-color:var(--orange);
+    color:var(--orange);
+}
+
+.guide-explainer-popover{
+    position:absolute;
+    top:calc(100% + 8px);
+    left:0;
+    width:280px;
+    max-width:calc(100vw - 32px);
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 12px 30px rgba(0,0,0,.18);
+    border:1px solid #e2e8f0;
+    padding:12px 14px;
+    z-index:210;
+}
+
+/* Icons floating in a card's top-right corner sit near the right edge
+   of the viewport - open the popover leftward instead of overflowing
+   off-screen to the right. */
+.guide-explainer-floating .guide-explainer-popover{
+    left:auto;
+    right:0;
+}
+
+.guide-explainer-popover-title{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:5px;
+}
+
+.guide-explainer-popover-text{
+    font-size:12px;
+    line-height:1.5;
+    color:#374151;
+}
+
+/* ---- Spotlight tour ---- */
+
+.guide-tour-root{
+    position:fixed;
+    inset:0;
+    z-index:400;
+}
+
+.guide-tour-dim{
+    position:fixed;
+    background:rgba(15,23,42,.55);
+    transition:top .2s ease,left .2s ease,right .2s ease,bottom .2s ease,width .2s ease,height .2s ease;
+}
+
+.guide-tour-highlight-ring{
+    position:fixed;
+    border:2px solid var(--orange);
+    border-radius:10px;
+    box-shadow:0 0 0 4px rgba(245,130,32,.25);
+    pointer-events:none;
+    transition:top .2s ease,left .2s ease,width .2s ease,height .2s ease;
+}
+
+.guide-tour-card{
+    position:fixed;
+    width:340px;
+    max-height:70vh;
+    overflow-y:auto;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 20px 45px rgba(0,0,0,.28);
+    padding:16px 18px;
+}
+
+.guide-tour-card-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+}
+
+.guide-tour-step-counter{
+    font-size:11px;
+    font-weight:700;
+    color:var(--orange);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+}
+
+.guide-tour-close{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:none;
+    border:none;
+    color:#64748b;
+    cursor:pointer;
+    padding:2px;
+}
+
+.guide-tour-close:hover{
+    color:var(--ink);
+}
+
+.guide-tour-card-title{
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:6px;
+}
+
+.guide-tour-card-text{
+    font-size:12px;
+    line-height:1.55;
+    color:#374151;
+    margin-bottom:10px;
+}
+
+.guide-tour-card-step-text{
+    font-size:12px;
+    line-height:1.55;
+    color:var(--ink);
+    background:#fff7ed;
+    border-left:3px solid var(--orange);
+    padding:8px 10px;
+    border-radius:0 6px 6px 0;
+    margin-bottom:10px;
+}
+
+.guide-tour-card-note{
+    font-size:11px;
+    font-style:italic;
+    color:#94a3b8;
+    margin-bottom:10px;
+}
+
+.guide-tour-card-actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+}
+
+.guide-tour-nav-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:6px 12px;
+    border-radius:8px;
+    border:1.5px solid #cbd5e1;
+    background:#fff;
+    color:var(--ink);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.guide-tour-nav-btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+.guide-tour-nav-btn-primary{
+    border-color:var(--orange);
+    background:var(--orange);
+    color:#fff;
+    margin-left:auto;
+}

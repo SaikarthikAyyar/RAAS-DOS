@@ -30,6 +30,13 @@ OPS_FIELD_MAP = {
 
     "ph_max": "ph_max",
 
+    # score_environment's extreme-pH check now derives its numeric
+    # range from this categorical field (see ops_engine.py's
+    # PH_RANGE_BY_CONDITION) - the Sales Survey form no longer collects
+    # ph_min/ph_max directly, so the two map entries above are inert
+    # leftovers (harmless, left in place rather than removed).
+    "material_ph_condition": "material_ph_condition",
+
     "flow_after_agitation": "flow_after_agitation",
 
     "cleaning_date": "cleaning_date",

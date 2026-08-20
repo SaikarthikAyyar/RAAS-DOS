@@ -22,6 +22,8 @@ import {
     requestApproval
 } from "../../../services/enquiryWorkspaceService";
 
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 function inr(value){
 
     if(value===null || value===undefined) return "-";
@@ -358,7 +360,9 @@ export default function QuoteCommercialSummary({
 
         <div className="quote-commercial-grid">
 
-            <div className="survey-summary-card">
+            <div className="survey-summary-card" data-guide-id="qc-breakdown" style={{position:"relative"}}>
+
+                <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-breakdown" floating/>
 
                 <h3 className="survey-summary-title">
                     Commercial breakdown
@@ -442,12 +446,15 @@ export default function QuoteCommercialSummary({
                     )}
 
                     {hasTask("enquiry-tab-quote-commercial", "preview_customer_quote") && (
+                        <span data-guide-id="qc-preview" style={{display:"inline-flex", alignItems:"center"}}>
                         <button
                             className="survey-action-button"
                             onClick={()=>setShowPreview(v=>!v)}
                         >
                             {showPreview ? "Hide" : "Preview"} customer-facing quote
                         </button>
+                        <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-preview"/>
+                        </span>
                     )}
 
                 </div>
@@ -498,7 +505,9 @@ export default function QuoteCommercialSummary({
 
             </div>
 
-            <div className="survey-summary-card">
+            <div className="survey-summary-card" data-guide-id="qc-valid-till" style={{position:"relative"}}>
+
+                <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-valid-till" floating/>
 
                 <h3 className="survey-summary-title">Decision, linked PO & history</h3>
 
@@ -613,6 +622,7 @@ export default function QuoteCommercialSummary({
 
 
                     {hasTask("enquiry-tab-quote-commercial", "request_revision") && (
+                        <span data-guide-id="qc-request-revision" style={{display:"inline-flex", alignItems:"center"}}>
                         <button
                             className="survey-action-button survey-action-button-danger"
                             onClick={handleRequestRevision}
@@ -626,6 +636,8 @@ export default function QuoteCommercialSummary({
                                         : "Request Revision"
                             }
                         </button>
+                        <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-request-revision"/>
+                        </span>
                     )}
 
                 </div>
@@ -647,6 +659,7 @@ export default function QuoteCommercialSummary({
 
                 <div className="survey-actions" style={{flexWrap:"wrap", gap:8, marginTop:8}}>
 
+                    <span data-guide-id="qc-request-approval" style={{display:"inline-flex", alignItems:"center"}}>
                     <button
                         className="survey-action-button"
                         onClick={handleRequestApproval}
@@ -655,6 +668,10 @@ export default function QuoteCommercialSummary({
                     >
                         {requesting ? "Requesting..." : "Request Approval"}
                     </button>
+                    <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-request-approval"/>
+                    </span>
+
+                    <span data-guide-id="qc-decision" style={{display:"inline-flex", alignItems:"center", gap:8}}>
 
                     {hasTask("enquiry-tab-quote-commercial", "proceed_to_commercial_approval") && (
                         <button
@@ -677,6 +694,10 @@ export default function QuoteCommercialSummary({
                             {deciding ? "Saving..." : "Send Back to Ops Review"}
                         </button>
                     )}
+
+                    <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-decision"/>
+
+                    </span>
 
                 </div>
 

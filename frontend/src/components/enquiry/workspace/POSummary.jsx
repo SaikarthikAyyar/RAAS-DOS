@@ -14,6 +14,8 @@ import { STAGE_LABELS } from "../../../data/workflowStages";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 const STAGE_ORDER = Object.keys(STAGE_LABELS);
 
 function inr(value){
@@ -234,6 +236,10 @@ export default function POSummary({
 
                 {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
 
+                <div data-guide-id="po-list" style={{position:"relative"}}>
+
+                <ComponentExplainerIcon tabId="po" componentId="po-list" floating/>
+
                 {
                     loading ? (
 
@@ -269,7 +275,7 @@ export default function POSummary({
                                             <td>{inr(po.po_value)}</td>
                                             <td>{po.uploaded_by ?? "-"}</td>
                                             <td>{formatDate(po.uploaded_at)}</td>
-                                            <td>
+                                            <td data-guide-id="po-remove">
 
                                                 {hasTask("enquiry-tab-po", "remove_po") && (
                                                     <span
@@ -292,6 +298,12 @@ export default function POSummary({
 
                     )
                 }
+
+                </div>
+
+                <div data-guide-id="po-upload" style={{position:"relative"}}>
+
+                <ComponentExplainerIcon tabId="po" componentId="po-upload" floating/>
 
                 {
                     !canUpload ? (
@@ -344,10 +356,12 @@ export default function POSummary({
                     )
                 }
 
+                </div>
+
                 {
                     canProceedToJobCreation && hasTask("enquiry-tab-po", "proceed_to_job_creation") && (
 
-                        <div className="survey-actions" style={{marginTop:16}}>
+                        <div className="survey-actions" style={{marginTop:16}} data-guide-id="po-proceed-job-creation">
 
                             <button
                                 className="survey-action-button survey-action-button-orange"
@@ -356,6 +370,8 @@ export default function POSummary({
                             >
                                 {proceeding ? "Proceeding..." : "Proceed to Job Creation"}
                             </button>
+
+                            <ComponentExplainerIcon tabId="po" componentId="po-proceed-job-creation"/>
 
                         </div>
 

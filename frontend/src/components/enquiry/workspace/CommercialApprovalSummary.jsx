@@ -27,6 +27,8 @@ import { getEmailTemplates } from "../../../services/emailTemplatesService";
 
 import SendTemplateModal from "../../businessMasters/emailTemplates/SendTemplateModal";
 
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 const QUOTE_RELEASE_EMAIL_TEMPLATE_NAME = "Quote Release";
 
 function inr(value){
@@ -446,7 +448,9 @@ export default function CommercialApprovalSummary({
 
         <div className="survey-summary-grid">
 
-            <div className="survey-summary-card" style={{gridColumn:"1 / -1"}}>
+            <div className="survey-summary-card" style={{gridColumn:"1 / -1", position:"relative"}} data-guide-id="ca-quote-lines">
+
+                <ComponentExplainerIcon tabId="commercial-approval" componentId="ca-quote-lines" floating/>
 
                 <h3 className="survey-summary-title">
                     Commercial Approval
@@ -476,7 +480,7 @@ export default function CommercialApprovalSummary({
 
                 </div>
 
-                <div className="survey-actions" style={{marginBottom:10}}>
+                <div className="survey-actions" style={{marginBottom:10}} data-guide-id="ca-request-approval">
 
                     <button
                         className="survey-action-button"
@@ -486,6 +490,8 @@ export default function CommercialApprovalSummary({
                     >
                         {requesting ? "Requesting..." : "Request Approval"}
                     </button>
+
+                    <ComponentExplainerIcon tabId="commercial-approval" componentId="ca-request-approval"/>
 
                 </div>
 
@@ -546,7 +552,9 @@ export default function CommercialApprovalSummary({
                 {
                     releaseDocument?.id && (
 
-                        <div className="survey-actions" style={{marginTop:10, marginBottom:10}}>
+                        <div className="survey-actions" style={{marginTop:10, marginBottom:10}} data-guide-id="ca-release-actions">
+
+                            <ComponentExplainerIcon tabId="commercial-approval" componentId="ca-release-actions"/>
 
                             {hasTask("enquiry-tab-commercial-approval", "download_quote_document") && (
                                 <a
@@ -669,7 +677,7 @@ export default function CommercialApprovalSummary({
 
                             {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
 
-                            <div className="survey-actions" style={{marginTop:10}}>
+                            <div className="survey-actions" style={{marginTop:10}} data-guide-id="ca-decision">
 
                                 <button
                                     className="survey-action-button survey-action-button-orange"
@@ -697,6 +705,8 @@ export default function CommercialApprovalSummary({
                                 >
                                     Send back for review
                                 </button>
+
+                                <ComponentExplainerIcon tabId="commercial-approval" componentId="ca-decision"/>
 
                             </div>
 

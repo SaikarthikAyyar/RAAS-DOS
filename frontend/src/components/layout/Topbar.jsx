@@ -291,6 +291,7 @@ export default function Topbar({
                         type="button"
                         className="topbar-icon-btn notif-bell-wrap"
                         aria-label="Notifications"
+                        data-guide-id="notif-bell"
                         onClick={()=>setNotifOpen(open=>!open)}
                     >
 

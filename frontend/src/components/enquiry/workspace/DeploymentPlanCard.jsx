@@ -16,6 +16,8 @@ import {
     getDewateringMethods
 } from "../../../services/dewateringMethodsService";
 
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 function defaultCrewPlan(manpowerRequired){
 
     return [{
@@ -380,7 +382,9 @@ export default function DeploymentPlanCard({
 
     return(
 
-        <div className="survey-summary-card ops-deployment-card">
+        <div className="survey-summary-card ops-deployment-card" data-guide-id="ops-review-deployment-plan" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-deployment-plan" floating/>
 
             <h3 className="survey-summary-title">
 
@@ -588,6 +592,8 @@ export default function DeploymentPlanCard({
 
             {hasTask("enquiry-tab-ops-review", "save_deployment_plan_generate_quote") && (
 
+                <span data-guide-id="ops-review-save-plan" style={{display:"inline-flex", alignItems:"center", marginTop:12}}>
+
                 <button
 
                     className="survey-action-button"
@@ -598,13 +604,15 @@ export default function DeploymentPlanCard({
 
                     title={!hasChanges ? "No changes to save - edit the machine, crew, accessories, or dewatering range first." : undefined}
 
-                    style={{marginTop:12}}
-
                 >
 
                     {saving ? "Saving..." : "Save Deployment Plan & Generate Quote"}
 
                 </button>
+
+                <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-save-plan"/>
+
+                </span>
 
             )}
 

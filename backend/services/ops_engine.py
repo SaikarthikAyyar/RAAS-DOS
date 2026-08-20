@@ -611,6 +611,23 @@ TEMPERATURE_RANGE_C = {
 }
 
 
+# Sales Survey Section B's "pH / Corrosiveness (Material)" field
+# (material_ph_condition) is categorical - no separate pH Min/Max
+# fields exist on the survey. Mirrors the frontend's own
+# frontend/src/data/phRanges.js so the extreme-pH scoring below stays
+# derived from the exact same chemistry mapping the user sees in the
+# dropdown's option text.
+PH_RANGE_BY_CONDITION = {
+
+    "Acidic": (1, 6),
+
+    "Low / Neutral": (7, 7),
+
+    "Alkaline": (8, 14)
+
+}
+
+
 def score_environment(
 
         engineering_inputs,
@@ -659,9 +676,9 @@ def score_environment(
     score = 10
 
 
-    ph_min = engineering_inputs.get("ph_min")
+    ph_range = PH_RANGE_BY_CONDITION.get(engineering_inputs.get("material_ph_condition"))
 
-    ph_max = engineering_inputs.get("ph_max")
+    ph_min, ph_max = ph_range if ph_range else (None, None)
 
     material_construction = machine.get("material_construction")
 

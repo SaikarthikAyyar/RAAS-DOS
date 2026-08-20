@@ -168,3 +168,17 @@ class RequestApprovalSchema(BaseModel):
     approval_type: str
 
     actor: Optional[ActorSchema] = None
+
+
+# ====================================
+# REQUEST OPS REVIEW
+# Optional actor, threaded through to the auto-run Ops Selector call
+# inside request_ops_review() so its resulting notification has a real
+# actor instead of NULL (notifications.user_name is NOT NULL). Body is
+# optional at the route level - an omitted body still works exactly as
+# before, just without a real actor on that one notification.
+# ====================================
+
+class RequestOpsReviewSchema(BaseModel):
+
+    actor: Optional[ActorSchema] = None
