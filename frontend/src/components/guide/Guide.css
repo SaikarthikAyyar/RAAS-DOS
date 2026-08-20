@@ -109,6 +109,8 @@
 .guide-explainer-popover-portal{
     position:fixed;
     max-width:calc(100vw - 32px);
+    max-height:calc(100vh - 32px);
+    overflow-y:auto;
     background:#fff;
     border-radius:10px;
     box-shadow:0 12px 30px rgba(0,0,0,.18);
