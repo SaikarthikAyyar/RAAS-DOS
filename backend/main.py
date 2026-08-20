@@ -100,6 +100,8 @@ from backend.api.pump_api import api as pump_api
 
 from backend.api.business_masters_export_api import api as business_masters_export_api
 
+from backend.api.dashboard_overview_api import api as dashboard_overview_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -280,6 +282,8 @@ app.include_router(machine_api)
 app.include_router(pump_api)
 
 app.include_router(business_masters_export_api)
+
+app.include_router(dashboard_overview_api)
 
 
 

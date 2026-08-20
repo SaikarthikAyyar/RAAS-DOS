@@ -1,0 +1,199 @@
+/* ====================================
+   ADMIN DASHBOARD — BUSINESS OVERVIEW
+   Scaled to match the wireframe's own compact type/spacing exactly
+   (21px h1, 14.5px card headers, 22px KPI values, 11px labels, 12.5px
+   table cells) - deliberately NOT reusing the existing Dashboard.css
+   classes shared by the Sales/Ops/Management/Customer dashboards,
+   which are a much larger, older scale. Tokens (--orange/--ink/
+   --muted/--line/--bg/--card) are already declared globally in
+   styles/layout.css with the exact same values the wireframe itself
+   uses, so no new tokens are declared here.
+==================================== */
+
+.ovw-page{
+    width:100%;
+    min-height:100vh;
+    padding:20px 24px 40px;
+    background:var(--bg);
+}
+
+.ovw-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+}
+
+.ovw-title h1{
+    margin:0;
+    font-size:21px;
+    font-weight:800;
+    color:var(--ink);
+}
+
+.ovw-title p{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.ovw-btn-primary{
+    border:1px solid var(--orange);
+    background:var(--orange);
+    color:#fff;
+    border-radius:9px;
+    padding:7px 14px;
+    font-size:12px;
+    font-weight:750;
+    cursor:pointer;
+}
+
+.ovw-btn-primary:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+.ovw-grid-6{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:14px;
+    margin-bottom:16px;
+}
+
+.ovw-grid-3{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:14px;
+}
+
+@media(max-width:1100px){
+    .ovw-grid-6{ grid-template-columns:repeat(3,1fr); }
+    .ovw-grid-3{ grid-template-columns:1fr; }
+}
+
+@media(max-width:640px){
+    .ovw-grid-6{ grid-template-columns:repeat(2,1fr); }
+}
+
+.ovw-kpi{
+    border-radius:14px;
+    padding:14px;
+    background:var(--card);
+    border:1px solid var(--line);
+}
+
+.ovw-kpi b{
+    font-size:22px;
+    display:block;
+    color:var(--ink);
+}
+
+.ovw-kpi span{
+    color:var(--muted);
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+}
+
+.ovw-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+}
+
+.ovw-card h3{
+    margin:0 0 12px;
+    font-size:14.5px;
+    font-weight:800;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.ovw-pill{
+    display:inline-flex;
+    align-items:center;
+    border-radius:999px;
+    padding:3px 10px;
+    font-size:11px;
+    font-weight:800;
+    border:1px solid var(--line);
+    background:#fff;
+    white-space:nowrap;
+}
+
+.ovw-pill.green{ color:#166534; background:#dcfce7; border-color:#bbf7d0; }
+.ovw-pill.red{ color:#991b1b; background:#fee2e2; border-color:#fecaca; }
+.ovw-pill.amber{ color:#92400e; background:#fef3c7; border-color:#fde68a; }
+.ovw-pill.blue{ color:#1d4ed8; background:#dbeafe; border-color:#bfdbfe; }
+.ovw-pill.gray{ color:#475569; background:#f1f5f9; }
+
+.ovw-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+}
+
+.ovw-table th,
+.ovw-table td{
+    text-align:left;
+    border-bottom:1px solid var(--line);
+    padding:8px 9px;
+    font-size:12.5px;
+    vertical-align:top;
+    color:var(--ink);
+}
+
+.ovw-table th{
+    color:#475569;
+    background:#f8fafc;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-weight:800;
+}
+
+.ovw-table tr:hover td{
+    background:#fffaf3;
+}
+
+.ovw-field-row{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:12.5px;
+    gap:10px;
+    color:var(--ink);
+}
+
+.ovw-field-row:last-child{
+    border-bottom:none;
+}
+
+.ovw-field-row b{
+    font-weight:800;
+    color:#111827;
+    text-align:right;
+}
+
+.ovw-empty{
+    color:var(--muted);
+    font-size:12.5px;
+    padding:6px 0;
+}
+
+.ovw-link{
+    font-size:12px;
+    font-weight:800;
+    color:var(--orange);
+    cursor:pointer;
+}
