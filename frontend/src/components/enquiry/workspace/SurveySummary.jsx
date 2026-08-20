@@ -233,7 +233,8 @@ export default function SurveySummary({
 
             {
                 survey && (
-                <div data-guide-id="survey-details" style={{position:"relative"}}>
+                <>
+                    <div data-guide-id="survey-details" style={{position:"relative"}}>
                     <ComponentExplainerIcon tabId="survey" componentId="survey-details" floating/>
                                <SurveySummaryCard
 
@@ -300,6 +301,7 @@ export default function SurveySummary({
                 ]}
 
             />
+                    </div>
 
             <SurveySummaryCard
 
@@ -992,7 +994,7 @@ export default function SurveySummary({
                 customerRequestId={enquiry.customer_request_id}
 
             />
-                </div>
+                </>
 
                 )
             }
