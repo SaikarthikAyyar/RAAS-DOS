@@ -460,7 +460,7 @@ export default function DeploymentPlanCard({
                                     />
                                 </td>
 
-                                <td>
+                                <td data-guide-id="ops-review-remove-crew-role">
                                     {hasTask("enquiry-tab-ops-review", "remove_crew_role") && (
                                         <button
                                             className="ops-row-remove"
@@ -484,6 +484,8 @@ export default function DeploymentPlanCard({
 
             {hasTask("enquiry-tab-ops-review", "add_crew_role") && (
 
+                <span data-guide-id="ops-review-add-crew-role" style={{display:"inline-flex", alignItems:"center", marginTop:8}}>
+
                 <button
 
                     type="button"
@@ -492,13 +494,15 @@ export default function DeploymentPlanCard({
 
                     onClick={addCrewRow}
 
-                    style={{marginTop:8}}
-
                 >
 
                     + Add Role
 
                 </button>
+
+                <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-add-crew-role"/>
+
+                </span>
 
             )}
 

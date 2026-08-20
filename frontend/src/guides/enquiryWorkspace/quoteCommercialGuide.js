@@ -1,7 +1,9 @@
 // ====================================
 // QUOTE & COMMERCIAL TAB — GUIDE CONTENT
 // componentIds here must match the data-guide-id attributes placed in
-// QuoteCommercialSummary.jsx.
+// QuoteCommercialSummary.jsx. Every hasTask-gated action on this tab
+// has its own entry here - none are folded silently into a parent
+// section's text only.
 // ====================================
 
 export const components = {
@@ -9,6 +11,11 @@ export const components = {
     "qc-breakdown": {
         title: "Commercial Breakdown & Internal-Only Addition",
         explanation: "The same line-item quote breakdown shown on the Techno-Commercial Review tab, plus one field only visible here: an internal-only addition — an extra amount and note that adjusts the quote's internal figures without appearing on anything the customer sees. Use it for costs that matter for margin tracking but should never be quoted externally."
+    },
+
+    "qc-save-internal-addition": {
+        title: "Save Internal Addition",
+        explanation: "Saves the internal-only amount and note above onto the quote. This figure affects nothing the customer ever sees — it exists purely so this enquiry's internal margin/commission tracking reflects the real number. Like every field on this card, typing a value alone does nothing until this button is clicked."
     },
 
     "qc-preview": {
@@ -19,6 +26,16 @@ export const components = {
     "qc-valid-till": {
         title: "Valid Till & Version History",
         explanation: "Sets the date this quote is valid until, and shows every earlier version of the quote generated for this enquiry (each time Ops Review's \"Save Deployment Plan & Generate Quote\" produced a new one). Use the history to see exactly what changed between versions."
+    },
+
+    "qc-save-valid-till": {
+        title: "Save (Valid Till)",
+        explanation: "Saves the date you've set for how long this quote stays valid. Like the internal addition above, picking a date alone does nothing until this Save button is clicked."
+    },
+
+    "qc-open-quotes-module": {
+        title: "Open Quotes Module",
+        explanation: "Takes you to the standalone Quotes module, already linked to this enquiry's Ops Selection — the same place a brand-new quote gets generated from Ops Review's Deployment Plan. Use it to regenerate or manually adjust this quote outside the Enquiry Workspace, most commonly once a revision has been requested and a fresh version needs to be produced."
     },
 
     "qc-request-revision": {
@@ -46,6 +63,11 @@ export const workflowSteps = [
     },
 
     {
+        componentId: "qc-save-internal-addition",
+        stepText: "If you entered an internal-only amount, click Save Internal Addition to record it — it won't apply until you do."
+    },
+
+    {
         componentId: "qc-preview",
         stepText: "Use the customer-facing preview to sanity-check exactly what the customer will see before this quote goes any further."
     },
@@ -53,6 +75,16 @@ export const workflowSteps = [
     {
         componentId: "qc-valid-till",
         stepText: "Set how long this quote stays valid, and check the version history if you need to confirm what changed since an earlier revision."
+    },
+
+    {
+        componentId: "qc-save-valid-till",
+        stepText: "After picking a valid-till date, click Save to record it on this quote."
+    },
+
+    {
+        componentId: "qc-open-quotes-module",
+        stepText: "Need to regenerate or manually adjust this quote outside this workspace — for example after a revision has been requested? Use Open Quotes Module, then come back here to review the new version and decide."
     },
 
     {

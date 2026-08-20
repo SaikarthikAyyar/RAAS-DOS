@@ -561,6 +561,8 @@ export default function OpsReviewSummary({
 
                                 {hasTask("enquiry-tab-ops-review", "open_ops_selector") && (
 
+                                    <span data-guide-id="ops-review-open-selector" style={{display:"inline-flex", alignItems:"center"}}>
+
                                     <button
 
                                         className="survey-action-button"
@@ -572,6 +574,10 @@ export default function OpsReviewSummary({
                                         Open Ops Selector
 
                                     </button>
+
+                                    <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-open-selector"/>
+
+                                    </span>
 
                                 )}
 

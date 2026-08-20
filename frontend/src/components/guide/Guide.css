@@ -100,11 +100,14 @@
     color:var(--orange);
 }
 
-.guide-explainer-popover{
-    position:absolute;
-    top:calc(100% + 8px);
-    left:0;
-    width:280px;
+/* Rendered via a React portal into document.body (not nested inside
+   the icon's own wrapper) - top/left/width come from an inline style
+   computed in JS from the icon's real position, so it can never be
+   clipped by an ancestor card with overflow:auto (several cards with
+   wide tables set this), and never needs a CSS left-vs-right variant
+   for icons near the viewport edge - the JS clamp already handles it. */
+.guide-explainer-popover-portal{
+    position:fixed;
     max-width:calc(100vw - 32px);
     background:#fff;
     border-radius:10px;
@@ -112,14 +115,6 @@
     border:1px solid #e2e8f0;
     padding:12px 14px;
     z-index:210;
-}
-
-/* Icons floating in a card's top-right corner sit near the right edge
-   of the viewport - open the popover leftward instead of overflowing
-   off-screen to the right. */
-.guide-explainer-floating .guide-explainer-popover{
-    left:auto;
-    right:0;
 }
 
 .guide-explainer-popover-title{

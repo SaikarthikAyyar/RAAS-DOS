@@ -2,7 +2,9 @@
 // OPS REVIEW TAB — GUIDE CONTENT
 // componentIds here must match the data-guide-id attributes placed in
 // OpsReviewSummary.jsx, DeploymentPlanCard.jsx and
-// OpsReviewDecisionCard.jsx.
+// OpsReviewDecisionCard.jsx. Every hasTask-gated action on this tab
+// has its own entry here - none are folded silently into a parent
+// section's text only.
 // ====================================
 
 export const components = {
@@ -10,6 +12,11 @@ export const components = {
     "ops-review-scoring": {
         title: "Algorithm Recommendation & Machine Scoring",
         explanation: "The system automatically scores every active machine from the Machines/Fleet Business Master against this enquiry's survey answers — job type, material, volume, access, environment, debris, and hub availability — and recommends the best-fitting one, along with a suggested pump/hose package drawn from the Pump Master. This table shows every machine's score breakdown, not just the winner, so you can see why one was picked over another. Editing either the Machines/Fleet or Pump Master Business Masters changes what this table can recommend on future runs."
+    },
+
+    "ops-review-open-selector": {
+        title: "Open Ops Selector",
+        explanation: "Takes you to the standalone Ops Selector page to re-run the recommendation algorithm from scratch for this enquiry — the same algorithm that already ran automatically the moment this case first reached Ops Review. Use it if the underlying Sales Survey answers have since changed, or if you simply want a fresh recommendation before deciding whether to override it by hand. It updates this same Ops Selection record in place — it never creates a second one for this enquiry."
     },
 
     "ops-review-override": {
@@ -20,6 +27,16 @@ export const components = {
     "ops-review-deployment-plan": {
         title: "Deployment Plan",
         explanation: "The day-by-day execution plan for this job — mobilisation, setup, execution and demobilisation days, the crew roles and headcounts needed, which accessories are required, and (if the job needs it) which dewatering method to price. These fields start with sensible defaults based on the recommended machine but are yours to adjust for the specifics of this site."
+    },
+
+    "ops-review-add-crew-role": {
+        title: "+ Add Role",
+        explanation: "Adds a new, blank row to the Deployment Plan's crew table so you can specify another role this job needs, beyond whatever the default plan already lists, with its own min/max headcount. Like every other Deployment Plan edit, the new row is only actually saved once you click Save Deployment Plan & Generate Quote."
+    },
+
+    "ops-review-remove-crew-role": {
+        title: "Remove Crew Role (×)",
+        explanation: "Removes a role from the crew table entirely. This only takes effect once you save — removing a row here and navigating away without saving leaves the original plan untouched."
     },
 
     "ops-review-save-plan": {
@@ -47,13 +64,28 @@ export const workflowSteps = [
     },
 
     {
+        componentId: "ops-review-open-selector",
+        stepText: "If the recommendation genuinely needs a fresh look — for example the survey was corrected after the algorithm first ran — use Open Ops Selector to re-run it from scratch. This is the first of two ways to change the recommended machine; Machine Override (next) is the other."
+    },
+
+    {
         componentId: "ops-review-override",
-        stepText: "If the recommended machine is not right for this job, use Machine Override instead of editing anything else — it records a real reason and takes over as the machine used for every later step."
+        stepText: "If the recommended machine still is not right for this job, use Machine Override instead — it records a real reason and takes over as the machine used for every later step."
     },
 
     {
         componentId: "ops-review-deployment-plan",
         stepText: "Fill in or adjust the Deployment Plan — days, crew, accessories, and dewatering method — for the machine that is actually going to be used (the recommendation, or your override)."
+    },
+
+    {
+        componentId: "ops-review-add-crew-role",
+        stepText: "Use + Add Role whenever the job needs a crew role the default plan doesn't already list."
+    },
+
+    {
+        componentId: "ops-review-remove-crew-role",
+        stepText: "Use the × next to a row to remove a crew role that isn't actually needed for this job."
     },
 
     {

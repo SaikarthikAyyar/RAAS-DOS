@@ -379,6 +379,8 @@ export default function OpsReviewDecisionCard({
 
                 {hasTask("enquiry-tab-ops-review", "open_ops_selector") && (
 
+                    <span data-guide-id="ops-review-open-selector" style={{display:"inline-flex", alignItems:"center"}}>
+
                     <button
 
                         type="button"
@@ -392,6 +394,10 @@ export default function OpsReviewDecisionCard({
                         Open Ops Selector
 
                     </button>
+
+                    <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-open-selector"/>
+
+                    </span>
 
                 )}
 

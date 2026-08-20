@@ -436,6 +436,7 @@ export default function QuoteCommercialSummary({
                 <div className="survey-actions" style={{marginTop:10}}>
 
                     {hasTask("enquiry-tab-quote-commercial", "save_internal_addition") && (
+                        <span data-guide-id="qc-save-internal-addition" style={{display:"inline-flex", alignItems:"center"}}>
                         <button
                             className="survey-action-button"
                             onClick={handleSaveExtra}
@@ -443,6 +444,8 @@ export default function QuoteCommercialSummary({
                         >
                             {savingExtra ? "Saving..." : "Save internal addition"}
                         </button>
+                        <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-save-internal-addition"/>
+                        </span>
                     )}
 
                     {hasTask("enquiry-tab-quote-commercial", "preview_customer_quote") && (
@@ -533,6 +536,7 @@ export default function QuoteCommercialSummary({
                                 style={{marginRight:8}}
                             />
                             {hasTask("enquiry-tab-quote-commercial", "save_valid_till") && (
+                                <span data-guide-id="qc-save-valid-till" style={{display:"inline-flex", alignItems:"center"}}>
                                 <button
                                     className="survey-action-button"
                                     onClick={handleSaveValidTill}
@@ -540,6 +544,8 @@ export default function QuoteCommercialSummary({
                                 >
                                     {savingValidTill ? "Saving..." : "Save"}
                                 </button>
+                                <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-save-valid-till"/>
+                                </span>
                             )}
                         </span>
                     </div>
@@ -611,12 +617,15 @@ export default function QuoteCommercialSummary({
                 <div className="survey-actions" style={{flexWrap:"wrap", gap:8}}>
 
                     {hasTask("enquiry-tab-quote-commercial", "open_quotes_module") && (
+                        <span data-guide-id="qc-open-quotes-module" style={{display:"inline-flex", alignItems:"center"}}>
                         <button
                             className="survey-action-button"
                             onClick={handleOpenQuotesModule}
                         >
                             Open Quotes Module
                         </button>
+                        <ComponentExplainerIcon tabId="quote-commercial" componentId="qc-open-quotes-module"/>
+                        </span>
                     )}
 
 
