@@ -29,3 +29,28 @@ export async function getDashboardOverview(){
     return data;
 
 }
+
+
+// ====================================
+// GET PIPELINE SNAPSHOT
+// Full active pipeline (every open enquiry, not just the 8 shown in
+// the Recent Cases table) - backs the "Export pipeline snapshot" button.
+// ====================================
+
+export async function getPipelineSnapshot(){
+
+    const response = await fetch(
+
+        `${API}/dashboard/pipeline-snapshot`
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}

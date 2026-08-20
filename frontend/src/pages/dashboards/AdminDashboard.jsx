@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import "../../components/dashboard/overview/DashboardOverview.css";
 
-import { getDashboardOverview } from "../../services/dashboardOverviewService";
+import { getDashboardOverview, getPipelineSnapshot } from "../../services/dashboardOverviewService";
 
 import KpiTileGrid from "../../components/dashboard/overview/KpiTileGrid";
 import FollowUpsCard from "../../components/dashboard/overview/FollowUpsCard";
@@ -75,6 +75,8 @@ export default function AdminDashboard(){
 
     const [error, setError] = useState("");
 
+    const [exporting, setExporting] = useState(false);
+
     useEffect(()=>{
 
         let cancelled = false;
@@ -93,27 +95,40 @@ export default function AdminDashboard(){
 
     }, []);
 
-    function handleExport(){
+    async function handleExport(){
 
-        if(!overview){
-            return;
+        setExporting(true);
+
+        try{
+
+            const snapshot = await getPipelineSnapshot();
+
+            const rows = snapshot.map(c=>[
+
+                `ENQ-${c.enquiry_id}`,
+                c.customer_name || "",
+                STAGE_LABELS[c.stage] || c.stage,
+                c.value ?? 0,
+                c.status || ""
+
+            ]);
+
+            downloadCSV(
+                "RAAS_DOS_Pipeline_Snapshot.csv",
+                ["Enquiry", "Customer", "Stage", "Value", "Status"],
+                rows
+            );
+
+        }catch(err){
+
+            console.error(err);
+            alert("Unable to export the pipeline snapshot.");
+
+        }finally{
+
+            setExporting(false);
+
         }
-
-        const rows = overview.recent_cases.map(c=>[
-
-            c.enquiry_id,
-            c.customer_name || "",
-            STAGE_LABELS[c.stage] || c.stage,
-            c.value ?? "",
-            c.quote_commercial_status || ""
-
-        ]);
-
-        downloadCSV(
-            "RAAS_DOS_Pipeline_Snapshot.csv",
-            ["Enquiry", "Customer", "Stage", "Value", "Status"],
-            rows
-        );
 
     }
 
@@ -132,9 +147,9 @@ export default function AdminDashboard(){
                     type="button"
                     className="ovw-btn-primary"
                     onClick={handleExport}
-                    disabled={!overview}
+                    disabled={!overview || exporting}
                 >
-                    Export pipeline snapshot
+                    {exporting ? "Exporting..." : "Export pipeline snapshot"}
                 </button>
 
             </div>

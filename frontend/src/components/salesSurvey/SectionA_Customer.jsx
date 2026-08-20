@@ -15,11 +15,7 @@ surveyData,
 
 updateSection,
 
-customers,
-
 selectedCustomer,
-
-setSelectedCustomer,
 
 customerSurveys,
 
@@ -78,65 +74,26 @@ A. Customer / Opportunity
 
 {/* ==================================== */}
 {/* CUSTOMER REQUEST */}
+{/* Read-only - this page never lists/picks Customer Requests
+   itself, it only ever receives one instance from the Enquiry
+   Workspace's Survey tab. */}
 {/* ==================================== */}
 
 <div className="survey-field">
 
 <label>
 
-Customer Request*
+Customer Request
 
 </label>
 
-<select
+<input
 
-className="customer-select"
+value={selectedCustomer ? `CR${selectedCustomer} - ${customer.company_name || ""}` : ""}
 
-value={selectedCustomer}
+readOnly
 
-onChange={(e)=>
-
-setSelectedCustomer(
-
-e.target.value
-
-)
-
-}
-
->
-
-<option value="">
-
-Select Customer Request
-
-</option>
-
-{
-
-customers.map(
-
-customer=>(
-
-<option
-
-key={customer.id}
-
-value={customer.id}
-
->
-
-{`CR${customer.id} - ${customer.company_name}`}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
+/>
 
 </div>
 

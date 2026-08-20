@@ -26,7 +26,6 @@ export const REQUIRED_FIELD_KEYS = [
     "job.material_category",
     "job.sludge_hardness",
     "job.debris_level",
-    "job.cleaning_date",
     "job.cleaning_frequency",
 
     // Section C

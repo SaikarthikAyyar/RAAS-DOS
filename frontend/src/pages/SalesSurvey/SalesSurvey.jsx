@@ -28,9 +28,7 @@ getSalesPrefill,
 
 getCustomerSurveys,
 
-getCustomerSurvey,
-
-getCustomers
+getCustomerSurvey
 
 }
 
@@ -234,24 +232,6 @@ useState(
 );
 
 
-// ====================================
-// CUSTOMER REQUEST OPTIONS
-// Real list, fetched once - powers the "Customer Request*" dropdown
-// when this page is reached directly (no location.state), instead of
-// the single fake entry it was previously stuck rendering.
-// ====================================
-
-const [customerRequestOptions, setCustomerRequestOptions] = useState([]);
-
-useEffect(() => {
-
-    getCustomers()
-        .then(data => setCustomerRequestOptions(Array.isArray(data) ? data : []))
-        .catch(error => console.log(error));
-
-}, []);
-
-
 const [
 
 selectedSurvey,
@@ -283,11 +263,9 @@ const {
 
 // ====================================
 // LOAD A CUSTOMER REQUEST'S SURVEY DATA
-// Shared by the deep-link path (Enquiry Workspace's Fill/Edit Survey
-// button, which arrives with location.state already set) and the
-// standalone-page path (picking a Customer Request directly from this
-// page's own dropdown, previously a no-op that left the four readOnly
-// contact fields permanently blank).
+// This page never browses/lists Customer Requests itself - it only
+// ever loads the one instance handed to it via location.state by the
+// Enquiry Workspace's Survey tab (Fill/Edit Survey button).
 // ====================================
 
 async function loadCustomerRequest(id, forceSurveyId){
@@ -369,43 +347,40 @@ useEffect(() => {
 
 ]);
 
-function handleSelectCustomer(id){
-
-    setSelectedCustomer(id);
-
-    if(!id){
-
-        setCustomerSurveys([]);
-
-        setSelectedSurvey("");
-
-        setSurveyData({
-            customer:{},
-            job:{},
-            geometry:{},
-            safety:{},
-            pump:{},
-            dewatering:{},
-            insights:{}
-        });
-
-        return;
-
-    }
-
-    loadCustomerRequest(id);
-
-}
-
-
-
-
 
 
 
 // ====================================
 // UI
 // ====================================
+
+if(!customerRequestId){
+
+    return(
+
+        <div className="sales-survey-page" ref={pageRef}>
+
+            <div className="survey-card">
+
+                <div className="survey-header">
+                    <h2>Sales Survey</h2>
+                </div>
+
+                <p style={{padding:"8px 4px", color:"var(--muted)"}}>
+
+                    Open this page from an enquiry's Survey tab ("Fill/Edit Survey")
+                    to load that Customer Request's survey - there's no Customer
+                    Request picker on this page.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    );
+
+}
 
 return(
 
@@ -442,11 +417,7 @@ surveyData={surveyData}
 
 updateSection={updateSection}
 
-customers={customerRequestOptions}
-
 selectedCustomer={selectedCustomer}
-
-setSelectedCustomer={handleSelectCustomer}
 
 customerSurveys={customerSurveys}
 

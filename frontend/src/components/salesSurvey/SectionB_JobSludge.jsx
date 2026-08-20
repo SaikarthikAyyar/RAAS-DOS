@@ -96,15 +96,12 @@ errorMessage="Material Category is required."
 />
 
 <FieldInput
-label="Cleaning Date*"
+label="Cleaning Date"
 type="date"
 value={job.cleaning_date}
 section="job"
 field="cleaning_date"
 updateSection={updateSection}
-onBlur={()=>touchField("job", "cleaning_date")}
-error={fieldError("cleaning_date")}
-errorMessage="Cleaning Date is required."
 />
 
 <FieldInput

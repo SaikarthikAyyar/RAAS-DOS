@@ -2,7 +2,7 @@
 # IMPORTS
 # ====================================
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from typing import Optional
 
@@ -280,6 +280,18 @@ class SalesSurveySchema(BaseModel):
     status:Optional[str]="SURVEY_COMPLETED"
 
 
+    # cleaning_date/tentative_start_date/tentative_end_date are all real
+    # Date columns on the sales_surveys table, but a blank date input on
+    # the frontend sends "" (not null/omitted) - Postgres rejects ""
+    # as an invalid date literal, so this coerces it to None before it
+    # ever reaches the DB, matching how a genuinely-omitted value already
+    # behaves.
+    @field_validator("cleaning_date", "tentative_start_date", "tentative_end_date", mode="before")
+    @classmethod
+    def _blank_date_to_none(cls, value):
+        if value == "":
+            return None
+        return value
 
 
 class CustomerSection(BaseModel):

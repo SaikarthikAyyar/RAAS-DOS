@@ -253,6 +253,55 @@ def get_recent_cases(db, limit=RECENT_CASES_LIMIT):
 
 
 # ====================================
+# PIPELINE SNAPSHOT (full active pipeline, for the CSV export -
+# not limited to RECENT_CASES_LIMIT the way the on-screen table is)
+# ====================================
+
+def _pipeline_status_label(quote):
+
+    if quote is None:
+        return "Not started"
+
+    if quote.revision_requested:
+        return "Revision Requested"
+
+    if quote.quote_commercial_status == "Approved":
+        return "Approved"
+
+    if quote.quote_commercial_status == "Sent back":
+        return "Sent Back"
+
+    return "Draft"
+
+
+def get_pipeline_snapshot(db):
+
+    active = (
+        _active_enquiries_query(db)
+        .order_by(Enquiry.created_at.desc())
+        .all()
+    )
+
+    quotes_by_id = _quotes_by_id(db, active)
+
+    result = []
+
+    for e in active:
+
+        quote = quotes_by_id.get(e.quote_id) if e.quote_id else None
+
+        result.append({
+            "enquiry_id": e.id,
+            "customer_name": e.customer_name,
+            "stage": e.stage,
+            "value": _quote_pipeline_value(quote),
+            "status": _pipeline_status_label(quote)
+        })
+
+    return result
+
+
+# ====================================
 # COMBINED OVERVIEW
 # ====================================
 
