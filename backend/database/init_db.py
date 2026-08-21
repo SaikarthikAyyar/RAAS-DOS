@@ -73,6 +73,9 @@ from backend.models.role_task_permission import RoleTaskPermission
 
 from backend.models.machines_pumps import Machine, Pump, MachinePumpCompatibility
 
+from backend.models.hr_role import HrRole
+from backend.models.gst_settings import GstSettings
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel

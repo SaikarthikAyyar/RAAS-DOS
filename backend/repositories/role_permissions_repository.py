@@ -82,10 +82,9 @@ BUSINESS_MASTER_TABS = [
 
 # Phase 21D: the real, enumerated action buttons per tab, EXCLUDING any
 # Approve/Reject/Accept/Send-back-style button (those are governed by
-# hub_approvers, Phase 21C, not this matrix). Placeholder tabs
-# (Personnel, Human Resources, GST & Tax - unbuilt, "Not built yet.")
-# get an empty list - they still get a Module row so they're ready to
-# gain tasks once built, per the standing "don't jeopardize existing
+# hub_approvers, Phase 21C, not this matrix). Still-unbuilt placeholder
+# tabs get an empty list - they still get a Module row so they're ready
+# to gain tasks once built, per the standing "don't jeopardize existing
 # function" instruction (an empty task list changes nothing for a role
 # that already has no buttons to click there).
 MODULE_TASKS = {
@@ -114,7 +113,15 @@ MODULE_TASKS = {
         ("export_current_tab", "Export current tab")
     ],
 
-    "bm-tab-personnel": [],
+    "bm-tab-personnel": [
+        ("add_person", "Add person"),
+        ("edit_person", "Edit person"),
+        ("remove_person", "Remove person"),
+        ("add_person_document", "Add document"),
+        ("edit_person_document", "Edit document"),
+        ("remove_person_document", "Remove document"),
+        ("export_current_tab", "Export current tab")
+    ],
 
     "bm-tab-accessories": [
         ("add_accessory", "Add accessory"),
@@ -123,7 +130,12 @@ MODULE_TASKS = {
         ("export_current_tab", "Export current tab")
     ],
 
-    "bm-tab-hr": [],
+    "bm-tab-hr": [
+        ("add_hr_role", "Add HR role"),
+        ("edit_hr_role", "Edit HR role"),
+        ("remove_hr_role", "Remove HR role"),
+        ("export_current_tab", "Export current tab")
+    ],
 
     "bm-tab-dewatering": [
         ("add_dewatering_method", "Add dewatering method"),
@@ -185,7 +197,9 @@ MODULE_TASKS = {
         ("export_current_tab", "Export current tab")
     ],
 
-    "bm-tab-gst": [],
+    "bm-tab-gst": [
+        ("save_gst_settings", "Save GST & Tax settings")
+    ],
 
     "enquiry-tab-survey": [
         ("fill_edit_survey", "Fill / Edit Survey"),

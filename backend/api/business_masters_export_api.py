@@ -22,6 +22,10 @@ from backend.models.email_template import EmailTemplate, EmailTemplateVariable
 from backend.models.lookup_list_model import LookupList, LookupListValue
 from backend.models.machines_pumps import Machine, Pump
 from backend.models.users import User
+from backend.models.personnel import Personnel
+from backend.models.personnel_document import PersonnelDocument
+from backend.models.hr_role import HrRole
+from backend.models.gst_settings import GstSettings
 
 
 api = APIRouter(tags=["Business Masters Export"])
@@ -83,7 +87,16 @@ TAB_EXPORT_TABLES = {
 
     "machines": [(Machine, "Machines")],
 
-    "pumps": [(Pump, "Pumps")]
+    "pumps": [(Pump, "Pumps")],
+
+    "personnel": [
+        (Personnel, "Personnel"),
+        (PersonnelDocument, "Personnel Documents")
+    ],
+
+    "hr": [(HrRole, "HR Roles")],
+
+    "gst": [(GstSettings, "GST Settings")]
 
 }
 

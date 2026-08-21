@@ -102,6 +102,12 @@ from backend.api.business_masters_export_api import api as business_masters_expo
 
 from backend.api.dashboard_overview_api import api as dashboard_overview_api
 
+from backend.api.personnel_api import api as personnel_api
+
+from backend.api.hr_role_api import api as hr_role_api
+
+from backend.api.gst_settings_api import api as gst_settings_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -284,6 +290,9 @@ app.include_router(pump_api)
 app.include_router(business_masters_export_api)
 
 app.include_router(dashboard_overview_api)
+app.include_router(personnel_api)
+app.include_router(hr_role_api)
+app.include_router(gst_settings_api)
 
 
 

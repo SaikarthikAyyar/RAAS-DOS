@@ -3,6 +3,7 @@ from sqlalchemy import (
     BigInteger,
     String,
     Boolean,
+    Date,
     ForeignKey,
     TIMESTAMP,
     text
@@ -45,6 +46,11 @@ class PersonnelDocument(Base):
     verification_status = Column(
         String(30),
         server_default="VERIFIED"
+    )
+
+    valid_till = Column(
+        Date,
+        nullable=True
     )
 
     verified_by = Column(

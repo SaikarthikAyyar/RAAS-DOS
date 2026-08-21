@@ -277,17 +277,6 @@ surveyData.geometry?.drop_to_floor
 || null,
 
 
-setup_distance:
-
-Number(
-
-surveyData.geometry?.setup_distance
-
-)
-
-|| null,
-
-
 vertical_lift:
 
 Number(
@@ -410,9 +399,6 @@ surveyData.pump?.discharge_pit_dimension,
 discharge_medium:
 surveyData.pump?.discharge_medium,
 
-disposal_route:
-surveyData.pump?.disposal_route,
-
 disposal_responsibility:
 surveyData.pump?.disposal_responsibility,
 
@@ -437,12 +423,6 @@ Number(surveyData.pump?.discharge_distance) || null,
 
 discharge_height:
 Number(surveyData.pump?.discharge_height) || null,
-
-debris_present:
-surveyData.pump?.debris_present,
-
-ph_condition:
-surveyData.pump?.ph_condition,
 
 pump_power_source:
 surveyData.pump?.pump_power_source,

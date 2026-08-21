@@ -541,14 +541,6 @@ export default function SurveySummary({
 
                     {
 
-                        label:"Setup Distance",
-
-                        value:survey.geometry.setup_distance
-
-                    },
-
-                    {
-
                         label:"Hose Distance",
 
                         value:survey.geometry.hose_distance
@@ -676,14 +668,6 @@ export default function SurveySummary({
                         label:"Discharge Medium",
 
                         value:survey.pump.discharge_medium
-
-                    },
-
-                    {
-
-                        label:"Disposal Route",
-
-                        value:survey.pump.disposal_route
 
                     },
 
@@ -842,22 +826,6 @@ export default function SurveySummary({
                         label:"Discharge Height",
 
                         value:survey.pump.discharge_height
-
-                    },
-
-                    {
-
-                        label:"Debris / Fibers Present",
-
-                        value:survey.pump.debris_present
-
-                    },
-
-                    {
-
-                        label:"pH / Corrosiveness",
-
-                        value:survey.pump.ph_condition
 
                     },
 

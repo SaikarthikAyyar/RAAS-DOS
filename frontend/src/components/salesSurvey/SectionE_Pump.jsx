@@ -4,8 +4,6 @@
 
 import LookupSelect from "../shared/LookupSelect";
 
-import { formatPhOptionLabel } from "../../data/phRanges";
-
 
 // ====================================
 // COMPONENT
@@ -88,27 +86,6 @@ updateSection={updateSection}
 
 
 <LookupSelect
-listKey="debrisLevel"
-label="Debris / Fibers Present?"
-value={pump.debris_present}
-section="pump"
-field="debris_present"
-updateSection={updateSection}
-/>
-
-
-<LookupSelect
-listKey="ph"
-label="pH / Corrosiveness"
-value={pump.ph_condition}
-section="pump"
-field="ph_condition"
-updateSection={updateSection}
-formatOption={formatPhOptionLabel}
-/>
-
-
-<LookupSelect
 listKey="pumpPower"
 label="Power Source for Pump"
 value={pump.pump_power_source}
@@ -146,15 +123,6 @@ updateSection={updateSection}
     section="pump"
     field="discharge_medium"
     updateSection={updateSection}
-/>
-
-<LookupSelect
-listKey="disposalRoute"
-label="Disposal Route"
-value={pump.disposal_route}
-section="pump"
-field="disposal_route"
-updateSection={updateSection}
 />
 
 <LookupSelect

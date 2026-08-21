@@ -14,6 +14,8 @@ import { getHubs } from "../../../services/hubsService";
 
 import { useLookupLists } from "../../../context/LookupListsContext";
 
+import LookupSelect from "../../shared/LookupSelect";
+
 import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
@@ -21,6 +23,12 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 import { buildActor } from "../../../utils/actor";
 
 
+// Deliberately its own small, simple vocabulary - NOT the Sales
+// Survey's "debrisLevel" lookup list. ops_engine.py's MACHINE_DEBRIS_RANK
+// matches on exactly these 4 lowercased keys (none/minor/moderate/heavy),
+// a different value shape than debrisLevel's descriptive survey options
+// ("None / negligible", "Minor screenable debris", ...) - wiring this
+// field to that list would silently break Ops Engine scoring.
 const DEBRIS_OPTIONS = ["None", "Minor", "Moderate", "Heavy"];
 
 
@@ -369,20 +377,28 @@ function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, hubs,
                         <input type="number" value={rate} onChange={e=>setRate(e.target.value)} />
                     </div>
 
-                    <div>
-                        <label>Material construction</label>
-                        <input value={materialConstruction} onChange={e=>setMaterialConstruction(e.target.value)} />
-                    </div>
+                    <LookupSelect
+                        listKey="materialOfConstruction"
+                        label="Material construction"
+                        value={materialConstruction}
+                        section="machine"
+                        field="materialConstruction"
+                        updateSection={(_s, _f, v)=>setMaterialConstruction(v)}
+                    />
 
                     <div>
                         <label>Max operating temp (°C)</label>
                         <input type="number" value={maxOperatingTemp} onChange={e=>setMaxOperatingTemp(e.target.value)} />
                     </div>
 
-                    <div>
-                        <label>Hazard rating</label>
-                        <input value={hazardRating} onChange={e=>setHazardRating(e.target.value)} placeholder="e.g. Standard, ATEX Zone 2" />
-                    </div>
+                    <LookupSelect
+                        listKey="hazardousAreaRating"
+                        label="Hazard rating"
+                        value={hazardRating}
+                        section="machine"
+                        field="hazardRating"
+                        updateSection={(_s, _f, v)=>setHazardRating(v)}
+                    />
 
                     <div>
                         <label>Max vertical lift (m)</label>

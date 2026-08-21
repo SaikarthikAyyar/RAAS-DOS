@@ -317,25 +317,6 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Setup Distance (m)"
-
-value={geometry.setup_distance}
-
-section="geometry"
-
-field="setup_distance"
-
-unit="m"
-
-type="number"
-
-updateSection={updateSection}
-
-/>
-
-
-<FieldInput
-
 label="Vertical Lift (m)"
 
 value={geometry.vertical_lift}

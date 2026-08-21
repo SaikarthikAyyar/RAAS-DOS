@@ -163,7 +163,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Power Availability Distance"
+label="Power Availability Distance (m)"
 
 value={safety.power_distance}
 

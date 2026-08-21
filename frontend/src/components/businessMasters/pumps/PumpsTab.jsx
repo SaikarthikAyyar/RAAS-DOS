@@ -13,6 +13,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import LookupSelect from "../../shared/LookupSelect";
+
 
 // ====================================
 // ERROR FORMATTING
@@ -182,10 +184,14 @@ function PumpModal({ editing, onClose, onSave }){
                         <input type="number" value={maxSolidsSize} onChange={e=>setMaxSolidsSize(e.target.value)} />
                     </div>
 
-                    <div>
-                        <label>Hazard rating</label>
-                        <input value={hazardRating} onChange={e=>setHazardRating(e.target.value)} placeholder="Standard / ATEX Zone 1" />
-                    </div>
+                    <LookupSelect
+                        listKey="hazardousAreaRating"
+                        label="Hazard rating"
+                        value={hazardRating}
+                        section="pump"
+                        field="hazardRating"
+                        updateSection={(_s, _f, v)=>setHazardRating(v)}
+                    />
 
                     <div>
                         <label>Power source</label>

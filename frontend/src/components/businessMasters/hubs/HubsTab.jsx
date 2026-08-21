@@ -15,6 +15,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import LookupSelect from "../../shared/LookupSelect";
+
 
 // ====================================
 // MULTI-SELECT CHECKBOX LIST
@@ -158,19 +160,14 @@ function HubModal({ editing, allUsers, onClose, onSave }){
 
                     </div>
 
-                    <div>
-
-                        <label>Region</label>
-
-                        <input
-
-                            value={region}
-
-                            onChange={e=>setRegion(e.target.value)}
-
-                        />
-
-                    </div>
+                    <LookupSelect
+                        listKey="customerRegion"
+                        label="Region"
+                        value={region}
+                        section="hub"
+                        field="region"
+                        updateSection={(_s, _f, v)=>setRegion(v)}
+                    />
 
                     <div style={{gridColumn:"1 / -1"}}>
 
