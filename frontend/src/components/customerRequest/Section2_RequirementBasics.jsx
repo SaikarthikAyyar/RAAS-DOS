@@ -204,15 +204,12 @@ updateSection={updateSection}
 />
 
 <FieldInput
-    label="*Cleaning Date"
+    label="Cleaning Date"
     type="date"
     value={requirement.cleaning_date}
     section="requirement"
     field="cleaning_date"
     updateSection={updateSection}
-    onBlur={()=>touchField("requirement", "cleaning_date")}
-    error={fieldError("cleaning_date")}
-    errorMessage="Cleaning Date is required."
 />
 
 <LookupSelect
@@ -235,7 +232,7 @@ updateSection={updateSection}
 
 <FieldInput
 
-label="Tank Name"
+label="*Tank Name"
 
 value={requirement.asset_name}
 
@@ -244,6 +241,12 @@ section="requirement"
 field="asset_name"
 
 updateSection={updateSection}
+
+onBlur={()=>touchField("requirement", "asset_name")}
+
+error={fieldError("asset_name")}
+
+errorMessage="Tank Name is required to create a new site/asset record."
 
 />
 

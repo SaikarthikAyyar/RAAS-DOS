@@ -2,7 +2,7 @@
 # IMPORTS
 # ====================================
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, model_validator
 
 from typing import Optional
 
@@ -128,7 +128,7 @@ class CustomerRequestSchema(BaseModel):
 
     status: Optional[str] = "REQUESTED"
 
-    cleaning_date: date
+    cleaning_date: Optional[date] = None
 
     cleaning_frequency: str
 
@@ -149,3 +149,33 @@ class CustomerRequestSchema(BaseModel):
     @classmethod
     def validate_client_contact_email(cls, value):
         return validate_email_format(value)
+
+    # cleaning_date is optional (not compulsory) but is a real Date
+    # column - a blank date input sends "" rather than omitting the
+    # field entirely, which Pydantic's date type would otherwise
+    # reject outright. Coerce blank to None, same as Sales Survey's
+    # identical fix.
+    @field_validator("cleaning_date", mode="before")
+    @classmethod
+    def blank_cleaning_date_to_none(cls, value):
+        if value == "":
+            return None
+        return value
+
+
+    # ====================================
+    # ASSET NAME REQUIRED FOR A NEW SITE
+    # Plant + Asset Name together are exactly what resolve_or_create_asset
+    # needs to actually create an Asset record - if neither an existing
+    # asset was picked (asset_id) nor a real Asset Name was typed, the
+    # resulting enquiry ends up with no linked asset at all, silently
+    # breaking Sales Survey's later asset-profile write-back.
+    # ====================================
+
+    @model_validator(mode="after")
+    def validate_asset_name_required_for_new_site(self):
+        if not self.asset_id and not self.asset_name:
+            raise ValueError(
+                "asset_name is required when no existing asset is selected."
+            )
+        return self
