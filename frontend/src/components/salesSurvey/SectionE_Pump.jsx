@@ -135,7 +135,7 @@ updateSection={updateSection}
 />
 
 <FieldInput
-label="Discharge Point Distance"
+label="Discharge Point Distance (m)"
 value={pump.discharge_point_distance}
 section="pump"
 field="discharge_point_distance"
