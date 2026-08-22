@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import LookupSelect from "../../shared/LookupSelect";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT
@@ -71,7 +73,7 @@ export default function EditCustomerModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to update customer.");
+            setError(formatApiError(err, "Unable to update customer."));
 
         }
 

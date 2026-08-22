@@ -22,6 +22,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // Deliberately its own small, simple vocabulary - NOT the Sales
 // Survey's "debrisLevel" lookup list. ops_engine.py's MACHINE_DEBRIS_RANK
@@ -32,27 +34,8 @@ import { buildActor } from "../../../utils/actor";
 const DEBRIS_OPTIONS = ["None", "Minor", "Moderate", "Heavy"];
 
 
-// ====================================
-// ERROR FORMATTING
-// FastAPI's automatic 422 validation errors put an ARRAY of
-// {type, loc, msg, ...} objects in `detail`, not a string - rendering
-// that directly as JSX crashes React ("Objects are not valid as a
-// React child"). This normalizes any shape into a safe string.
-// ====================================
-
-function formatApiError(err){
-
-    const detail = err?.detail;
-
-    if(typeof detail === "string") return detail;
-
-    if(Array.isArray(detail)){
-        return detail.map(d=>d?.msg || JSON.stringify(d)).join("; ");
-    }
-
-    return "Unable to save machine.";
-
-}
+// formatApiError now lives in ../../../utils/apiError.js (shared by
+// every Business Masters modal, not just this one).
 
 
 // ====================================
@@ -217,7 +200,7 @@ function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, hubs,
         }
 
         catch(err){
-            setError(formatApiError(err));
+            setError(formatApiError(err, "Unable to save machine."));
         }
 
         finally{
@@ -563,7 +546,7 @@ export default function MachinesTab(){
             load();
         }
         catch(err){
-            alert(formatApiError(err));
+            alert(formatApiError(err, "Unable to remove machine."));
         }
 
     }

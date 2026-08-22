@@ -9,6 +9,8 @@ import {
 
 import { isValidEmail } from "../../../utils/validators";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT
@@ -149,7 +151,7 @@ export default function SendTemplateModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to send email.");
+            setError(formatApiError(err, "Unable to send email."));
 
         }
 

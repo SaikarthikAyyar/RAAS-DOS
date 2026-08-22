@@ -14,6 +14,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT (Details action)
@@ -112,7 +114,7 @@ export default function QuoteTemplateVariablesModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to add variable.");
+            setError(formatApiError(err, "Unable to add variable."));
 
         }
 
@@ -142,7 +144,7 @@ export default function QuoteTemplateVariablesModal({
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove variable.");
+            alert(formatApiError(err, "Unable to remove variable."));
 
         }
 

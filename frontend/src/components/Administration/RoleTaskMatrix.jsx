@@ -9,6 +9,8 @@ import {
 
 import { MODULE_META } from "../../config/navigation";
 
+import { formatApiError } from "../../utils/apiError";
+
 import "./RoleNavigationMatrix.css";
 
 // ====================================
@@ -323,7 +325,7 @@ export default function RoleTaskMatrix({ role }){
         }
         catch(error){
 
-            setMessage({ type:"error", text: error?.detail || "Unable to save role-based access." });
+            setMessage({ type:"error", text: formatApiError(error, "Unable to save role-based access.") });
 
         }
         finally{

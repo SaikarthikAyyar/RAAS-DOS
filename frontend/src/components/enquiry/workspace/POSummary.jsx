@@ -10,6 +10,8 @@ import { advanceStageAtLeast } from "../../../services/enquiryWorkspaceService";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import { STAGE_LABELS } from "../../../data/workflowStages";
 
 import { useAuth } from "../../../contexts/AuthContext";
@@ -157,7 +159,7 @@ export default function POSummary({
         catch(err){
 
             console.error(err);
-            setError(err?.detail || "Unable to upload the PO.");
+            setError(formatApiError(err, "Unable to upload the PO."));
 
         }
 
@@ -185,7 +187,7 @@ export default function POSummary({
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove this PO.");
+            alert(formatApiError(err, "Unable to remove this PO."));
 
         }
 
@@ -209,7 +211,7 @@ export default function POSummary({
 
         catch(err){
 
-            alert(err?.detail || "Unable to proceed to Job Creation.");
+            alert(formatApiError(err, "Unable to proceed to Job Creation."));
 
         }
 

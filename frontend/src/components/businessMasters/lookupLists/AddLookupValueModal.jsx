@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT
@@ -52,7 +54,7 @@ export default function AddLookupValueModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to add value.");
+            setError(formatApiError(err, "Unable to add value."));
 
         }
 

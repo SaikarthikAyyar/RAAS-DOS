@@ -13,6 +13,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import { buildActor } from "../../../utils/actor";
 
 
@@ -114,7 +116,7 @@ export default function TemplateVariablesModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to add variable.");
+            setError(formatApiError(err, "Unable to add variable."));
 
         }
 
@@ -150,7 +152,7 @@ export default function TemplateVariablesModal({
 
         catch(err){
 
-            alert(err?.detail || "Unable to update variable.");
+            alert(formatApiError(err, "Unable to update variable."));
 
         }
 
@@ -174,7 +176,7 @@ export default function TemplateVariablesModal({
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove variable.");
+            alert(formatApiError(err, "Unable to remove variable."));
 
         }
 

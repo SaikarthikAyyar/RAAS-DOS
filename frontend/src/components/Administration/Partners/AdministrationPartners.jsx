@@ -18,6 +18,8 @@ import {
 
 } from "../../../services/administrationPartnersService";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import AdministrationPartnersTable
 from "./AdministrationPartnersTable";
 
@@ -318,13 +320,7 @@ export default function AdministrationPartners({
 
             console.error(error);
 
-            alert(
-
-                error.detail ||
-
-                "Unable to save partner."
-
-            );
+            alert(formatApiError(error, "Unable to save partner."));
 
         }
 

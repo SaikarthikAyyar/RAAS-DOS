@@ -13,6 +13,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import { buildActor } from "../../../utils/actor";
 
 
@@ -60,7 +62,7 @@ function AccessoryModal({ editing, onClose, onSave }){
 
         catch(err){
 
-            setError(err?.detail || "Unable to save accessory.");
+            setError(formatApiError(err, "Unable to save accessory."));
 
         }
 
@@ -266,7 +268,7 @@ export default function AccessoriesTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove accessory.");
+            alert(formatApiError(err, "Unable to remove accessory."));
 
         }
 

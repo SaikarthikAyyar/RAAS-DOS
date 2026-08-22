@@ -12,6 +12,8 @@ import {
 
 import "../components/allocation/Allocation.css";
 
+import { formatApiError } from "../utils/apiError";
+
 export default function Allocation(){
 
     const API = import.meta.env.VITE_API_URL;
@@ -116,11 +118,7 @@ export default function Allocation(){
 
             console.error(error);
 
-            alert(
-                error.detail ||
-                error.message ||
-                "Allocation Failed"
-            );
+            alert(formatApiError(error, "Allocation Failed"));
 
         }
 

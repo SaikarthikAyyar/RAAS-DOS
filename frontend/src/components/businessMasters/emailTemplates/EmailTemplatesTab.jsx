@@ -13,6 +13,8 @@ import {
 import EditTemplateModal from "./EditTemplateModal";
 import ViewBodyModal from "./ViewBodyModal";
 import TemplateVariablesModal from "./TemplateVariablesModal";
+
+import { formatApiError } from "../../../utils/apiError";
 import SendTemplateModal from "./SendTemplateModal";
 
 import { useAuth } from "../../../contexts/AuthContext";
@@ -130,7 +132,7 @@ export default function EmailTemplatesTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to update status.");
+            alert(formatApiError(err, "Unable to update status."));
 
         }
 
@@ -154,7 +156,7 @@ export default function EmailTemplatesTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove template.");
+            alert(formatApiError(err, "Unable to remove template."));
 
         }
 

@@ -17,6 +17,8 @@ import { buildActor } from "../../../utils/actor";
 
 import LookupSelect from "../../shared/LookupSelect";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // MULTI-SELECT CHECKBOX LIST
@@ -120,7 +122,7 @@ function HubModal({ editing, allUsers, onClose, onSave }){
 
         catch(err){
 
-            setError(err?.detail || "Unable to save hub.");
+            setError(formatApiError(err, "Unable to save hub."));
 
         }
 
@@ -342,7 +344,7 @@ export default function HubsTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove hub.");
+            alert(formatApiError(err, "Unable to remove hub."));
 
         }
 

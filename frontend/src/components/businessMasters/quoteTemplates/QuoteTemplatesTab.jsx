@@ -14,6 +14,8 @@ import {
 import EditQuoteTemplateModal from "./EditQuoteTemplateModal";
 import QuoteTemplateVariablesModal from "./QuoteTemplateVariablesModal";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
@@ -156,7 +158,7 @@ export default function QuoteTemplatesTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to update status.");
+            alert(formatApiError(err, "Unable to update status."));
 
         }
 
@@ -180,7 +182,7 @@ export default function QuoteTemplatesTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove template.");
+            alert(formatApiError(err, "Unable to remove template."));
 
         }
 

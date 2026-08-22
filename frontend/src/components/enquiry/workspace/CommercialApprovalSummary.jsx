@@ -8,6 +8,8 @@ import { buildActor } from "../../../utils/actor";
 
 import { computeGateStatus, computeStageOnly } from "../../../utils/gateStatus";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import {
     getApprovalHistory,
     recordCommercialApprovalDecision,
@@ -290,7 +292,7 @@ export default function CommercialApprovalSummary({
         catch(err){
 
             console.error(err);
-            setError(err?.detail || "Unable to record the decision.");
+            setError(formatApiError(err, "Unable to record the decision."));
 
         }
 
@@ -339,7 +341,7 @@ export default function CommercialApprovalSummary({
         catch(err){
 
             console.error(err);
-            setError(err?.detail || "Unable to send this back.");
+            setError(formatApiError(err, "Unable to send this back."));
 
         }
 
@@ -378,7 +380,7 @@ export default function CommercialApprovalSummary({
         catch(err){
 
             console.error(err);
-            setRequestMessage(err?.detail || "Unable to request approval.");
+            setRequestMessage(formatApiError(err, "Unable to request approval."));
 
         }
 

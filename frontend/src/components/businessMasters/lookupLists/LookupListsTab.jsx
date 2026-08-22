@@ -12,6 +12,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // ONE LIST CARD
@@ -146,7 +148,7 @@ export default function LookupListsTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove value.");
+            alert(formatApiError(err, "Unable to remove value."));
 
         }
 

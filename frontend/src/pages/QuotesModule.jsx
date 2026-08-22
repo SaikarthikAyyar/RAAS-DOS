@@ -10,6 +10,8 @@ import {
 
 import "../components/quotesModule/QuotesModule.css";
 
+import { formatApiError } from "../utils/apiError";
+
 import QuotesHeader from "../components/quotesModule/QuotesHeader";
 import QuotesToolbar from "../components/quotesModule/QuotesToolbar";
 import QuotesStatusTabs from "../components/quotesModule/QuotesStatusTabs";
@@ -117,7 +119,7 @@ export default function QuotesModule(){
 
             console.error(err);
 
-            setError(err?.detail || "Unable to load quotes.");
+            setError(formatApiError(err, "Unable to load quotes."));
 
         }
 

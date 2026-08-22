@@ -4,6 +4,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import {
     saveDeploymentPlan
 } from "../../../services/opsSelectorService";
@@ -363,12 +365,7 @@ export default function DeploymentPlanCard({
 
             console.error(err);
 
-            setError(
-
-                err?.detail ||
-                "Unable to save deployment plan / generate quote."
-
-            );
+            setError(formatApiError(err, "Unable to save deployment plan / generate quote."));
 
         }
 

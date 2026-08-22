@@ -24,6 +24,8 @@ import { getSurveyCompletenessErrors } from "../../../utils/surveyCompleteness";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
 
 export default function SurveySummary({
@@ -88,7 +90,7 @@ export default function SurveySummary({
 
         catch(err){
 
-            alert(err?.detail || "Unable to cancel reminder.");
+            alert(formatApiError(err, "Unable to cancel reminder."));
 
         }
 
@@ -160,7 +162,7 @@ export default function SurveySummary({
 
             console.error(err);
 
-            alert(err?.detail || "Unable to request Ops Review.");
+            alert(formatApiError(err, "Unable to request Ops Review."));
 
         }
 

@@ -4,6 +4,8 @@ import PhoneInput from "../../shared/PhoneInput";
 
 import { isValidEmail, isValidPhone } from "../../../utils/validators";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT
@@ -81,7 +83,7 @@ export default function AddContactModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to add contact.");
+            setError(formatApiError(err, "Unable to add contact."));
 
         }
 

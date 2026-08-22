@@ -67,6 +67,8 @@ import { useAuth } from "../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../hooks/useRemarkPrompt";
 
+import { formatApiError } from "../utils/apiError";
+
 import { buildActor } from "../utils/actor";
 
 
@@ -274,7 +276,7 @@ function CustomersTab({
 
         catch(err){
 
-            alert(err?.detail || "Unable to delete customer.");
+            alert(formatApiError(err, "Unable to delete customer."));
 
         }
 
@@ -300,7 +302,7 @@ function CustomersTab({
 
         catch(err){
 
-            alert(err?.detail || "Unable to delete asset.");
+            alert(formatApiError(err, "Unable to delete asset."));
 
         }
 
@@ -691,7 +693,7 @@ export default function BusinessMastersModule(){
 
         catch(err){
 
-            alert(err?.detail || "Nothing to export for this tab yet.");
+            alert(formatApiError(err, "Nothing to export for this tab yet."));
 
             return;
 

@@ -12,6 +12,8 @@ import JobCreationCard from "../components/jobCreation/JobCreationCard";
 
 import { saveJobCreation } from "../services/jobCreationService";
 
+import { formatApiError } from "../utils/apiError";
+
 
 // ====================================
 // PAGE
@@ -69,11 +71,7 @@ export default function JobCreation(){
 
         catch(err){
 
-            alert(
-                err?.detail ||
-                err?.message ||
-                "Failed to create job."
-            );
+            alert(formatApiError(err, "Failed to create job."));
 
         }
 

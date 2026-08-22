@@ -10,6 +10,8 @@ import { buildActor } from "../../../utils/actor";
 
 import { computeGateStatus, computeStageOnly } from "../../../utils/gateStatus";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import {
     saveOpsReviewDecision
 } from "../../../services/opsSelectorService";
@@ -142,7 +144,7 @@ export default function OpsReviewDecisionCard({
 
             console.error(err);
 
-            setRequestMessage(err?.detail || "Unable to request approval.");
+            setRequestMessage(formatApiError(err, "Unable to request approval."));
 
         }
 
@@ -192,12 +194,7 @@ export default function OpsReviewDecisionCard({
 
             console.error(err);
 
-            setError(
-
-                err?.detail ||
-                "Unable to save the decision."
-
-            );
+            setError(formatApiError(err, "Unable to save the decision."));
 
         }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { FieldInput, FieldSelect } from "./FormField";
 
@@ -42,26 +42,35 @@ export default function LookupSelect({
 
     const [showOtherInput, setShowOtherInput] = useState(false);
 
-    const [initialized, setInitialized] = useState(false);
+    // Once the user (or the two handlers below, on their behalf)
+    // explicitly picks a mode, the auto-resolve effect below must never
+    // override it again - a ref, not state, since flipping it should
+    // never itself trigger a render.
+    const userTouchedRef = useRef(false);
 
-    // Resolve the starting mode once the list has actually loaded -
-    // if it ran before options arrived, an existing free-typed value
-    // would look "unknown" simply because the list was still empty.
+    // Keeps re-resolving the starting mode (not just once) until the
+    // user actually interacts - `value` often arrives from a SEPARATE
+    // async fetch (e.g. loading a previously-saved survey) that can
+    // settle after the lookup list's own `loading` has already gone
+    // false. Resolving only once, keyed off `loading`, would freeze in
+    // "known/empty" mode using the still-blank initial value and then
+    // never re-check once the real (possibly free-typed) value shows up -
+    // silently hiding a saved "Other" value on reload.
     useEffect(()=>{
 
-        if(!loading && !initialized){
-
-            const isKnownOrEmpty = !value || options.includes(value);
-
-            setShowOtherInput(!isKnownOrEmpty);
-
-            setInitialized(true);
-
+        if(loading || userTouchedRef.current){
+            return;
         }
 
-    }, [loading, initialized, options, value]);
+        const isKnownOrEmpty = !value || options.includes(value);
+
+        setShowOtherInput(!isKnownOrEmpty);
+
+    }, [loading, options, value]);
 
     function handleSelectChange(sec, fld, newValue){
+
+        userTouchedRef.current = true;
 
         if(otherRow && newValue === otherRow.value){
 
@@ -80,6 +89,8 @@ export default function LookupSelect({
     }
 
     function handleChooseFromList(){
+
+        userTouchedRef.current = true;
 
         setShowOtherInput(false);
 

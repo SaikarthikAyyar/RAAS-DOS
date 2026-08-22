@@ -8,6 +8,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // TAB
@@ -99,7 +101,7 @@ export default function GstTaxTab(){
 
         catch(err){
 
-            setSaveMessage(err?.detail || "Unable to save GST & Tax settings.");
+            setSaveMessage(formatApiError(err, "Unable to save GST & Tax settings."));
 
         }
 

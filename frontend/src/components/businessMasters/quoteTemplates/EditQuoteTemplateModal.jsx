@@ -13,6 +13,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT
@@ -105,7 +107,7 @@ export default function EditQuoteTemplateModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to save quote template.");
+            setError(formatApiError(err, "Unable to save quote template."));
 
         }
 

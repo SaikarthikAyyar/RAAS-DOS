@@ -8,6 +8,8 @@ import "../components/auditTrail/AuditTrail.css";
 
 import { useAuth } from "../contexts/AuthContext";
 
+import { formatApiError } from "../utils/apiError";
+
 import {
     getNotifications,
     getNotificationsExport,
@@ -95,7 +97,7 @@ export default function AuditTrail(){
         catch(err){
 
             console.error(err);
-            setError(err?.detail || "Unable to load the audit trail.");
+            setError(formatApiError(err, "Unable to load the audit trail."));
 
         }
         finally{

@@ -15,6 +15,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // ADD / EDIT MODAL
@@ -60,7 +62,7 @@ function ServiceConfigModal({ editing, onClose, onSave }){
 
         catch(err){
 
-            setError(err?.detail || "Unable to save service configuration.");
+            setError(formatApiError(err, "Unable to save service configuration."));
 
         }
 
@@ -266,7 +268,7 @@ export default function ServiceConfigTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove service configuration.");
+            alert(formatApiError(err, "Unable to remove service configuration."));
 
         }
 

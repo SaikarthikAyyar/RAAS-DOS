@@ -14,6 +14,8 @@ from "../components/approval/ApprovalCard";
 
 import { useParams } from "react-router-dom";
 
+import { formatApiError } from "../utils/apiError";
+
 import {
     getApprovalBoard,
     getApprovalBoardByQuote,
@@ -217,11 +219,7 @@ export default function ApprovalBoard(){
 
         catch(error){
 
-            setErrorMessage(
-
-                error.detail || "Approval failed."
-
-            );
+            setErrorMessage(formatApiError(error, "Approval failed."));
 
             setTimeout(() => {
 

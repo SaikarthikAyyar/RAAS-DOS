@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT
@@ -59,7 +61,7 @@ export default function SetFollowUpModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to save follow-up.");
+            setError(formatApiError(err, "Unable to save follow-up."));
 
         }
 

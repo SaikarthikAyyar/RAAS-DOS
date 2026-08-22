@@ -14,6 +14,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import { buildActor } from "../../../utils/actor";
 
 
@@ -213,7 +215,7 @@ export default function CommercialRulesTab(){
 
         catch(err){
 
-            setError(err?.detail || "Unable to save commercial rules.");
+            setError(formatApiError(err, "Unable to save commercial rules."));
 
         }
 
@@ -262,7 +264,7 @@ export default function CommercialRulesTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to add customer category.");
+            alert(formatApiError(err, "Unable to add customer category."));
 
         }
 
@@ -286,7 +288,7 @@ export default function CommercialRulesTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove customer category.");
+            alert(formatApiError(err, "Unable to remove customer category."));
 
         }
 

@@ -23,24 +23,7 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
-
-// ====================================
-// ERROR FORMATTING
-// ====================================
-
-function formatApiError(err, fallback){
-
-    const detail = err?.detail;
-
-    if(typeof detail === "string") return detail;
-
-    if(Array.isArray(detail)){
-        return detail.map(d=>d?.msg || JSON.stringify(d)).join("; ");
-    }
-
-    return fallback;
-
-}
+import { formatApiError } from "../../../utils/apiError";
 
 
 function isExpired(validTill){

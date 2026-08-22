@@ -13,6 +13,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import { buildActor } from "../../../utils/actor";
 
 
@@ -66,7 +68,7 @@ function DewateringMethodModal({ editing, onClose, onSave }){
 
         catch(err){
 
-            setError(err?.detail || "Unable to save dewatering method.");
+            setError(formatApiError(err, "Unable to save dewatering method."));
 
         }
 
@@ -304,7 +306,7 @@ export default function DewateringMethodsTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove dewatering method.");
+            alert(formatApiError(err, "Unable to remove dewatering method."));
 
         }
 

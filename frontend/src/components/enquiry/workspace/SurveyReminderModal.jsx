@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { setSurveyReminder } from "../../../services/surveyReminderService";
 
+import { formatApiError } from "../../../utils/apiError";
+
 // ====================================
 // COMPONENT
 // A plain countdown from "now" - the number+unit is converted to
@@ -72,7 +74,7 @@ export default function SurveyReminderModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to set reminder.");
+            setError(formatApiError(err, "Unable to set reminder."));
 
         }
 

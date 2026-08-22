@@ -13,6 +13,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
+import { formatApiError } from "../../../utils/apiError";
+
 import { buildActor } from "../../../utils/actor";
 
 
@@ -57,7 +59,7 @@ function HrRoleModal({ editing, onClose, onSave }){
 
         catch(err){
 
-            setError(err?.detail || "Unable to save HR role.");
+            setError(formatApiError(err, "Unable to save HR role."));
 
         }
 
@@ -240,7 +242,7 @@ export default function HumanResourcesTab(){
 
         catch(err){
 
-            alert(err?.detail || "Unable to remove HR role.");
+            alert(formatApiError(err, "Unable to remove HR role."));
 
         }
 

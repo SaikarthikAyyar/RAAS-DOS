@@ -15,28 +15,7 @@ import { buildActor } from "../../../utils/actor";
 
 import LookupSelect from "../../shared/LookupSelect";
 
-
-// ====================================
-// ERROR FORMATTING
-// FastAPI's automatic 422 validation errors put an ARRAY of
-// {type, loc, msg, ...} objects in `detail`, not a string - rendering
-// that directly as JSX crashes React ("Objects are not valid as a
-// React child"). This normalizes any shape into a safe string.
-// ====================================
-
-function formatApiError(err){
-
-    const detail = err?.detail;
-
-    if(typeof detail === "string") return detail;
-
-    if(Array.isArray(detail)){
-        return detail.map(d=>d?.msg || JSON.stringify(d)).join("; ");
-    }
-
-    return "Unable to save pump.";
-
-}
+import { formatApiError } from "../../../utils/apiError";
 
 
 // ====================================
@@ -103,7 +82,7 @@ function PumpModal({ editing, onClose, onSave }){
         }
 
         catch(err){
-            setError(formatApiError(err));
+            setError(formatApiError(err, "Unable to save pump."));
         }
 
         finally{
@@ -298,7 +277,7 @@ export default function PumpsTab(){
             load();
         }
         catch(err){
-            alert(formatApiError(err));
+            alert(formatApiError(err, "Unable to remove pump."));
         }
 
     }

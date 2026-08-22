@@ -8,6 +8,8 @@ import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
 
 import { buildActor } from "../../../utils/actor";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT
@@ -60,7 +62,7 @@ export default function ViewBodyModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to save body.");
+            setError(formatApiError(err, "Unable to save body."));
 
         }
 

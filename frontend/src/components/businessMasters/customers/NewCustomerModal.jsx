@@ -6,6 +6,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 import { getUsers } from "../../../services/administrationUsersService";
 
+import { formatApiError } from "../../../utils/apiError";
+
 
 // ====================================
 // COMPONENT
@@ -99,7 +101,7 @@ export default function NewCustomerModal({
 
         catch(err){
 
-            setError(err?.detail || "Unable to create customer.");
+            setError(formatApiError(err, "Unable to create customer."));
 
         }
 

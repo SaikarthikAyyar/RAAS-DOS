@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -118,12 +118,33 @@ app = FastAPI()
 
 
 # ====================================
-# GLOBAL EXCEPTION HANDLER
+# GLOBAL EXCEPTION HANDLERS
 # ====================================
 # Unhandled exceptions otherwise bypass CORSMiddleware's response
 # processing, so the resulting 500 has no Access-Control-Allow-Origin
 # header - the browser then reports the request to the frontend as a
 # generic "Failed to fetch" instead of surfacing the real error.
+#
+# The catch-all below is registered for the base Exception class, which
+# also matches HTTPException (a subclass) - without a more specific
+# handler, every HTTPException raised anywhere in the app (every real
+# 404/422/etc with a real detail message) was being silently downgraded
+# to a fake 500, discarding the actual status code. This dedicated
+# HTTPException handler is registered separately so Starlette's
+# exception-handler lookup (which walks the raised exception's MRO and
+# picks the most specific match) finds this one first and preserves the
+# real status_code/detail/headers, leaving the Exception catch-all for
+# genuinely unexpected errors only.
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers=exc.headers
+    )
+
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception):

@@ -28,6 +28,8 @@ import EnquiryTable from "./EnquiryTable";
 
 import EnquiryPagination from "./EnquiryPagination";
 
+import { formatApiError } from "../../utils/apiError";
+
 import {
 
     getEnquiries,
@@ -237,13 +239,7 @@ export default function EnquiryModuleFrontPage(){
 
                 );
 
-                setError(
-
-                    error?.detail ||
-
-                    "Unable to load enquiries."
-
-                );
+                setError(formatApiError(error, "Unable to load enquiries."));
 
             }
 
@@ -388,13 +384,7 @@ export default function EnquiryModuleFrontPage(){
 
             );
 
-            setError(
-
-                error?.detail ||
-
-                "Operation failed."
-
-            );
+            setError(formatApiError(error, "Operation failed."));
 
         }
 
