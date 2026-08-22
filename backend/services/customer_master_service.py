@@ -16,6 +16,8 @@ from backend.repositories.customer_master_repository import (
     delete_customer,
     list_contacts,
     add_contact,
+    get_contact,
+    delete_contact,
     list_assets,
     get_asset,
     find_asset_by_path,
@@ -704,6 +706,50 @@ def add_contact_request(
     )
 
     return contact
+
+
+# ====================================
+# DELETE CONTACT
+# ====================================
+
+def delete_contact_request(
+        db,
+        contact_id,
+        actor,
+        remark
+):
+    contact = get_contact(db, contact_id)
+
+    if not contact:
+        return "not_found"
+
+    customer = get_customer(db, contact.customer_id) if contact.customer_id else None
+
+    label = contact.name or "Unnamed contact"
+
+    delete_contact(db, contact)
+
+    record_business_master_change(
+        db=db,
+        module="Business Masters",
+        action="DELETE",
+        actor_user_id=actor.user_id,
+        actor_name=actor.name,
+        actor_role=actor.role,
+        title=(
+            f"{actor.name} removed contact '{label}' from "
+            f"{customer.company_name if customer else 'a customer'} in Business Masters"
+        ),
+        changes=[
+            {"field": "name", "before": label, "after": None},
+            {"field": "designation", "before": contact.designation, "after": None},
+            {"field": "email", "before": contact.email, "after": None},
+            {"field": "phone", "before": contact.phone, "after": None}
+        ],
+        remark=remark
+    )
+
+    return "deleted"
 
 
 # ====================================

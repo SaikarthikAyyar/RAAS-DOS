@@ -111,7 +111,7 @@ previous=>{
 
 const existing=
 
-previous.uploads[type] || [];
+previous.uploads?.[type] || [];
 
 
 const combined=[
@@ -166,15 +166,15 @@ const counts={
 
 photos:
 
-customerData.uploads.photos?.length || 0,
+customerData.uploads?.photos?.length || 0,
 
 videos:
 
-customerData.uploads.videos?.length || 0,
+customerData.uploads?.videos?.length || 0,
 
 layouts:
 
-customerData.uploads.layouts?.length || 0
+customerData.uploads?.layouts?.length || 0
 
 };
 

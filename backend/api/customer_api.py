@@ -30,6 +30,11 @@ from backend.services.customer_service import (
 
 from backend.services.customer_service import create_customer_request
 
+from backend.services.customer_service import (
+    update_customer_request,
+    get_customer_request_edit_prefill
+)
+
 from backend.models.customer_requests import CustomerRequest
 
 from backend.services.customer_takeaway_service import (
@@ -79,6 +84,58 @@ def customer_request(
         raise HTTPException(status_code=422, detail=str(error))
 
     return customer
+
+
+# ====================================
+# UPDATE CUSTOMER REQUEST (post-creation edit)
+# ====================================
+
+@router.put("/customer-request/{customer_id}")
+def update_customer_request_route(
+        customer_id: int,
+        payload: CustomerRequestSchema,
+        db: Session = Depends(get_db)
+):
+    try:
+        customer = update_customer_request(
+            db,
+            customer_id,
+            payload
+        )
+
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error))
+
+    if not customer:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer Request not found"
+        )
+
+    return customer
+
+
+# ====================================
+# CUSTOMER REQUEST EDIT PREFILL
+# ====================================
+
+@router.get("/customer-request/{customer_id}/edit-prefill")
+def get_customer_request_edit_prefill_route(
+        customer_id: int,
+        db: Session = Depends(get_db)
+):
+    prefill = get_customer_request_edit_prefill(
+        db,
+        customer_id
+    )
+
+    if not prefill:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer Request not found"
+        )
+
+    return prefill
 
 
 # ====================================

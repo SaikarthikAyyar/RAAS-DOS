@@ -8,9 +8,9 @@ import "../../components/salesSurvey/SalesSurvey.css";
 
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import useCustomerRequest from "../../hooks/useCustomerRequest";
 
@@ -19,7 +19,9 @@ import {
 } from "../../utils/customerRequestValidation";
 
 import {
-  createCustomerRequest
+  createCustomerRequest,
+  updateCustomerRequest,
+  getCustomerRequestEditPrefill
 } from "../../services/customerService";
 
 import {
@@ -81,11 +83,17 @@ export default function CustomerRequest(){
 
   const navigate = useNavigate();
 
+  const { customerRequestId } = useParams();
+
+  const isEditMode = Boolean(customerRequestId);
+
 
 
 const{
 
     customerData,
+
+    setCustomerData,
 
     updateSection,
 
@@ -104,6 +112,49 @@ useCustomerRequest();
   const [submitting, setSubmitting] = useState(false);
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const [loadingPrefill, setLoadingPrefill] = useState(isEditMode);
+
+
+  // ====================================
+  // EDIT MODE - HYDRATE FROM EXISTING REQUEST
+  // ====================================
+
+  useEffect(()=>{
+
+    if(!isEditMode){
+      return;
+    }
+
+    let cancelled = false;
+
+    setLoadingPrefill(true);
+
+    getCustomerRequestEditPrefill(customerRequestId)
+      .then(prefill=>{
+        if(cancelled){
+          return;
+        }
+        // uploads must stay present (even empty) - useCustomerRequest's
+        // counts/updateMedia both dereference customerData.uploads
+        // directly, and this prefill wholesale-replaces state rather
+        // than merging into the hook's own initial shape.
+        setCustomerData({...prefill, uploads:{}});
+      })
+      .catch(error=>{
+        console.error(error);
+        alert("Could not load this Customer Request for editing.");
+        navigate("/enquiry");
+      })
+      .finally(()=>{
+        if(!cancelled){
+          setLoadingPrefill(false);
+        }
+      });
+
+    return ()=>{ cancelled = true; };
+
+  }, [isEditMode, customerRequestId]);
 
   const errors = getCustomerRequestErrors(
     customerData.customer || {},
@@ -189,18 +240,31 @@ async function submit(){
 
       console.log("PAYLOAD", payload);
 
-      const response =
-        await createCustomerRequest(payload);
+      const response = isEditMode
+        ? await updateCustomerRequest(customerRequestId, payload)
+        : await createCustomerRequest(payload);
 
       console.log("API RESPONSE", response);
 
       if(!response?.id){
 
-        console.log("Customer Request Creation Failed", response);
+        console.log("Customer Request Save Failed", response);
 
         alert(
-          "Customer request could not be created. Please check the form and try again."
+          isEditMode
+            ? "Customer request could not be updated. Please check the form and try again."
+            : "Customer request could not be created. Please check the form and try again."
         );
+
+        return;
+
+      }
+
+      if(isEditMode){
+
+        alert("Customer request has been updated successfully.");
+
+        navigate("/enquiry");
 
         return;
 
@@ -259,6 +323,14 @@ async function submit(){
   // UI
   // ====================================
 
+  if(loadingPrefill){
+    return(
+      <div className="sales-survey-page">
+        <p style={{padding:"20px"}}>Loading Customer Request...</p>
+      </div>
+    );
+  }
+
   return(
 
     // onBlurCapture (not a per-field onBlur) so leaving ANY field on
@@ -267,6 +339,17 @@ async function submit(){
     // field's error, matching "select a later field and an earlier
     // required one lights up" without touching every field's JSX.
     <div className="sales-survey-page" onBlurCapture={()=>touchField("_form", "_any")}>
+
+{
+  isEditMode && (
+    <div className="survey-card" style={{marginBottom:"12px"}}>
+      <div className="survey-header">
+        <h2>Editing Customer Request CR{customerRequestId}</h2>
+        <span>Updates apply to the original enquiry - no new case is created</span>
+      </div>
+    </div>
+  )
+}
 
 <Section1_CustomerSite
 
@@ -298,6 +381,7 @@ submitAttempted={submitAttempted}
       <CustomerActions
         submit={submit}
         submitting={submitting}
+        isEditMode={isEditMode}
       />
 
     </div>

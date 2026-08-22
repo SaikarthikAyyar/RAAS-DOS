@@ -111,7 +111,9 @@ export default function CustomerDetailView({
 
     onDelete,
 
-    onDeleteAsset
+    onDeleteAsset,
+
+    onDeleteContact
 
 }){
 
@@ -367,7 +369,12 @@ export default function CustomerDetailView({
                 <table>
 
                     <thead>
-                        <tr><th>Name</th><th>Email</th><th>Phone</th></tr>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            {hasTask("bm-tab-customers", "remove_contact") && <th></th>}
+                        </tr>
                     </thead>
 
                     <tbody>
@@ -376,7 +383,14 @@ export default function CustomerDetailView({
 
                             detail.contacts.length===0 ? (
 
-                                <tr><td colSpan={3} className="bm-muted">None yet.</td></tr>
+                                <tr>
+                                    <td
+                                        colSpan={hasTask("bm-tab-customers", "remove_contact") ? 4 : 3}
+                                        className="bm-muted"
+                                    >
+                                        None yet.
+                                    </td>
+                                </tr>
 
                             ) : detail.contacts.map(k=>(
 
@@ -387,6 +401,20 @@ export default function CustomerDetailView({
                                     <td>{k.email || "—"}</td>
 
                                     <td>{k.phone || "—"}</td>
+
+                                    {
+                                        hasTask("bm-tab-customers", "remove_contact") && (
+                                            <td>
+                                                <button
+                                                    className="bm-backlink"
+                                                    style={{color:"#991b1b"}}
+                                                    onClick={()=>onDeleteContact(k.id)}
+                                                >
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        )
+                                    }
 
                                 </tr>
 

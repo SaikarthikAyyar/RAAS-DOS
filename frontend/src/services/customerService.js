@@ -99,3 +99,52 @@ export async function getCustomerRequest(
     return data;
 
 }
+
+
+// ====================================
+// UPDATE CUSTOMER REQUEST (post-creation edit)
+// ====================================
+
+export async function updateCustomerRequest(customerId, payload){
+
+  const response = await fetch(
+    `${API}/customer-request/${customerId}`,
+    {
+      method:"PUT",
+
+      headers:{
+        "Content-Type":"application/json"
+      },
+
+      body:JSON.stringify(payload)
+    }
+  );
+
+  const data = await response.json();
+
+  if(!response.ok){
+    throw data;
+  }
+
+  return data;
+}
+
+
+// ====================================
+// GET CUSTOMER REQUEST EDIT PREFILL
+// ====================================
+
+export async function getCustomerRequestEditPrefill(customerId){
+
+  const response = await fetch(
+    `${API}/customer-request/${customerId}/edit-prefill`
+  );
+
+  const data = await response.json();
+
+  if(!response.ok){
+    throw data;
+  }
+
+  return data;
+}

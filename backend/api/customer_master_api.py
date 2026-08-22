@@ -34,6 +34,7 @@ from backend.services.customer_master_service import (
     update_customer_request,
     delete_customer_request,
     delete_asset_request,
+    delete_contact_request,
     build_customers_report,
     get_customer_detail_request,
     add_contact_request,
@@ -282,6 +283,30 @@ def add_contact(
         db: Session = Depends(get_db)
 ):
     return add_contact_request(db, customer_id, payload)
+
+
+# ====================================
+# DELETE CONTACT
+# ====================================
+
+@router.delete(
+    "/business-master/customers/{customer_id}/contacts/{contact_id}"
+)
+def delete_contact(
+        customer_id: int,
+        contact_id: int,
+        payload: BusinessMasterActionSchema,
+        db: Session = Depends(get_db)
+):
+    result = delete_contact_request(db, contact_id, payload.actor, payload.remark)
+
+    if result == "not_found":
+        raise HTTPException(
+            status_code=404,
+            detail="Contact not found."
+        )
+
+    return {"success": True}
 
 
 # ====================================

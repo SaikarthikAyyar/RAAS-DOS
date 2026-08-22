@@ -19,6 +19,8 @@ export default function EnquiryTable({
 
     onView,
 
+    onEdit,
+
     onArchive,
 
     onRestore,
@@ -179,6 +181,8 @@ export default function EnquiryTable({
                                 enquiry={enquiry}
 
                                 onView={onView}
+
+                                onEdit={onEdit}
 
                                 onArchive={onArchive}
 

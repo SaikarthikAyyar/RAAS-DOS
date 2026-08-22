@@ -282,6 +282,51 @@ export async function deleteAsset(
 
 
 // ====================================
+// DELETE CONTACT
+// ====================================
+
+export async function deleteContact(
+
+    customerId,
+
+    contactId,
+
+    actor,
+
+    remark
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/customers/${customerId}/contacts/${contactId}`,
+
+        {
+
+            method:"DELETE",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify({ actor, remark })
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // CUSTOMERS REPORT (3-sheet Excel export - Summary/Assets/Contacts)
 // ====================================
 

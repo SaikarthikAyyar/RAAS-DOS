@@ -453,6 +453,16 @@
 
 }
 
+.enquiry-edit{
+
+    color:#b45309;
+
+    background:rgba(180,83,9,.08);
+
+    border-color:rgba(180,83,9,.16);
+
+}
+
 .enquiry-view{
 
     color:var(--enquiry-blue);

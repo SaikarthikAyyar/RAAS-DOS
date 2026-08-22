@@ -5,7 +5,14 @@
 from backend.repositories.customer_repository import (
 
     create_customer,
+    update_customer_request as update_customer_request_repository,
     get_customers
+
+)
+
+from backend.repositories.customer_master_repository import (
+
+    get_enquiry_by_customer_request
 
 )
 
@@ -209,6 +216,222 @@ def create_customer_request(
     customer_request.enquiry_id = new_enquiry.id
 
     return customer_request
+
+
+# ====================================
+# UPDATE CUSTOMER REQUEST (post-creation edit)
+# Reuses the exact same field-resolution functions create_customer_
+# request already relies on (resolve_or_create_customer/asset), so
+# changing the Company Name or Existing Asset selection during an edit
+# behaves identically to picking them at creation time. The linked
+# Enquiry's own snapshot columns (customer_id/asset_id/customer_name/
+# nature) are refreshed too - those are what the Enquiries front page
+# and its Owner column (resolved from customer_id) actually read, so
+# an edit that changes the customer/asset must propagate there or the
+# list would keep showing stale data forever.
+# ====================================
+
+def update_customer_request(
+
+        db,
+
+        customer_request_id,
+
+        payload
+
+):
+
+    customer_request = db.query(
+        CustomerRequest
+    ).filter(
+        CustomerRequest.id == customer_request_id
+    ).first()
+
+    if not customer_request:
+        return None
+
+    if not payload.customer_id:
+        raise ValueError(
+            "A real customer must be selected. Customer Request can no longer create "
+            "a new customer inline - use Business Masters > Customers to add one first."
+        )
+
+    customer_request = update_customer_request_repository(
+        db,
+        customer_request,
+        payload
+    )
+
+    customer = resolve_or_create_customer(
+
+        db,
+
+        payload.customer_id,
+
+        payload.company_name
+
+    )
+
+    asset = resolve_or_create_asset(
+
+        db,
+
+        customer.id,
+
+        payload.asset_id,
+
+        payload.division,
+
+        payload.plant_site_location,
+
+        payload.department,
+
+        payload.asset_name,
+
+        payload.asset_type,
+
+        payload.cleaning_frequency,
+
+        payload.observed_material,
+
+        payload.access_opening_type,
+
+        payload.can_place_equipment_nearby,
+
+        payload.pain_point
+
+    )
+
+    linked_enquiry = get_enquiry_by_customer_request(db, customer_request_id)
+
+    if linked_enquiry:
+
+        linked_enquiry.customer_id = customer.id
+        linked_enquiry.asset_id = asset.id if asset else None
+        linked_enquiry.customer_name = customer.company_name
+        linked_enquiry.nature = payload.nature_of_job
+
+        linked_enquiry.payload = {
+
+            "customer_request_id": customer_request.id,
+            "status": customer_request.status,
+
+            "company_name": customer_request.company_name,
+            "contact_person": customer_request.contact_person,
+            "client_contact_email": customer_request.client_contact_email,
+            "plant_site_location": customer_request.plant_site_location,
+            "nearest_city_hub": customer_request.nearest_city_hub,
+            "division": customer_request.division,
+            "department": customer_request.department,
+            "lead_source": customer_request.lead_source,
+
+            "existing_asset": customer_request.existing_asset,
+            "asset_name": customer_request.asset_name,
+            "asset_type": customer_request.asset_type,
+
+            "service_requirement_type": customer_request.service_requirement_type,
+            "observed_material": customer_request.observed_material,
+            "tank_type": customer_request.tank_type,
+            "estimated_volume": customer_request.estimated_volume,
+            "urgency": customer_request.urgency,
+
+            "cleaning_date": (
+                customer_request.cleaning_date.isoformat()
+                if customer_request.cleaning_date
+                else None
+            )
+
+        }
+
+        db.commit()
+        db.refresh(linked_enquiry)
+
+        # The commit above expires every attribute of customer_request
+        # (SQLAlchemy's default expire_on_commit) - re-refresh it so its
+        # real columns are reloaded into __dict__ before this function
+        # returns it directly (no response_model), otherwise FastAPI's
+        # jsonable_encoder would only see the dynamically-set enquiry_id
+        # attribute below, since that one isn't a mapped column and
+        # survives expiry untouched.
+        db.refresh(customer_request)
+
+        customer_request.enquiry_id = linked_enquiry.id
+
+    return customer_request
+
+
+# ====================================
+# CUSTOMER REQUEST EDIT PREFILL
+# Shapes an existing Customer Request into the same {customer, requirement}
+# structure useCustomerRequest's state already uses, so the Edit page can
+# hydrate the form directly with no separate mapping logic on the frontend.
+# customer_id/existing_asset_id aren't stored on customer_requests itself
+# (only company_name/asset_name text are) - they're resolved from the
+# linked Enquiry's real Business Master FKs instead.
+# ====================================
+
+def get_customer_request_edit_prefill(
+
+        db,
+
+        customer_request_id
+
+):
+
+    customer_request = db.query(
+        CustomerRequest
+    ).filter(
+        CustomerRequest.id == customer_request_id
+    ).first()
+
+    if not customer_request:
+        return None
+
+    linked_enquiry = get_enquiry_by_customer_request(db, customer_request_id)
+
+    return {
+
+        "customer": {
+
+            "company_name": customer_request.company_name,
+            "customer_id": linked_enquiry.customer_id if linked_enquiry else None,
+            "existing_asset_id": linked_enquiry.asset_id if linked_enquiry else None,
+
+            "contact_person": customer_request.contact_person,
+            "contact_number": customer_request.contact_number,
+            "client_contact_email": customer_request.client_contact_email,
+            "nearest_city_hub": customer_request.nearest_city_hub,
+            "urgency": customer_request.urgency,
+            "nature_of_job": customer_request.nature_of_job,
+            "lead_source": customer_request.lead_source,
+            "plant_site_location": customer_request.plant_site_location,
+            "division": customer_request.division,
+            "department": customer_request.department
+
+        },
+
+        "requirement": {
+
+            "service_requirement_type": customer_request.service_requirement_type,
+            "observed_material": customer_request.observed_material,
+            "access_opening_type": customer_request.access_opening_type,
+            "can_place_equipment_nearby": (
+                "Yes, within 10 m" if customer_request.can_place_equipment_nearby else "No"
+            ) if customer_request.can_place_equipment_nearby is not None else None,
+            "cleaning_date": (
+                customer_request.cleaning_date.isoformat()
+                if customer_request.cleaning_date
+                else ""
+            ),
+            "cleaning_frequency": customer_request.cleaning_frequency,
+            "asset_name": customer_request.asset_name,
+            "asset_type": customer_request.asset_type,
+            "pain_point": customer_request.pain_point,
+            "estimated_volume": customer_request.estimated_volume
+
+        }
+
+    }
 
 
 # ====================================

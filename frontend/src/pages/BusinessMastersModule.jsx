@@ -55,6 +55,8 @@ import {
 
     deleteAsset,
 
+    deleteContact,
+
     getCustomersReport
 
 } from "../services/customerMasterService";
@@ -308,6 +310,32 @@ function CustomersTab({
 
     }
 
+    async function handleDeleteContact(contactId){
+
+        const remark = await promptForRemark("Removing this contact");
+
+        if(remark===null){
+            return;
+        }
+
+        try{
+
+            await deleteContact(selectedCustomerId, contactId, buildActor(user), remark);
+
+            loadDetail(selectedCustomerId);
+
+            onReload();
+
+        }
+
+        catch(err){
+
+            alert(formatApiError(err, "Unable to remove contact."));
+
+        }
+
+    }
+
     return(
 
         <>
@@ -339,6 +367,8 @@ function CustomersTab({
                         onDelete={handleDeleteCustomer}
 
                         onDeleteAsset={handleDeleteAsset}
+
+                        onDeleteContact={handleDeleteContact}
 
                     />
 

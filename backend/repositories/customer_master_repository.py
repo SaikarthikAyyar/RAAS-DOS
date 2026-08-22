@@ -279,6 +279,29 @@ def add_contact(
     return contact
 
 
+def get_contact(
+        db,
+        contact_id
+):
+    return (
+        db.query(
+            CustomerContact
+        )
+        .filter(
+            CustomerContact.id == contact_id
+        )
+        .first()
+    )
+
+
+def delete_contact(
+        db,
+        contact
+):
+    db.delete(contact)
+    db.commit()
+
+
 # ====================================
 # ASSETS ON FILE
 # ====================================

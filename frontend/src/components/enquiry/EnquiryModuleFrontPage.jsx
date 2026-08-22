@@ -419,6 +419,37 @@ export default function EnquiryModuleFrontPage(){
 
 
     // ====================================
+    // EDIT
+    // Loads the linked Customer Request (via its own ID, not the
+    // Enquiry ID) into the Customer Request form's edit mode, so the
+    // user can correct the original enquiry-creation details post-
+    // creation without touching anything workflow-related.
+    // ====================================
+
+    function handleEdit(
+
+        enquiry
+
+    ){
+
+        if(!enquiry.customer_request_id){
+
+            alert("This enquiry has no linked Customer Request to edit.");
+
+            return;
+
+        }
+
+        navigate(
+
+            `/customer-request/edit/${enquiry.customer_request_id}`
+
+        );
+
+    }
+
+
+    // ====================================
     // ARCHIVE
     // ====================================
 
@@ -674,6 +705,8 @@ export default function EnquiryModuleFrontPage(){
                 error={error}
 
                 onView={handleOpen}
+
+                onEdit={handleEdit}
 
                 onArchive={handleArchive}
 

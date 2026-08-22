@@ -83,6 +83,8 @@ function App() {
 
           <Route path="customer-request" element={<CustomerRequest />} />
 
+          <Route path="customer-request/edit/:customerRequestId" element={<CustomerRequest />} />
+
           <Route path="sales-survey" element={<SalesSurvey />} />
 
           <Route path="ops-approval" element={<OpsApproval />} />

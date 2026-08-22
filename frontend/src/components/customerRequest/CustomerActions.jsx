@@ -2,7 +2,9 @@ export default function CustomerActions({
 
 submit,
 
-submitting
+submitting,
+
+isEditMode
 
 }){
 
@@ -24,7 +26,11 @@ disabled={submitting}
 
 >
 
-{submitting ? "Submitting..." : "Submit Requirement"}
+{
+    submitting
+        ? (isEditMode ? "Saving..." : "Submitting...")
+        : (isEditMode ? "Save Changes" : "Submit Requirement")
+}
 
 
 

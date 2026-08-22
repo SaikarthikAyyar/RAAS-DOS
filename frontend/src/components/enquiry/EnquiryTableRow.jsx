@@ -1,4 +1,4 @@
-import { FolderOpen, Archive, ArchiveRestore, Ban, CheckCheck, Trash2 } from "lucide-react";
+import { Pencil, FolderOpen, Archive, ArchiveRestore, Ban, CheckCheck, Trash2 } from "lucide-react";
 
 import { STAGE_LABELS } from "../../data/workflowStages";
 
@@ -44,6 +44,8 @@ export default function EnquiryTableRow({
     enquiry,
 
     onView,
+
+    onEdit,
 
     onArchive,
 
@@ -229,6 +231,13 @@ export default function EnquiryTableRow({
             {/* ===================================== */}
 
             <td className="enquiry-actions">
+
+                <ActionButton
+                    icon={Pencil}
+                    label="Edit"
+                    className="enquiry-edit"
+                    onClick={()=>onEdit?.(enquiry)}
+                />
 
                 <ActionButton
                     icon={FolderOpen}
