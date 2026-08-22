@@ -26,18 +26,28 @@ from backend.services.workflow_service import (
 )
 
 from backend.models.techno_commercial_quote import Quote
+from backend.models.customer_master import Customer
+from backend.models.users import User
 
 from backend.utils.aging import compute_aging_seconds, aging_seconds_to_days_display
 from backend.utils.value_display import compute_value_display
 
 
 # ====================================
-# ATTACH AGING + VALUE
-# Both are computed live (never stored/cached) - matches the
+# ATTACH AGING + VALUE + OWNER
+# Aging/value are computed live (never stored/cached) - matches the
 # wireframe's own daysInStage(), which recomputes at render time
-# rather than keeping a background job in sync. Attached as plain
-# Python attributes (not real ORM columns) so EnquiryConsolidatedListItem's
-# from_attributes=True picks them up via getattr, same as any other field.
+# rather than keeping a background job in sync. Owner is resolved the
+# same way: Enquiry.owner is a dead snapshot column (never written by
+# any code path - Customer.owner was superseded by the real
+# Customer.owner_user_id "Account Owner" FK in Phase 21B), so instead
+# of relying on that stale field, the Enquiries list's Owner column is
+# resolved live from the linked Customer's current owner_user_id ->
+# User.name every time, so reassigning a customer's Account Owner in
+# Business Masters is immediately reflected here with no backfill.
+# Attached as plain Python attributes (not real ORM columns) so
+# EnquiryConsolidatedListItem's from_attributes=True picks them up via
+# getattr, same as any other field.
 # ====================================
 
 def _attach_aging_and_value(db, enquiries):
@@ -52,6 +62,28 @@ def _attach_aging_and_value(db, enquiries):
 
         quotes_by_id = {q.id: q for q in quotes}
 
+    customer_ids = [e.customer_id for e in enquiries if e.customer_id]
+
+    owner_user_id_by_customer_id = {}
+
+    if customer_ids:
+
+        customers = db.query(Customer).filter(Customer.id.in_(customer_ids)).all()
+
+        owner_user_id_by_customer_id = {
+            c.id: c.owner_user_id for c in customers if c.owner_user_id
+        }
+
+    owner_user_ids = set(owner_user_id_by_customer_id.values())
+
+    owner_name_by_user_id = {}
+
+    if owner_user_ids:
+
+        owners = db.query(User).filter(User.id.in_(owner_user_ids)).all()
+
+        owner_name_by_user_id = {u.id: u.name for u in owners}
+
     for enquiry in enquiries:
 
         aging_seconds = compute_aging_seconds(enquiry.stage_entered_at)
@@ -62,6 +94,15 @@ def _attach_aging_and_value(db, enquiries):
         quote = quotes_by_id.get(enquiry.quote_id) if enquiry.quote_id else None
 
         enquiry.value_display = compute_value_display(quote)
+
+        owner_user_id = (
+            owner_user_id_by_customer_id.get(enquiry.customer_id)
+            if enquiry.customer_id else None
+        )
+
+        enquiry.owner = (
+            owner_name_by_user_id.get(owner_user_id) if owner_user_id else None
+        )
 
     return enquiries
 
@@ -194,6 +235,8 @@ def get_enquiry(
         enquiry_id
 
     )
+
+    _attach_aging_and_value(db, [enquiry])
 
     print("[SERVICE] Returning Detail")
     print("========================================\n")
