@@ -6,6 +6,8 @@ import { useState } from "react";
 
 import LookupSelect from "../shared/LookupSelect";
 
+import FieldTooltip from "../shared/FieldTooltip";
+
 import { uploadMedia } from "../../services/customerMediaService";
 
 
@@ -114,6 +116,7 @@ export default function SectionG_Insights({
                     <label>
 
                         Customer pain point / key insight
+                        <FieldTooltip text="The main problem or concern the customer has, in their own words - captured during the survey visit."/>
 
                     </label>
 
@@ -164,6 +167,8 @@ export default function SectionG_Insights({
 
                     updateSection={updateSection}
 
+                    tooltip="The window of time the customer's plant/site will be shut down and available for this job."
+
                 />
 
 
@@ -174,6 +179,7 @@ export default function SectionG_Insights({
                     <label>
 
                         Completion Deadline
+                        <FieldTooltip text="The date the customer expects the job to be fully finished by."/>
 
                     </label>
 
@@ -224,6 +230,8 @@ export default function SectionG_Insights({
 
                     updateSection={updateSection}
 
+                    tooltip="How the customer currently handles this cleaning job, if at all (e.g. manual, another vendor)."
+
                 />
 
 
@@ -243,6 +251,8 @@ export default function SectionG_Insights({
 
                     updateSection={updateSection}
 
+                    tooltip="Whether the customer has already indicated a budget for this job."
+
                 />
 
 
@@ -256,6 +266,7 @@ export default function SectionG_Insights({
                             <label>
 
                                 Budget Estimate (INR)
+                                <FieldTooltip text="The customer's indicated or estimated budget for this job, in INR."/>
 
                             </label>
 
@@ -294,6 +305,7 @@ export default function SectionG_Insights({
                     <label>
 
                         Decision Maker
+                        <FieldTooltip text="The person at the customer's organisation who will approve/decide on this job."/>
 
                     </label>
 
@@ -337,6 +349,7 @@ export default function SectionG_Insights({
                     <label>
 
                         Billing Address
+                        <FieldTooltip text="The address to be used for invoicing this job, if different from the site address."/>
 
                     </label>
 
@@ -372,6 +385,7 @@ export default function SectionG_Insights({
                     <label>
 
                         Photos / Videos
+                        <FieldTooltip text="Site photos/videos captured during the survey, to support the assessment and quote."/>
 
                     </label>
 

@@ -38,6 +38,30 @@ function isExpired(validTill){
 
 
 // ====================================
+// DOCUMENT URL
+// file_path is stored as a real disk path rooted at the backend's own
+// working directory (e.g. "backend/uploads/personnel_documents/16/
+// test_doc.pdf") - the "/uploads" static mount in main.py serves
+// everything under "backend/uploads" at that prefix, so stripping the
+// leading "backend/" is what turns the stored path into the URL that
+// mount actually answers to.
+// ====================================
+
+const API = import.meta.env.VITE_API_URL;
+
+function documentUrl(filePath){
+
+    const relativePath = filePath.replace(/^backend\//, "");
+
+    // encodeURI (not encodeURIComponent) so real "/" separators survive -
+    // only characters like spaces in a real filename ("Heavy Machine
+    // License.pdf") get escaped.
+    return `${API}/${encodeURI(relativePath)}`;
+
+}
+
+
+// ====================================
 // ADD / EDIT PERSON MODAL
 // ====================================
 
@@ -197,6 +221,14 @@ function AddDocumentModal({ person, docTypeOptions, onClose, onUpload }){
 
         }
 
+        if(!file.name.toLowerCase().endsWith(".pdf")){
+
+            setError("Only PDF files are accepted for personnel documents.");
+
+            return;
+
+        }
+
         setSaving(true);
         setError("");
 
@@ -241,8 +273,8 @@ function AddDocumentModal({ person, docTypeOptions, onClose, onUpload }){
                     </div>
 
                     <div style={{gridColumn:"1 / -1"}}>
-                        <label>File</label>
-                        <input type="file" onChange={e=>setFile(e.target.files?.[0] || null)} />
+                        <label>File (PDF only)</label>
+                        <input type="file" accept="application/pdf" onChange={e=>setFile(e.target.files?.[0] || null)} />
                     </div>
 
                 </div>
@@ -633,7 +665,16 @@ export default function PersonnelTab(){
                                                 }
                                             </td>
 
-                                            <td>{d.document_name}</td>
+                                            <td>
+                                                <a
+                                                    href={documentUrl(d.file_path)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="bm-backlink"
+                                                >
+                                                    {d.document_name}
+                                                </a>
+                                            </td>
 
                                             <td>
 

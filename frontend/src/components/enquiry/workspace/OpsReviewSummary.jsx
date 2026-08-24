@@ -26,6 +26,8 @@ import {
 
 import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
 
+import FieldTooltip from "../../shared/FieldTooltip";
+
 export default function OpsReviewSummary({
 
     enquiry,
@@ -298,7 +300,7 @@ export default function OpsReviewSummary({
 
                             <ComponentExplainerIcon tabId="ops-review" componentId="ops-review-override" floating/>
 
-                            <h4 className="ops-subheading">Override Machine</h4>
+                            <h4 className="ops-subheading">Override Machine<FieldTooltip text="Manually pick a different machine than the algorithm recommended - a reason is required and goes into the audit trail."/></h4>
 
                             {error && <div className="survey-empty">{error}</div>}
 

@@ -160,6 +160,14 @@ async def upload_document_request(db, personnel_id, file, document_type, valid_t
     if not person:
         raise ValueError("Person not found.")
 
+    # Personnel compliance documents (Insurance, ID Proof, Driving
+    # License, Medical Certificate, etc.) are always scanned/issued as
+    # PDFs - reject anything else rather than silently accepting a
+    # photo or a doc file that the viewer link below wouldn't render
+    # sensibly in a browser tab.
+    if not file.filename.lower().endswith(".pdf"):
+        raise ValueError("Only PDF files are accepted for personnel documents.")
+
     folder = f"backend/uploads/personnel_documents/{personnel_id}"
     os.makedirs(folder, exist_ok=True)
 

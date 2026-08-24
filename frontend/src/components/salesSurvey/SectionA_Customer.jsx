@@ -8,6 +8,8 @@ from "../shared/FormField";
 
 import LookupSelect from "../shared/LookupSelect";
 
+import FieldTooltip from "../shared/FieldTooltip";
+
 
 export default function SectionA_Customer({
 
@@ -209,6 +211,8 @@ error={fieldError("nearest_hub")}
 
 errorMessage="Nearest Hub is required."
 
+tooltip="The RAAS-DOS hub nearest the job site - determines which team is assigned and affects approval routing."
+
 />
 
 {/* ==================================== */}
@@ -234,6 +238,8 @@ onBlur={()=>touchField("customer", "urgency")}
 error={fieldError("urgency")}
 
 errorMessage="Urgency is required."
+
+tooltip="How soon this job needs to move forward."
 
 />
 
@@ -265,6 +271,8 @@ errorMessage={
         : "Survey Date is required."
 }
 
+tooltip="The date this site survey is being (or was) carried out. Must fall on or after the enquiry's creation date."
+
 />
 
 <FieldInput
@@ -278,6 +286,8 @@ section="customer"
 field="surveyed_by"
 
 updateSection={updateSection}
+
+tooltip="The name of the person who conducted this survey."
 
 />
 
@@ -295,6 +305,8 @@ field="survey_trigger"
 
 updateSection={updateSection}
 
+tooltip="What prompted this survey/job (e.g. scheduled maintenance, breakdown, customer request)."
+
 />
 
 <LookupSelect
@@ -310,6 +322,8 @@ section="customer"
 field="repeat_potential"
 
 updateSection={updateSection}
+
+tooltip="How likely this is to become a recurring job (one-time, semi-annual, annual)."
 
 />
 
@@ -327,6 +341,8 @@ field="tentative_start_date"
 
 updateSection={updateSection}
 
+tooltip="The expected start date of the actual cleaning job, if known."
+
 />
 
 <FieldInput
@@ -342,6 +358,8 @@ section="customer"
 field="tentative_end_date"
 
 updateSection={updateSection}
+
+tooltip="The expected completion date of the job, if known."
 
 />
 

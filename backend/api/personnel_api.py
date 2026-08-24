@@ -92,7 +92,9 @@ async def upload_personnel_document(
 
     except ValueError as error:
 
-        raise HTTPException(status_code=404, detail=str(error))
+        status_code = 404 if str(error) == "Person not found." else 422
+
+        raise HTTPException(status_code=status_code, detail=str(error))
 
 
 @api.put("/personnel-documents/{document_id}", response_model=PersonnelDocumentResponse)

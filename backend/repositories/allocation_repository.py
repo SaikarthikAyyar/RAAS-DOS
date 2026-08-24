@@ -4,7 +4,6 @@ from backend.data.machine_inventory_seed import MACHINE_INVENTORY
 
 from backend.models.machine_inventory import MachineInventory
 from backend.models.personnel import Personnel
-from backend.models.personnel_document import PersonnelDocument
 
 
 def seed_machine_inventory(db):
@@ -79,15 +78,6 @@ def seed_personnel(db):
 
     ]
 
-    documents = [
-
-        ("Aadhaar Card", "Identity"),
-        ("Driving Licence", "Licence"),
-        ("Medical Certificate", "Medical"),
-        ("Safety Certificate", "Certification")
-
-    ]
-
     for code, fullname, phone, designation in personnel_data:
 
         person = Personnel(
@@ -114,6 +104,17 @@ def seed_personnel(db):
 
             availability_status="AVAILABLE",
 
+            # Seeded people start with no PersonnelDocument rows at all -
+            # a prior version of this seeder fabricated 4 placeholder
+            # rows per person with a fake file_path ("/documents/{code}/
+            # ...") that never had a real file behind it anywhere on
+            # disk. Real documents only exist once someone actually
+            # uploads one via the Personnel tab (a real multipart
+            # upload, see personnel_service.py). documents_verified
+            # stays True to preserve existing Allocation-module gating
+            # behavior on a fresh seed - that flag isn't yet wired to
+            # reflect real per-document verification, so changing its
+            # default here is a separate concern from this fix.
             documents_verified=True
 
         )
@@ -121,25 +122,5 @@ def seed_personnel(db):
         db.add(person)
 
         db.flush()
-
-        for document_name, document_type in documents:
-
-            document = PersonnelDocument(
-
-                personnel_id=person.id,
-
-                document_name=document_name,
-
-                document_type=document_type,
-
-                file_path=f"/documents/{code}/{document_name.replace(' ', '_')}.pdf",
-
-                verification_status="VERIFIED",
-
-                verified_by="USER"
-
-            )
-
-            db.add(document)
 
     db.commit()

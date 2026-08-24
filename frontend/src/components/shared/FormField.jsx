@@ -1,3 +1,5 @@
+import FieldTooltip from "./FieldTooltip";
+
 // ====================================
 // SHARED FORM FIELD COMPONENTS
 // Replaces the near-identical local FieldInput/FieldSelect copies
@@ -61,7 +63,8 @@ export function FieldInput({
     readOnly,
     disabled,
     list,
-    placeholder
+    placeholder,
+    tooltip
 
 }) {
 
@@ -71,6 +74,7 @@ export function FieldInput({
 
             <label>
                 {renderLabel(label)}
+                <FieldTooltip text={tooltip}/>
             </label>
 
             <input
@@ -117,7 +121,8 @@ export function FieldSelect({
     error,
     errorMessage,
     disabled,
-    formatOption
+    formatOption,
+    tooltip
 
 }) {
 
@@ -127,6 +132,7 @@ export function FieldSelect({
 
             <label>
                 {renderLabel(label)}
+                <FieldTooltip text={tooltip}/>
             </label>
 
             <select

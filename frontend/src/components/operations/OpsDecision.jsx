@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { getMachines } from "../../services/machinesService";
 import { getPumps } from "../../services/pumpsService";
 import { getServiceConfigurations } from "../../services/serviceConfigService";
+import FieldTooltip from "../shared/FieldTooltip";
 
 
 // ====================================
@@ -120,6 +121,7 @@ export default function OpsDecision({
                     opsData={opsData}
                     updateField={updateField}
                     options={approvalOptions}
+                    tooltip="Whether this job can realistically be done as scoped. Set an approval status if it needs sign-off before proceeding."
                 />
 
                 <Row
@@ -131,6 +133,7 @@ export default function OpsDecision({
                     options={approvalOptions}
                     valueOptions={serviceConfigOptions}
                     valuePlaceholder="Choose service configuration..."
+                    tooltip="The service package (day-rate tier) recommended for this job, from the Service Configurations master."
                 />
 
                 <Row
@@ -142,6 +145,7 @@ export default function OpsDecision({
                     options={approvalOptions}
                     valueOptions={machineOptions}
                     valuePlaceholder="Choose machine..."
+                    tooltip="The machine the scoring algorithm recommends as the best fit for this job's conditions."
                 />
 
                 <Row
@@ -153,6 +157,7 @@ export default function OpsDecision({
                     options={approvalOptions}
                     valueOptions={pumpOptions}
                     valuePlaceholder="Choose pump..."
+                    tooltip="The pump and hose combination recommended to match the selected machine and site conditions."
                 />
 
                 <Row
@@ -162,6 +167,7 @@ export default function OpsDecision({
                     opsData={opsData}
                     updateField={updateField}
                     options={approvalOptions}
+                    tooltip="Any additional accessories or attachments recommended for this job."
                 />
 
             </div>
@@ -193,7 +199,9 @@ function Row({
 
     valueOptions,
 
-    valuePlaceholder
+    valuePlaceholder,
+
+    tooltip
 
 }){
 
@@ -204,6 +212,7 @@ function Row({
             <div className="ops-label">
 
                 {label}
+                <FieldTooltip text={tooltip}/>
 
             </div>
 

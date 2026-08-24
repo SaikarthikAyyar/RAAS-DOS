@@ -4,6 +4,8 @@
 
 import LookupSelect from "../shared/LookupSelect";
 
+import FieldTooltip from "../shared/FieldTooltip";
+
 
 // ====================================
 // COMPONENT
@@ -108,6 +110,8 @@ error={fieldError("tank_type")}
 
 errorMessage="Tank Type is required."
 
+tooltip="The shape/construction of the tank or vessel being surveyed."
+
 />
 
 
@@ -132,6 +136,8 @@ onBlur={()=>touchField("geometry", "length_dia")}
 error={fieldError("length_dia")}
 
 errorMessage="Length / Dia is required."
+
+tooltip="The tank's length (rectangular) or diameter (round), in metres."
 
 />
 
@@ -158,6 +164,8 @@ error={fieldError("width")}
 
 errorMessage="Width is required."
 
+tooltip="The tank's width, in metres (leave the same as Length/Dia for a round tank)."
+
 />
 
 
@@ -183,6 +191,8 @@ error={fieldError("sludge_depth")}
 
 errorMessage="Sludge Depth is required."
 
+tooltip="How deep the sludge/material sits in the tank, in metres."
+
 />
 
 
@@ -201,6 +211,8 @@ section="geometry"
 field="access_type"
 
 updateSection={updateSection}
+
+tooltip="How the machine/hose can get into the tank (e.g. manhole, open top, side entry)."
 
 />
 
@@ -232,6 +244,8 @@ type="number"
 
 updateSection={updateSection}
 
+tooltip="The expected rate at which material can be removed, in cubic metres per hour."
+
 />
 
 
@@ -253,6 +267,8 @@ type="number"
 
 updateSection={updateSection}
 
+tooltip="The length or diameter of the access opening, in millimetres."
+
 />
 
 
@@ -272,6 +288,8 @@ type="number"
 
 updateSection={updateSection}
 
+tooltip="The width of the access opening, in millimetres."
+
 />
 
 
@@ -290,6 +308,8 @@ unit="m"
 type="number"
 
 updateSection={updateSection}
+
+tooltip="The height of the access opening above ground level, in metres."
 
 />
 
@@ -312,6 +332,8 @@ type="number"
 
 updateSection={updateSection}
 
+tooltip="The vertical distance from the access opening down to the tank floor or sludge surface, in metres."
+
 />
 
 
@@ -330,6 +352,8 @@ unit="m"
 type="number"
 
 updateSection={updateSection}
+
+tooltip="The height the pump/hose needs to lift material to reach the discharge point, in metres."
 
 />
 
@@ -352,6 +376,8 @@ type="number"
 
 updateSection={updateSection}
 
+tooltip="The total hose run length needed from the pump to the discharge point, in metres."
+
 />
 
 
@@ -373,6 +399,8 @@ placeholder="e.g., 2.5"
 
 updateSection={updateSection}
 
+tooltip="The width of the path equipment must travel to reach the tank, in metres."
+
 />
 
 
@@ -390,6 +418,8 @@ field="equipment_nearby"
 
 updateSection={updateSection}
 
+tooltip="Whether there's enough clear space to position cleaning equipment close to the access point."
+
 />
 
 
@@ -402,6 +432,7 @@ value={geometry.access_support}
 section="geometry"
 field="access_support"
 updateSection={updateSection}
+tooltip="What extra support (ladder, platform, scaffolding) is available to help reach the access point."
 />
 
 
@@ -412,6 +443,7 @@ value={geometry.customer_support}
 section="geometry"
 field="customer_support"
 updateSection={updateSection}
+tooltip="Equipment the customer can provide on-site to assist the job (e.g. forklift, generator)."
 />
 
 
@@ -424,6 +456,7 @@ value={geometry.scaffolding_needed}
 section="geometry"
 field="scaffolding_needed"
 updateSection={updateSection}
+tooltip="Whether scaffolding is needed to safely reach the access point."
 />
 
 <LookupSelect
@@ -433,6 +466,7 @@ value={geometry.crane_available}
 section="geometry"
 field="crane_available"
 updateSection={updateSection}
+tooltip="Whether a crane is available on-site, needed for heavy equipment or awkward access."
 />
 
 <FieldInput
@@ -443,6 +477,7 @@ field="opening_height"
 unit="mm"
 type="number"
 updateSection={updateSection}
+tooltip="The vertical clearance of the access opening, in millimetres."
 />
 
 
@@ -494,6 +529,7 @@ value={geometry.tank_location}
 section="geometry"
 field="tank_location"
 updateSection={updateSection}
+tooltip="Whether the tank is overhead or underground - affects rigging and access planning."
 />
 
 <LookupSelect
@@ -503,6 +539,7 @@ value={geometry.setup_complexity}
 section="geometry"
 field="setup_complexity"
 updateSection={updateSection}
+tooltip="An overall estimate of how difficult it will be to set up equipment for this job."
 />
 
 
@@ -541,7 +578,9 @@ error,
 
 errorMessage,
 
-type
+type,
+
+tooltip
 
 }){
 
@@ -554,6 +593,7 @@ return(
 <label>
 
 {label}
+<FieldTooltip text={tooltip}/>
 
 </label>
 

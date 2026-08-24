@@ -4,6 +4,8 @@
 
 import LookupSelect from "../shared/LookupSelect";
 
+import FieldTooltip from "../shared/FieldTooltip";
+
 
 // ====================================
 // COMPONENT
@@ -60,6 +62,8 @@ field="power_available"
 
 updateSection={updateSection}
 
+tooltip="What kind of power source is available on-site for equipment (e.g. grid, generator, none)."
+
 />
 
 
@@ -77,6 +81,8 @@ field="water_available"
 
 updateSection={updateSection}
 
+tooltip="Whether a water supply is available on-site, if needed for the job."
+
 />
 
 <LookupSelect
@@ -86,6 +92,7 @@ updateSection={updateSection}
     section="safety"
     field="air_supply_available"
     updateSection={updateSection}
+    tooltip="Whether compressed air is available on-site, if needed for pneumatic tools."
 />
 
 
@@ -102,6 +109,8 @@ section="safety"
 field="confined_space"
 
 updateSection={updateSection}
+
+tooltip="Whether the work area qualifies as a confined space, which requires special safety procedures."
 
 />
 
@@ -122,6 +131,8 @@ field="ventilation_required"
 
 updateSection={updateSection}
 
+tooltip="Whether forced ventilation is needed for the work area (common for confined spaces)."
+
 />
 
 
@@ -139,6 +150,8 @@ field="gas_testing_required"
 
 updateSection={updateSection}
 
+tooltip="Whether atmospheric gas testing is required before entry, per site EHS rules."
+
 />
 
 
@@ -155,6 +168,8 @@ section="safety"
 field="ehs_restriction"
 
 updateSection={updateSection}
+
+tooltip="Any environmental, health & safety restriction the customer's site imposes on this job."
 
 />
 
@@ -176,6 +191,8 @@ unit="m"
 type="number"
 
 updateSection={updateSection}
+
+tooltip="Distance from the nearest available power source to the work area, in metres."
 
 />
 
@@ -207,7 +224,9 @@ unit,
 
 type,
 
-updateSection
+updateSection,
+
+tooltip
 
 }){
 
@@ -218,6 +237,7 @@ return(
 <label>
 
 {label}
+<FieldTooltip text={tooltip}/>
 
 </label>
 

@@ -1,3 +1,5 @@
+import FieldTooltip from "../shared/FieldTooltip";
+
 // ====================================
 // COMPONENT
 // ====================================
@@ -60,6 +62,8 @@ export default function OpsDaysManpower({
 
                     updateField={updateField}
 
+                    tooltip="Estimated days to transport equipment to site and prepare for the job."
+
                 />
 
                 <Row
@@ -73,6 +77,8 @@ export default function OpsDaysManpower({
                     unit="day"
 
                     updateField={updateField}
+
+                    tooltip="Estimated days to position and configure equipment on-site before execution begins."
 
                 />
 
@@ -88,6 +94,8 @@ export default function OpsDaysManpower({
 
                     updateField={updateField}
 
+                    tooltip="Estimated days to actually carry out the cleaning work."
+
                 />
 
                 <Row
@@ -101,6 +109,8 @@ export default function OpsDaysManpower({
                     unit="day"
 
                     updateField={updateField}
+
+                    tooltip="Estimated days to pack up and remove equipment from site after the job."
 
                 />
 
@@ -116,6 +126,8 @@ export default function OpsDaysManpower({
 
                     updateField={updateField}
 
+                    tooltip="The sum of mobilisation, setup, execution, and demobilisation days."
+
                 />
 
                 <TextRow
@@ -129,6 +141,8 @@ export default function OpsDaysManpower({
                     unit="-"
 
                     updateField={updateField}
+
+                    tooltip="The crew/personnel required to carry out this job."
 
                 />
 
@@ -155,7 +169,9 @@ function Row({
 
     unit,
 
-    updateField
+    updateField,
+
+    tooltip
 
 }){
 
@@ -166,6 +182,7 @@ function Row({
             <div className="ops-label">
 
                 {label}
+                <FieldTooltip text={tooltip}/>
 
             </div>
 
@@ -226,7 +243,9 @@ function TextRow({
 
     unit,
 
-    updateField
+    updateField,
+
+    tooltip
 
 }){
 
@@ -237,6 +256,7 @@ function TextRow({
             <div className="ops-label">
 
                 {label}
+                <FieldTooltip text={tooltip}/>
 
             </div>
 

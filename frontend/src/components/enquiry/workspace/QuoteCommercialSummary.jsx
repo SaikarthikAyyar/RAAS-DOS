@@ -24,6 +24,8 @@ import {
     requestApproval
 } from "../../../services/enquiryWorkspaceService";
 
+import FieldTooltip from "../../shared/FieldTooltip";
+
 import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
 
 function inr(value){
@@ -414,6 +416,7 @@ export default function QuoteCommercialSummary({
                         onChange={e=>setExtraEnabled(e.target.checked)}
                     />
                     Add internal amount (commission / other)
+                    <FieldTooltip text="An internal-only extra amount (e.g. commission) added on top of the quoted value - not shown to the customer."/>
                 </label>
 
                 <div className="ops-override-form" style={{marginTop:8}}>
@@ -529,7 +532,7 @@ export default function QuoteCommercialSummary({
                     </div>
 
                     <div className="survey-summary-row">
-                        <span className="survey-summary-label">Valid till</span>
+                        <span className="survey-summary-label">Valid till<FieldTooltip text="The date this quote's pricing expires and would need to be re-generated."/></span>
                         <span className="survey-summary-value">
                             <input
                                 type="date"

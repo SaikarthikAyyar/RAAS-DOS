@@ -746,7 +746,7 @@ export default function Allocation(){
                                     <div>{doc.status}</div>
 
                                     <a
-                                        href={`${API}/${doc.file}`}
+                                        href={`${API}/${encodeURI(doc.file)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="document-link"

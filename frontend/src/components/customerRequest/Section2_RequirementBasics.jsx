@@ -8,6 +8,8 @@ from "../shared/FormField";
 
 import LookupSelect from "../shared/LookupSelect";
 
+import FieldTooltip from "../shared/FieldTooltip";
+
 
 // ====================================
 // COMPONENT
@@ -99,6 +101,8 @@ error={errors?.plant_site_location && (touched?.["customer.plant_site_location"]
 
 errorMessage="Plant / Site Location is required."
 
+tooltip="The specific plant or site address where the job will take place."
+
 />
 
 {
@@ -112,6 +116,7 @@ errorMessage="Plant / Site Location is required."
 <label>
 
 Division / Subsidiary
+<FieldTooltip text="The customer's internal division or subsidiary this site belongs to, if applicable."/>
 
 </label>
 
@@ -132,6 +137,7 @@ Division / Subsidiary
 <label>
 
 Department
+<FieldTooltip text="The department at the site responsible for this job, if applicable."/>
 
 </label>
 
@@ -167,6 +173,8 @@ field="observed_material"
 
 updateSection={updateSection}
 
+tooltip="The type of material observed at the site (e.g. sludge, slurry, ash) - a first-pass estimate before the formal survey."
+
 />
 
 
@@ -183,6 +191,8 @@ section="requirement"
 field="access_opening_type"
 
 updateSection={updateSection}
+
+tooltip="How the tank/pit/vessel can be accessed (e.g. manhole, open top) - affects which equipment can be used."
 
 />
 
@@ -201,6 +211,8 @@ field="can_place_equipment_nearby"
 
 updateSection={updateSection}
 
+tooltip="Whether there's space to position cleaning equipment near the access point."
+
 />
 
 <FieldInput
@@ -210,6 +222,7 @@ updateSection={updateSection}
     section="requirement"
     field="cleaning_date"
     updateSection={updateSection}
+    tooltip="The date this cleaning job is expected to be carried out."
 />
 
 <LookupSelect
@@ -222,6 +235,7 @@ updateSection={updateSection}
     onBlur={()=>touchField("requirement", "cleaning_frequency")}
     error={fieldError("cleaning_frequency")}
     errorMessage="Cleaning Frequency is required."
+    tooltip="How often this site needs cleaning (one-time, monthly, etc.) - helps plan recurring work."
 />
 
 {
@@ -248,6 +262,8 @@ error={fieldError("asset_name")}
 
 errorMessage="Tank Name is required to create a new site/asset record."
 
+tooltip="A name identifying this specific tank/asset, used to track it in Business Masters."
+
 />
 
 <LookupSelect
@@ -263,6 +279,8 @@ section="requirement"
 field="asset_type"
 
 updateSection={updateSection}
+
+tooltip="The shape/construction of the tank (e.g. cuboidal, cylindrical)."
 
 />
 
@@ -287,6 +305,7 @@ gridColumn:"1 / span 3"
 <label>
 
 Customer problem / pain point
+<FieldTooltip text="A brief description, in the customer's own words, of the problem they want solved."/>
 
 </label>
 

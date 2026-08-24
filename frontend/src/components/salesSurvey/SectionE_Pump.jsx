@@ -4,6 +4,8 @@
 
 import LookupSelect from "../shared/LookupSelect";
 
+import FieldTooltip from "../shared/FieldTooltip";
+
 
 // ====================================
 // COMPONENT
@@ -49,6 +51,7 @@ field="target_flow"
 unit="m³/hr"
 type="number"
 updateSection={updateSection}
+tooltip="The desired rate of material removal, in cubic metres per hour."
 />
 
 
@@ -60,6 +63,7 @@ field="suction_depth"
 unit="m"
 type="number"
 updateSection={updateSection}
+tooltip="How deep the pump needs to draw material from, in metres."
 />
 
 
@@ -71,6 +75,7 @@ field="discharge_distance"
 unit="m"
 type="number"
 updateSection={updateSection}
+tooltip="The horizontal distance from the pump to the discharge point, in metres."
 />
 
 
@@ -82,6 +87,7 @@ field="discharge_height"
 unit="m"
 type="number"
 updateSection={updateSection}
+tooltip="The vertical height the pump needs to lift material to the discharge point, in metres."
 />
 
 
@@ -92,6 +98,7 @@ value={pump.pump_power_source}
 section="pump"
 field="pump_power_source"
 updateSection={updateSection}
+tooltip="What powers the pump on-site (e.g. diesel, electric, hydraulic)."
 />
 
 <FieldInput
@@ -114,6 +121,8 @@ unit="m"
 
 updateSection={updateSection}
 
+tooltip="The size of the pit or sump the material will be discharged into, if applicable."
+
 />
 
 <LookupSelect
@@ -123,6 +132,7 @@ updateSection={updateSection}
     section="pump"
     field="discharge_medium"
     updateSection={updateSection}
+    tooltip="Where the pumped material is discharged to (e.g. tanker, drain, holding pit)."
 />
 
 <LookupSelect
@@ -132,6 +142,7 @@ value={pump.disposal_responsibility}
 section="pump"
 field="disposal_responsibility"
 updateSection={updateSection}
+tooltip="Who is responsible for disposing of the removed material - RAAS-DOS or the customer."
 />
 
 <FieldInput
@@ -142,6 +153,7 @@ field="discharge_point_distance"
 unit="m"
 type="number"
 updateSection={updateSection}
+tooltip="The total distance from the pump to the final discharge point, in metres."
 />
 
 <FieldInput
@@ -151,6 +163,7 @@ section="pump"
 field="hose_route_bends"
 type="number"
 updateSection={updateSection}
+tooltip="The number of bends/turns in the hose route - more bends reduce flow efficiency."
 />
 
 <LookupSelect
@@ -160,6 +173,7 @@ value={pump.pump_risk}
 section="pump"
 field="pump_risk"
 updateSection={updateSection}
+tooltip="Any elevated risk associated with pumping this material (e.g. clogging, hazardous fumes)."
 />
 
 <FieldInput
@@ -170,6 +184,7 @@ field="effective_work_hours"
 unit="hrs/day"
 type="number"
 updateSection={updateSection}
+tooltip="The realistic number of productive working hours available per day on-site."
 />
 
 
@@ -200,7 +215,9 @@ unit,
 
 type,
 
-updateSection
+updateSection,
+
+tooltip
 
 }){
 
@@ -211,6 +228,7 @@ return(
 <label>
 
 {label}
+<FieldTooltip text={tooltip}/>
 
 </label>
 

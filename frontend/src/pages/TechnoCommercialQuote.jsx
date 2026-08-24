@@ -28,6 +28,8 @@ from "../components/quote/TechnicalSummaryCard";
 import CommercialEstimateCard
 from "../components/quote/CommercialEstimateCard";
 
+import FieldTooltip from "../components/shared/FieldTooltip";
+
 import {
 
 getQuoteOps,
@@ -186,6 +188,11 @@ export default function TechnoCommercialQuote() {
             </div>
 
             <div className="quote-selector-bar">
+
+            <span style={{display:"inline-flex", alignItems:"center"}}>
+                Select OPS Selection
+                <FieldTooltip text="The Ops Selection (recommended machine/pump/deployment) this quote will be generated from."/>
+            </span>
 
             <select
 

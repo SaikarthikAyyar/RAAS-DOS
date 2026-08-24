@@ -1,4 +1,5 @@
 import { COUNTRY_CODES, DEFAULT_COUNTRY_ISO2 } from "../../data/countryCodes";
+import FieldTooltip from "./FieldTooltip";
 
 // ====================================
 // PHONE INPUT
@@ -45,7 +46,8 @@ export default function PhoneInput({
     onBlur,
     error,
     errorMessage,
-    disabled
+    disabled,
+    tooltip
 
 }){
 
@@ -89,6 +91,7 @@ export default function PhoneInput({
 
             <label>
                 {label}
+                <FieldTooltip text={tooltip}/>
             </label>
 
             <div className="phone-input-row">

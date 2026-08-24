@@ -11,8 +11,6 @@ from backend.models.invoice import Invoice
 
 from backend.models.machine_schedule import MachineSchedule
 
-import os
-
 
 
 
@@ -344,11 +342,16 @@ def get_allocation_dashboard(
                     "name": d.document_name,
                     "type": d.document_type,
                     "status": d.verification_status,
-                    "file": (
-                        f"uploads/personnel_documents/EMP004/"
-                        f"{person.employee_code}/"
-                        f"{os.path.basename(d.file_path)}"
-                    )
+                    # d.file_path is a real disk path rooted at the
+                    # backend's own working directory (e.g. "backend/
+                    # uploads/personnel_documents/{id}/{filename}") -
+                    # stripping the leading "backend/" is what turns it
+                    # into the URL the app's "/uploads" static mount
+                    # actually answers to. This used to be rebuilt from
+                    # a hardcoded "EMP004" literal + employee_code,
+                    # which pointed at the wrong file for every person
+                    # except whoever happened to be EMP004.
+                    "file": d.file_path.replace("backend/", "", 1)
                 }
                 for d in docs
             ]

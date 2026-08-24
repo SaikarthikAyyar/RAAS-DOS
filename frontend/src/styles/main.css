@@ -204,3 +204,119 @@ padding:28px;
 background:#f4f7fb;
 
 }
+
+/* ========================================= */
+/* FIELD TOOLTIP */
+/* Small "i" icon next to a field label - hover reveals a dark popover
+/* with a brief field explanation. Global (not scoped to any one
+/* module's stylesheet) since it's used across Customer Request, Sales
+/* Survey, Ops Selector, and the Quote module. */
+/* ========================================= */
+
+.field-tooltip-wrap{
+
+position:relative;
+
+display:inline-flex;
+
+align-items:center;
+
+justify-content:center;
+
+margin-left:5px;
+
+vertical-align:middle;
+
+}
+
+.field-tooltip-icon{
+
+color:#9aa4b2;
+
+cursor:help;
+
+transition:color .15s ease;
+
+}
+
+.field-tooltip-wrap:hover .field-tooltip-icon,
+.field-tooltip-wrap:focus-within .field-tooltip-icon{
+
+color:#f58220;
+
+}
+
+.field-tooltip-text{
+
+position:absolute;
+
+bottom:calc(100% + 8px);
+
+left:50%;
+
+transform:translateX(-50%) translateY(4px);
+
+min-width:180px;
+
+max-width:260px;
+
+background:#1f2937;
+
+color:#fff;
+
+font-size:11px;
+
+font-weight:500;
+
+line-height:1.4;
+
+padding:8px 10px;
+
+border-radius:8px;
+
+box-shadow:0 6px 16px rgba(15,23,42,.25);
+
+opacity:0;
+
+visibility:hidden;
+
+pointer-events:none;
+
+transition:opacity .12s ease, transform .12s ease;
+
+z-index:400;
+
+text-align:left;
+
+white-space:normal;
+
+}
+
+.field-tooltip-text::after{
+
+content:"";
+
+position:absolute;
+
+top:100%;
+
+left:50%;
+
+transform:translateX(-50%);
+
+border:5px solid transparent;
+
+border-top-color:#1f2937;
+
+}
+
+.field-tooltip-wrap:hover .field-tooltip-text,
+.field-tooltip-wrap:focus-within .field-tooltip-text{
+
+opacity:1;
+
+visibility:visible;
+
+transform:translateX(-50%) translateY(0);
+
+}

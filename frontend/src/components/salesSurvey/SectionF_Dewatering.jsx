@@ -4,6 +4,8 @@
 
 import LookupSelect from "../shared/LookupSelect";
 
+import FieldTooltip from "../shared/FieldTooltip";
+
 
 // ====================================
 // COMPONENT
@@ -47,6 +49,7 @@ export default function SectionF_Dewatering({
                     section="dewatering"
                     field="dewatering_required"
                     updateSection={updateSection}
+                    tooltip="Whether the removed material needs to be dried/separated from water before disposal."
                 />
 
 
@@ -58,6 +61,7 @@ export default function SectionF_Dewatering({
                     type="number"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="The estimated volume of material that will need dewatering, in cubic metres."
                 />
 
 
@@ -69,6 +73,7 @@ export default function SectionF_Dewatering({
                     type="number"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="The estimated moisture content of the material before dewatering."
                 />
 
 
@@ -80,6 +85,7 @@ export default function SectionF_Dewatering({
                     type="number"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="The desired moisture content of the material after dewatering."
                 />
 
 
@@ -91,6 +97,7 @@ export default function SectionF_Dewatering({
                     field="expected_final_form"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="What the dewatered material will look like/behave like once processed (e.g. cake, granular)."
                 />
 
 
@@ -102,6 +109,7 @@ export default function SectionF_Dewatering({
                     field="visible_free_water"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="Whether standing water is visibly separate from the material."
                 />
 
 
@@ -113,6 +121,7 @@ export default function SectionF_Dewatering({
                     field="natural_settling"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="How readily the solids in the material settle out on their own, without chemical treatment."
                 />
 
 
@@ -123,6 +132,7 @@ export default function SectionF_Dewatering({
                     section="dewatering"
                     field="oily_emulsified"
                     updateSection={updateSection}
+                    tooltip="Whether the material contains oil or an oil-water emulsion - affects the dewatering method."
                 />
 
 
@@ -134,6 +144,7 @@ export default function SectionF_Dewatering({
                     field="space_available"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="Whether there's on-site space to hold dewatering bags or containers."
                 />
 
 
@@ -145,6 +156,7 @@ export default function SectionF_Dewatering({
                     field="filtrate_route"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="Whether there's somewhere to route the liquid separated out during dewatering (e.g. a drain)."
                 />
 
 
@@ -156,6 +168,7 @@ export default function SectionF_Dewatering({
                     field="moisture_guarantee"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="Whether the customer requires a contractual guarantee on the final moisture percentage."
                 />
 
 
@@ -167,6 +180,7 @@ export default function SectionF_Dewatering({
                     field="cake_handling_scope"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="Who is responsible for handling/removing the dewatered solid cake after processing."
                 />
 
                 {
@@ -177,6 +191,7 @@ export default function SectionF_Dewatering({
                             section="dewatering"
                             field="filtrate_route_detail"
                             updateSection={updateSection}
+                            tooltip="A description of where the separated liquid (filtrate) will be routed to."
                         />
                     )
                 }
@@ -188,6 +203,7 @@ export default function SectionF_Dewatering({
                     field="polymer_allowed"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="Whether the customer permits using flocculant/polymer chemicals to speed up dewatering."
                 />
 
                 <FieldInput
@@ -197,6 +213,7 @@ export default function SectionF_Dewatering({
                     field="commitment"
                     disabled={disabled}
                     updateSection={updateSection}
+                    tooltip="Any specific commitment made to the customer regarding the dewatering outcome."
                 />
 
 
@@ -227,7 +244,9 @@ function FieldInput({
 
     type,
 
-    updateSection
+    updateSection,
+
+    tooltip
 
 }){
 
@@ -235,7 +254,7 @@ function FieldInput({
 
         <div className={`survey-field${disabled ? " disabled" : ""}`}>
 
-            <label>{label}</label>
+            <label>{label}<FieldTooltip text={tooltip}/></label>
 
             <input
 

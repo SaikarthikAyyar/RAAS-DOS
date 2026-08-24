@@ -24,6 +24,8 @@ import LookupSelect from "../shared/LookupSelect";
 
 import PhoneInput from "../shared/PhoneInput";
 
+import FieldTooltip from "../shared/FieldTooltip";
+
 
 // ====================================
 // COMPONENT
@@ -203,6 +205,7 @@ Required
 
     <label>
         <span className="required-asterisk">*</span>Company Name
+        <FieldTooltip text="The customer account this enquiry belongs to. Pick an existing customer, or use Add New Customer to create one in Business Masters first."/>
     </label>
 
     <select
@@ -248,6 +251,8 @@ field="service_requirement_type"
 
 updateSection={updateSection}
 
+tooltip="The category of work being requested (e.g. tank, pit, pipeline cleaning)."
+
 />
 
 
@@ -262,6 +267,8 @@ section="customer"
 field="contact_person"
 
 updateSection={updateSection}
+
+tooltip="The person at the site who can be contacted about this job."
 
 />
 
@@ -283,6 +290,8 @@ onBlur={()=>touchField("customer", "contact_number")}
 error={fieldError("contact_number")}
 
 errorMessage="Enter a valid 10-digit mobile number."
+
+tooltip="A direct phone number for the site contact, used to coordinate the survey and job."
 
 />
 
@@ -307,6 +316,8 @@ error={fieldError("client_contact_email")}
 
 errorMessage="Enter a valid email address."
 
+tooltip="An email address for the site contact, used for job-related correspondence."
+
 />
 
 
@@ -324,6 +335,8 @@ field="nearest_city_hub"
 
 updateSection={updateSection}
 
+tooltip="The RAAS-DOS hub nearest the job site - determines which team is assigned and affects approval routing."
+
 />
 
 
@@ -340,6 +353,8 @@ section="customer"
 field="urgency"
 
 updateSection={updateSection}
+
+tooltip="How soon this enquiry needs to move forward, from Immediate to a few months out."
 
 />
 
@@ -363,6 +378,8 @@ error={fieldError("nature_of_job")}
 
 errorMessage="Nature of Job is required."
 
+tooltip="How critical or time-sensitive this job is for the customer - drives prioritisation."
+
 />
 
 <div className="survey-field">
@@ -370,6 +387,7 @@ errorMessage="Nature of Job is required."
 <label>
 
 Existing asset (optional)
+<FieldTooltip text="If this job is at a site already on file, pick it here to reuse its saved details. Leave blank for a brand-new site."/>
 
 </label>
 
@@ -411,6 +429,8 @@ field="lead_source"
 
 updateSection={updateSection}
 
+tooltip="How this enquiry reached RAAS-DOS (referral, tender, website, etc.) - used for reporting."
+
 />
 
 <FieldInput
@@ -426,6 +446,8 @@ section="requirement"
 field="estimated_volume"
 
 updateSection={updateSection}
+
+tooltip="A rough estimate of the material volume involved, if known at this stage."
 
 />
 

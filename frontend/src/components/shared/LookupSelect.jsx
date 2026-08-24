@@ -30,7 +30,8 @@ export default function LookupSelect({
     error,
     errorMessage,
     onBlur,
-    formatOption
+    formatOption,
+    tooltip
 
 }){
 
@@ -117,6 +118,7 @@ export default function LookupSelect({
                     errorMessage={errorMessage}
                     onBlur={onBlur}
                     placeholder="Type your own value"
+                    tooltip={tooltip}
 
                 />
 
@@ -163,6 +165,7 @@ export default function LookupSelect({
             errorMessage={errorMessage}
             onBlur={onBlur}
             formatOption={formatOption}
+            tooltip={tooltip}
 
         />
 

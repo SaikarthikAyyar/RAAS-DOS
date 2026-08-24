@@ -20,6 +20,8 @@ import {
 
 import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
 
+import FieldTooltip from "../../shared/FieldTooltip";
+
 function defaultCrewPlan(manpowerRequired){
 
     return [{
@@ -392,28 +394,28 @@ export default function DeploymentPlanCard({
             <div className="ops-days-grid">
 
                 <label>
-                    Mob days
+                    Mob days<FieldTooltip text="Days needed to transport equipment to site and prepare for the job."/>
                     <input type="number" value={mobDays} onChange={e=>setMobDays(e.target.value)} />
                 </label>
 
                 <label>
-                    Setup days
+                    Setup days<FieldTooltip text="Days needed to position and configure equipment on-site before execution begins."/>
                     <input type="number" value={setupDays} onChange={e=>setSetupDays(e.target.value)} />
                 </label>
 
                 <label>
-                    Exec days
+                    Exec days<FieldTooltip text="Days needed to actually carry out the cleaning work."/>
                     <input type="number" value={execDays} onChange={e=>setExecDays(e.target.value)} />
                 </label>
 
                 <label>
-                    Demob days
+                    Demob days<FieldTooltip text="Days needed to pack up and remove equipment from site after the job."/>
                     <input type="number" value={demobDays} onChange={e=>setDemobDays(e.target.value)} />
                 </label>
 
             </div>
 
-            <h4 className="ops-subheading">Crew (Min-Max)</h4>
+            <h4 className="ops-subheading">Crew (Min-Max)<FieldTooltip text="The personnel roles and quantity range (min-max) needed to staff this job."/></h4>
 
             <table className="ops-plan-table">
 
@@ -503,7 +505,7 @@ export default function DeploymentPlanCard({
 
             )}
 
-            <h4 className="ops-subheading">Accessories Needed</h4>
+            <h4 className="ops-subheading">Accessories Needed<FieldTooltip text="Which of this machine's standard accessories are actually needed for this specific job."/></h4>
 
             {
 
@@ -561,12 +563,12 @@ export default function DeploymentPlanCard({
 
             }
 
-            <h4 className="ops-subheading">Dewatering Method Range</h4>
+            <h4 className="ops-subheading">Dewatering Method Range<FieldTooltip text="The candidate dewatering methods used to compute the quote's low-cost/high-cost range."/></h4>
 
             <div className="ops-days-grid" style={{gridTemplateColumns:"1fr 1fr"}}>
 
                 <label>
-                    Min-cost candidate
+                    Min-cost candidate<FieldTooltip text="The cheaper dewatering method, used for the low end of the quote's cost range."/>
                     <select value={dewMin} onChange={e=>setDewMin(e.target.value)}>
                         <option value="">-</option>
                         {dewateringMethods.map(m=>
@@ -576,7 +578,7 @@ export default function DeploymentPlanCard({
                 </label>
 
                 <label>
-                    Max-cost candidate
+                    Max-cost candidate<FieldTooltip text="The pricier dewatering method, used for the high end of the quote's cost range."/>
                     <select value={dewMax} onChange={e=>setDewMax(e.target.value)}>
                         <option value="">-</option>
                         {dewateringMethods.map(m=>
