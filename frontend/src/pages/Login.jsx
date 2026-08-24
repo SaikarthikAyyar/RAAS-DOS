@@ -51,8 +51,16 @@ function Login(){
         setPassword
     ] = useState("");
 
+    const [loggingIn, setLoggingIn] = useState(false);
+
 
     async function handleLogin(){
+
+        if(loggingIn){
+            return;
+        }
+
+        setLoggingIn(true);
 
         try{
 
@@ -76,9 +84,17 @@ function Login(){
 
             );
 
+            // Hand off to the dedicated loading screen instead of
+            // jumping straight to the landing page - on Render's free
+            // tier a cold backend can make the login() call above take
+            // a long while with zero visual feedback otherwise, and
+            // this also gives every subsequent login a consistent,
+            // deliberate "you're in, app is opening" beat.
             navigate(
 
-                user.landingPage || "/administration"
+                "/loading",
+
+                { state:{ landingPage: user.landingPage || "/administration" } }
 
             );
 
@@ -91,6 +107,8 @@ function Login(){
                 error.message
 
             );
+
+            setLoggingIn(false);
 
         }
 
@@ -311,9 +329,11 @@ function Login(){
 
                     onClick={handleLogin}
 
+                    disabled={loggingIn}
+
                     >
 
-                    Login
+                    {loggingIn ? "Logging in..." : "Login"}
 
                     </button>
 

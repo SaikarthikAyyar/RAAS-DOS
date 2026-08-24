@@ -4,6 +4,8 @@ import MainLayout from "./layouts/MainLayout";
 
 import Login from "./pages/Login";
 
+import LoadingScreen from "./pages/LoadingScreen";
+
 import Dashboard from "./pages/Dashboard";
 
 import CustomerRequest from "./pages/CustomerRequest/CustomerRequest";
@@ -55,6 +57,8 @@ function App() {
       <Routes>
 
         <Route path="/" element={<Login />} />
+
+        <Route path="/loading" element={<LoadingScreen />} />
 
         <Route element={<MainLayout />}>
 
