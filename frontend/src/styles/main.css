@@ -250,11 +250,15 @@ color:#f58220;
 
 position:absolute;
 
-bottom:calc(100% + 8px);
+/* Opens downward (not upward) - a field near the top of a scrolling
+/* form (e.g. the very first field) would otherwise get its tooltip
+/* clipped by .app-content's own overflow:auto boundary before it ever
+/* reaches the viewport edge. */
+top:calc(100% + 8px);
 
 left:50%;
 
-transform:translateX(-50%) translateY(4px);
+transform:translateX(-50%) translateY(-4px);
 
 min-width:180px;
 
@@ -298,7 +302,7 @@ content:"";
 
 position:absolute;
 
-top:100%;
+bottom:100%;
 
 left:50%;
 
@@ -306,7 +310,7 @@ transform:translateX(-50%);
 
 border:5px solid transparent;
 
-border-top-color:#1f2937;
+border-bottom-color:#1f2937;
 
 }
 
