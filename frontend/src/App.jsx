@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 
 import LoadingScreen from "./pages/LoadingScreen";
 
+import RequireAuth from "./components/shared/RequireAuth";
+
 import Dashboard from "./pages/Dashboard";
 
 import CustomerRequest from "./pages/CustomerRequest/CustomerRequest";
@@ -60,7 +62,7 @@ function App() {
 
         <Route path="/loading" element={<LoadingScreen />} />
 
-        <Route element={<MainLayout />}>
+        <Route element={<RequireAuth><MainLayout /></RequireAuth>}>
 
           <Route path="dashboard" element={<Dashboard />} />
 
