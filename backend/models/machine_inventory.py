@@ -52,6 +52,19 @@ class MachineInventory(Base):
     )
 
     # ====================================
+    # MACHINE TYPE (Business Masters -> Machine Inventory)
+    # Real FK to the Machines/Fleet spec catalog - the "type" this
+    # physical unit belongs to. Nullable since legacy rows may not
+    # have a clean code match; new rows always set this via the tab.
+    # ====================================
+
+    machine_type_id = Column(
+        BigInteger,
+        ForeignKey("machines.id"),
+        nullable=True
+    )
+
+    # ====================================
     # LIVE STATUS
     # ====================================
 

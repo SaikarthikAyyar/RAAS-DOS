@@ -114,6 +114,8 @@ from backend.api.fleet_schedule_api import api as fleet_schedule_api
 
 from backend.api.fleet_availability_api import api as fleet_availability_api
 
+from backend.api.machine_inventory_api import api as machine_inventory_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -323,6 +325,7 @@ app.include_router(gst_settings_api)
 app.include_router(fleet_unit_api)
 app.include_router(fleet_schedule_api)
 app.include_router(fleet_availability_api)
+app.include_router(machine_inventory_api)
 
 
 

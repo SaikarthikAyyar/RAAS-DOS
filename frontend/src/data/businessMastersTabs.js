@@ -15,6 +15,8 @@ export const businessMastersTabs = [
 
     ["machines", "Machines / Fleet"],
 
+    ["machineinventory", "Machine Inventory"],
+
     ["pumps", "Pump Master"],
 
     ["personnel", "Personnel"],
