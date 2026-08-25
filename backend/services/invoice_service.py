@@ -30,19 +30,39 @@ from backend.models.purchase_order import PurchaseOrder
 
 # ====================================
 # RESOLVE PURCHASE ORDER FOR A JOB
-# Resolves via the job's enquiry (customer_request_id link), the same
-# chain purchase_order_service.py already uses elsewhere - "invoice
-# values refer to the PO for which jobs have been created."
+# Resolves via the job's own real enquiry - job.approval_board_id is a
+# direct, unambiguous FK to exactly one Enquiry (the same join
+# create_job_request itself uses to find "consolidated_enquiry").
+#
+# Falls back to the older customer_request_id + most-recent heuristic
+# only when no enquiry carries that approval_board_id at all (a job
+# with no real approval-board linkage). That fallback is NOT safe as
+# the primary path: EnquiryService.create_allocation_enquiry() creates
+# a second, separate Enquiry row for the same job right after Job
+# Creation (an "Allocation task" stub - approval_board_id always NULL,
+# customer_name always NULL, id always higher than the real enquiry's
+# since it's created moments later) sharing the same
+# customer_request_id. Ordering by id-desc then always picked that
+# empty stub over the real, PO-bearing enquiry - silently resolving to
+# "no PO" for every job ever created through the real workflow.
 # ====================================
 
 def _resolve_purchase_order_for_job(db, job):
 
     enquiry = (
         db.query(Enquiry)
-        .filter(Enquiry.customer_request_id == job.customer_request_id)
-        .order_by(Enquiry.id.desc())
+        .filter(Enquiry.approval_board_id == job.approval_board_id)
         .first()
     )
+
+    if enquiry is None:
+
+        enquiry = (
+            db.query(Enquiry)
+            .filter(Enquiry.customer_request_id == job.customer_request_id)
+            .order_by(Enquiry.id.desc())
+            .first()
+        )
 
     if enquiry is None:
         return None
