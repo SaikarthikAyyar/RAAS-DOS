@@ -95,12 +95,20 @@ export async function deletePersonnel(id, actor, remark){
 // in this app (uploadPurchaseOrder in purchaseOrderService.js).
 // ====================================
 
-export async function uploadPersonnelDocument(personnelId, file, documentType, validTill, actor, remark){
+export async function uploadPersonnelDocument(personnelId, file, documentType, validTill, actor, remark, insuranceType, verificationStatus){
 
     const formData = new FormData();
 
     formData.append("file", file);
     formData.append("document_type", documentType);
+
+    if(insuranceType){
+        formData.append("insurance_type", insuranceType);
+    }
+
+    if(verificationStatus){
+        formData.append("verification_status", verificationStatus);
+    }
 
     if(validTill){
         formData.append("valid_till", validTill);

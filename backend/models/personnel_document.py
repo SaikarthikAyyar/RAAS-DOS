@@ -38,6 +38,11 @@ class PersonnelDocument(Base):
         nullable=False
     )
 
+    insurance_type = Column(
+        String(150),
+        nullable=True
+    )
+
     file_path = Column(
         String(500),
         nullable=False

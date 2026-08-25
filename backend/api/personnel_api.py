@@ -75,6 +75,8 @@ async def upload_personnel_document(
     personnel_id: int,
     file: UploadFile = File(...),
     document_type: str = Form(...),
+    insurance_type: Optional[str] = Form(None),
+    verification_status: str = Form("NOT_VERIFIED"),
     valid_till: Optional[date] = Form(None),
     actor_user_id: int = Form(...),
     actor_name: str = Form(...),
@@ -88,7 +90,7 @@ async def upload_personnel_document(
 
         actor = ActorSchema(user_id=actor_user_id, name=actor_name, role=actor_role)
 
-        return await upload_document_request(db, personnel_id, file, document_type, valid_till, actor, remark)
+        return await upload_document_request(db, personnel_id, file, document_type, valid_till, actor, remark, insurance_type, verification_status)
 
     except ValueError as error:
 

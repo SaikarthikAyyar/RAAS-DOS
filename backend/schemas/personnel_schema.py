@@ -21,6 +21,7 @@ class PersonnelDocumentResponse(BaseModel):
     personnel_id: int
     document_name: str
     document_type: str
+    insurance_type: Optional[str] = None
     file_path: str
     verification_status: Optional[str] = None
     valid_till: Optional[date] = None
@@ -28,6 +29,8 @@ class PersonnelDocumentResponse(BaseModel):
 
 class PersonnelDocumentUpdate(BaseModel):
     document_type: Optional[str] = None
+    insurance_type: Optional[str] = None
+    verification_status: Optional[str] = None
     valid_till: Optional[date] = None
     actor: ActorSchema
     remark: str

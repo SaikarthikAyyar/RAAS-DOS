@@ -206,10 +206,15 @@ function AddDocumentModal({ person, docTypeOptions, onClose, onUpload }){
 
     const [file, setFile] = useState(null);
     const [documentType, setDocumentType] = useState(docTypeOptions[0] || "");
+    const [insuranceType, setInsuranceType] = useState("");
+    const [verificationStatus, setVerificationStatus] = useState("NOT_VERIFIED");
     const [validTill, setValidTill] = useState("");
 
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+
+    const isInsurance = documentType === "Insurance";
+    const isPassportPhoto = documentType === "Passport Photo";
 
     async function handleSubmit(){
 
@@ -221,7 +226,21 @@ function AddDocumentModal({ person, docTypeOptions, onClose, onUpload }){
 
         }
 
-        if(!file.name.toLowerCase().endsWith(".pdf")){
+        const fileName = file.name.toLowerCase();
+
+        if(isPassportPhoto){
+
+            if(!/\.(jpg|jpeg|png|webp)$/.test(fileName)){
+
+                setError("Only image files (JPG, PNG, WEBP) are accepted for Passport Photo.");
+
+                return;
+
+            }
+
+        }
+
+        else if(!fileName.endsWith(".pdf")){
 
             setError("Only PDF files are accepted for personnel documents.");
 
@@ -234,7 +253,7 @@ function AddDocumentModal({ person, docTypeOptions, onClose, onUpload }){
 
         try{
 
-            await onUpload(file, documentType, validTill || null);
+            await onUpload(file, documentType, validTill || null, isInsurance ? (insuranceType.trim() || null) : null, verificationStatus);
 
         }
 
@@ -272,9 +291,30 @@ function AddDocumentModal({ person, docTypeOptions, onClose, onUpload }){
                         <input type="date" value={validTill} onChange={e=>setValidTill(e.target.value)} />
                     </div>
 
+                    <div>
+                        <label>Verified</label>
+                        <select value={verificationStatus} onChange={e=>setVerificationStatus(e.target.value)}>
+                            <option value="NOT_VERIFIED">No</option>
+                            <option value="VERIFIED">Yes</option>
+                        </select>
+                    </div>
+
+                    {isInsurance && (
+
+                        <div>
+                            <label>Insurance type</label>
+                            <input value={insuranceType} onChange={e=>setInsuranceType(e.target.value)} placeholder="e.g. Accident / Health / Third-party" />
+                        </div>
+
+                    )}
+
                     <div style={{gridColumn:"1 / -1"}}>
-                        <label>File (PDF only)</label>
-                        <input type="file" accept="application/pdf" onChange={e=>setFile(e.target.files?.[0] || null)} />
+                        <label>{isPassportPhoto ? "File (image only)" : "File (PDF only)"}</label>
+                        <input
+                            type="file"
+                            accept={isPassportPhoto ? "image/jpeg,image/png,image/webp" : "application/pdf"}
+                            onChange={e=>setFile(e.target.files?.[0] || null)}
+                        />
                     </div>
 
                 </div>
@@ -305,10 +345,14 @@ function AddDocumentModal({ person, docTypeOptions, onClose, onUpload }){
 function EditDocumentModal({ document, docTypeOptions, onClose, onSave }){
 
     const [documentType, setDocumentType] = useState(document.document_type);
+    const [insuranceType, setInsuranceType] = useState(document.insurance_type || "");
+    const [verificationStatus, setVerificationStatus] = useState(document.verification_status || "NOT_VERIFIED");
     const [validTill, setValidTill] = useState(document.valid_till || "");
 
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+
+    const isInsurance = documentType === "Insurance";
 
     async function handleSubmit(){
 
@@ -317,7 +361,12 @@ function EditDocumentModal({ document, docTypeOptions, onClose, onSave }){
 
         try{
 
-            await onSave({ document_type: documentType, valid_till: validTill || null });
+            await onSave({
+                document_type: documentType,
+                insurance_type: isInsurance ? (insuranceType.trim() || null) : null,
+                verification_status: verificationStatus,
+                valid_till: validTill || null
+            });
 
         }
 
@@ -354,6 +403,23 @@ function EditDocumentModal({ document, docTypeOptions, onClose, onSave }){
                         <label>Valid till</label>
                         <input type="date" value={validTill} onChange={e=>setValidTill(e.target.value)} />
                     </div>
+
+                    <div>
+                        <label>Verified</label>
+                        <select value={verificationStatus} onChange={e=>setVerificationStatus(e.target.value)}>
+                            <option value="NOT_VERIFIED">No</option>
+                            <option value="VERIFIED">Yes</option>
+                        </select>
+                    </div>
+
+                    {isInsurance && (
+
+                        <div>
+                            <label>Insurance type</label>
+                            <input value={insuranceType} onChange={e=>setInsuranceType(e.target.value)} placeholder="e.g. Accident / Health / Third-party" />
+                        </div>
+
+                    )}
 
                 </div>
 
@@ -498,7 +564,7 @@ export default function PersonnelTab(){
     // DOCUMENT CRUD
     // ====================================
 
-    async function handleUploadDocument(file, documentType, validTill){
+    async function handleUploadDocument(file, documentType, validTill, insuranceType, verificationStatus){
 
         const remark = await promptForRemark(`Adding a document for ${addingDocFor.full_name}`);
 
@@ -506,7 +572,7 @@ export default function PersonnelTab(){
             throw { detail: "Cancelled." };
         }
 
-        await uploadPersonnelDocument(addingDocFor.id, file, documentType, validTill, buildActor(user), remark);
+        await uploadPersonnelDocument(addingDocFor.id, file, documentType, validTill, buildActor(user), remark, insuranceType, verificationStatus);
 
         setAddingDocFor(null);
         load();
@@ -606,7 +672,12 @@ export default function PersonnelTab(){
 
                     <div className="bm-card"><p className="bm-muted">No personnel yet — add the first one.</p></div>
 
-                ) : personnel.map(p=>(
+                ) : personnel.map(p=>{
+
+                    const hasInsuranceDoc = p.documents.some(d=>d.document_type==="Insurance");
+                    const columnCount = hasInsuranceDoc ? 6 : 5;
+
+                    return(
 
                     <div className="bm-card" key={p.id} style={{marginBottom:"12px"}}>
 
@@ -616,6 +687,10 @@ export default function PersonnelTab(){
 
                             <span className="bm-muted" style={{fontWeight:600, fontSize:"12px"}}>
                                 ({p.employee_code} · {p.designation}{p.current_location ? ` · ${p.current_location}` : ""})
+                            </span>
+
+                            <span className={`bm-pill ${p.documents_verified ? "bm-pill-green" : "bm-pill-red"}`}>
+                                {p.documents_verified ? "Deployment ready" : "Not deployment ready"}
                             </span>
 
                             <span style={{marginLeft:"auto", display:"flex", gap:"10px"}}>
@@ -637,6 +712,8 @@ export default function PersonnelTab(){
                             <thead>
                                 <tr>
                                     <th>Document type</th>
+                                    {hasInsuranceDoc && <th>Insurance type</th>}
+                                    <th>Verified</th>
                                     <th>Valid till</th>
                                     <th>File</th>
                                     <th></th>
@@ -649,13 +726,23 @@ export default function PersonnelTab(){
 
                                     p.documents.length===0 ? (
 
-                                        <tr><td colSpan="4" className="bm-muted">No documents on file.</td></tr>
+                                        <tr><td colSpan={columnCount} className="bm-muted">No documents on file.</td></tr>
 
                                     ) : p.documents.map(d=>(
 
                                         <tr key={d.id}>
 
                                             <td>{d.document_type}</td>
+
+                                            {hasInsuranceDoc && (
+                                                <td>{d.document_type==="Insurance" ? (d.insurance_type || "—") : "—"}</td>
+                                            )}
+
+                                            <td>
+                                                <span className={`bm-pill ${d.verification_status==="VERIFIED" ? "bm-pill-green" : "bm-pill-red"}`}>
+                                                    {d.verification_status==="VERIFIED" ? "Yes" : "No"}
+                                                </span>
+                                            </td>
 
                                             <td>
                                                 {
@@ -720,7 +807,9 @@ export default function PersonnelTab(){
 
                     </div>
 
-                ))
+                    );
+
+                })
 
             }
 

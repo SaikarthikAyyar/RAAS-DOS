@@ -69,14 +69,16 @@ def get_document(db, document_id):
     return db.query(PersonnelDocument).filter(PersonnelDocument.id == document_id).first()
 
 
-def create_document(db, personnel_id, document_name, document_type, file_path, valid_till):
+def create_document(db, personnel_id, document_name, document_type, file_path, valid_till, insurance_type=None, verification_status="NOT_VERIFIED"):
 
     row = PersonnelDocument(
         personnel_id=personnel_id,
         document_name=document_name,
         document_type=document_type,
+        insurance_type=insurance_type,
         file_path=file_path,
-        valid_till=valid_till
+        valid_till=valid_till,
+        verification_status=verification_status
     )
     db.add(row)
     db.commit()
