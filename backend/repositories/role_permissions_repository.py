@@ -38,7 +38,8 @@ NAV_MODULES = [
     ("/customer-portal", "Customer Portal"),
     ("/analytics", "Analytics"),
     ("/audit-trail", "Audit Trail"),
-    ("/reviews-approvals", "Reviews & Approvals")
+    ("/reviews-approvals", "Reviews & Approvals"),
+    ("/fleet-availability", "Fleet & Availability")
 
 ]
 
@@ -73,6 +74,7 @@ BUSINESS_MASTER_TABS = [
     ("bm-tab-serviceconfig", "Service Configurations"),
     ("bm-tab-rules", "Commercial Rules"),
     ("bm-tab-hubs", "Hubs"),
+    ("bm-tab-fleetunits", "Fleet Units"),
     ("bm-tab-quotetemplates", "Quote Templates"),
     ("bm-tab-emailtemplates", "Email Templates"),
     ("bm-tab-lists", "Lookup Lists"),
@@ -166,6 +168,13 @@ MODULE_TASKS = {
         ("export_current_tab", "Export current tab")
     ],
 
+    "bm-tab-fleetunits": [
+        ("add_fleet_unit", "Add fleet unit"),
+        ("edit_fleet_unit", "Edit fleet unit"),
+        ("remove_fleet_unit", "Remove fleet unit"),
+        ("export_current_tab", "Export current tab")
+    ],
+
     "bm-tab-quotetemplates": [
         ("add_quote_template", "Add quote template"),
         ("edit_quote_template", "Edit quote template"),
@@ -239,7 +248,13 @@ MODULE_TASKS = {
         ("proceed_to_job_creation", "Proceed to Job Creation")
     ],
 
-    "enquiry-tab-job-created": [],
+    "enquiry-tab-job-created": [
+        ("create_job", "Create job"),
+        ("save_planned_dates", "Save planned dates"),
+        ("book_fleet_unit", "Book Fleet Unit"),
+        ("reschedule_fleet_booking", "Reschedule booking"),
+        ("cancel_fleet_booking", "Cancel booking")
+    ],
     "enquiry-tab-execution": [],
     "enquiry-tab-audit": []
 
@@ -289,11 +304,11 @@ ROLE_NAV_ACCESS = {
     "ops": [
         "/ops-approval", "/ops-selector",
         "/job-creation", "/allocation", "/execution",
-        "/reviews-approvals"
+        "/reviews-approvals", "/fleet-availability"
     ],
 
     "management": [
-        "/approval", "/reviews-approvals"
+        "/approval", "/reviews-approvals", "/fleet-availability"
     ],
 
     "customer": [

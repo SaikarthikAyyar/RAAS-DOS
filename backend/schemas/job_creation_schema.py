@@ -3,8 +3,11 @@
 # ====================================
 
 from typing import Optional
+from datetime import date
 
 from pydantic import BaseModel
+
+from backend.schemas.notification_schema import ActorSchema
 
 
 # ====================================
@@ -42,3 +45,20 @@ class JobCreationSchema(BaseModel):
     readiness_json: Optional[dict] = None
 
     workflow_status: Optional[str] = None
+
+
+# ====================================
+# JOB CREATION UPDATE SCHEMA
+# Planned dates only, for now - the field this phase actually opens
+# up for editing after creation.
+# ====================================
+
+class JobCreationUpdateSchema(BaseModel):
+
+    planned_start: Optional[date] = None
+
+    planned_completion: Optional[date] = None
+
+    actor: Optional[ActorSchema] = None
+
+    remark: Optional[str] = None

@@ -99,8 +99,6 @@ def create_execution(
 
         eta_minutes = 0,
 
-        distance_remaining_km = 0,
-
         today_output = 0,
 
         total_output = 0,
@@ -500,6 +498,17 @@ def dequeue_execution_schedules(
             )
             s.schedule_status = "COMPLETED"
             s.actual_completion = date.today()
+
+        # This session is configured with autoflush=False (see
+        # database/connection.py) - without an explicit flush here,
+        # the "remaining" query below re-selects straight from the DB,
+        # doesn't see the pending COMPLETED status yet, and the
+        # identity map hands back the SAME in-memory row, silently
+        # clobbering the completion with an ACTIVE re-promotion. A
+        # real, pre-existing bug that only manifests with a genuine
+        # 2+-deep queue at completion time - found and fixed while
+        # building the fleet-level analog of this exact function.
+        db.flush()
 
         # Lock and re-fetch everything still QUEUED/ACTIVE for this
         # machine, in position order, then compact to 1,2,3...

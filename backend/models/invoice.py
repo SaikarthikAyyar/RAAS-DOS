@@ -79,6 +79,14 @@ class Invoice(
 
     )
 
+    purchase_order_id = Column(
+
+        Integer,
+
+        nullable=True
+
+    )
+
     # ====================================
     # WORKFLOW
     # ====================================

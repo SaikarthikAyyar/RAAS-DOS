@@ -654,3 +654,66 @@
     color:var(--muted);
     font-size:12.5px;
 }
+
+
+/* ====================================
+   FLEET & AVAILABILITY CALENDAR
+   Same visual convention as the wireframe's own calWrap/calDay -
+   avail/plan/block colors, just re-meaning plan/block as our real
+   QUEUED/ACTIVE booking states rather than a pre-PO tentative hold.
+==================================== */
+
+.calWrap{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+    margin-top:8px;
+}
+
+.calHead{
+    font-size:10px;
+    text-transform:uppercase;
+    color:var(--muted);
+    text-align:center;
+    font-weight:800;
+}
+
+.calDay{
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:8px 4px;
+    text-align:center;
+    font-size:11px;
+    font-weight:700;
+    background:#fff;
+    cursor:pointer;
+    min-height:44px;
+}
+
+.calDay.blank{
+    visibility:hidden;
+    cursor:default;
+}
+
+.calDay.avail{
+    background:#dcfce7;
+    color:#166534;
+    border-color:#bbf7d0;
+}
+
+.calDay.plan{
+    background:#fef3c7;
+    color:#92400e;
+    border-color:#fde68a;
+}
+
+.calDay.block{
+    background:#fee2e2;
+    color:#991b1b;
+    border-color:#fecaca;
+}
+
+.calDay.pending-highlight{
+    outline:3px solid var(--orange);
+    outline-offset:-1px;
+}

@@ -24,6 +24,38 @@ from backend.repositories.job_creation_repository import (
 
 )
 
+from backend.models.enquiry import Enquiry
+from backend.models.purchase_order import PurchaseOrder
+
+
+# ====================================
+# RESOLVE PURCHASE ORDER FOR A JOB
+# Resolves via the job's enquiry (customer_request_id link), the same
+# chain purchase_order_service.py already uses elsewhere - "invoice
+# values refer to the PO for which jobs have been created."
+# ====================================
+
+def _resolve_purchase_order_for_job(db, job):
+
+    enquiry = (
+        db.query(Enquiry)
+        .filter(Enquiry.customer_request_id == job.customer_request_id)
+        .order_by(Enquiry.id.desc())
+        .first()
+    )
+
+    if enquiry is None:
+        return None
+
+    po = (
+        db.query(PurchaseOrder)
+        .filter(PurchaseOrder.enquiry_id == enquiry.id)
+        .order_by(PurchaseOrder.uploaded_at.desc())
+        .first()
+    )
+
+    return po
+
 
 
 
@@ -85,6 +117,8 @@ def create_invoice_request(
 
         return existing
 
+    purchase_order = _resolve_purchase_order_for_job(db, job)
+
     invoice = InvoiceSchema(
 
         job_creation_id =
@@ -98,6 +132,10 @@ def create_invoice_request(
         customer_request_id =
 
         job.customer_request_id,
+
+        purchase_order_id =
+
+        purchase_order.id if purchase_order else None,
 
         invoice_status =
 
@@ -257,6 +295,13 @@ def get_invoice_by_job_request(
 
     print(f"Invoice ID : {invoice.id}")
 
+    invoice_value = None
+
+    if invoice.purchase_order_id:
+        po = db.query(PurchaseOrder).filter(PurchaseOrder.id == invoice.purchase_order_id).first()
+        if po is not None:
+            invoice_value = float(po.po_value) if po.po_value is not None else None
+
     response = {
 
         "id": invoice.id,
@@ -275,6 +320,12 @@ def get_invoice_by_job_request(
 
             "customer_request_id":
                 invoice.customer_request_id,
+
+            "purchase_order_id":
+                invoice.purchase_order_id,
+
+            "invoice_value":
+                invoice_value,
 
             "invoice_status":
                 invoice.invoice_status,

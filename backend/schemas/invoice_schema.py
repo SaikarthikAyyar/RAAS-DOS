@@ -23,6 +23,8 @@ class InvoiceSchema(
 
     customer_request_id: int
 
+    purchase_order_id: int | None = None
+
     invoice_status: str
 
     execution_phase: str

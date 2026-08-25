@@ -11,6 +11,8 @@ import QuoteCommercialSummary from "./QuoteCommercialSummary";
 import CommercialApprovalSummary from "./CommercialApprovalSummary";
 
 import POSummary from "./POSummary";
+
+import JobCreationSummary from "./JobCreationSummary";
 // ====================================
 // COMPONENT
 // ====================================
@@ -161,11 +163,13 @@ export default function WorkspaceContent({
 
             return(
 
-                <div>
+                <JobCreationSummary
 
-                    Job Created Placeholder
+                    enquiry={enquiry}
 
-                </div>
+                    reload={reload}
+
+                />
 
             );
 

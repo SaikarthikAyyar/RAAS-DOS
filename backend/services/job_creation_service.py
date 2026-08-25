@@ -2,6 +2,8 @@
 # IMPORTS
 # ====================================
 
+from datetime import date, timedelta
+
 from fastapi import HTTPException
 
 from backend.schemas.job_creation_schema import JobCreationSchema
@@ -9,6 +11,10 @@ from backend.schemas.job_creation_schema import JobCreationSchema
 from backend.repositories.job_creation_repository import (
 
     create_job,
+
+    get_job,
+
+    update_job,
 
     get_job_by_approval
 
@@ -57,6 +63,10 @@ from backend.services.enquiry_service import EnquiryService
 from backend.services.status_service import (
     update_customer_request_status
 )
+
+from backend.models.enquiry import Enquiry
+
+from backend.services.enquiry_consolidated_service import update_module_reference
 
 # Replace this with your actual invoice service once it exists
 from backend.services.invoice_service import create_invoice_request
@@ -137,7 +147,15 @@ def create_job_request(
 
         )
     
-    if quote.workflow_status != "MANAGEMENT_APPROVED":
+    # "APPROVAL_COMPLETED" is the real, current terminal status a
+    # quote reaches via Commercial Approval's Accept/Release action
+    # (approval_board_service.py) - "MANAGEMENT_APPROVED" is kept
+    # accepted too for backward compatibility with older quotes that
+    # predate that flow. Found and fixed 2026-08-25: this check only
+    # ever accepted the latter, which no real PO_RECEIVED-stage
+    # enquiry's quote actually reaches anymore, making Job Creation
+    # completely unreachable until this was corrected.
+    if quote.workflow_status not in ("APPROVAL_COMPLETED", "MANAGEMENT_APPROVED"):
         raise HTTPException(
             status_code=400,
             detail="Quote has not been approved by management."
@@ -188,6 +206,19 @@ def create_job_request(
     )
 
     # ====================================
+    # PLANNED DATES
+    # First estimate at creation time - a real, editable starting
+    # point (see PUT /job-creation/{id}), same fallback shape
+    # get_job_creation_data already computes on the fly elsewhere.
+    # ====================================
+
+    planned_start_value = date.today()
+
+    total_days = ops.total_job_days if ops.total_job_days is not None else 1
+
+    planned_completion_value = planned_start_value + timedelta(days=total_days)
+
+    # ====================================
     # BUILD PAYLOAD
     # ====================================
 
@@ -212,6 +243,14 @@ def create_job_request(
         generated_job_id =
 
         f"JOB-{approval.id:04d}",
+
+        planned_start =
+
+        planned_start_value.isoformat(),
+
+        planned_completion =
+
+        planned_completion_value.isoformat(),
 
         customer_visible_status =
 
@@ -260,6 +299,20 @@ def create_job_request(
     )
 
     print(f"[Workflow] Job Created : {job.id}")
+
+    # Link the consolidated Enquiry row (the Enquiry Workspace's own
+    # model - a separate, older EnquiryService-based queue is what the
+    # code below this point actually drives) to the new job, so the
+    # Job Created tab's by-enquiry lookup can find it. Never wired
+    # before this phase - the tab had no real content to need it.
+    consolidated_enquiry = (
+        db.query(Enquiry)
+        .filter(Enquiry.approval_board_id == approval.id)
+        .first()
+    )
+
+    if consolidated_enquiry:
+        update_module_reference(db, consolidated_enquiry.id, "job_creation_id", job.id)
 
     print("[Workflow] Completing Job Creation enquiry")
 
@@ -353,6 +406,77 @@ def create_job_request(
     print("========== JOB CREATION COMPLETE ==========\n")
 
     return job
+
+
+# ====================================
+# UPDATE JOB (planned dates)
+# So both Job Creation and, later, Fleet & Availability can adjust
+# the job's dates after creation - closes the "subject to change...
+# edited in fleet/availability" requirement.
+# ====================================
+
+def update_job_request(
+
+        db,
+
+        job_id,
+
+        payload
+
+):
+
+    job = get_job(db, job_id)
+
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found.")
+
+    if payload.planned_start is not None:
+        job.planned_start = payload.planned_start
+
+    if payload.planned_completion is not None:
+        job.planned_completion = payload.planned_completion
+
+    job = update_job(db, job)
+
+    return job
+
+
+# ====================================
+# GET JOB BY ENQUIRY (Phase 33D)
+# Resolves the enquiry's own linked job_creation_id if set; otherwise
+# reports "not yet created" plus the approval_board_id the frontend
+# needs to create one - avoids a second round-trip just to find that
+# id, since the Enquiry Workspace already has the full enquiry detail
+# in hand.
+# ====================================
+
+def get_job_by_enquiry_request(db, enquiry):
+
+    if not enquiry.job_creation_id:
+        return {
+            "job_exists": False,
+            "approval_board_id": enquiry.approval_board_id
+        }
+
+    job = get_job(db, enquiry.job_creation_id)
+
+    if job is None:
+        return {
+            "job_exists": False,
+            "approval_board_id": enquiry.approval_board_id
+        }
+
+    return {
+        "job_exists": True,
+        "id": job.id,
+        "generated_job_id": job.generated_job_id,
+        "planned_start": job.planned_start,
+        "planned_completion": job.planned_completion,
+        "approved_service_configuration": job.approved_service_configuration,
+        "approved_machine": job.approved_machine,
+        "approved_pump_package": job.approved_pump_package,
+        "approved_accessories": job.approved_accessories
+    }
 
 
 # ====================================

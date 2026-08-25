@@ -31,6 +31,10 @@ def create_invoice(
 
         payload.customer_request_id,
 
+        purchase_order_id =
+
+        payload.purchase_order_id,
+
         invoice_status =
 
         payload.invoice_status,

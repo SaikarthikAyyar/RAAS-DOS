@@ -31,6 +31,8 @@ export const businessMastersTabs = [
 
     ["hubs", "Hubs"],
 
+    ["fleetunits", "Fleet Units"],
+
     ["quotetemplates", "Quote Templates"],
 
     ["emailtemplates", "Email Templates"],

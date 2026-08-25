@@ -12,7 +12,9 @@ from backend.database.connection import get_db
 
 from backend.schemas.job_creation_schema import (
 
-    JobCreationSchema
+    JobCreationSchema,
+
+    JobCreationUpdateSchema
 
 )
 
@@ -20,11 +22,19 @@ from backend.services.job_creation_service import (
 
     create_job_request,
 
+    update_job_request,
+
     get_approved_quotes_request,
 
-    get_job_creation_request
+    get_job_creation_request,
+
+    get_job_by_enquiry_request
 
 )
+
+from backend.repositories.enquiry_consolidated_repository import get_enquiry
+
+from fastapi import HTTPException
 
 
 # ====================================
@@ -93,6 +103,73 @@ def create_job(
     )
 
     return job
+
+
+# ====================================
+# UPDATE JOB (planned dates)
+# ====================================
+
+@router.put(
+
+    "/job-creation/{job_id}"
+
+)
+
+def update_job(
+
+    job_id: int,
+
+    payload: JobCreationUpdateSchema,
+
+    db: Session = Depends(
+
+        get_db
+
+    )
+
+):
+
+    job = update_job_request(
+
+        db,
+
+        job_id,
+
+        payload
+
+    )
+
+    return job
+
+
+# ====================================
+# GET JOB BY ENQUIRY
+# ====================================
+
+@router.get(
+
+    "/job-creation/by-enquiry/{enquiry_id}"
+
+)
+
+def get_job_by_enquiry(
+
+    enquiry_id: int,
+
+    db: Session = Depends(
+
+        get_db
+
+    )
+
+):
+
+    enquiry = get_enquiry(db, enquiry_id)
+
+    if enquiry is None:
+        raise HTTPException(status_code=404, detail="Enquiry not found.")
+
+    return get_job_by_enquiry_request(db, enquiry)
 
 
 # ====================================

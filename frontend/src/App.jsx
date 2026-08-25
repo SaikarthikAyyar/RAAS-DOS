@@ -49,6 +49,8 @@ import AuditTrail from "./pages/AuditTrail";
 
 import ReviewsApprovals from "./pages/ReviewsApprovals";
 
+import FleetReadiness from "./pages/FleetReadiness";
+
 
 function App() {
 
@@ -128,6 +130,8 @@ function App() {
           <Route path="audit-trail" element={<AuditTrail />} />
 
           <Route path="reviews-approvals" element={<ReviewsApprovals />} />
+
+          <Route path="fleet-availability" element={<FleetReadiness />} />
 
         </Route>
 

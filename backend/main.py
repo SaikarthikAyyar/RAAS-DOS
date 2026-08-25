@@ -108,6 +108,12 @@ from backend.api.hr_role_api import api as hr_role_api
 
 from backend.api.gst_settings_api import api as gst_settings_api
 
+from backend.api.fleet_unit_api import api as fleet_unit_api
+
+from backend.api.fleet_schedule_api import api as fleet_schedule_api
+
+from backend.api.fleet_availability_api import api as fleet_availability_api
+
 from backend.database.init_db import create_tables
 
 from pathlib import Path
@@ -314,6 +320,9 @@ app.include_router(dashboard_overview_api)
 app.include_router(personnel_api)
 app.include_router(hr_role_api)
 app.include_router(gst_settings_api)
+app.include_router(fleet_unit_api)
+app.include_router(fleet_schedule_api)
+app.include_router(fleet_availability_api)
 
 
 

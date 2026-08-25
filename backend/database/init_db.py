@@ -76,6 +76,9 @@ from backend.models.machines_pumps import Machine, Pump, MachinePumpCompatibilit
 from backend.models.hr_role import HrRole
 from backend.models.gst_settings import GstSettings
 
+from backend.models.fleet_unit import FleetUnit, FleetUnitPersonnel
+from backend.models.fleet_schedule import FleetSchedule
+
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
     seed_personnel
@@ -83,6 +86,10 @@ from backend.repositories.allocation_repository import (
 
 from backend.repositories.role_permissions_repository import (
     seed_roles_modules_permissions
+)
+
+from backend.repositories.fleet_unit_repository import (
+    seed_fleet_units
 )
 
 from backend.database.connection import SessionLocal
@@ -102,6 +109,8 @@ def create_tables():
         seed_personnel(db)
 
         seed_roles_modules_permissions(db)
+
+        seed_fleet_units(db)
 
     finally:
 

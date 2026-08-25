@@ -43,6 +43,10 @@ from backend.models.machine_schedule import MachineSchedule
 
 from backend.models.machine_inventory import MachineInventory
 
+from backend.models.fleet_schedule import FleetSchedule
+
+from backend.repositories.fleet_schedule_repository import dequeue_fleet_schedules
+
 
 # ====================================
 # CREATE EXECUTION
@@ -297,7 +301,7 @@ def update_execution_after_allocation(
     if execution.planned_start is not None and payload.planned_start is not None:
         execution.planned_start = payload.planned_start
 
-    if execution.planned_completion is not None and payload.planned_completion is not None:
+    if execution.estimated_completion is not None and payload.planned_completion is not None:
         execution.estimated_completion = payload.planned_completion
 
     db.commit()
@@ -1154,6 +1158,72 @@ def complete_execution_phase(
     print("Final phase reached -> dequeuing machine schedules")
 
     affected_schedules = dequeue_execution_schedules(db, execution)
+
+    # ====================================
+    # DEQUEUE FLEET SCHEDULES (Phase 33)
+    # A given execution_id only ever has rows in ONE of
+    # machine_schedule / fleet_schedule (whichever mechanism actually
+    # booked it), so calling both dequeues unconditionally is safe -
+    # the one with no matching rows just returns [] harmlessly.
+    # ====================================
+
+    affected_fleet_schedules = dequeue_fleet_schedules(db, execution)
+
+    promoted_fleet_unit_ids = {s.fleet_unit_id for s in affected_fleet_schedules}
+
+    for fleet_unit_id in promoted_fleet_unit_ids:
+
+        promoted = (
+            db.query(FleetSchedule)
+            .filter(
+                FleetSchedule.fleet_unit_id == fleet_unit_id,
+                FleetSchedule.queue_position == 1,
+                FleetSchedule.schedule_status == "ACTIVE"
+            )
+            .first()
+        )
+
+        if not promoted:
+            print(f"[NEXT] Fleet unit {fleet_unit_id} : queue empty, nothing to promote")
+            continue
+
+        print(
+            f"[NEXT] Fleet unit {fleet_unit_id} : promoting job "
+            f"{promoted.job_creation_id} (schedule {promoted.id})"
+        )
+
+        next_execution = get_execution_by_job(db, promoted.job_creation_id)
+
+        if not next_execution:
+            print(f"[NEXT] No execution row for job {promoted.job_creation_id}")
+            continue
+
+        next_execution.workflow_status = "READY"
+        next_execution.current_phase = "PHASE_1"
+        next_execution.execution_progress = 0
+        next_execution.phase_1_status = "PENDING"
+        next_execution.phase_2_status = "PENDING"
+        next_execution.phase_3_status = "PENDING"
+        next_execution.current_activity = "Resources Allocated"
+        next_execution.site_location = promoted.site_location
+        next_execution.planned_start = promoted.planned_start
+        next_execution.estimated_completion = promoted.planned_completion
+        next_execution.actual_completion = None
+        next_execution.delay_days = 0
+        next_execution.transport_status = "WAITING"
+
+        db.commit()
+        db.refresh(next_execution)
+
+        promoted.execution_id = next_execution.id
+        db.commit()
+
+        print(
+            f"[NEXT] Execution {next_execution.id} reset to READY/PHASE_1, "
+            f"relinked to fleet schedule {promoted.id}"
+        )
+
+        sync_invoice_from_execution(db, next_execution)
 
     # ====================================
     # RESET NEXT EXECUTION PER PROMOTED MACHINE

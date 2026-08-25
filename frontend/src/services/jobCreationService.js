@@ -116,6 +116,54 @@ export async function getJobCreation(
 
 
 // ====================================
+// GET JOB BY ENQUIRY (Phase 33D)
+// ====================================
+
+export async function getJobByEnquiry(enquiryId){
+
+    const response = await fetch(`${API}/job-creation/by-enquiry/${enquiryId}`);
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// UPDATE JOB (planned dates)
+// ====================================
+
+export async function updateJobCreation(jobId, payload){
+
+    const response = await fetch(
+
+        `${API}/job-creation/${jobId}`,
+
+        {
+            method:"PUT",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(payload)
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // SAVE HEADER
 // ====================================
 
