@@ -100,7 +100,7 @@ function MachineInventoryModal({ editing, machineTypes, onClose, onSave }){
                         <label>Machine type</label>
                         <select value={machineTypeId} onChange={e=>handleTypeChange(e.target.value)}>
                             <option value="">— Unassigned —</option>
-                            {machineTypes.map(t=>(
+                            {machineTypes.filter(t=>t.active).map(t=>(
                                 <option key={t.id} value={t.id}>{t.code} - {t.name}</option>
                             ))}
                         </select>

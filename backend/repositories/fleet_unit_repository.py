@@ -77,7 +77,16 @@ def build_fleet_unit_dict(db, fleet_unit):
 # ====================================
 
 def list_all_machines(db):
-    return db.query(MachineInventory).order_by(MachineInventory.machine_code).all()
+    # RETIRED units (the old, superseded fictional catalog - kept in
+    # place non-destructively, never deleted) are excluded here so new
+    # Fleet Unit bookings only ever target the real, current fleet.
+    # They still appear in the Machine Inventory tab itself.
+    return (
+        db.query(MachineInventory)
+        .filter(MachineInventory.status != "RETIRED")
+        .order_by(MachineInventory.machine_code)
+        .all()
+    )
 
 
 # ====================================

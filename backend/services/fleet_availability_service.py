@@ -61,18 +61,26 @@ def _po_value_for_job(db, job_id, cache):
 
 # ====================================
 # CATEGORY RESOLUTION
-# Fleet Unit -> machine_inventory -> matched Machine spec row ->
-# power_type, the closest existing field to the reference
-# spreadsheet's Electric/Hydraulic/RHF/Floating category grouping.
-# machine_inventory.machine_code is the spec's own code plus a
-# per-unit "-NN" suffix (e.g. spec "SCH-300-PBM" -> inventory
-# "SCH-300-PBM-01") - not a strict FK, so matched by prefix, same
-# dual-tolerant spirit as quote_engine.py::resolve_machine_rate.
+# Fleet Unit -> machine_inventory -> its real machine type -> power_type
+# (Electric/Hydraulic/RHF/Floating, matching the reference spreadsheet's
+# own category labels exactly). Every unit created via the Machine
+# Inventory tab carries a real machine_type_id FK - preferred first.
+# Falls back to code-prefix matching only for older/legacy rows that
+# predate that FK (same dual-tolerant spirit as
+# quote_engine.py::resolve_machine_rate).
 # ====================================
 
-def _category_for_fleet_unit(db, fleet_unit, machine_inventory_row, machine_spec_by_code):
+def _category_for_fleet_unit(db, fleet_unit, machine_inventory_row, machine_spec_by_code, machine_types_by_id=None):
 
-    if machine_inventory_row is None or not machine_inventory_row.machine_code:
+    if machine_inventory_row is None:
+        return "Other"
+
+    if machine_types_by_id is not None and machine_inventory_row.machine_type_id:
+        spec = machine_types_by_id.get(machine_inventory_row.machine_type_id)
+        if spec is not None and spec.power_type:
+            return spec.power_type
+
+    if not machine_inventory_row.machine_code:
         return "Other"
 
     inventory_code = machine_inventory_row.machine_code
@@ -153,7 +161,9 @@ def _forecast_data(db, weeks=13):
     units = db.query(FleetUnit).filter(FleetUnit.active == True).order_by(FleetUnit.fleet_code).all()  # noqa: E712
 
     machine_inventory_by_id = {m.id: m for m in db.query(MachineInventory).all()}
-    machine_spec_by_code = {m.code: m for m in db.query(Machine).all()}
+    machine_specs = db.query(Machine).all()
+    machine_spec_by_code = {m.code: m for m in machine_specs}
+    machine_types_by_id = {m.id: m for m in machine_specs}
 
     today = date.today()
     week_starts = [today + timedelta(days=7 * i) for i in range(weeks)]
@@ -195,7 +205,7 @@ def _forecast_data(db, weeks=13):
     for unit in units:
 
         machine_row = machine_inventory_by_id.get(unit.machine_inventory_id)
-        category = _category_for_fleet_unit(db, unit, machine_row, machine_spec_by_code)
+        category = _category_for_fleet_unit(db, unit, machine_row, machine_spec_by_code, machine_types_by_id)
 
         bookings = (
             db.query(FleetSchedule)
