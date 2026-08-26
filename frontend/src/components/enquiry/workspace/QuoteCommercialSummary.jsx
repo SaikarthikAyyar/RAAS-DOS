@@ -325,6 +325,15 @@ export default function QuoteCommercialSummary({
             return;
         }
 
+        const confirmMessage =
+            status === "Approved"
+                ? "Approve and send this case to Commercial Approval? Once approved, Request Revision and this quote's own fields here can't be edited again unless the case is sent back to Quote & Commercial."
+                : "Send this case back to Ops Review? Request Revision and this quote's own fields here won't be editable again until the case reaches Quote & Commercial once more - but Ops Review will become editable again immediately.";
+
+        if(!window.confirm(confirmMessage)){
+            return;
+        }
+
         setDeciding(true);
         setError("");
 
@@ -640,6 +649,8 @@ export default function QuoteCommercialSummary({
                         <button
                             className="survey-action-button"
                             onClick={handleOpenQuotesModule}
+                            disabled={!requestGate.canRequest}
+                            title={!requestGate.canRequest ? requestGate.reason : "Generate a new quote revision from there."}
                         >
                             Open Quotes Module
                         </button>

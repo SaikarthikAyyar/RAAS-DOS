@@ -192,7 +192,7 @@
 }
 
 /* "Fill / Edit Survey" — matches wireframe .btn.primary */
-.survey-action-button:not(.survey-create-button):not(.survey-action-button-orange){
+.survey-action-button:not(.survey-create-button):not(.survey-action-button-orange):not(.survey-action-button-danger){
     background:#f58220;
     border-color:#f58220;
     color:#fff;

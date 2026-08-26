@@ -166,6 +166,15 @@ export default function OpsReviewDecisionCard({
 
         }
 
+        const confirmMessage =
+            status === "Approved"
+                ? "Approve and send this case to Quote & Commercial? Once approved, the Deployment Plan and Ops Selector here can't be edited again unless the case is sent back to Ops Review."
+                : "Send this case back to Sales Survey? The Deployment Plan and Ops Selector here won't be editable again until the case reaches Ops Review once more - but Survey will become editable again immediately.";
+
+        if(!window.confirm(confirmMessage)){
+            return;
+        }
+
         setSaving(true);
 
         setError("");
@@ -385,6 +394,10 @@ export default function OpsReviewDecisionCard({
                         className="survey-action-button"
 
                         onClick={handleOpenOpsSelector}
+
+                        disabled={!requestGate.canRequest}
+
+                        title={!requestGate.canRequest ? requestGate.reason : "Re-run the scoring algorithm against the latest Machines/Fleet and Pump Master data."}
 
                     >
 

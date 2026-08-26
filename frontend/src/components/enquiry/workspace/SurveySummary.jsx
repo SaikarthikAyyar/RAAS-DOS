@@ -22,6 +22,8 @@ from "../../../services/surveyReminderService";
 
 import { getSurveyCompletenessErrors } from "../../../utils/surveyCompleteness";
 
+import { computeStageOnly } from "../../../utils/gateStatus";
+
 import { buildActor } from "../../../utils/actor";
 
 import { formatApiError } from "../../../utils/apiError";
@@ -197,6 +199,14 @@ export default function SurveySummary({
             : !surveyComplete
                 ? "Complete all compulsory survey fields before requesting Ops Review."
                 : null;
+
+    // Editing the survey's underlying answers only makes sense while
+    // the case is genuinely still sitting at Survey - once it's moved
+    // on, this "task" button must grey out too, matching the other
+    // stage-gated buttons downstream. Read-only survey data still
+    // shows in the summary cards above regardless of this gate; it
+    // only blocks the navigate-away-and-edit action.
+    const editSurveyStageGate = computeStageOnly(enquiry, "SALES_SURVEY");
 
     return(
 
@@ -986,6 +996,10 @@ export default function SurveySummary({
                                 className="survey-action-button"
 
                                 onClick={handleFillEditSurvey}
+
+                                disabled={!editSurveyStageGate.canRequest}
+
+                                title={!editSurveyStageGate.canRequest ? editSurveyStageGate.reason : undefined}
 
                             >
 

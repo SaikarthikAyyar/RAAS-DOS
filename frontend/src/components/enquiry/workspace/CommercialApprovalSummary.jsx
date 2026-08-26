@@ -213,14 +213,6 @@ export default function CommercialApprovalSummary({
 
     async function handleDecision(decision){
 
-        if(decision==="REJECTED"){
-
-            if(!window.confirm("Reject this quote? The case will be sent back to Ops Review.")){
-                return;
-            }
-
-        }
-
         if(!canDecide){
 
             setError(gate.reason || "You are not authorized to record this decision.");
@@ -261,6 +253,15 @@ export default function CommercialApprovalSummary({
 
             }
 
+        }
+
+        const confirmMessage =
+            decision==="APPROVED"
+                ? "Accept and generate the quote release document? Once accepted, this decision can't be edited here again unless the case is sent back to Ops Review."
+                : "Reject this quote? The case will be sent back to Ops Review, where the deployment plan and quote can be edited and regenerated again - this decision here can't be changed once recorded.";
+
+        if(!window.confirm(confirmMessage)){
+            return;
         }
 
         setSaving(true);
@@ -318,6 +319,12 @@ export default function CommercialApprovalSummary({
             setError("A note is required - it goes into the decision history.");
             return;
 
+        }
+
+        if(!window.confirm(
+            "Send this case back to Ops Review for further review? The deployment plan and quote can be edited and regenerated again once it's back there - this decision here can't be changed once recorded."
+        )){
+            return;
         }
 
         setSaving(true);
