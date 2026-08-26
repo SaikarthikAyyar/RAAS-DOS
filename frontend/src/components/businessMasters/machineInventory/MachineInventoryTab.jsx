@@ -265,34 +265,6 @@ export default function MachineInventoryTab(){
 
     }
 
-    // Group inventory rows under their real machine type, matching the
-    // Fleet Units dropdown's own grouping concept - an "Unassigned"
-    // bucket holds any row without a clean type match (legacy data).
-    const groups = [];
-    const byType = new Map();
-
-    for(const row of inventory){
-
-        const key = row.machine_type_id || "unassigned";
-
-        if(!byType.has(key)){
-
-            const typeInfo = row.machine_type_id
-                ? { id: row.machine_type_id, label: `${row.machine_type_code || ""} - ${row.machine_type_name || ""}`.trim() }
-                : { id: "unassigned", label: "Unassigned type" };
-
-            const group = { ...typeInfo, rows: [] };
-            byType.set(key, group);
-            groups.push(group);
-
-        }
-
-        byType.get(key).rows.push(row);
-
-    }
-
-    groups.sort((a,b)=> a.id==="unassigned" ? 1 : b.id==="unassigned" ? -1 : a.label.localeCompare(b.label));
-
     return(
 
         <div className="bm-card">
@@ -315,7 +287,7 @@ export default function MachineInventoryTab(){
             </h3>
 
             <p className="bm-muted" style={{marginBottom:10}}>
-                Real physical stock, grouped by machine type - this is what the Fleet Units tab's "Machine" dropdown draws from directly.
+                Real physical stock - this is what the Fleet Units tab's "Machine" dropdown draws from directly.
             </p>
 
             {
@@ -327,66 +299,62 @@ export default function MachineInventoryTab(){
                     <p className="bm-muted">No machine inventory yet — add the first unit.</p>
                 ) : (
 
-                    groups.map(group=>(
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Machine type</th>
+                                <th>Machine code</th>
+                                <th>Machine name</th>
+                                <th>Asset number</th>
+                                <th>Status</th>
+                                <th>Hub</th>
+                                <th>Current site</th>
+                                <th>Queue</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {inventory.map(row=>(
+                                <tr key={row.id}>
+                                    <td>
+                                        {row.machine_type_id
+                                            ? `${row.machine_type_code || ""} - ${row.machine_type_name || ""}`.trim()
+                                            : "Unassigned"}
+                                    </td>
+                                    <td>{row.machine_code}</td>
+                                    <td>{row.machine_name}</td>
+                                    <td>{row.asset_number}</td>
+                                    <td>{row.status || "-"}</td>
+                                    <td>{row.hub_name || "-"}</td>
+                                    <td>{row.current_site || "-"}</td>
+                                    <td>{row.queue_count ?? 0}</td>
+                                    <td>
 
-                        <div key={group.id} style={{marginBottom:18}}>
+                                        {hasTask("bm-tab-machineinventory", "edit_machine_unit") && (
+                                            <button
+                                                className="bm-backlink"
+                                                onClick={()=>{ setEditing(row); setShowModal(true); }}
+                                            >
+                                                Edit
+                                            </button>
+                                        )}
 
-                            <h4 className="bm-muted" style={{marginBottom:6}}>{group.label}</h4>
+                                        {" "}
 
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Machine code</th>
-                                        <th>Machine name</th>
-                                        <th>Asset number</th>
-                                        <th>Status</th>
-                                        <th>Hub</th>
-                                        <th>Current site</th>
-                                        <th>Queue</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {group.rows.map(row=>(
-                                        <tr key={row.id}>
-                                            <td>{row.machine_code}</td>
-                                            <td>{row.machine_name}</td>
-                                            <td>{row.asset_number}</td>
-                                            <td>{row.status || "-"}</td>
-                                            <td>{row.hub_name || "-"}</td>
-                                            <td>{row.current_site || "-"}</td>
-                                            <td>{row.queue_count ?? 0}</td>
-                                            <td>
+                                        {hasTask("bm-tab-machineinventory", "remove_machine_unit") && (
+                                            <button
+                                                className="bm-backlink"
+                                                onClick={()=>handleRemove(row)}
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
 
-                                                {hasTask("bm-tab-machineinventory", "edit_machine_unit") && (
-                                                    <button
-                                                        className="bm-backlink"
-                                                        onClick={()=>{ setEditing(row); setShowModal(true); }}
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                )}
-
-                                                {" "}
-
-                                                {hasTask("bm-tab-machineinventory", "remove_machine_unit") && (
-                                                    <button
-                                                        className="bm-backlink"
-                                                        onClick={()=>handleRemove(row)}
-                                                    >
-                                                        Remove
-                                                    </button>
-                                                )}
-
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-
-                        </div>
-
-                    ))
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
 
                 )
             }

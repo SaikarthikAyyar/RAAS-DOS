@@ -581,7 +581,7 @@ export default function CommercialApprovalSummary({
                                     className="survey-action-button survey-action-button-orange"
                                     onClick={handleOpenSendModal}
                                 >
-                                    Send Quote Release Email
+                                    Download Quote Release Email
                                 </button>
                             )}
 
@@ -735,7 +735,11 @@ export default function CommercialApprovalSummary({
 
                         onClose={()=>setShowSendModal(false)}
 
-                        requireAttachment
+                        downloadOnly
+
+                        attachmentUrl={releaseDocument?.id ? quoteReleaseDownloadUrl(releaseDocument.id) : null}
+
+                        attachmentFileName={releaseDocument?.file_name}
 
                     />
 
