@@ -148,6 +148,11 @@ export default function QuoteCommercialSummary({
 
     async function handleSaveExtra(){
 
+        if(!requestGate.canRequest){
+            setError(requestGate.reason || "This case has moved past Quote & Commercial.");
+            return;
+        }
+
         setSavingExtra(true);
         setError("");
 
@@ -182,6 +187,11 @@ export default function QuoteCommercialSummary({
     }
 
     async function handleSaveValidTill(){
+
+        if(!requestGate.canRequest){
+            setError(requestGate.reason || "This case has moved past Quote & Commercial.");
+            return;
+        }
 
         setSavingValidTill(true);
         setError("");
@@ -468,7 +478,8 @@ export default function QuoteCommercialSummary({
                         <button
                             className="survey-action-button"
                             onClick={handleSaveExtra}
-                            disabled={savingExtra}
+                            disabled={savingExtra || !requestGate.canRequest}
+                            title={!requestGate.canRequest ? requestGate.reason : undefined}
                         >
                             {savingExtra ? "Saving..." : "Save internal addition"}
                         </button>
@@ -481,6 +492,8 @@ export default function QuoteCommercialSummary({
                         <button
                             className="survey-action-button"
                             onClick={()=>setShowPreview(v=>!v)}
+                            disabled={!requestGate.canRequest}
+                            title={!requestGate.canRequest ? requestGate.reason : undefined}
                         >
                             {showPreview ? "Hide" : "Preview"} customer-facing quote
                         </button>
@@ -568,7 +581,8 @@ export default function QuoteCommercialSummary({
                                 <button
                                     className="survey-action-button"
                                     onClick={handleSaveValidTill}
-                                    disabled={savingValidTill}
+                                    disabled={savingValidTill || !requestGate.canRequest}
+                                    title={!requestGate.canRequest ? requestGate.reason : undefined}
                                 >
                                     {savingValidTill ? "Saving..." : "Save"}
                                 </button>
