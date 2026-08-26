@@ -10,6 +10,8 @@ import { useAuth } from "../contexts/AuthContext";
 
 import { formatApiError } from "../utils/apiError";
 
+import { withDateStamp } from "../utils/exportFilename";
+
 import {
     getNotifications,
     getNotificationsExport,
@@ -215,7 +217,7 @@ export default function AuditTrail(){
 
             }
 
-            XLSX.writeFile(workbook, "RAAS_DOS_Audit_Trail.xlsx");
+            XLSX.writeFile(workbook, withDateStamp("RAAS_DOS_Audit_Trail.xlsx"));
 
         }
         catch(err){

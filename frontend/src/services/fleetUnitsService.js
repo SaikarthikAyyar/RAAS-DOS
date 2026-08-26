@@ -2,6 +2,8 @@
 // API
 // ====================================
 
+import { withDateStamp } from "../utils/exportFilename";
+
 const API = import.meta.env.VITE_API_URL;
 
 
@@ -218,7 +220,7 @@ export async function downloadFleetForecastXlsx(weeks=13){
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = "Fleet_3Month_Forecast.xlsx";
+    link.download = withDateStamp("Fleet_3Month_Forecast.xlsx");
     document.body.appendChild(link);
     link.click();
     link.remove();

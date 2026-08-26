@@ -21,6 +21,7 @@ class MachineInventoryCreate(BaseModel):
     machine_code: str
     asset_number: str
     machine_type_id: Optional[int] = None
+    hub_id: Optional[int] = None
     status: str = "AVAILABLE"
     current_site: Optional[str] = "WAREHOUSE"
     remarks: Optional[str] = None
@@ -34,6 +35,7 @@ class MachineInventoryUpdate(BaseModel):
     machine_code: Optional[str] = None
     asset_number: Optional[str] = None
     machine_type_id: Optional[int] = None
+    hub_id: Optional[int] = None
     status: Optional[str] = None
     current_site: Optional[str] = None
     remarks: Optional[str] = None
@@ -56,6 +58,8 @@ class MachineInventoryResponse(BaseModel):
     machine_type_id: Optional[int] = None
     machine_type_code: Optional[str] = None
     machine_type_name: Optional[str] = None
+    hub_id: Optional[int] = None
+    hub_name: Optional[str] = None
     status: Optional[str] = None
     current_site: Optional[str] = None
     current_job_id: Optional[int] = None

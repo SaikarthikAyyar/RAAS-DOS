@@ -21,6 +21,8 @@ import QuotesPagination from "../components/quotesModule/QuotesPagination";
 
 import { getQuotesList } from "../services/quotesModuleService";
 
+import { withDateStamp } from "../utils/exportFilename";
+
 
 // ====================================
 // CSV EXPORT
@@ -183,7 +185,7 @@ export default function QuotesModule(){
 
             downloadCSV(
 
-                "RAAS_DOS_Quotes.csv",
+                withDateStamp("RAAS_DOS_Quotes.csv"),
 
                 ["Quote ID", "Customer", "Range Min", "Range Max", "Status"],
 

@@ -30,6 +30,8 @@ import EnquiryPagination from "./EnquiryPagination";
 
 import { formatApiError } from "../../utils/apiError";
 
+import { withDateStamp } from "../../utils/exportFilename";
+
 import {
 
     getEnquiries,
@@ -622,7 +624,7 @@ export default function EnquiryModuleFrontPage(){
 
             downloadCSV(
 
-                "RAAS_DOS_Enquiries.csv",
+                withDateStamp("RAAS_DOS_Enquiries.csv"),
 
                 ["Enquiry ID", "Customer", "Nature", "Stage", "Status", "Owner", "Created"],
 

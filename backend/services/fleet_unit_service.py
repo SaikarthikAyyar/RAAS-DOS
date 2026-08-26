@@ -14,6 +14,8 @@ from backend.repositories.fleet_unit_repository import (
 
 from backend.repositories.notification_repository import record_business_master_change
 
+from backend.models.hub import Hub
+
 
 # ====================================
 # FLEET UNITS (33A: read-only)
@@ -42,8 +44,22 @@ def list_all_machines_request(db):
 
     machines = list_all_machines(db)
 
+    hubs_by_id = {h.id: h for h in db.query(Hub).all()}
+
     return [
-        {"id": m.id, "machine_code": m.machine_code, "machine_name": m.machine_name}
+        {
+            "id": m.id,
+            "machine_code": m.machine_code,
+            "machine_name": m.machine_name,
+            # Carried along so the Fleet Unit modal can prefill "Home
+            # hub" the moment a machine is picked (a convenience default,
+            # still independently editable afterward - same pattern
+            # already used for the Machine Inventory tab's own
+            # type -> name prefill) and show where the unit sits today.
+            "hub_id": m.hub_id,
+            "hub_name": hubs_by_id.get(m.hub_id).hub_name if m.hub_id and hubs_by_id.get(m.hub_id) else None,
+            "current_site": m.current_site
+        }
         for m in machines
     ]
 

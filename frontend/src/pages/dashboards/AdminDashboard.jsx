@@ -16,6 +16,8 @@ import RecentCasesTable from "../../components/dashboard/overview/RecentCasesTab
 
 import { STAGE_LABELS } from "../../data/workflowStages";
 
+import { withDateStamp } from "../../utils/exportFilename";
+
 
 // ====================================
 // CSV EXPORT
@@ -114,7 +116,7 @@ export default function AdminDashboard(){
             ]);
 
             downloadCSV(
-                "RAAS_DOS_Pipeline_Snapshot.csv",
+                withDateStamp("RAAS_DOS_Pipeline_Snapshot.csv"),
                 ["Enquiry", "Customer", "Stage", "Value", "Status"],
                 rows
             );

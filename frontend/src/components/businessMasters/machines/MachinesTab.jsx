@@ -10,7 +10,6 @@ import {
 import { getPumps } from "../../../services/pumpsService";
 import { getServiceConfigurations } from "../../../services/serviceConfigService";
 import { getAccessories } from "../../../services/accessoriesService";
-import { getHubs } from "../../../services/hubsService";
 
 import { useLookupLists } from "../../../context/LookupListsContext";
 
@@ -90,7 +89,7 @@ function CheckboxList({ options, selected, onChange }){
 // ADD / EDIT MODAL
 // ====================================
 
-function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, hubs, onClose, onSave }){
+function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, onClose, onSave }){
 
     const { getOptions } = useLookupLists();
 
@@ -136,8 +135,6 @@ function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, hubs,
     const [vehiclePayload, setVehiclePayload] = useState(editing?.vehicle_payload || "");
     const [dims, setDims] = useState(editing?.dims || "");
     const [weight, setWeight] = useState(editing?.weight || "");
-
-    const [hubsAvailable, setHubsAvailable] = useState(editing?.hubs_available || []);
 
     const [description, setDescription] = useState(editing?.description || "");
 
@@ -193,7 +190,6 @@ function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, hubs,
                 vehicle_payload: vehiclePayload.trim() || null,
                 dims: dims.trim() || null,
                 weight: weight.trim() || null,
-                hubs_available: hubsAvailable,
                 description: description.trim() || null
             });
 
@@ -416,16 +412,7 @@ function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, hubs,
                         <input value={weight} onChange={e=>setWeight(e.target.value)} />
                     </div>
 
-                    <h4>Hubs &amp; Description</h4>
-
-                    <div style={{gridColumn:"1 / -1"}}>
-                        <label>Available at hubs</label>
-                        <CheckboxList
-                            options={hubs.map(h=>h.hub_name)}
-                            selected={hubsAvailable}
-                            onChange={setHubsAvailable}
-                        />
-                    </div>
+                    <h4>Description</h4>
 
                     <div className="bm-formgrid single" style={{gridColumn:"1 / -1"}}>
                         <div>
@@ -465,7 +452,6 @@ export default function MachinesTab(){
     const [pumps, setPumps] = useState([]);
     const [serviceConfigs, setServiceConfigs] = useState([]);
     const [accessoriesMaster, setAccessoriesMaster] = useState([]);
-    const [hubs, setHubs] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -482,19 +468,17 @@ export default function MachinesTab(){
 
         try{
 
-            const [machinesData, pumpsData, configsData, accData, hubsData] = await Promise.all([
+            const [machinesData, pumpsData, configsData, accData] = await Promise.all([
                 getMachines(),
                 getPumps(),
                 getServiceConfigurations(),
-                getAccessories(),
-                getHubs()
+                getAccessories()
             ]);
 
             setMachines(machinesData ?? []);
             setPumps(pumpsData ?? []);
             setServiceConfigs(configsData ?? []);
             setAccessoriesMaster(accData ?? []);
-            setHubs(hubsData ?? []);
 
         }
 
@@ -557,7 +541,7 @@ export default function MachinesTab(){
 
             <h3>
 
-                Machines / Fleet
+                Machine Specs
 
                 {hasTask("bm-tab-machines", "add_machine") && (
                     <button
@@ -668,7 +652,6 @@ export default function MachinesTab(){
                         pumps={pumps}
                         serviceConfigs={serviceConfigs}
                         accessoriesMaster={accessoriesMaster}
-                        hubs={hubs}
                         onClose={()=>{ setShowModal(false); setEditing(null); }}
                         onSave={handleSave}
                     />

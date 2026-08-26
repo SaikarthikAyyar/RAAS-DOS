@@ -4,6 +4,7 @@
 
 from backend.models.machine_inventory import MachineInventory
 from backend.models.machines_pumps import Machine
+from backend.models.hub import Hub
 
 
 # ====================================
@@ -18,7 +19,7 @@ def get_machine_inventory(db, machine_inventory_id):
     return db.query(MachineInventory).filter(MachineInventory.id == machine_inventory_id).first()
 
 
-def build_machine_inventory_dict(db, row, machine_types_by_id=None):
+def build_machine_inventory_dict(db, row, machine_types_by_id=None, hubs_by_id=None):
 
     machine_type = None
 
@@ -29,6 +30,15 @@ def build_machine_inventory_dict(db, row, machine_types_by_id=None):
         else:
             machine_type = db.query(Machine).filter(Machine.id == row.machine_type_id).first()
 
+    hub = None
+
+    if row.hub_id:
+
+        if hubs_by_id is not None:
+            hub = hubs_by_id.get(row.hub_id)
+        else:
+            hub = db.query(Hub).filter(Hub.id == row.hub_id).first()
+
     return {
         "id": row.id,
         "machine_name": row.machine_name,
@@ -37,6 +47,8 @@ def build_machine_inventory_dict(db, row, machine_types_by_id=None):
         "machine_type_id": row.machine_type_id,
         "machine_type_code": machine_type.code if machine_type else None,
         "machine_type_name": machine_type.name if machine_type else None,
+        "hub_id": row.hub_id,
+        "hub_name": hub.hub_name if hub else None,
         "status": row.status,
         "current_site": row.current_site,
         "current_job_id": row.current_job_id,

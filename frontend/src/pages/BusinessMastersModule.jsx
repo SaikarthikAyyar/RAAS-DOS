@@ -10,6 +10,8 @@ import {
 
 import * as XLSX from "xlsx";
 
+import { withDateStamp } from "../utils/exportFilename";
+
 import "../components/businessMasters/BusinessMasters.css";
 
 import { businessMastersTabs } from "../data/businessMastersTabs";
@@ -707,7 +709,7 @@ export default function BusinessMastersModule(){
         XLSX.utils.book_append_sheet(workbook, assetsSheet, "Assets");
         XLSX.utils.book_append_sheet(workbook, contactsSheet, "Company & POC");
 
-        downloadWorkbook(workbook, "Customers_Report.xlsx");
+        downloadWorkbook(workbook, withDateStamp("Customers_Report.xlsx"));
 
     }
 
@@ -753,7 +755,7 @@ export default function BusinessMastersModule(){
 
         });
 
-        downloadWorkbook(workbook, `${label.replace(/\s+/g, "_")}.xlsx`);
+        downloadWorkbook(workbook, withDateStamp(`${label.replace(/\s+/g, "_")}.xlsx`));
 
     }
 

@@ -13,7 +13,7 @@ export const businessMastersTabs = [
 
     ["customers", "Customers"],
 
-    ["machines", "Machines / Fleet"],
+    ["machines", "Machine Specs"],
 
     ["machineinventory", "Machine Inventory"],
 

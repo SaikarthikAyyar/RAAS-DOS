@@ -65,6 +65,19 @@ class MachineInventory(Base):
     )
 
     # ====================================
+    # HOME HUB
+    # Real per-unit hub ownership - the Machine Specs catalog's own
+    # hubs_available list (per TYPE) is superseded by this going
+    # forward, since real physical stock has exactly one home hub.
+    # ====================================
+
+    hub_id = Column(
+        BigInteger,
+        ForeignKey("hubs.id"),
+        nullable=True
+    )
+
+    # ====================================
     # LIVE STATUS
     # ====================================
 

@@ -6,6 +6,8 @@ import * as XLSX from "xlsx";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import { withDateStamp } from "../../../utils/exportFilename";
+
 
 // ====================================
 // FORMATTERS
@@ -278,7 +280,7 @@ export default function CustomerDetailView({
 
         XLSX.utils.book_append_sheet(workbook, assetsSheet, sheetName("Assets", detail.company_name));
 
-        XLSX.writeFile(workbook, `${detail.company_name.replace(/\s/g, "_")}_360_Export.xlsx`);
+        XLSX.writeFile(workbook, withDateStamp(`${detail.company_name.replace(/\s/g, "_")}_360_Export.xlsx`));
 
     }
 

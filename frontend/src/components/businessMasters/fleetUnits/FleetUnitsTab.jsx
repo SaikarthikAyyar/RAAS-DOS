@@ -86,6 +86,25 @@ function FleetUnitModal({ editing, machines, hubs, allPersonnel, onClose, onSave
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
+    // Convenience only - prefills "Home hub" from the picked machine's
+    // own Machine Inventory hub, still fully editable (a Fleet Unit can
+    // legitimately be assigned a different hub than its machine's own
+    // home base). Same "picking one thing prefills another, doesn't
+    // lock it" pattern already used for Machine Inventory's own
+    // type -> name prefill.
+    function handleMachineChange(value){
+
+        setMachineId(value);
+
+        if(!editing && value && !hubId){
+            const machine = machines.find(m=>String(m.id)===String(value));
+            if(machine?.hub_id){
+                setHubId(machine.hub_id);
+            }
+        }
+
+    }
+
     async function handleSubmit(){
 
         if(!fleetCode.trim() || !fleetName.trim()){
@@ -154,7 +173,7 @@ function FleetUnitModal({ editing, machines, hubs, allPersonnel, onClose, onSave
 
                     <div>
                         <label>Machine</label>
-                        <select value={machineId} onChange={e=>setMachineId(e.target.value)}>
+                        <select value={machineId} onChange={e=>handleMachineChange(e.target.value)}>
                             <option value="">— Select a machine —</option>
                             {machines.map(m=>(
                                 <option key={m.id} value={m.id}>
@@ -350,6 +369,7 @@ export default function FleetUnitsTab(){
                                 <th>Name</th>
                                 <th>Machine</th>
                                 <th>Hub</th>
+                                <th>Current Location</th>
                                 <th>Crew</th>
                                 <th>Status</th>
                                 <th></th>
@@ -365,6 +385,7 @@ export default function FleetUnitsTab(){
                                     <td>{f.fleet_name}</td>
                                     <td>{f.machine_code ? `${f.machine_code} - ${f.machine_name}` : "—"}</td>
                                     <td>{f.hub_name || "—"}</td>
+                                    <td>{f.current_location || "—"}</td>
                                     <td>{f.crew?.length ? f.crew.map(c=>c.full_name).join(", ") : "—"}</td>
                                     <td>{f.active ? "Active" : "Inactive"}</td>
                                     <td>

@@ -397,6 +397,7 @@ export default function FleetReadiness(){
                                             <th>Unit</th>
                                             <th>Machine</th>
                                             <th>Hub</th>
+                                            <th>Current Location</th>
                                             <th>Crew</th>
                                             <th></th>
                                         </tr>
@@ -407,6 +408,7 @@ export default function FleetReadiness(){
                                                 <td>{f.fleet_code}</td>
                                                 <td>{f.machine_code}</td>
                                                 <td>{f.hub_name || "-"}</td>
+                                                <td>{f.current_location || "-"}</td>
                                                 <td>{f.crew?.length ? f.crew.map(c=>c.full_name).join(", ") : "-"}</td>
                                                 <td>
                                                     <span

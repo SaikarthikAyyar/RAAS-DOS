@@ -2,6 +2,8 @@
 # IMPORTS
 # ====================================
 
+from datetime import date
+
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -48,6 +50,6 @@ def report(
         media_type="application/pdf",
         headers={
             "Content-Disposition":
-            f'inline; filename="Survey_{customer_request_id}.pdf"'
+            f'inline; filename="Survey_{customer_request_id}_{date.today().isoformat()}.pdf"'
         }
     )

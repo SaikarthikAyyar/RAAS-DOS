@@ -66,4 +66,6 @@ class FleetUnitResponse(BaseModel):
     hub_id: Optional[int] = None
     hub_name: Optional[str] = None
 
+    current_location: Optional[str] = None
+
     crew: list[FleetUnitCrewMemberSchema] = []

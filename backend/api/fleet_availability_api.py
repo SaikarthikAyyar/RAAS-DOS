@@ -2,6 +2,8 @@
 # IMPORTS
 # ====================================
 
+from datetime import date
+
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
@@ -34,8 +36,10 @@ def export_forecast(weeks: int = Query(13, ge=1, le=26), db: Session = Depends(g
 
     buffer = build_forecast_workbook_bytes(db, weeks)
 
+    filename = f"Fleet_3Month_Forecast_{date.today().isoformat()}.xlsx"
+
     return StreamingResponse(
         buffer,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": "attachment; filename=Fleet_3Month_Forecast.xlsx"}
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )

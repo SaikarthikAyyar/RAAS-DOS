@@ -8,6 +8,8 @@ import {
     deleteMachineInventory
 } from "../../../services/machineInventoryService";
 
+import { getHubs } from "../../../services/hubsService";
+
 import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
@@ -24,13 +26,14 @@ const STATUS_OPTIONS = ["AVAILABLE", "ALLOCATED", "MAINTENANCE", "RETIRED"];
 // ADD / EDIT MODAL
 // ====================================
 
-function MachineInventoryModal({ editing, machineTypes, onClose, onSave }){
+function MachineInventoryModal({ editing, machineTypes, hubs, onClose, onSave }){
 
     const [machineTypeId, setMachineTypeId] = useState(editing?.machine_type_id || "");
     const [machineName, setMachineName] = useState(editing?.machine_name || "");
     const [machineCode, setMachineCode] = useState(editing?.machine_code || "");
     const [assetNumber, setAssetNumber] = useState(editing?.asset_number || "");
     const [status, setStatus] = useState(editing?.status || "AVAILABLE");
+    const [hubId, setHubId] = useState(editing?.hub_id || "");
     const [currentSite, setCurrentSite] = useState(editing?.current_site || "WAREHOUSE");
     const [remarks, setRemarks] = useState(editing?.remarks || "");
 
@@ -70,6 +73,7 @@ function MachineInventoryModal({ editing, machineTypes, onClose, onSave }){
                 machine_code: machineCode.trim(),
                 asset_number: assetNumber.trim(),
                 status,
+                hub_id: hubId ? Number(hubId) : null,
                 current_site: currentSite.trim() || null,
                 remarks: remarks.trim() || null
             });
@@ -135,6 +139,16 @@ function MachineInventoryModal({ editing, machineTypes, onClose, onSave }){
                     </div>
 
                     <div>
+                        <label>Home hub</label>
+                        <select value={hubId} onChange={e=>setHubId(e.target.value)}>
+                            <option value="">— No hub —</option>
+                            {hubs.map(h=>(
+                                <option key={h.id} value={h.id}>{h.hub_name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
                         <label>Current site</label>
                         <input value={currentSite} onChange={e=>setCurrentSite(e.target.value)}/>
                     </div>
@@ -177,6 +191,7 @@ export default function MachineInventoryTab(){
 
     const [inventory, setInventory] = useState([]);
     const [machineTypes, setMachineTypes] = useState([]);
+    const [hubs, setHubs] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -193,9 +208,10 @@ export default function MachineInventoryTab(){
         setError("");
 
         try{
-            const [inv, types] = await Promise.all([getMachineInventory(), getMachineTypes()]);
+            const [inv, types, hubsData] = await Promise.all([getMachineInventory(), getMachineTypes(), getHubs()]);
             setInventory(inv ?? []);
             setMachineTypes(types ?? []);
+            setHubs(hubsData ?? []);
         }
         catch(err){
             console.error(err);
@@ -324,6 +340,7 @@ export default function MachineInventoryTab(){
                                         <th>Machine name</th>
                                         <th>Asset number</th>
                                         <th>Status</th>
+                                        <th>Hub</th>
                                         <th>Current site</th>
                                         <th>Queue</th>
                                         <th></th>
@@ -336,6 +353,7 @@ export default function MachineInventoryTab(){
                                             <td>{row.machine_name}</td>
                                             <td>{row.asset_number}</td>
                                             <td>{row.status || "-"}</td>
+                                            <td>{row.hub_name || "-"}</td>
                                             <td>{row.current_site || "-"}</td>
                                             <td>{row.queue_count ?? 0}</td>
                                             <td>
@@ -378,6 +396,7 @@ export default function MachineInventoryTab(){
                     <MachineInventoryModal
                         editing={editing}
                         machineTypes={machineTypes}
+                        hubs={hubs}
                         onClose={()=>{ setShowModal(false); setEditing(null); }}
                         onSave={handleSave}
                     />

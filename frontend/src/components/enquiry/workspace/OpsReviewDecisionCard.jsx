@@ -407,7 +407,7 @@ export default function OpsReviewDecisionCard({
 
                         disabled={!openSelectorGate.canRequest}
 
-                        title={!openSelectorGate.canRequest ? openSelectorGate.reason : "Re-run the scoring algorithm against the latest Machines/Fleet and Pump Master data."}
+                        title={!openSelectorGate.canRequest ? openSelectorGate.reason : "Re-run the scoring algorithm against the latest Machine Specs and Pump Master data."}
 
                     >
 

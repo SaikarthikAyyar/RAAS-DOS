@@ -14,10 +14,15 @@ from backend.repositories.machine_inventory_repository import (
 from backend.repositories.notification_repository import record_business_master_change
 
 from backend.models.machines_pumps import Machine
+from backend.models.hub import Hub
 
 
 def _machine_types_by_id(db):
     return {m.id: m for m in db.query(Machine).all()}
+
+
+def _hubs_by_id(db):
+    return {h.id: h for h in db.query(Hub).all()}
 
 
 # ====================================
@@ -28,8 +33,9 @@ def list_machine_inventory_request(db):
 
     rows = list_machine_inventory(db)
     types_by_id = _machine_types_by_id(db)
+    hubs_by_id = _hubs_by_id(db)
 
-    return [build_machine_inventory_dict(db, r, types_by_id) for r in rows]
+    return [build_machine_inventory_dict(db, r, types_by_id, hubs_by_id) for r in rows]
 
 
 def get_machine_inventory_request(db, machine_inventory_id):
@@ -54,7 +60,8 @@ def create_machine_inventory_request(db, payload):
         {"field": "machine_name", "before": None, "after": row.machine_name},
         {"field": "machine_code", "before": None, "after": row.machine_code},
         {"field": "asset_number", "before": None, "after": row.asset_number},
-        {"field": "machine_type", "before": None, "after": row_dict["machine_type_code"]}
+        {"field": "machine_type", "before": None, "after": row_dict["machine_type_code"]},
+        {"field": "hub", "before": None, "after": row_dict["hub_name"]}
     ]
 
     record_business_master_change(
@@ -98,6 +105,11 @@ def update_machine_inventory_request(db, machine_inventory_id, payload):
         and payload.machine_type_id != before.machine_type_id
     )
 
+    hub_changed = (
+        "hub_id" in payload.model_fields_set
+        and payload.hub_id != before.hub_id
+    )
+
     row = update_machine_inventory(db, machine_inventory_id, payload)
     after_dict = build_machine_inventory_dict(db, row)
 
@@ -106,6 +118,13 @@ def update_machine_inventory_request(db, machine_inventory_id, payload):
             "field": "machine_type",
             "before": before_dict["machine_type_code"],
             "after": after_dict["machine_type_code"]
+        })
+
+    if hub_changed:
+        changes.append({
+            "field": "hub",
+            "before": before_dict["hub_name"],
+            "after": after_dict["hub_name"]
         })
 
     if changes:

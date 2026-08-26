@@ -62,6 +62,12 @@ def build_fleet_unit_dict(db, fleet_unit):
         "machine_name": machine.machine_name if machine else None,
         "hub_id": fleet_unit.hub_id,
         "hub_name": hub.hub_name if hub else None,
+        # Resolved live from the linked Machine Inventory row, never
+        # stored on fleet_units itself - matches current_site's own
+        # real-time-updated nature (set by the booking/dequeue flow
+        # today, a real GPS/telemetry feed later) rather than freezing
+        # a copy that could go stale the moment the machine moves.
+        "current_location": machine.current_site if machine else None,
         "crew": [
             {"id": p.id, "full_name": p.full_name, "designation": p.designation}
             for p in crew

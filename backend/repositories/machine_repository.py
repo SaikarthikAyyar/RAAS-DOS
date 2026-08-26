@@ -135,6 +135,42 @@ def delete_machine(db, machine_id):
 
 
 # ====================================
+# HUB AVAILABILITY (derived, per machine TYPE)
+# Hub ownership now lives on Machine Inventory (a real per-UNIT home
+# hub), not on this spec catalog's own hubs_available column anymore -
+# that column is frozen going forward (kept non-destructively, still
+# readable, just no longer edited from the Machine Specs tab). Ops
+# Engine's hub_fit scoring still needs a real, live answer to "is this
+# machine TYPE stationed at hub X", so it's derived here instead: a
+# type counts as available at a hub if any of its real, non-retired
+# physical units currently has that hub set.
+# ====================================
+
+def _hubs_available_by_machine_type_id(db):
+
+    from backend.models.machine_inventory import MachineInventory
+    from backend.models.hub import Hub
+
+    rows = (
+        db.query(MachineInventory.machine_type_id, Hub.hub_name)
+        .join(Hub, Hub.id == MachineInventory.hub_id)
+        .filter(
+            MachineInventory.machine_type_id.isnot(None),
+            MachineInventory.status != "RETIRED"
+        )
+        .distinct()
+        .all()
+    )
+
+    result = {}
+
+    for machine_type_id, hub_name in rows:
+        result.setdefault(machine_type_id, []).append(hub_name)
+
+    return result
+
+
+# ====================================
 # OPS ENGINE ADAPTER
 # Converts active Machine rows into plain dicts using the exact same
 # key names backend/data/machine_library.py's MACHINE_LIBRARY entries
@@ -146,6 +182,8 @@ def delete_machine(db, machine_id):
 def list_active_machines_as_dicts(db):
 
     rows = list_active_machines(db)
+
+    hubs_available_by_type = _hubs_available_by_machine_type_id(db)
 
     machines = []
 
@@ -179,7 +217,7 @@ def list_active_machines_as_dicts(db):
             "hazard_rating": row.hazard_rating,
             "max_vertical_lift": float(row.max_vertical_lift) if row.max_vertical_lift is not None else None,
             "crane_required": row.crane_required,
-            "hubs_available": row.hubs_available or [],
+            "hubs_available": hubs_available_by_type.get(row.id, []),
             "compatible_pump_codes": row.compatible_pump_codes
         })
 
