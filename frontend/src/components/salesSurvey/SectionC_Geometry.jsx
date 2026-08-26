@@ -339,6 +339,27 @@ tooltip="The vertical distance from the access opening down to the tank floor or
 
 <FieldInput
 
+label="Setup Distance (m)"
+
+value={geometry.setup_distance}
+
+section="geometry"
+
+field="setup_distance"
+
+unit="m"
+
+type="number"
+
+updateSection={updateSection}
+
+tooltip="The distance from where the machine/equipment is set up to the access opening, in metres - feeds directly into the Equipment Reach calculation above."
+
+/>
+
+
+<FieldInput
+
 label="Vertical Lift (m)"
 
 value={geometry.vertical_lift}

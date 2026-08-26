@@ -30,6 +30,8 @@ import { formatApiError } from "../../../utils/apiError";
 
 import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
 
+import { SURVEY_PROFILE_FIELDS, SURVEY_PROFILE_GROUPS } from "../../../data/surveyProfileFields";
+
 export default function SurveySummary({
 
     enquiry,
@@ -254,6 +256,39 @@ export default function SurveySummary({
                     />
                     </div>
                 )
+            }
+
+            {
+                assetProfile?.profile && (
+                    <div data-guide-id="survey-asset-site-profile" style={{position:"relative"}}>
+                    <ComponentExplainerIcon tabId="survey" componentId="survey-asset-site-profile" floating/>
+                    </div>
+                )
+            }
+
+            {
+                assetProfile?.profile && SURVEY_PROFILE_GROUPS.map(group=>(
+
+                    <SurveySummaryCard
+                        key={group.key}
+                        title={group.title}
+                        fields={SURVEY_PROFILE_FIELDS.filter(([, , , g])=>g===group.key).map(([key, label, isBool])=>{
+
+                            const raw = assetProfile.profile[key];
+
+                            const value =
+                                raw === null || raw === undefined
+                                    ? undefined
+                                    : isBool
+                                        ? (raw ? "Yes" : "No")
+                                        : raw;
+
+                            return { label, value };
+
+                        })}
+                    />
+
+                ))
             }
 
             {

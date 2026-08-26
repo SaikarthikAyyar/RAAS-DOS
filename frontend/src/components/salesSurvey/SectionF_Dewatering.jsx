@@ -45,7 +45,7 @@ export default function SectionF_Dewatering({
                 <LookupSelect
                     listKey="yesNoNA"
                     label="Dewatering Required?"
-                    value={dewatering.dewatering_required || "Yes"}
+                    value={dewatering.dewatering_required || ""}
                     section="dewatering"
                     field="dewatering_required"
                     updateSection={updateSection}

@@ -12,6 +12,11 @@ export const components = {
         explanation: "Shown only when this enquiry is linked to a site that has been surveyed before. It displays what is already known about that site — division, plant, department, asset name/type, cleaning frequency, and any material/access notes captured on a previous visit. This data comes from the Business Masters Customers module, not from this survey itself, and is a starting point rather than something you edit here."
     },
 
+    "survey-asset-site-profile": {
+        title: "Site Profile (Last Survey)",
+        explanation: "Shown only once a Sales Survey has actually been submitted for this site before. It shows the site/geometry/access/safety/pump details that survey recorded — separate from the Asset Profile card above, which only holds the handful of fields set from Business Masters. This carries forward automatically the next time this same site is surveyed again."
+    },
+
     "survey-details": {
         title: "Survey Details",
         explanation: "The read-only cards below (Customer Details, Job Details, Sludge Details, Geometry, Access & Setup, Safety, Pump Details, Dewatering, Customer Insights) show exactly what has been recorded on the actual Sales Survey for this enquiry. If no survey has been submitted yet, they instead show the prefilled values that will be offered when you do fill one in, drawn from the original Customer Request."

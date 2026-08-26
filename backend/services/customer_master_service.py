@@ -266,19 +266,23 @@ def get_asset_detail_request(
 
     return {
         "id": asset.id,
+        "customer_id": asset.customer_id,
         "division": asset.division,
         "plant": asset.plant,
         "department": asset.department,
         "name": asset.name,
         "asset_type": asset.asset_type,
         "cleaning_frequency": asset.cleaning_frequency,
+        "last_cleaned": asset.last_cleaned.isoformat() if asset.last_cleaned else None,
         "next_due": asset.next_due.isoformat() if asset.next_due else None,
         "last_verified": asset.last_verified.isoformat() if asset.last_verified else None,
         "verified_by": asset.verified_by,
         "observed_material": asset.observed_material,
         "access_opening_type": asset.access_opening_type,
         "can_place_equipment_nearby": asset.can_place_equipment_nearby,
-        "pain_point": asset.pain_point
+        "pain_point": asset.pain_point,
+        "profile": asset.profile,
+        "created_at": asset.created_at
     }
 
 from backend.models.techno_commercial_quote import Quote
