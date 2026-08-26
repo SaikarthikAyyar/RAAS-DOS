@@ -314,7 +314,7 @@ export default function EmailTemplatesTab(){
                                             {hasTask("bm-tab-emailtemplates", "send_email_template") && (
                                                 <ActionButton
                                                     icon={Send}
-                                                    label="Send"
+                                                    label="Send / Download"
                                                     className="email-template-send"
                                                     onClick={()=>setSendingTemplate(t)}
                                                 />

@@ -11,6 +11,8 @@ import { isValidEmail } from "../../../utils/validators";
 
 import { formatApiError } from "../../../utils/apiError";
 
+import { withDateStamp } from "../../../utils/exportFilename";
+
 
 // ====================================
 // COMPONENT
@@ -163,6 +165,41 @@ export default function SendTemplateModal({
 
     }
 
+    // Download the currently-resolved subject/body as a .eml file - the
+    // user's own mail client opens it (as a draft or via Forward) letting
+    // them pick their own account/address to send from, instead of going
+    // through this app's SMTP relay.
+    function handleDownload(){
+
+        const to = recipientVariable ? (values[recipientVariable.key] || "").trim() : "";
+
+        const headerLines = [];
+
+        if(to){
+            headerLines.push(`To: ${to}`);
+        }
+
+        headerLines.push(`Subject: ${subjectText}`);
+        headerLines.push(`MIME-Version: 1.0`);
+        headerLines.push(`Content-Type: text/plain; charset="UTF-8"`);
+        headerLines.push(`Content-Transfer-Encoding: 8bit`);
+
+        const emlContent = [...headerLines, "", bodyText].join("\r\n");
+
+        const blob = new Blob([emlContent], { type: "message/rfc822" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = withDateStamp(`${template.name.replace(/\s+/g, "_")}.eml`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+
+    }
+
     return(
 
         <div className="bm-modal-overlay" onClick={onClose}>
@@ -270,6 +307,20 @@ export default function SendTemplateModal({
                 <div className="bm-modal-actions">
 
                     <button className="bm-btn bm-btn-ghost" onClick={onClose}>Cancel</button>
+
+                    <button
+
+                        className="bm-btn"
+
+                        onClick={handleDownload}
+
+                        title="Download this email (subject + body) as a .eml file to send from your own email address"
+
+                    >
+
+                        Download (.eml)
+
+                    </button>
 
                     <button
 
