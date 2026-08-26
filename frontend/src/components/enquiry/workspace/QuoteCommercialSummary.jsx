@@ -220,7 +220,21 @@ export default function QuoteCommercialSummary({
 
     }
 
+    // A revision request only makes sense while the case is genuinely
+    // still sitting at Quote & Commercial - once it's moved on (or was
+    // sent back to Ops Review already), this "task" button must grey
+    // out too, not just the Approve/Send-back decision buttons below
+    // it. Firing this from a stale, already-passed tab would silently
+    // flag revision_requested on a quote a later stage has already
+    // acted on, retroactively blocking that later stage's own decision.
+    const revisionStageGate = computeStageOnly(enquiry, "QUOTE_COMMERCIAL_REVIEW");
+
     async function handleRequestRevision(){
+
+        if(!revisionStageGate.canRequest){
+            setError(revisionStageGate.reason || "This case has moved past Quote & Commercial.");
+            return;
+        }
 
         setRequestingRevision(true);
         setError("");
@@ -640,7 +654,8 @@ export default function QuoteCommercialSummary({
                         <button
                             className="survey-action-button survey-action-button-danger"
                             onClick={handleRequestRevision}
-                            disabled={requestingRevision || quote.revision_requested}
+                            disabled={requestingRevision || quote.revision_requested || !revisionStageGate.canRequest}
+                            title={!revisionStageGate.canRequest ? revisionStageGate.reason : undefined}
                         >
                             {
                                 requestingRevision

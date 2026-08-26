@@ -269,7 +269,7 @@ function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, hubs,
                     </div>
 
                     <div>
-                        <label>Base output per day</label>
+                        <label>Base output per day (m3/day)</label>
                         <input type="number" value={baseOutputPerDay} onChange={e=>setBaseOutputPerDay(e.target.value)} />
                     </div>
 

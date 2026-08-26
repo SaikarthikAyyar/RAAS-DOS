@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import { computeStageOnly } from "../../../utils/gateStatus";
+
 import { buildActor } from "../../../utils/actor";
 
 import { formatApiError } from "../../../utils/apiError";
@@ -255,6 +257,15 @@ export default function DeploymentPlanCard({
 
     });
 
+    // Saving/re-generating the quote only makes sense while the case is
+    // genuinely still sitting at Ops Review - once a later stage has
+    // acted on it (Approved, sent further along, or beyond), this same
+    // "task" button must grey out too, not just the Approve/Send-back
+    // decision buttons. Reuses the same stage-only gate the "Request
+    // Approval" ping already uses on this tab (no standing requirement -
+    // this isn't a decision, just a data save).
+    const stageGate = computeStageOnly(enquiry, "OPS_REVIEW");
+
     function updateCrewField(index, field, value){
 
         setCrewPlan(prev=>
@@ -302,6 +313,11 @@ export default function DeploymentPlanCard({
     }
 
     async function handleSaveAndGenerateQuote(){
+
+        if(!stageGate.canRequest){
+            setError(stageGate.reason || "This case has moved past Ops Review.");
+            return;
+        }
 
         setSaving(true);
 
@@ -603,9 +619,15 @@ export default function DeploymentPlanCard({
 
                     onClick={handleSaveAndGenerateQuote}
 
-                    disabled={saving || !hasChanges}
+                    disabled={saving || !stageGate.canRequest || !hasChanges}
 
-                    title={!hasChanges ? "No changes to save - edit the machine, crew, accessories, or dewatering range first." : undefined}
+                    title={
+                        !stageGate.canRequest
+                            ? stageGate.reason
+                            : !hasChanges
+                                ? "No changes to save - edit the machine, crew, accessories, or dewatering range first."
+                                : undefined
+                    }
 
                 >
 
