@@ -10,6 +10,8 @@ import { useState, useEffect } from "react";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import { computeStageOnly } from "../../../utils/gateStatus";
+
 import { buildActor } from "../../../utils/actor";
 
 // "Open Ops Selector" lives inside OpsReviewDecisionCard now, alongside the
@@ -129,7 +131,25 @@ export default function OpsReviewSummary({
 
     }
 
+    // Same "editing tool, not a decision" treatment as Save Deployment
+    // Plan / Open Ops Selector - blocked once the case has moved past
+    // Ops Review, except while the current quote has a revision
+    // requested (that flag leaves enquiry.stage at QUOTE_COMMERCIAL_REVIEW
+    // on purpose - see QuoteCommercialSummary.jsx - and re-picking the
+    // machine is a legitimate part of making that revision).
+    const overrideStageGate = quote?.revision_requested
+        ? { canRequest: true, reason: null }
+        : computeStageOnly(enquiry, "OPS_REVIEW");
+
     async function handleSaveOverride(){
+
+        if(!overrideStageGate.canRequest){
+
+            setError(overrideStageGate.reason || "This case has moved past Ops Review.");
+
+            return;
+
+        }
 
         if(!overrideMachine || !overrideReason.trim()){
 
@@ -354,7 +374,9 @@ export default function OpsReviewSummary({
 
                                     onClick={handleSaveOverride}
 
-                                    disabled={saving}
+                                    disabled={saving || !overrideStageGate.canRequest}
+
+                                    title={!overrideStageGate.canRequest ? overrideStageGate.reason : undefined}
 
                                 >
 

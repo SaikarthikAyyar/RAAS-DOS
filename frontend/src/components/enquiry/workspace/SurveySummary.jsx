@@ -40,6 +40,8 @@ export default function SurveySummary({
 
     assetProfile,
 
+    quote,
+
     reload
 
 }){
@@ -206,7 +208,18 @@ export default function SurveySummary({
     // stage-gated buttons downstream. Read-only survey data still
     // shows in the summary cards above regardless of this gate; it
     // only blocks the navigate-away-and-edit action.
-    const editSurveyStageGate = computeStageOnly(enquiry, "SALES_SURVEY");
+    //
+    // Exception: a Quote & Commercial revision request deliberately
+    // does NOT regress enquiry.stage (see QuoteCommercialSummary.jsx) -
+    // it's a lightweight "go fix the upstream inputs and regenerate"
+    // flag, not a full re-walk of every gate. While the case's current
+    // quote is flagged revision_requested, Survey editing has to stay
+    // reachable even though stage is still sitting at Quote &
+    // Commercial - otherwise the very revision the flag exists for
+    // becomes impossible to make.
+    const editSurveyStageGate = quote?.revision_requested
+        ? { canRequest: true, reason: null }
+        : computeStageOnly(enquiry, "SALES_SURVEY");
 
     return(
 

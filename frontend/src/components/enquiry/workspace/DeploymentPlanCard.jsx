@@ -264,7 +264,17 @@ export default function DeploymentPlanCard({
     // decision buttons. Reuses the same stage-only gate the "Request
     // Approval" ping already uses on this tab (no standing requirement -
     // this isn't a decision, just a data save).
-    const stageGate = computeStageOnly(enquiry, "OPS_REVIEW");
+    //
+    // Exception: a Quote & Commercial revision request leaves
+    // enquiry.stage sitting at QUOTE_COMMERCIAL_REVIEW on purpose
+    // (see QuoteCommercialSummary.jsx) rather than regressing it -
+    // saving a fresh deployment plan / generating a new quote revision
+    // is precisely the fix that flag is asking for, so this button has
+    // to stay reachable while it's set, even though stage hasn't
+    // literally come back to Ops Review.
+    const stageGate = quote?.revision_requested
+        ? { canRequest: true, reason: null }
+        : computeStageOnly(enquiry, "OPS_REVIEW");
 
     function updateCrewField(index, field, value){
 

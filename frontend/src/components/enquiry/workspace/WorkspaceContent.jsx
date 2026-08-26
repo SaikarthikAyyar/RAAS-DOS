@@ -65,6 +65,8 @@ export default function WorkspaceContent({
 
                     assetProfile={assetProfile}
 
+                    quote={quote}
+
                     reload={reload}
 
                 />

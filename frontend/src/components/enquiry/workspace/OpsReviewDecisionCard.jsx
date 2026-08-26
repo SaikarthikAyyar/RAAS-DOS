@@ -110,6 +110,16 @@ export default function OpsReviewDecisionCard({
     // genuinely being at this gate's stage right now.
     const requestGate = computeStageOnly(enquiry, "OPS_REVIEW");
 
+    // "Open Ops Selector" is an editing tool, not an approval ping - it
+    // additionally has to stay reachable during a Quote & Commercial
+    // revision request, which deliberately leaves enquiry.stage sitting
+    // at QUOTE_COMMERCIAL_REVIEW rather than regressing it (see
+    // QuoteCommercialSummary.jsx). Re-running the algorithm is exactly
+    // how that revision's "fix the upstream inputs" step gets made.
+    const openSelectorGate = quote?.revision_requested
+        ? { canRequest: true, reason: null }
+        : requestGate;
+
     async function handleRequestApproval(){
 
         if(!requestGate.canRequest){
@@ -395,9 +405,9 @@ export default function OpsReviewDecisionCard({
 
                         onClick={handleOpenOpsSelector}
 
-                        disabled={!requestGate.canRequest}
+                        disabled={!openSelectorGate.canRequest}
 
-                        title={!requestGate.canRequest ? requestGate.reason : "Re-run the scoring algorithm against the latest Machines/Fleet and Pump Master data."}
+                        title={!openSelectorGate.canRequest ? openSelectorGate.reason : "Re-run the scoring algorithm against the latest Machines/Fleet and Pump Master data."}
 
                     >
 
