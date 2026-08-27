@@ -51,11 +51,11 @@ def list_all_machines_request(db):
             "id": m.id,
             "machine_code": m.machine_code,
             "machine_name": m.machine_name,
-            # Carried along so the Fleet Unit modal can prefill "Home
-            # hub" the moment a machine is picked (a convenience default,
-            # still independently editable afterward - same pattern
-            # already used for the Machine Inventory tab's own
-            # type -> name prefill) and show where the unit sits today.
+            # Carried along for reference (the picked machine's real
+            # home hub, resolved the same way build_fleet_unit_dict
+            # resolves it for the fleet unit itself - hub is no longer
+            # a separately-editable Fleet Unit field, it's always
+            # whatever the assigned machine's own hub is).
             "hub_id": m.hub_id,
             "hub_name": hubs_by_id.get(m.hub_id).hub_name if m.hub_id and hubs_by_id.get(m.hub_id) else None,
             "current_site": m.current_site
@@ -128,18 +128,18 @@ def update_fleet_unit_request(db, fleet_unit_id, payload):
         and payload.machine_inventory_id != before.machine_inventory_id
     )
 
-    hub_changed = (
-        "hub_id" in payload.model_fields_set
-        and payload.hub_id != before.hub_id
-    )
-
     row = update_fleet_unit(db, fleet_unit_id, payload)
     after_dict = build_fleet_unit_dict(db, row)
 
     if machine_changed:
         changes.append({"field": "machine", "before": before_dict["machine_code"], "after": after_dict["machine_code"]})
 
-    if hub_changed:
+    # Hub is derived from the assigned machine now (build_fleet_unit_dict),
+    # not an independently-settable field - diff the resolved name
+    # directly rather than tracking a separate hub_id payload field, so
+    # this still reports correctly even when a machine swap is what
+    # changed the hub.
+    if before_dict["hub_name"] != after_dict["hub_name"]:
         changes.append({"field": "hub", "before": before_dict["hub_name"], "after": after_dict["hub_name"]})
 
     if "crew_personnel_ids" in payload.model_fields_set:

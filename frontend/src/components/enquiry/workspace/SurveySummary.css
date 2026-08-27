@@ -413,3 +413,50 @@
     text-decoration:none;
     font-weight:750;
 }
+
+.survey-media-thumb-wrap{
+    position:relative;
+}
+
+.survey-media-thumb-wrap .survey-media-thumb{
+    width:100%;
+}
+
+.survey-media-list-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+}
+
+.survey-media-download-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    padding:0;
+    border:1px solid #e5e7eb;
+    border-radius:6px;
+    background:#fff;
+    color:#f58220;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.survey-media-download-btn:hover{
+    background:#fff4ea;
+    border-color:#f58220;
+}
+
+.survey-media-download-btn:disabled{
+    opacity:0.5;
+    cursor:default;
+}
+
+.survey-media-thumb-wrap .survey-media-download-btn{
+    position:absolute;
+    bottom:4px;
+    right:4px;
+    background:rgba(255,255,255,0.92);
+}

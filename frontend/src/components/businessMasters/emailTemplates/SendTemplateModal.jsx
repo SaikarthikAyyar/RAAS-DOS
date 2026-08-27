@@ -83,6 +83,15 @@ export default function SendTemplateModal({
 
     const recipientVariable = template.variables.find(v=>v.is_recipient_field);
 
+    // In downloadOnly mode there's no Send action for a recipient
+    // address to feed - showing that input would only invite the user
+    // to type an address that then does nothing (and, before the fix
+    // above, used to get silently baked into the download as a
+    // misleading "To:"). Every other variable still renders normally.
+    const visibleVariables = downloadOnly
+        ? variables.filter(v=>!v.is_recipient_field)
+        : variables;
+
     const [values, setValues] = useState(
 
         Object.fromEntries(variables.map(v=>[v.key, ""]))
@@ -216,6 +225,16 @@ export default function SendTemplateModal({
     // through this app's SMTP relay. When attachmentUrl is supplied (the
     // Quote Release flow), the real document is fetched and embedded as
     // a genuine MIME attachment rather than just a text-only email.
+    //
+    // Deliberately never writes a "To:" header - downloading means the
+    // sender hasn't committed to a recipient through this app at all,
+    // and whatever they typed into the recipient field here (which only
+    // ever matters for the in-app Send action, if one is even offered
+    // alongside Download) may not be who they actually end up mailing.
+    // Baking it in would silently pre-fill the wrong address the moment
+    // the download is opened, contradicting a body that's otherwise
+    // recipient-agnostic. Their mail client's own "To" field is where a
+    // real recipient belongs - filled in there, by them, at send time.
     async function handleDownload(){
 
         setDownloading(true);
@@ -223,15 +242,20 @@ export default function SendTemplateModal({
 
         try{
 
-            const to = recipientVariable ? (values[recipientVariable.key] || "").trim() : "";
-
             const headerLines = [];
 
-            if(to){
-                headerLines.push(`To: ${to}`);
-            }
-
             headerLines.push(`Subject: ${subjectText}`);
+
+            // X-Unsent tells a mail client that respects it (Apple Mail,
+            // notably) to open this .eml straight into an editable
+            // compose window instead of a read-only "received message"
+            // preview - skips the Reply/Forward step entirely there.
+            // Clients that don't recognize it (Outlook, most others)
+            // just ignore it and fall back to their normal read view,
+            // where Forward still turns it into an editable draft with
+            // the subject/body/attachment carried over.
+            headerLines.push(`X-Unsent: 1`);
+            headerLines.push(`Date: ${new Date().toUTCString()}`);
             headerLines.push(`MIME-Version: 1.0`);
 
             let bodyContent;
@@ -328,13 +352,17 @@ export default function SendTemplateModal({
 
                         <p className="bm-muted">This template has no variables defined - add some via "Details" first.</p>
 
+                    ) : visibleVariables.length===0 ? (
+
+                        <p className="bm-muted">This template's only variable is the recipient address, which doesn't apply to a download - edit Subject/Body below directly if needed.</p>
+
                     ) : (
 
                         <div className="bm-formgrid">
 
                             {
 
-                                variables.map(v=>(
+                                visibleVariables.map(v=>(
 
                                     <div key={v.id}>
 
@@ -449,7 +477,7 @@ export default function SendTemplateModal({
 
                         disabled={downloading}
 
-                        title={attachmentUrl ? "Download this email with the quote document attached, as a .eml file to send from your own email address" : "Download this email (subject + body) as a .eml file to send from your own email address"}
+                        title={attachmentUrl ? "Download this email with the quote document attached, as a .eml file - no recipient is set, pick one in your own mail client when you send it" : "Download this email (subject + body) as a .eml file - no recipient is set, pick one in your own mail client when you send it"}
 
                     >
 

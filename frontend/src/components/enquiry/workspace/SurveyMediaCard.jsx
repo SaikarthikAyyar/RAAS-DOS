@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 
+import { Download } from "lucide-react";
+
 import { API } from "../../../config/api";
 
 import {
     getMedia
 } from "../../../services/customerMediaService";
+
+import { downloadFileFromUrl } from "../../../utils/downloadFile";
 
 export default function SurveyMediaCard({
 
@@ -15,6 +19,24 @@ export default function SurveyMediaCard({
     const [media, setMedia] = useState([]);
 
     const [loading, setLoading] = useState(true);
+
+    const [downloadingId, setDownloadingId] = useState(null);
+
+    async function handleDownload(item){
+
+        setDownloadingId(item.id);
+
+        try{
+            await downloadFileFromUrl(`${API}${item.url}`, item.file_name);
+        }
+        catch(err){
+            alert(err.message || "Unable to download this file.");
+        }
+        finally{
+            setDownloadingId(null);
+        }
+
+    }
 
     useEffect(()=>{
 
@@ -103,31 +125,51 @@ export default function SurveyMediaCard({
 
                                             photos.map(photo=>(
 
-                                                <a
+                                                <div key={photo.id} className="survey-media-thumb-wrap">
 
-                                                    key={photo.id}
+                                                    <a
 
-                                                    href={`${API}${photo.url}`}
+                                                        href={`${API}${photo.url}`}
 
-                                                    target="_blank"
+                                                        target="_blank"
 
-                                                    rel="noreferrer"
+                                                        rel="noreferrer"
 
-                                                    className="survey-media-thumb"
+                                                        className="survey-media-thumb"
 
-                                                    title={photo.file_name}
+                                                        title={photo.file_name}
 
-                                                >
+                                                    >
 
-                                                    <img
+                                                        <img
 
-                                                        src={`${API}${photo.url}`}
+                                                            src={`${API}${photo.url}`}
 
-                                                        alt={photo.file_name}
+                                                            alt={photo.file_name}
 
-                                                    />
+                                                        />
 
-                                                </a>
+                                                    </a>
+
+                                                    <button
+
+                                                        type="button"
+
+                                                        className="survey-media-download-btn"
+
+                                                        title={`Download ${photo.file_name}`}
+
+                                                        disabled={downloadingId===photo.id}
+
+                                                        onClick={()=>handleDownload(photo)}
+
+                                                    >
+
+                                                        <Download size={13}/>
+
+                                                    </button>
+
+                                                </div>
 
                                             ))
 
@@ -155,7 +197,7 @@ export default function SurveyMediaCard({
 
                                             videos.map(video=>(
 
-                                                <li key={video.id}>
+                                                <li key={video.id} className="survey-media-list-row">
 
                                                     <a
 
@@ -170,6 +212,24 @@ export default function SurveyMediaCard({
                                                         {video.file_name}
 
                                                     </a>
+
+                                                    <button
+
+                                                        type="button"
+
+                                                        className="survey-media-download-btn"
+
+                                                        title={`Download ${video.file_name}`}
+
+                                                        disabled={downloadingId===video.id}
+
+                                                        onClick={()=>handleDownload(video)}
+
+                                                    >
+
+                                                        <Download size={13}/>
+
+                                                    </button>
 
                                                 </li>
 
@@ -199,7 +259,7 @@ export default function SurveyMediaCard({
 
                                             layouts.map(layout=>(
 
-                                                <li key={layout.id}>
+                                                <li key={layout.id} className="survey-media-list-row">
 
                                                     <a
 
@@ -214,6 +274,24 @@ export default function SurveyMediaCard({
                                                         {layout.file_name}
 
                                                     </a>
+
+                                                    <button
+
+                                                        type="button"
+
+                                                        className="survey-media-download-btn"
+
+                                                        title={`Download ${layout.file_name}`}
+
+                                                        disabled={downloadingId===layout.id}
+
+                                                        onClick={()=>handleDownload(layout)}
+
+                                                    >
+
+                                                        <Download size={13}/>
+
+                                                    </button>
 
                                                 </li>
 

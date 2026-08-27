@@ -406,7 +406,7 @@ export default function FleetReadiness(){
                                         {units.map(f=>(
                                             <tr key={f.id}>
                                                 <td>{f.fleet_code}</td>
-                                                <td>{f.machine_code}</td>
+                                                <td>{f.machine_name}</td>
                                                 <td>{f.hub_name || "-"}</td>
                                                 <td>{f.current_location || "-"}</td>
                                                 <td>{f.crew?.length ? f.crew.map(c=>c.full_name).join(", ") : "-"}</td>
@@ -434,7 +434,7 @@ export default function FleetReadiness(){
                                 <div className="bm-card">
 
                                     <h3>
-                                        Calendar - {selectedUnit.fleet_code} ({selectedUnit.machine_code})
+                                        Calendar - {selectedUnit.fleet_code} ({selectedUnit.machine_name})
                                     </h3>
 
                                     <div style={{display:"flex", gap:8, alignItems:"center", marginBottom:6}}>

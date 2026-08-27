@@ -8,7 +8,6 @@ import {
     deleteFleetUnit
 } from "../../../services/fleetUnitsService";
 
-import { getHubs } from "../../../services/hubsService";
 import { getPersonnel } from "../../../services/personnelService";
 
 import { useAuth } from "../../../contexts/AuthContext";
@@ -74,36 +73,23 @@ function CrewCheckboxList({ options, selected, onChange }){
 // ADD / EDIT MODAL
 // ====================================
 
-function FleetUnitModal({ editing, machines, hubs, allPersonnel, onClose, onSave }){
+function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
 
     const [fleetCode, setFleetCode] = useState(editing?.fleet_code || "");
     const [fleetName, setFleetName] = useState(editing?.fleet_name || "");
     const [machineId, setMachineId] = useState(editing?.machine_inventory_id || "");
-    const [hubId, setHubId] = useState(editing?.hub_id || "");
     const [active, setActive] = useState(editing ? editing.active : true);
     const [crewIds, setCrewIds] = useState(editing?.crew?.map(c=>c.id) || []);
 
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
-    // Convenience only - prefills "Home hub" from the picked machine's
-    // own Machine Inventory hub, still fully editable (a Fleet Unit can
-    // legitimately be assigned a different hub than its machine's own
-    // home base). Same "picking one thing prefills another, doesn't
-    // lock it" pattern already used for Machine Inventory's own
-    // type -> name prefill.
-    function handleMachineChange(value){
-
-        setMachineId(value);
-
-        if(!editing && value && !hubId){
-            const machine = machines.find(m=>String(m.id)===String(value));
-            if(machine?.hub_id){
-                setHubId(machine.hub_id);
-            }
-        }
-
-    }
+    // Hub isn't collected here at all - it's always the assigned
+    // machine's own Machine Inventory home hub (resolved server-side,
+    // shown read-only in the table below), not a separately-settable
+    // Fleet Unit field. Re-assign the machine here, or change that
+    // machine's own hub via the Machine Inventory tab, to change it.
+    const selectedMachine = machines.find(m=>String(m.id)===String(machineId));
 
     async function handleSubmit(){
 
@@ -126,7 +112,6 @@ function FleetUnitModal({ editing, machines, hubs, allPersonnel, onClose, onSave
                 fleet_code: fleetCode.trim(),
                 fleet_name: fleetName.trim(),
                 machine_inventory_id: Number(machineId),
-                hub_id: hubId ? Number(hubId) : null,
                 active,
                 crew_personnel_ids: crewIds
             });
@@ -173,7 +158,7 @@ function FleetUnitModal({ editing, machines, hubs, allPersonnel, onClose, onSave
 
                     <div>
                         <label>Machine</label>
-                        <select value={machineId} onChange={e=>handleMachineChange(e.target.value)}>
+                        <select value={machineId} onChange={e=>setMachineId(e.target.value)}>
                             <option value="">— Select a machine —</option>
                             {machines.map(m=>(
                                 <option key={m.id} value={m.id}>
@@ -185,12 +170,10 @@ function FleetUnitModal({ editing, machines, hubs, allPersonnel, onClose, onSave
 
                     <div>
                         <label>Home hub</label>
-                        <select value={hubId} onChange={e=>setHubId(e.target.value)}>
-                            <option value="">— No hub —</option>
-                            {hubs.map(h=>(
-                                <option key={h.id} value={h.id}>{h.hub_name}</option>
-                            ))}
-                        </select>
+                        <p className="bm-muted" style={{margin:"4px 0 0"}}>
+                            {selectedMachine ? (selectedMachine.hub_name || "No hub set on this machine yet") : "Pick a machine first"}
+                            {" — "}set via Machine Inventory, not here.
+                        </p>
                     </div>
 
                     <div>
@@ -246,7 +229,6 @@ export default function FleetUnitsTab(){
 
     const [fleetUnits, setFleetUnits] = useState([]);
     const [machines, setMachines] = useState([]);
-    const [hubs, setHubs] = useState([]);
     const [allPersonnel, setAllPersonnel] = useState([]);
 
     const [loading, setLoading] = useState(true);
@@ -282,7 +264,6 @@ export default function FleetUnitsTab(){
     useEffect(()=>{
 
         getAvailableMachines().then(setMachines).catch(err=>console.error(err));
-        getHubs().then(setHubs).catch(err=>console.error(err));
         getPersonnel().then(setAllPersonnel).catch(err=>console.error(err));
 
     }, []);
@@ -427,7 +408,6 @@ export default function FleetUnitsTab(){
                     <FleetUnitModal
                         editing={editing}
                         machines={machines}
-                        hubs={hubs}
                         allPersonnel={allPersonnel}
                         onClose={()=>{ setShowModal(false); setEditing(null); }}
                         onSave={handleSave}

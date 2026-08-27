@@ -46,9 +46,17 @@ def build_fleet_unit_dict(db, fleet_unit):
         MachineInventory.id == fleet_unit.machine_inventory_id
     ).first()
 
+    # Resolved live from the assigned machine's own Machine Inventory
+    # hub, never from fleet_unit.hub_id - a fleet unit's hub is the
+    # hub its machine actually lives at, so it must track that machine
+    # (including a later change to the machine's own home hub) rather
+    # than a separately-editable copy that could silently drift, same
+    # reasoning as current_location below. fleet_units.hub_id is left
+    # in the schema unused (non-destructive convention), superseded by
+    # this derivation.
     hub = None
-    if fleet_unit.hub_id:
-        hub = db.query(Hub).filter(Hub.id == fleet_unit.hub_id).first()
+    if machine and machine.hub_id:
+        hub = db.query(Hub).filter(Hub.id == machine.hub_id).first()
 
     crew = list_crew(db, fleet_unit.id)
 
@@ -60,7 +68,7 @@ def build_fleet_unit_dict(db, fleet_unit):
         "machine_inventory_id": fleet_unit.machine_inventory_id,
         "machine_code": machine.machine_code if machine else None,
         "machine_name": machine.machine_name if machine else None,
-        "hub_id": fleet_unit.hub_id,
+        "hub_id": machine.hub_id if machine else None,
         "hub_name": hub.hub_name if hub else None,
         # Resolved live from the linked Machine Inventory row, never
         # stored on fleet_units itself - matches current_site's own
