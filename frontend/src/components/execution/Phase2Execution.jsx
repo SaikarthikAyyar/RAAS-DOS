@@ -16,6 +16,8 @@ import {
 
 from "../../services/executionService";
 
+import { useAuth } from "../../contexts/AuthContext";
+
 
 // ====================================
 // PHASE 2
@@ -28,6 +30,10 @@ export default function Phase2Execution({
     refreshExecution
 
 }){
+
+    const { hasTask } = useAuth();
+
+    const canUpdateProgress = hasTask("enquiry-tab-execution", "update_progress");
 
     const [
 
@@ -394,9 +400,10 @@ export default function Phase2Execution({
 
             <p
                 style={{
-                    marginTop:"12px",
-                    fontWeight:"600",
-                    color:"#d8ecec"
+                    marginTop:"10px",
+                    fontWeight:"700",
+                    fontSize:"12.5px",
+                    color:"var(--ink)"
                 }}
             >
 
@@ -619,21 +626,23 @@ export default function Phase2Execution({
 
             </div>
 
-            <div className="execution-actions">
+            {canUpdateProgress && (
+                <div className="execution-actions">
 
-                <button
+                    <button
 
-                    className="execution-btn"
+                        className="execution-btn"
 
-                    onClick={saveProgress}
+                        onClick={saveProgress}
 
-                >
+                    >
 
-                    Save Execution Progress
+                        Save Execution Progress
 
-                </button>
+                    </button>
 
-            </div>
+                </div>
+            )}
 
         </div>
 

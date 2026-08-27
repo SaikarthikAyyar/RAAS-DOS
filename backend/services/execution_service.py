@@ -45,7 +45,65 @@ from backend.models.machine_inventory import MachineInventory
 
 from backend.models.fleet_schedule import FleetSchedule
 
+from backend.models.fleet_unit import FleetUnit
+
 from backend.repositories.fleet_schedule_repository import dequeue_fleet_schedules
+
+from backend.utils.geo import haversine_km
+
+
+# ====================================
+# MACHINE RESOLUTION (Phase 38)
+# Tries the current FleetSchedule/FleetUnit path first (Phase 33+ -
+# the real path for any job booked today), falls back to the legacy
+# MachineSchedule path for older data - same dual-path convention
+# dequeue_execution_schedules/dequeue_fleet_schedules already use.
+# ====================================
+
+def _resolve_execution_machine(db, job_creation_id):
+
+    fleet_schedule = (
+        db.query(FleetSchedule)
+        .filter(FleetSchedule.job_creation_id == job_creation_id)
+        .order_by(FleetSchedule.queue_position)
+        .first()
+    )
+
+    if fleet_schedule:
+
+        fleet_unit = (
+            db.query(FleetUnit)
+            .filter(FleetUnit.id == fleet_schedule.fleet_unit_id)
+            .first()
+        )
+
+        if fleet_unit and fleet_unit.machine_inventory_id:
+
+            machine = (
+                db.query(MachineInventory)
+                .filter(MachineInventory.id == fleet_unit.machine_inventory_id)
+                .first()
+            )
+
+            if machine:
+                return machine
+
+    machine_schedule = (
+        db.query(MachineSchedule)
+        .filter(MachineSchedule.job_creation_id == job_creation_id)
+        .order_by(MachineSchedule.queue_position)
+        .first()
+    )
+
+    if machine_schedule:
+
+        return (
+            db.query(MachineInventory)
+            .filter(MachineInventory.id == machine_schedule.machine_id)
+            .first()
+        )
+
+    return None
 
 
 # ====================================
@@ -168,6 +226,25 @@ def create_execution_request(
         execution
 
     )
+
+    # ====================================
+    # PREFILL SOURCE COORDINATES (Phase 38)
+    # Convenience prefill from the assigned machine's own "last known
+    # position," not a lock - still editable via set_execution_route
+    # before Phase 1 starts if the real pickup point differs. Same
+    # "picking one thing prefills another" pattern already used for
+    # Fleet Unit's hub-from-machine prefill (Phase 36).
+    # ====================================
+
+    machine = _resolve_execution_machine(db, job.id)
+
+    if machine and machine.current_latitude is not None and machine.current_longitude is not None:
+
+        execution.source_latitude = machine.current_latitude
+        execution.source_longitude = machine.current_longitude
+
+        db.commit()
+        db.refresh(execution)
 
     invoice = get_invoice_by_job(
 
@@ -626,6 +703,57 @@ def sync_invoice_from_execution(
     )
 
 
+# ====================================
+# SET EXECUTION ROUTE (Phase 38)
+# Sets/edits the source and/or destination coordinates for Phase 1/3
+# and recomputes distance_to_cover_km from them via haversine_km -
+# distance is never accepted directly from the client, it's always
+# derived from these two points.
+# ====================================
+
+def set_execution_route(
+    db,
+    execution_id,
+    payload
+):
+
+    execution = get_execution(db, execution_id)
+
+    if execution is None:
+        raise HTTPException(status_code=404, detail="Execution not found.")
+
+    if payload.source_latitude is not None:
+        execution.source_latitude = payload.source_latitude
+
+    if payload.source_longitude is not None:
+        execution.source_longitude = payload.source_longitude
+
+    if payload.destination_latitude is not None:
+        execution.destination_latitude = payload.destination_latitude
+
+    if payload.destination_longitude is not None:
+        execution.destination_longitude = payload.destination_longitude
+
+    distance = haversine_km(
+        execution.source_latitude,
+        execution.source_longitude,
+        execution.destination_latitude,
+        execution.destination_longitude
+    )
+
+    if distance is not None:
+        execution.distance_to_cover_km = distance
+
+    execution.last_updated = datetime.utcnow()
+
+    db.commit()
+    db.refresh(execution)
+
+    sync_invoice_from_execution(db, execution)
+
+    return execution
+
+
 def update_execution_progress(
     db,
     execution_id,
@@ -849,6 +977,40 @@ def get_execution_request(
 
 
 # ====================================
+# GET EXECUTION BY JOB (Phase 38 - Enquiry Workspace's Execution tab
+# resolves its own execution row this way, matching the established
+# by-enquiry/by-job lookup pattern already used for Job Creation and
+# Fleet Schedule)
+# ====================================
+
+def get_execution_by_job_request(
+    db,
+    job_creation_id
+):
+
+    execution = get_execution_by_job(db, job_creation_id)
+
+    if execution is None:
+        return None
+
+    survey = (
+        db.query(SalesSurvey)
+        .filter(SalesSurvey.id == execution.sales_survey_id)
+        .first()
+    )
+
+    result = execution.__dict__.copy()
+
+    result["estimated_volume"] = (
+        survey.estimated_volume
+        if survey
+        else 0
+    )
+
+    return result
+
+
+# ====================================
 # LIST EXECUTIONS
 # ====================================
 
@@ -903,17 +1065,41 @@ def start_execution_phase(
 
     )
 
-    if execution.current_phase == "PHASE_1":
+    # ====================================
+    # ROUTE DISTANCE + MACHINE LOCATION SYNC (Phase 38)
+    # distance_to_cover_km is derived from source/destination via
+    # haversine_km on Phase 1 start and again on Phase 3 start (the
+    # return leg - same two points, distance is symmetric) - no more
+    # hardcoded constants. On Phase 2 start (Phase 1 just completed),
+    # the resolved machine's own "last known position" is synced to
+    # the destination it just arrived at, so Business Masters / Fleet &
+    # Availability reflect the move as it happens, not just at final
+    # dequeue.
+    # ====================================
 
-        execution.distance_to_cover_km = 18      # temporary constant
+    route_machine = _resolve_execution_machine(db, execution.job_creation_id)
+
+    if execution.current_phase in ("PHASE_1", "PHASE_3"):
+
+        distance = haversine_km(
+            execution.source_latitude,
+            execution.source_longitude,
+            execution.destination_latitude,
+            execution.destination_longitude
+        )
+
+        if distance is not None:
+            execution.distance_to_cover_km = distance
 
         execution.distance_travelled_km = 0
 
-    if execution.current_phase == "PHASE_3":
+    elif execution.current_phase == "PHASE_2":
 
-        execution.distance_to_cover_km = 15      # return journey
+        if route_machine and execution.destination_latitude is not None:
 
-        execution.distance_travelled_km = 0
+            route_machine.current_latitude = execution.destination_latitude
+            route_machine.current_longitude = execution.destination_longitude
+            route_machine.current_site = execution.site_location
 
     # ====================================
     # START MACHINE SCHEDULE
@@ -1156,6 +1342,25 @@ def complete_execution_phase(
         return execution
 
     print("Final phase reached -> dequeuing machine schedules")
+
+    # ====================================
+    # MACHINE RETURNED TO SOURCE (Phase 38)
+    # Demobilisation (Phase 3) just completed - the machine is back at
+    # its source point. Synced before dequeue so Business Masters /
+    # Fleet & Availability reflect it immediately; if dequeue below
+    # promotes a next queued job for this same machine, that job's own
+    # allocation correctly overwrites current_site/status right after -
+    # no conflict, same "last write wins" reasoning already used
+    # throughout dequeue_fleet_schedules.
+    # ====================================
+
+    return_machine = _resolve_execution_machine(db, execution.job_creation_id)
+
+    if return_machine and execution.source_latitude is not None:
+
+        return_machine.current_latitude = execution.source_latitude
+        return_machine.current_longitude = execution.source_longitude
+        db.commit()
 
     affected_schedules = dequeue_execution_schedules(db, execution)
 

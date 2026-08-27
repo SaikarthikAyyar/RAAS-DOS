@@ -181,6 +181,36 @@ class Execution(Base):
     )
 
     # ====================================
+    # ROUTE (Phase 1/3 - Mobilisation/Demobilisation)
+    # Real coordinates, not a display-only string - source is prefilled
+    # from the assigned machine's MachineInventory.current_latitude/
+    # _longitude at Execution creation (still editable if the real
+    # pickup point differs), destination is the real job-site
+    # coordinates. distance_to_cover_km below is derived from these two
+    # points (haversine, backend/utils/geo.py), not typed by hand.
+    # ====================================
+
+    source_latitude = Column(
+        Float,
+        nullable=True
+    )
+
+    source_longitude = Column(
+        Float,
+        nullable=True
+    )
+
+    destination_latitude = Column(
+        Float,
+        nullable=True
+    )
+
+    destination_longitude = Column(
+        Float,
+        nullable=True
+    )
+
+    # ====================================
     # LIVE EXECUTION
     # ====================================
 

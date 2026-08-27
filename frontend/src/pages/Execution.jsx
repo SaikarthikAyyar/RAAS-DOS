@@ -309,15 +309,17 @@ export default function Execution(){
 
     return(
 
-    <div>
+    <div className="execution-page">
 
-        <h1 style={{ color: "#000000" }}>
+        <h1 className="execution-title">
 
             Execution
 
         </h1>
 
         <select
+
+            className="execution-selector"
 
             value={selectedExecution}
 
@@ -419,33 +421,6 @@ export default function Execution(){
 
         }
 
-
-
-        {execution && (
-
-        <div
-            style={{
-                width:"100%",
-                height:"18px",
-                background:"#444",
-                borderRadius:"4px",
-                overflow:"hidden"
-            }}
-        >
-
-            <div
-                style={{
-                    width:`${execution.execution_progress}%`,
-                    height:"100%",
-                    background:"#4caf50"
-                }}
-            />
-
-        </div>
-
-        )}
-
-        <br/>
 
 
         <ExecutionControls

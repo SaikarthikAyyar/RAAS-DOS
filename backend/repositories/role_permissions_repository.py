@@ -263,7 +263,13 @@ MODULE_TASKS = {
         ("reschedule_fleet_booking", "Reschedule booking"),
         ("cancel_fleet_booking", "Cancel booking")
     ],
-    "enquiry-tab-execution": [],
+    "enquiry-tab-execution": [
+        ("create_execution", "Create execution"),
+        ("set_execution_route", "Set source/destination route"),
+        ("start_phase", "Start current phase"),
+        ("update_progress", "Update execution progress"),
+        ("complete_phase", "Complete current phase")
+    ],
     "enquiry-tab-audit": []
 
 }
@@ -560,6 +566,14 @@ def seed_roles_modules_permissions(db):
 
         for tab_key in tab_keys:
 
+            # enquiry-tab-execution's tasks are deliberately admin-only
+            # for now (Phase 38, direct instruction), not granted to
+            # every role that can already view the tab like every
+            # other tab's tasks - handled in the dedicated block below
+            # instead of this general grant.
+            if tab_key == "enquiry-tab-execution":
+                continue
+
             for task_key, _ in MODULE_TASKS.get(tab_key, []):
 
                 task = task_rows.get((tab_key, task_key))
@@ -580,6 +594,39 @@ def seed_roles_modules_permissions(db):
                     module_task_id=task.id,
                     allowed=True
                 ))
+
+    # ====================================
+    # ADMIN-ONLY TASK GRANT (Phase 38)
+    # enquiry-tab-execution's real task buttons are granted to admin
+    # only for now - direct instruction. Extending to more roles later
+    # is a one-line addition to tab_keys_with_view_by_role's exclusion
+    # above (just remove the skip) rather than anything here.
+    # ====================================
+
+    admin_role = role_rows.get("admin")
+
+    if admin_role:
+
+        for task_key, _ in MODULE_TASKS.get("enquiry-tab-execution", []):
+
+            task = task_rows.get(("enquiry-tab-execution", task_key))
+
+            if not task:
+                continue
+
+            already_granted = db.query(RoleTaskPermission).filter(
+                RoleTaskPermission.role_id == admin_role.id,
+                RoleTaskPermission.module_task_id == task.id
+            ).first()
+
+            if already_granted:
+                continue
+
+            db.add(RoleTaskPermission(
+                role_id=admin_role.id,
+                module_task_id=task.id,
+                allowed=True
+            ))
 
     db.commit()
 

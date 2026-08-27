@@ -7,9 +7,14 @@ import { useEffect, useState } from "react";
 import "./Execution.css";
 
 import {
-    updateExecutionProgress
+    updateExecutionProgress,
+    setExecutionRoute
 }
 from "../../services/executionService";
+
+import ExecutionRouteMap from "./ExecutionRouteMap";
+
+import { useAuth } from "../../contexts/AuthContext";
 
 
 // ====================================
@@ -24,20 +29,14 @@ export default function Phase1Mobilisation({
 
 }){
 
-    const [
+    const { hasTask } = useAuth();
 
-        initialDistance,
-
-        setInitialDistance
-
-    ] = useState(null);
+    const canUpdateProgress = hasTask("enquiry-tab-execution", "update_progress");
+    const canSetRoute = hasTask("enquiry-tab-execution", "set_execution_route");
 
     const [
-
         form,
-
         setForm
-
     ] = useState({
 
         latitude:0,
@@ -54,7 +53,7 @@ export default function Phase1Mobilisation({
 
         eta_minutes:0,
 
-        distance_to_cover_km:0,
+        distance_travelled_km:0,
 
         transport_status:"",
 
@@ -63,6 +62,17 @@ export default function Phase1Mobilisation({
         remarks:""
 
     });
+
+    const [route, setRoute] = useState({
+
+        source_latitude:"",
+        source_longitude:"",
+        destination_latitude:"",
+        destination_longitude:""
+
+    });
+
+    const [savingRoute, setSavingRoute] = useState(false);
 
 
     // ====================================
@@ -93,7 +103,7 @@ export default function Phase1Mobilisation({
 
             eta_minutes:execution.eta_minutes ?? 0,
 
-            distance_to_cover_km:execution.distance_to_cover_km ?? 0,
+            distance_travelled_km:execution.distance_travelled_km ?? 0,
 
             transport_status:execution.transport_status ?? "",
 
@@ -103,15 +113,14 @@ export default function Phase1Mobilisation({
 
         });
 
-        if(initialDistance === null){
+        setRoute({
 
-            setInitialDistance(
+            source_latitude:execution.source_latitude ?? "",
+            source_longitude:execution.source_longitude ?? "",
+            destination_latitude:execution.destination_latitude ?? "",
+            destination_longitude:execution.destination_longitude ?? ""
 
-                execution.distance_to_cover_km ?? 0
-
-            );
-
-        }
+        });
 
     },[execution]);
 
@@ -132,42 +141,71 @@ export default function Phase1Mobilisation({
 
     }
 
+    function updateRouteField(field, value){
+
+        setRoute(previous=>({ ...previous, [field]:value }));
+
+    }
+
 
     // ====================================
     // CALCULATIONS
+    // Mirrors exactly what the backend's own update_execution_progress
+    // formula computes, so what's shown here never drifts from what
+    // actually gets saved - total is the derived route distance
+    // (source -> destination, no longer hand-typed here), travelled
+    // is the one figure still manually entered.
     // ====================================
 
-    const totalDistance =
+    const totalDistance = Number(execution?.distance_to_cover_km ?? 0);
 
-        Number(initialDistance ?? 0);
+    const travelledDistance = Number(form.distance_travelled_km ?? 0);
 
-    const remainingDistance =
-
-        Number(form.distance_to_cover_km ?? 0);
-
-    const travelledDistance =
-
-        Math.max(
-
-            totalDistance -
-
-            remainingDistance,
-
-            0
-
-        );
+    const remainingDistance = Math.max(totalDistance - travelledDistance, 0);
 
     const phaseProgress =
-
         totalDistance > 0
+        ? Math.min(travelledDistance / totalDistance, 1) * 100
+        : 0;
 
-        ?
 
-        (travelledDistance / totalDistance) * 100
+    // ====================================
+    // SAVE ROUTE
+    // ====================================
 
-        :
+    async function saveRoute(){
 
-        0;
+        setSavingRoute(true);
+
+        try{
+
+            await setExecutionRoute(execution.id, {
+
+                source_latitude: route.source_latitude === "" ? null : Number(route.source_latitude),
+                source_longitude: route.source_longitude === "" ? null : Number(route.source_longitude),
+                destination_latitude: route.destination_latitude === "" ? null : Number(route.destination_latitude),
+                destination_longitude: route.destination_longitude === "" ? null : Number(route.destination_longitude)
+
+            });
+
+            if(refreshExecution){
+                await refreshExecution(execution.id);
+            }
+
+        }
+        catch(error){
+
+            console.error(error);
+            alert("Unable to save the route.");
+
+        }
+        finally{
+
+            setSavingRoute(false);
+
+        }
+
+    }
 
 
     // ====================================
@@ -198,7 +236,7 @@ export default function Phase1Mobilisation({
 
                     eta_minutes:Number(form.eta_minutes),
 
-                    distance_to_cover_km:Number(form.distance_to_cover_km),
+                    distance_travelled_km:Number(form.distance_travelled_km),
 
                     transport_status:form.transport_status,
 
@@ -327,6 +365,78 @@ export default function Phase1Mobilisation({
 
             <br/>
 
+            <h5 style={{margin:"0 0 10px"}}>Source &amp; Destination</h5>
+
+            <div className="execution-form-grid">
+
+                <div className="execution-form-group">
+                    <label>Source Latitude</label>
+                    <input
+                        className="execution-input"
+                        type="number"
+                        value={route.source_latitude}
+                        onChange={e=>updateRouteField("source_latitude", e.target.value)}
+                    />
+                </div>
+
+                <div className="execution-form-group">
+                    <label>Source Longitude</label>
+                    <input
+                        className="execution-input"
+                        type="number"
+                        value={route.source_longitude}
+                        onChange={e=>updateRouteField("source_longitude", e.target.value)}
+                    />
+                </div>
+
+                <div className="execution-form-group">
+                    <label>Destination Latitude</label>
+                    <input
+                        className="execution-input"
+                        type="number"
+                        value={route.destination_latitude}
+                        onChange={e=>updateRouteField("destination_latitude", e.target.value)}
+                    />
+                </div>
+
+                <div className="execution-form-group">
+                    <label>Destination Longitude</label>
+                    <input
+                        className="execution-input"
+                        type="number"
+                        value={route.destination_longitude}
+                        onChange={e=>updateRouteField("destination_longitude", e.target.value)}
+                    />
+                </div>
+
+            </div>
+
+            {canSetRoute && (
+                <div className="execution-actions">
+                    <button
+                        className="execution-btn"
+                        onClick={saveRoute}
+                        disabled={savingRoute}
+                    >
+                        {savingRoute ? "Saving Route..." : "Save Route"}
+                    </button>
+                </div>
+            )}
+
+            <ExecutionRouteMap
+                sourceLat={execution?.source_latitude}
+                sourceLng={execution?.source_longitude}
+                destinationLat={execution?.destination_latitude}
+                destinationLng={execution?.destination_longitude}
+                currentLat={execution?.latitude}
+                currentLng={execution?.longitude}
+                distanceKm={execution?.distance_to_cover_km}
+            />
+
+            <br/>
+
+            <h5 style={{margin:"0 0 10px"}}>Last Known Position</h5>
+
             <div className="execution-form-grid">
 
                 <div className="execution-form-group">
@@ -421,7 +531,7 @@ export default function Phase1Mobilisation({
 
                     <label>
 
-                        Distance To Cover (km)
+                        Distance Travelled (km)
 
                     </label>
 
@@ -431,9 +541,9 @@ export default function Phase1Mobilisation({
 
                         type="number"
 
-                        value={form.distance_to_cover_km}
+                        value={form.distance_travelled_km}
 
-                        onChange={e=>updateField("distance_to_cover_km",e.target.value)}
+                        onChange={e=>updateField("distance_travelled_km",e.target.value)}
 
                     />
 
@@ -511,31 +621,23 @@ export default function Phase1Mobilisation({
 
             </div>
 
-            <div className="execution-map">
+            {canUpdateProgress && (
+                <div className="execution-actions">
 
-                Live GPS Map
+                    <button
 
-                <br/>
+                        className="execution-btn"
 
-                (Google Maps Integration)
+                        onClick={saveMobilisation}
 
-            </div>
+                    >
 
-            <div className="execution-actions">
+                        Save Mobilisation
 
-                <button
+                    </button>
 
-                    className="execution-btn"
-
-                    onClick={saveMobilisation}
-
-                >
-
-                    Save Mobilisation
-
-                </button>
-
-            </div>
+                </div>
+            )}
 
         </div>
 

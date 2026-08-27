@@ -183,9 +183,11 @@ export default function ExecutionSummary({
 
             <div
                 style={{
-                    marginTop:"10px",
+                    marginTop:"6px",
                     textAlign:"right",
-                    fontWeight:"700"
+                    fontWeight:"700",
+                    fontSize:"12px",
+                    color:"var(--ink)"
                 }}
             >
 

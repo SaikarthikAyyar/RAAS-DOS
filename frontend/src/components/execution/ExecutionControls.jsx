@@ -4,6 +4,8 @@
 
 import "./Execution.css";
 
+import { useAuth } from "../../contexts/AuthContext";
+
 
 // ====================================
 // EXECUTION CONTROLS
@@ -21,6 +23,8 @@ export default function ExecutionControls({
 
 }){
 
+    const { hasTask } = useAuth();
+
     if(!execution){
 
         return null;
@@ -35,15 +39,15 @@ export default function ExecutionControls({
 
     const canStart =
 
-        !completed;
+        !completed && hasTask("enquiry-tab-execution", "start_phase");
 
     const canUpdate =
 
-        !completed;
+        !completed && hasTask("enquiry-tab-execution", "update_progress");
 
     const canComplete =
 
-        !completed;
+        !completed && hasTask("enquiry-tab-execution", "complete_phase");
 
     return(
 
@@ -57,8 +61,9 @@ export default function ExecutionControls({
 
             <p
                 style={{
-                    color:"#b8e5e5",
-                    marginBottom:"24px"
+                    color:"var(--muted)",
+                    fontSize:"12.5px",
+                    marginBottom:"12px"
                 }}
             >
 

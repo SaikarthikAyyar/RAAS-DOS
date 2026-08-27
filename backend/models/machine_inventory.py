@@ -8,6 +8,7 @@ from sqlalchemy import String
 from sqlalchemy import TIMESTAMP
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
+from sqlalchemy import Float
 from sqlalchemy import text
 
 from backend.database.tables import Base
@@ -97,8 +98,29 @@ class MachineInventory(Base):
         default="WAREHOUSE"
     )
 
+    # current_gps (String) is superseded by the two real float columns
+    # below - it was never actually written to anywhere in the codebase
+    # (confirmed by a full repo grep, Phase 38), left in place unused
+    # per this project's non-destructive-column convention rather than
+    # dropped.
     current_gps = Column(
         String(100),
+        nullable=True
+    )
+
+    # The machine's own "last known position" - set at Execution
+    # creation (prefills that execution's own source_latitude/
+    # _longitude) and kept in sync at each real Phase transition
+    # (Phase 38), not just at final dequeue - this is what lets
+    # Business Masters / Fleet & Availability show a real, current
+    # position without opening a specific execution.
+    current_latitude = Column(
+        Float,
+        nullable=True
+    )
+
+    current_longitude = Column(
+        Float,
         nullable=True
     )
 

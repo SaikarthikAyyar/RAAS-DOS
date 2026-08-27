@@ -86,6 +86,58 @@ export async function getExecution(executionId){
 
 
 // ====================================
+// GET EXECUTION BY JOB
+// ====================================
+
+export async function getExecutionByJob(jobCreationId){
+
+    const response = await fetch(
+
+        `${API}/execution/by-job/${jobCreationId}`
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+
+// ====================================
+// SET EXECUTION ROUTE
+// ====================================
+
+export async function setExecutionRoute(executionId, payload){
+
+    const response = await fetch(
+
+        `${API}/execution/${executionId}/route`,
+
+        {
+            method:"PUT",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify(payload)
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // LIST EXECUTIONS
 // ====================================
 

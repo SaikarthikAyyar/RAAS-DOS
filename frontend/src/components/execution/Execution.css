@@ -1,18 +1,24 @@
 /* ===========================================
    PAGE
+   Matches the app-wide scale (BusinessMasters.css / SalesSurvey.css) -
+   this file was originally built at a much larger, unrelated scale
+   (42px titles, 30px card padding) before the Execution module had a
+   real design pass; resized here to match everywhere else.
 =========================================== */
 
 .execution-page{
 
     min-height:100vh;
 
-    padding:40px;
+    padding:20px;
 
     background:var(--bg);
 
     color:var(--ink);
 
-    font-family:Inter,sans-serif;
+    font-family:Inter,"Segoe UI",Arial,sans-serif;
+
+    font-size:14px;
 
 }
 
@@ -23,11 +29,11 @@
 
 .execution-title{
 
-    font-size:42px;
+    font-size:21px;
 
-    font-weight:700;
+    font-weight:800;
 
-    margin-bottom:30px;
+    margin-bottom:14px;
 
     color:var(--ink);
 
@@ -46,12 +52,11 @@
 
     box-shadow:0 4px 14px rgba(17,24,39,.04);
 
-    border-radius:24px;
+    border-radius:14px;
 
-    padding:30px;
+    padding:16px;
 
-    margin-bottom:30px;
-
+    margin-bottom:14px;
 
 }
 
@@ -62,11 +67,11 @@
 
 .execution-section-title{
 
-    font-size:28px;
+    font-size:14.5px;
 
-    font-weight:700;
+    font-weight:800;
 
-    margin-bottom:20px;
+    margin-bottom:12px;
 
     color:var(--ink);
 
@@ -79,21 +84,23 @@
 
 .execution-selector{
 
-    width:360px;
+    width:320px;
 
-    padding:12px 16px;
+    max-width:100%;
+
+    padding:7px 10px;
 
     border:1px solid var(--line);
 
-    border-radius:10px;
+    border-radius:8px;
 
     background:white;
 
     color:var(--ink);
 
-    font-size:16px;
+    font-size:12.5px;
 
-    margin-bottom:25px;
+    margin-bottom:14px;
 
 }
 
@@ -108,7 +115,7 @@
 
     grid-template-columns:repeat(2,1fr);
 
-    gap:18px;
+    gap:10px;
 
 }
 
@@ -119,9 +126,9 @@
 
     border:1px solid var(--line);
 
-    padding:18px;
+    padding:10px 12px;
 
-    border-radius:16px;
+    border-radius:8px;
 
 }
 
@@ -132,16 +139,18 @@
 
     color:var(--muted);
 
-    font-size:13px;
+    font-size:11px;
 
-    margin-bottom:6px;
+    font-weight:800;
+
+    margin-bottom:4px;
 
 }
 
 
 .execution-summary-item strong{
 
-    font-size:18px;
+    font-size:13.5px;
 
     color:var(--ink);
 
@@ -158,9 +167,9 @@
 
     grid-template-columns:repeat(4,1fr);
 
-    gap:18px;
+    gap:10px;
 
-    margin-bottom:25px;
+    margin-bottom:14px;
 
 }
 
@@ -169,9 +178,9 @@
 
     background:white;
 
-    border-radius:18px;
+    border-radius:8px;
 
-    padding:18px;
+    padding:12px;
 
     border:1px solid var(--line);
 
@@ -180,13 +189,13 @@
 
 .execution-metric h5{
 
-    margin:0 0 10px;
+    margin:0 0 6px;
 
     color:var(--muted);
 
-    font-size:13px;
+    font-size:11px;
 
-    font-weight:600;
+    font-weight:800;
 
 }
 
@@ -195,9 +204,9 @@
 
     margin:0;
 
-    font-size:28px;
+    font-size:18px;
 
-    font-weight:700;
+    font-weight:800;
 
     color:var(--ink);
 
@@ -214,7 +223,7 @@
 
     grid-template-columns:repeat(2,1fr);
 
-    gap:20px;
+    gap:10px;
 
 }
 
@@ -230,11 +239,13 @@
 
 .execution-form-group label{
 
-    color:var(--muted);
+    color:#475569;
 
-    margin-bottom:8px;
+    margin-bottom:4px;
 
-    font-size:14px;
+    font-size:11px;
+
+    font-weight:800;
 
 }
 
@@ -247,17 +258,32 @@
 
     width:100%;
 
-    padding:12px;
+    padding:7px 10px;
 
     border:1px solid var(--line);
 
-    border-radius:10px;
+    border-radius:8px;
 
     background:white;
 
     color:var(--ink);
 
-    font-size:15px;
+    font-size:12.5px;
+
+    font-family:inherit;
+
+}
+
+
+.execution-input:focus,
+
+.execution-select:focus,
+
+.execution-textarea:focus{
+
+    outline:none;
+
+    border-color:var(--orange);
 
 }
 
@@ -266,7 +292,7 @@
 
     resize:vertical;
 
-    min-height:100px;
+    min-height:70px;
 
 }
 
@@ -279,9 +305,9 @@
 
     width:100%;
 
-    height:340px;
+    height:300px;
 
-    border-radius:18px;
+    border-radius:10px;
 
     overflow:hidden;
 
@@ -295,7 +321,97 @@
 
     align-items:center;
 
-    margin-top:25px;
+    margin-top:14px;
+
+}
+
+.execution-map-wrap{
+
+    margin-top:14px;
+
+}
+
+.execution-map-wrap .execution-map{
+
+    margin-top:0;
+
+}
+
+.execution-map-empty{
+
+    color:#94a3b8;
+
+    font-size:12px;
+
+    text-align:center;
+
+    padding:0 20px;
+
+}
+
+.execution-map-pin{
+
+    display:block;
+
+    width:14px;
+
+    height:14px;
+
+    border-radius:50%;
+
+    border:2px solid #fff;
+
+    box-shadow:0 1px 4px rgba(17,24,39,.35);
+
+}
+
+.execution-map-legend{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    flex-wrap:wrap;
+
+    margin-top:8px;
+
+    font-size:11px;
+
+    color:#475569;
+
+}
+
+.execution-map-legend span{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+}
+
+.execution-map-legend i{
+
+    display:inline-block;
+
+    width:9px;
+
+    height:9px;
+
+    border-radius:50%;
+
+}
+
+.execution-map-legend strong{
+
+    margin-left:auto;
+
+    color:var(--ink);
+
+    font-size:11px;
 
 }
 
@@ -308,11 +424,11 @@
 
     width:100%;
 
-    height:18px;
+    height:8px;
 
     background:#e5e7eb;
 
-    border-radius:20px;
+    border-radius:6px;
 
     overflow:hidden;
 
@@ -338,9 +454,9 @@
 
     display:flex;
 
-    gap:18px;
+    gap:10px;
 
-    margin-top:25px;
+    margin-top:14px;
 
     flex-wrap:wrap;
 
@@ -349,32 +465,30 @@
 
 .execution-btn{
 
-    padding:14px 30px;
+    padding:7px 14px;
 
-    border:none;
+    border:1px solid var(--orange);
 
-    border-radius:12px;
+    border-radius:9px;
 
     background:var(--orange);
 
     color:white;
 
-    font-size:17px;
+    font-size:12px;
 
-    font-weight:700;
+    font-weight:750;
 
     cursor:pointer;
 
-    transition:.25s;
+    transition:.15s ease;
 
 }
 
 
 .execution-btn:hover{
 
-    transform:translateY(-2px);
-
-    background:#d96b0d;
+    opacity:.85;
 
 }
 

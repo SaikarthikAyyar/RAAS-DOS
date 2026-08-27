@@ -13,6 +13,8 @@ import CommercialApprovalSummary from "./CommercialApprovalSummary";
 import POSummary from "./POSummary";
 
 import JobCreationSummary from "./JobCreationSummary";
+
+import ExecutionWorkspaceSummary from "./ExecutionWorkspaceSummary";
 // ====================================
 // COMPONENT
 // ====================================
@@ -179,11 +181,13 @@ export default function WorkspaceContent({
 
             return(
 
-                <div>
+                <ExecutionWorkspaceSummary
 
-                    Execution / Job Placeholder
+                    enquiry={enquiry}
 
-                </div>
+                    reload={reload}
+
+                />
 
             );
 

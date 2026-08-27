@@ -51,6 +51,18 @@ class ExecutionSchema(BaseModel):
     invoice_synced: str = "YES"
 
     # ====================================
+    # ROUTE (Phase 1/3)
+    # ====================================
+
+    source_latitude: float | None = None
+
+    source_longitude: float | None = None
+
+    destination_latitude: float | None = None
+
+    destination_longitude: float | None = None
+
+    # ====================================
     # LIVE GPS
     # ====================================
 
@@ -96,6 +108,23 @@ class ExecutionSchema(BaseModel):
 
 
 # ====================================
+# EXECUTION ROUTE UPDATE (Phase 1/3 - source/destination coordinates)
+# distance_to_cover_km is recomputed server-side from these, never
+# accepted directly.
+# ====================================
+
+class ExecutionRouteUpdateSchema(BaseModel):
+
+    source_latitude: float | None = None
+
+    source_longitude: float | None = None
+
+    destination_latitude: float | None = None
+
+    destination_longitude: float | None = None
+
+
+# ====================================
 # EXECUTION PROGRESS UPDATE
 # ====================================
 
@@ -117,7 +146,11 @@ class ExecutionProgressUpdateSchema(BaseModel):
 
     eta_minutes: int | None = None
 
-    distance_to_cover_km: float | None = None
+    # distance_to_cover_km is deliberately NOT accepted here anymore -
+    # it's derived from source/destination via haversine_km (see
+    # set_execution_route below), not typed by hand. distance_travelled
+    # stays manual - that's the "how far has it actually gone so far"
+    # figure a real GPS device would supply instead, later.
 
     distance_travelled_km: float | None = None
     

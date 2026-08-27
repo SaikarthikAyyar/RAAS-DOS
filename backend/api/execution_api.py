@@ -15,18 +15,23 @@ from backend.services.execution_service import (
 
     get_execution_request,
 
+    get_execution_by_job_request,
+
     list_execution_request,
 
     start_execution_phase,
 
     complete_execution_phase,
 
-    update_execution_progress
+    update_execution_progress,
+
+    set_execution_route
 
 )
 
 from backend.schemas.execution_schema import (
-    ExecutionProgressUpdateSchema
+    ExecutionProgressUpdateSchema,
+    ExecutionRouteUpdateSchema
 )
 
 # ====================================
@@ -133,6 +138,72 @@ def get_execution(
         db,
 
         execution_id
+
+    )
+
+
+# ====================================
+# GET EXECUTION BY JOB
+# ====================================
+
+@router.get(
+
+    "/execution/by-job/{job_creation_id}"
+
+)
+
+def get_execution_by_job(
+
+    job_creation_id: int,
+
+    db: Session = Depends(get_db)
+
+):
+
+    return get_execution_by_job_request(
+
+        db,
+
+        job_creation_id
+
+    )
+
+
+# ====================================
+# SET EXECUTION ROUTE
+# ====================================
+
+@router.put(
+
+    "/execution/{execution_id}/route"
+
+)
+
+def set_route(
+
+    execution_id: int,
+
+    payload: ExecutionRouteUpdateSchema,
+
+    db: Session = Depends(get_db)
+
+):
+
+    print("\n========== EXECUTION API ==========")
+
+    print(
+
+        f"Set Execution Route : {execution_id}"
+
+    )
+
+    return set_execution_route(
+
+        db,
+
+        execution_id,
+
+        payload
 
     )
 
