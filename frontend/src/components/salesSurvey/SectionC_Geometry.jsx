@@ -274,7 +274,7 @@ tooltip="The length or diameter of the access opening, in millimetres."
 
 <FieldInput
 
-label="Opening Width (mm)"
+label="Opening Width (mm)*"
 
 value={geometry.opening_width}
 
@@ -287,6 +287,12 @@ unit="mm"
 type="number"
 
 updateSection={updateSection}
+
+onBlur={()=>touchField("geometry", "opening_width")}
+
+error={fieldError("opening_width")}
+
+errorMessage="Opening Width is required."
 
 tooltip="The width of the access opening, in millimetres."
 
@@ -339,7 +345,7 @@ tooltip="The vertical distance from the access opening down to the tank floor or
 
 <FieldInput
 
-label="Vertical Lift (m)"
+label="Vertical Lift (m)*"
 
 value={geometry.vertical_lift}
 
@@ -352,6 +358,12 @@ unit="m"
 type="number"
 
 updateSection={updateSection}
+
+onBlur={()=>touchField("geometry", "vertical_lift")}
+
+error={fieldError("vertical_lift")}
+
+errorMessage="Vertical Lift is required."
 
 tooltip="The height the pump/hose needs to lift material to reach the discharge point, in metres."
 
@@ -461,22 +473,28 @@ tooltip="Whether scaffolding is needed to safely reach the access point."
 
 <LookupSelect
 listKey="yesNoUnknown"
-label="Crane Available?"
+label="Crane Available?*"
 value={geometry.crane_available}
 section="geometry"
 field="crane_available"
 updateSection={updateSection}
+onBlur={()=>touchField("geometry", "crane_available")}
+error={fieldError("crane_available")}
+errorMessage="Crane Available is required."
 tooltip="Whether a crane is available on-site, needed for heavy equipment or awkward access."
 />
 
 <FieldInput
-label="Opening Height (mm)"
+label="Opening Height (mm)*"
 value={geometry.opening_height}
 section="geometry"
 field="opening_height"
 unit="mm"
 type="number"
 updateSection={updateSection}
+onBlur={()=>touchField("geometry", "opening_height")}
+error={fieldError("opening_height")}
+errorMessage="Opening Height is required."
 tooltip="The vertical clearance of the access opening, in millimetres."
 />
 

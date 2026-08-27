@@ -197,23 +197,29 @@ tooltip="A description of any large foreign objects found in the material (e.g. 
 
 <LookupSelect
 listKey="hazardLevel"
-label="Hazard Level"
+label="Hazard Level*"
 value={job.hazard_level}
 section="job"
 field="hazard_level"
 updateSection={updateSection}
+onBlur={()=>touchField("job", "hazard_level")}
+error={fieldError("hazard_level")}
+errorMessage="Hazard Level is required."
 tooltip="Whether the material poses a chemical, flammability, or explosive hazard."
 />
 
 
 <LookupSelect
 listKey="ph"
-label="pH / Corrosiveness (Material)"
+label="pH / Corrosiveness (Material)*"
 value={job.material_ph_condition}
 section="job"
 field="material_ph_condition"
 updateSection={updateSection}
 formatOption={formatPhOptionLabel}
+onBlur={()=>touchField("job", "material_ph_condition")}
+error={fieldError("material_ph_condition")}
+errorMessage="pH / Corrosiveness (Material) is required."
 tooltip="The acidity/alkalinity of the material - extreme values can affect which machine construction is safe to use."
 />
 
@@ -230,11 +236,14 @@ tooltip="Whether stirring/agitating the material makes it flow enough to be pump
 
 <LookupSelect
 listKey="temperatureRange"
-label="Temperature Range"
+label="Temperature Range*"
 value={job.temperature_range}
 section="job"
 field="temperature_range"
 updateSection={updateSection}
+onBlur={()=>touchField("job", "temperature_range")}
+error={fieldError("temperature_range")}
+errorMessage="Temperature Range is required."
 tooltip="The typical operating temperature of the material - extreme heat can rule out certain machines."
 />
 

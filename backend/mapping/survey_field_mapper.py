@@ -55,7 +55,15 @@ OPS_FIELD_MAP = {
 
     "opening_width": "opening_width",
 
-    "opening_height": "height_from_ground",
+    # Fixed - this previously pointed at "height_from_ground" (a
+    # different, genuinely separate Section C field), so score_access()
+    # was comparing the site's Height-From-Ground value against each
+    # machine's minimum-opening-height requirement, and the real
+    # opening_height column the user actually fills in ("Opening
+    # Height (mm)") was never read by the algorithm under any key.
+    # height_from_ground is not consumed anywhere in ops_engine.py, so
+    # it's simply left unmapped now rather than given its own inert key.
+    "opening_height": "opening_height",
 
     "drop_to_floor": "drop_to_floor",
 

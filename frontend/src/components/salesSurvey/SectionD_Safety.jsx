@@ -15,7 +15,15 @@ export default function SectionD_Safety({
 
 surveyData,
 
-updateSection
+updateSection,
+
+errors,
+
+touched,
+
+touchField,
+
+submitAttempted
 
 }){
 
@@ -23,6 +31,17 @@ updateSection
 const safety =
 
 surveyData.safety || {};
+
+// Once the user has interacted with ANY field on the form (not just
+// this one), a still-empty compulsory field starts showing its error -
+// matches the same convention already used in Sections B/C.
+const anyFieldTouched = Object.keys(touched || {}).length > 0;
+
+function fieldError(field){
+
+    return errors?.[`safety.${field}`] && (anyFieldTouched || submitAttempted);
+
+}
 
 
 return(
@@ -52,7 +71,7 @@ D. Support, Safety & Utilities
 
 listKey="powerAvailable"
 
-label="Power Available"
+label="Power Available*"
 
 value={safety.power_available}
 
@@ -61,6 +80,12 @@ section="safety"
 field="power_available"
 
 updateSection={updateSection}
+
+onBlur={()=>touchField("safety", "power_available")}
+
+error={fieldError("power_available")}
+
+errorMessage="Power Available is required."
 
 tooltip="What kind of power source is available on-site for equipment (e.g. grid, generator, none)."
 

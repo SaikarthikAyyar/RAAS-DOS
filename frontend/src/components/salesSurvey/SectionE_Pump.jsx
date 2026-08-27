@@ -6,6 +6,8 @@ import LookupSelect from "../shared/LookupSelect";
 
 import FieldTooltip from "../shared/FieldTooltip";
 
+import { FieldInput as SharedFieldInput } from "../shared/FormField";
+
 
 // ====================================
 // COMPONENT
@@ -15,13 +17,32 @@ export default function SectionE_Pump({
 
 surveyData,
 
-updateSection
+updateSection,
+
+errors,
+
+touched,
+
+touchField,
+
+submitAttempted
 
 }){
 
 const pump =
 
 surveyData.pump || {};
+
+// Once the user has interacted with ANY field on the form (not just
+// this one), a still-empty compulsory field starts showing its error -
+// matches the same convention already used in Sections B/C.
+const anyFieldTouched = Object.keys(touched || {}).length > 0;
+
+function fieldError(field){
+
+    return errors?.[`pump.${field}`] && (anyFieldTouched || submitAttempted);
+
+}
 
 return(
 
@@ -43,26 +64,30 @@ E. Pump Selection Inputs
 <div className="survey-grid">
 
 
-<FieldInput
-label="Target Flow (m³/hr)"
+<SharedFieldInput
+label="Target Flow (m³/hr)*"
 value={pump.target_flow}
 section="pump"
 field="target_flow"
-unit="m³/hr"
 type="number"
 updateSection={updateSection}
+onBlur={()=>touchField("pump", "target_flow")}
+error={fieldError("target_flow")}
+errorMessage="Target Flow is required."
 tooltip="The desired rate of material removal, in cubic metres per hour."
 />
 
 
-<FieldInput
-label="Suction Depth (m)"
+<SharedFieldInput
+label="Suction Depth (m)*"
 value={pump.suction_depth}
 section="pump"
 field="suction_depth"
-unit="m"
 type="number"
 updateSection={updateSection}
+onBlur={()=>touchField("pump", "suction_depth")}
+error={fieldError("suction_depth")}
+errorMessage="Suction Depth is required."
 tooltip="How deep the pump needs to draw material from, in metres."
 />
 

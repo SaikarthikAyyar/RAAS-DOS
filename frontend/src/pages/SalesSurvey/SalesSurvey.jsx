@@ -478,6 +478,14 @@ surveyData={surveyData}
 
 updateSection={updateSection}
 
+errors={errors}
+
+touched={touched}
+
+touchField={touchField}
+
+submitAttempted={submitAttempted}
+
 />
 
 
@@ -486,6 +494,14 @@ updateSection={updateSection}
 surveyData={surveyData}
 
 updateSection={updateSection}
+
+errors={errors}
+
+touched={touched}
+
+touchField={touchField}
+
+submitAttempted={submitAttempted}
 
 />
 
