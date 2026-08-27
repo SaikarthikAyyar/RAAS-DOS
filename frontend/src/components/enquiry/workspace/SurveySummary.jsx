@@ -250,8 +250,7 @@ export default function SurveySummary({
                                         ? undefined
                                         : (assetProfile.can_place_equipment_nearby ? "Yes" : "No")
                             },
-                            { label:"Pain Point", value:assetProfile.pain_point },
-                            { label:"Last Verified", value:assetProfile.last_verified }
+                            { label:"Pain Point", value:assetProfile.pain_point }
                         ]}
                     />
                     </div>

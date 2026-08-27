@@ -2,6 +2,8 @@
 // API
 // ====================================
 
+import { withDateStamp } from "../utils/exportFilename";
+
 const API = import.meta.env.VITE_API_URL;
 
 
@@ -376,6 +378,44 @@ export async function getCustomerDetail(
     }
 
     return data;
+
+}
+
+
+// ====================================
+// EXPORT CUSTOMER 360 (real styled .xlsx generated server-side via
+// openpyxl - see backend/reporting/customer_360_xlsx.py - fetched as a
+// blob and triggered as a normal browser download, matching the same
+// convention already used for the Fleet Forecast export)
+// ====================================
+
+export async function exportCustomer360(customerId, companyName){
+
+    const response = await fetch(
+        `${API}/business-master/customers/${customerId}/export`
+    );
+
+    if(!response.ok){
+        throw await response.json().catch(()=>({detail:"Unable to export this customer."}));
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    // The backend's Content-Disposition filename isn't readable here -
+    // it needs an explicit CORS expose_headers entry the app doesn't
+    // set, same reason the Fleet Forecast export never reads it either.
+    // Computed client-side instead, matching that same convention.
+    const safeName = (companyName || "Customer").replace(/\s/g, "_");
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = withDateStamp(`${safeName}_360_Export.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
 
 }
 

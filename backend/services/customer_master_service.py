@@ -61,26 +61,69 @@ def _user_name_map(db):
 # no linked asset (e.g. a request with no existing-asset match).
 # ====================================
 
+# Mirrors frontend/src/data/surveyProfileFields.js's SURVEY_PROFILE_FIELDS
+# exactly (same keys, same section split, "customer"/"job" groups first
+# since those are new this pass) - kept in sync by hand since the two
+# run in different languages. Deliberately excludes setup_distance,
+# ph_condition, disposal_route (real SalesSurvey columns with no input
+# anywhere in the actual form - see that file's header comment) and
+# excludes survey_trigger/tentative_start_date/tentative_end_date from
+# Section A (explicitly asked to be left out) and plant_site_location
+# (a read-only Section A display field sourced from the asset itself,
+# not a real survey input).
 SURVEY_PROFILE_FIELDS = [
-    # Material / site condition
+    # Section A - Customer/Opportunity
+    "nearest_hub", "urgency", "survey_date", "surveyed_by", "repeat_potential",
+    # Section B - Job/Sludge
+    "cleaning_date", "material_ph_condition", "sample_available", "temperature_range",
+    # Section B - Sludge Details
     "material_category", "tank_type", "sludge_hardness", "debris_level",
     "water_visibility", "hazard_level",
-    # Geometry / access
+    # Section C - Geometry
     "tank_length", "tank_width", "tank_depth",
     "opening_length", "opening_width", "opening_height",
-    "height_from_ground", "drop_to_floor", "setup_distance",
+    "height_from_ground", "drop_to_floor",
     "vertical_lift", "hose_distance", "access_path_width",
     "access_support", "customer_support", "access_type", "equipment_nearby",
     "scaffolding_needed", "crane_available", "tank_location", "setup_complexity",
-    # Safety / utilities
+    # Section D - Safety / utilities
     "power_available", "water_available", "air_supply_available",
     "confined_space", "ventilation_required", "gas_testing_required",
     "ehs_restriction", "power_distance",
-    # Pump / discharge
-    "abrasiveness", "ph_condition", "pump_power_source",
-    "discharge_medium", "disposal_route", "disposal_responsibility",
-    "discharge_point_distance"
+    # Section E - Pump / discharge
+    "abrasiveness", "pump_power_source",
+    "discharge_medium", "disposal_responsibility",
+    "discharge_point_distance", "suction_depth", "discharge_distance",
+    "discharge_pit_dimension",
+    # Section G - Customer Insights
+    "customer_pain_point", "shutdown_window", "current_method",
+    "budget_estimate", "decision_maker"
 ]
+
+# Section F - Dewatering. Conditional: only synced into the profile
+# when this survey's own dewatering_required == "Yes" - when "No" (or
+# unset), none of these 15 keys are written at all, not even a "No"
+# for dewatering_required itself. set_asset_survey_profile() replaces
+# the whole profile dict wholesale (not a merge), so simply omitting
+# these keys from profile_dict is what makes a later "No" survey
+# correctly clear out any dewatering data an earlier "Yes" survey left
+# behind, rather than leaving it stale.
+DEWATERING_PROFILE_FIELDS = [
+    "dewatering_required", "dewatering_volume", "inlet_moisture",
+    "target_final_moisture", "expected_final_form", "visible_free_water",
+    "natural_settling", "oily_emulsified", "space_available",
+    "filtrate_route", "moisture_guarantee", "cake_handling_scope",
+    "filtrate_route_detail", "polymer_allowed", "commitment"
+]
+
+
+def _profile_safe_value(value):
+    # Date/datetime columns (survey_date, cleaning_date, ...) aren't
+    # JSON-serializable as-is into a JSONB column - isoformat() them,
+    # same treatment last_survey_date already got before this pass.
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    return value
 
 
 def sync_asset_profile_from_survey(
@@ -99,9 +142,14 @@ def sync_asset_profile_from_survey(
     if not asset:
         return None
 
+    all_fields = list(SURVEY_PROFILE_FIELDS)
+
+    if survey.dewatering_required == "Yes":
+        all_fields += DEWATERING_PROFILE_FIELDS
+
     profile_dict = {
-        field: getattr(survey, field)
-        for field in SURVEY_PROFILE_FIELDS
+        field: _profile_safe_value(getattr(survey, field))
+        for field in all_fields
     }
 
     profile_dict["last_survey_id"] = survey.id
@@ -118,7 +166,9 @@ def sync_asset_profile_from_survey(
 
         changes = []
 
-        for field in SURVEY_PROFILE_FIELDS:
+        changed_fields = set(before_profile.keys()) | set(profile_dict.keys())
+
+        for field in changed_fields:
 
             before = before_profile.get(field)
             after = profile_dict.get(field)
@@ -273,10 +323,6 @@ def get_asset_detail_request(
         "name": asset.name,
         "asset_type": asset.asset_type,
         "cleaning_frequency": asset.cleaning_frequency,
-        "last_cleaned": asset.last_cleaned.isoformat() if asset.last_cleaned else None,
-        "next_due": asset.next_due.isoformat() if asset.next_due else None,
-        "last_verified": asset.last_verified.isoformat() if asset.last_verified else None,
-        "verified_by": asset.verified_by,
         "observed_material": asset.observed_material,
         "access_opening_type": asset.access_opening_type,
         "can_place_equipment_nearby": asset.can_place_equipment_nearby,
@@ -609,10 +655,6 @@ def get_customer_detail_request(
             "name": asset.name,
             "asset_type": asset.asset_type,
             "cleaning_frequency": asset.cleaning_frequency,
-            "last_cleaned": asset.last_cleaned.isoformat() if asset.last_cleaned else None,
-            "next_due": asset.next_due.isoformat() if asset.next_due else None,
-            "last_verified": asset.last_verified.isoformat() if asset.last_verified else None,
-            "verified_by": asset.verified_by,
             "observed_material": asset.observed_material,
             "access_opening_type": asset.access_opening_type,
             "can_place_equipment_nearby": asset.can_place_equipment_nearby,

@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import * as XLSX from "xlsx";
-
 import { useAuth } from "../../../contexts/AuthContext";
 
-import { withDateStamp } from "../../../utils/exportFilename";
+import { exportCustomer360 } from "../../../services/customerMasterService";
 
-import { SURVEY_PROFILE_FIELDS } from "../../../data/surveyProfileFields";
+import { formatApiError } from "../../../utils/apiError";
 
 
 // ====================================
@@ -31,57 +29,6 @@ function followUpPill(bucket){
     if(bucket==="today") return <span className="bm-pill bm-pill-amber">Today</span>;
 
     return <span className="bm-pill bm-pill-gray">Upcoming</span>;
-
-}
-
-
-// ====================================
-// SHEET NAME
-// Excel sheet names are capped at 31 characters and can't contain
-// []:*?/\ — trims and strips those so long/odd company names don't
-// break the export.
-// ====================================
-
-function sheetName(suffix, companyName){
-
-    // Excel sheet names cap at 31 chars. Truncating the full
-    // "{company} - {suffix}" string from the end (the old approach)
-    // could cut the suffix off entirely for a long company name,
-    // making the Details and Assets sheets collide on the exact same
-    // truncated name and crash the export - truncate the company
-    // portion instead, so the suffix always survives.
-    const cleanCompany = companyName.replace(/[\[\]:*?/\\]/g, "");
-
-    const cleanSuffix = suffix.replace(/[\[\]:*?/\\]/g, "");
-
-    const tail = ` - ${cleanSuffix}`;
-
-    const truncatedCompany = cleanCompany.slice(0, Math.max(31 - tail.length, 0));
-
-    return `${truncatedCompany}${tail}`.slice(0, 31);
-
-}
-
-
-// ====================================
-// EXPORT FORMATTERS
-// ====================================
-
-function formatDateTime(value){
-
-    if(!value) return "";
-
-    const parsed = new Date(value);
-
-    return isNaN(parsed) ? value : parsed.toLocaleString();
-
-}
-
-function formatBool(value){
-
-    if(value===null || value===undefined) return "";
-
-    return value ? "Yes" : "No";
 
 }
 
@@ -131,6 +78,8 @@ export default function CustomerDetailView({
 
     const [ownerDraft, setOwnerDraft] = useState("");
 
+    const [exporting, setExporting] = useState(false);
+
     useEffect(()=>{
 
         setOwnerDraft(detail?.owner_user_id || "");
@@ -168,75 +117,19 @@ export default function CustomerDetailView({
 
     }
 
-    function handleExportCustomer(){
+    async function handleExportCustomer(){
 
-        const detailsSheet = XLSX.utils.aoa_to_sheet([
+        setExporting(true);
 
-            ["Field", "Value"],
-            ["ID", detail.id],
-            ["Company", detail.company_name],
-            ["Category", detail.category || ""],
-            ["Industry", detail.industry || ""],
-            ["Region", detail.region || ""],
-            ["Account Owner", detail.owner_name || detail.owner || ""],
-            ["Created By", detail.created_by_name || ""],
-            ["GST Number", detail.gst_number || ""],
-            ["Next Follow-up Date", detail.next_follow_up_date || ""],
-            ["Next Follow-up Owner", detail.next_follow_up_owner || ""],
-            ["Next Follow-up Note", detail.next_follow_up_note || ""],
-            ["Created At", formatDateTime(detail.created_at)],
-            ["Updated At", formatDateTime(detail.updated_at)]
-
-        ]);
-
-        const assetRows = (detail.assets || []).map(a=>[
-
-            a.id,
-            a.customer_id,
-            a.division || "",
-            a.plant || "",
-            a.department || "",
-            a.name || "",
-            a.asset_type || "",
-            a.cleaning_frequency || "",
-            a.last_cleaned || "",
-            a.next_due || "",
-            a.last_verified || "",
-            a.verified_by || "",
-            a.observed_material || "",
-            a.access_opening_type || "",
-            formatBool(a.can_place_equipment_nearby),
-            a.pain_point || "",
-            ...SURVEY_PROFILE_FIELDS.map(([key, , isBool])=>{
-                const value = a.profile ? a.profile[key] : undefined;
-                if(value === undefined || value === null) return "";
-                return isBool ? formatBool(value) : value;
-            }),
-            formatDateTime(a.created_at)
-
-        ]);
-
-        const assetsSheet = XLSX.utils.aoa_to_sheet([
-
-            [
-                "ID", "Customer ID", "Division", "Plant", "Department", "Asset",
-                "Asset Type", "Cleaning Frequency", "Last Cleaned", "Next Due",
-                "Last Verified", "Verified By", "Observed Material",
-                "Access Opening Type", "Equipment Nearby Possible", "Pain Point",
-                ...SURVEY_PROFILE_FIELDS.map(([, label])=>`Survey: ${label}`),
-                "Created At"
-            ],
-            ...assetRows
-
-        ]);
-
-        const workbook = XLSX.utils.book_new();
-
-        XLSX.utils.book_append_sheet(workbook, detailsSheet, sheetName("Details", detail.company_name));
-
-        XLSX.utils.book_append_sheet(workbook, assetsSheet, sheetName("Assets", detail.company_name));
-
-        XLSX.writeFile(workbook, withDateStamp(`${detail.company_name.replace(/\s/g, "_")}_360_Export.xlsx`));
+        try{
+            await exportCustomer360(detail.id, detail.company_name);
+        }
+        catch(err){
+            alert(formatApiError(err, "Unable to export this customer."));
+        }
+        finally{
+            setExporting(false);
+        }
 
     }
 
@@ -395,7 +288,7 @@ export default function CustomerDetailView({
                 <table>
 
                     <thead>
-                        <tr><th>Division</th><th>Plant</th><th>Department</th><th>Asset</th><th>Next due</th><th>Last verified</th>{isAdmin && <th></th>}</tr>
+                        <tr><th>Division</th><th>Plant</th><th>Department</th><th>Asset</th>{isAdmin && <th></th>}</tr>
                     </thead>
 
                     <tbody>
@@ -404,7 +297,7 @@ export default function CustomerDetailView({
 
                             detail.assets.length===0 ? (
 
-                                <tr><td colSpan={isAdmin ? 7 : 6} className="bm-muted">No assets registered yet.</td></tr>
+                                <tr><td colSpan={isAdmin ? 5 : 4} className="bm-muted">No assets registered yet.</td></tr>
 
                             ) : detail.assets.map(a=>(
 
@@ -417,10 +310,6 @@ export default function CustomerDetailView({
                                     <td>{a.department || "—"}</td>
 
                                     <td>{a.name || "—"}</td>
-
-                                    <td>{a.next_due || "—"}</td>
-
-                                    <td>{a.last_verified ? `${a.last_verified} (${a.verified_by || "—"})` : "—"}</td>
 
                                     {
 
@@ -468,9 +357,11 @@ export default function CustomerDetailView({
 
                         onClick={handleExportCustomer}
 
+                        disabled={exporting}
+
                     >
 
-                        ⬇ Export Current Customer
+                        {exporting ? "Exporting..." : "⬇ Export Current Customer"}
 
                     </button>
 

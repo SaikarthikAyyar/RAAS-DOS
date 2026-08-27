@@ -2,9 +2,12 @@
 # IMPORTS
 # ====================================
 
+from datetime import date
+
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from fastapi.responses import StreamingResponse
 
 from sqlalchemy.orm import Session
 
@@ -25,6 +28,8 @@ from backend.schemas.customer_master_schema import (
 )
 
 from backend.schemas.notification_schema import BusinessMasterActionSchema
+
+from backend.reporting.customer_360_xlsx import build_customer_360_workbook_bytes
 
 from backend.services.customer_master_service import (
     list_customers_request,
@@ -195,6 +200,38 @@ def get_customer_detail(
         )
 
     return detail
+
+
+# ====================================
+# CUSTOMER 360 EXPORT (styled .xlsx, server-side - the client-side
+# SheetJS build every other export in this app uses can't apply cell
+# fills/fonts/merges at all, so this one is generated with openpyxl
+# instead, same fix already used for the Fleet Forecast export)
+# ====================================
+
+@router.get(
+    "/business-master/customers/{customer_id}/export"
+)
+def export_customer_360(
+        customer_id: int,
+        db: Session = Depends(get_db)
+):
+    buffer, company_name = build_customer_360_workbook_bytes(db, customer_id)
+
+    if buffer is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found."
+        )
+
+    safe_name = (company_name or "Customer").replace(" ", "_")
+    filename = f"{safe_name}_360_Export_{date.today().isoformat()}.xlsx"
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
 
 
 # ====================================

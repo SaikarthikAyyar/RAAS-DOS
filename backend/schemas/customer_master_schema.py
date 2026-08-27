@@ -141,14 +141,6 @@ class AssetSchema(BaseModel):
 
     cleaning_frequency: str | None = None
 
-    last_cleaned: str | None = None
-
-    next_due: str | None = None
-
-    last_verified: str | None = None
-
-    verified_by: str | None = None
-
     observed_material: str | None = None
 
     access_opening_type: str | None = None

@@ -7,7 +7,6 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy import Boolean
-from sqlalchemy import Date
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 
@@ -74,21 +73,13 @@ class Asset(Base):
         String(50)
     )
 
-    last_cleaned = Column(
-        Date
-    )
-
-    next_due = Column(
-        Date
-    )
-
-    last_verified = Column(
-        Date
-    )
-
-    verified_by = Column(
-        String(150)
-    )
+    # last_cleaned, next_due, last_verified, verified_by removed -
+    # confirmed via a full backend grep to have zero write path from
+    # any source (Customer Request, Sales Survey, or any other action)
+    # ever - permanently null, dead columns. The raw DB columns are
+    # left in place (non-destructive convention), just no longer
+    # mapped by the ORM, exposed in any API response, or shown/
+    # exported anywhere.
 
     # ====================================
     # SITE PROFILE (Customer Request Section 2 fields that carry
