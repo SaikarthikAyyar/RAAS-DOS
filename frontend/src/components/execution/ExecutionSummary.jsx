@@ -4,6 +4,8 @@
 
 import "./Execution.css";
 
+import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
+
 // Matches Phase1Mobilisation.jsx/Phase3Demobilisation.jsx's own map -
 // the underlying value is derived server-side, this is display only.
 const TRANSPORT_STATUS_LABELS = {
@@ -32,7 +34,9 @@ export default function ExecutionSummary({
 
     return(
 
-        <div className="execution-card">
+        <div className="execution-card" data-guide-id="execution-summary" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="execution" componentId="execution-summary" floating/>
 
             <h2 className="execution-section-title">
 

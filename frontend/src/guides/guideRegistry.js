@@ -2,11 +2,13 @@
 // GUIDE REGISTRY
 // Maps an Enquiry Workspace tab id (matches WorkflowTabs.jsx's own
 // WORKFLOW_TABS ids exactly) to its guide content module. Only tabs
-// with real, built content appear here - "job-created", "execution"
-// and "audit" are still unbuilt placeholders in WorkspaceContent.jsx
-// (nothing real to guide anyone through), so they are deliberately
-// absent. GuideTriggerIcon only renders when the active tab has an
-// entry here.
+// with real, built content appear here - "audit" (the workspace's own
+// Audit Trail tab, distinct from the global Audit Trail module) is
+// still an unbuilt placeholder in WorkspaceContent.jsx, so it stays
+// deliberately absent. "job-created" and "execution" were placeholders
+// too when this registry was first built, but both are now real,
+// fully working tabs, so their guides are included here. GuideTriggerIcon
+// only renders when the active tab has an entry here.
 // ====================================
 
 import * as survey from "./enquiryWorkspace/surveyGuide";
@@ -15,6 +17,8 @@ import * as technoCommercialReview from "./enquiryWorkspace/technoCommercialRevi
 import * as quoteCommercial from "./enquiryWorkspace/quoteCommercialGuide";
 import * as commercialApproval from "./enquiryWorkspace/commercialApprovalGuide";
 import * as po from "./enquiryWorkspace/poGuide";
+import * as jobCreated from "./enquiryWorkspace/jobCreatedGuide";
+import * as execution from "./enquiryWorkspace/executionGuide";
 
 export const guideRegistry = {
 
@@ -23,7 +27,9 @@ export const guideRegistry = {
     "techno-commercial-approval": technoCommercialReview,
     "quote-commercial": quoteCommercial,
     "commercial-approval": commercialApproval,
-    "po": po
+    "po": po,
+    "job-created": jobCreated,
+    "execution": execution
 
 };
 

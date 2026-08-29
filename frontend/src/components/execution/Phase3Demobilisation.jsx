@@ -15,6 +15,8 @@ import ExecutionRouteMap from "./ExecutionRouteMap";
 
 import { useAuth } from "../../contexts/AuthContext";
 
+import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
+
 // Derived server-side from distance travelled vs. total (see
 // backend's update_execution_progress) - display labels only, the
 // underlying value is never typed by hand.
@@ -40,7 +42,12 @@ export default function Phase3Demobilisation({
 
     const { hasTask } = useAuth();
 
-    const canUpdateProgress = hasTask("enquiry-tab-execution", "update_progress");
+    // Matches the backend's own started-check - progress can only be
+    // recorded once this phase has genuinely begun via Start Current
+    // Phase.
+    const phaseStarted = execution?.phase_3_status !== "PENDING";
+
+    const canUpdateProgress = phaseStarted && hasTask("enquiry-tab-execution", "update_progress");
 
     const [
         form,
@@ -246,6 +253,10 @@ export default function Phase3Demobilisation({
 
             <br/>
 
+            <div data-guide-id="phase3-route" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="execution" componentId="phase3-route" floating/>
+
             <h5 style={{margin:"0 0 10px"}}>Return Route</h5>
 
             {/*
@@ -282,7 +293,13 @@ export default function Phase3Demobilisation({
                 distanceKm={execution?.distance_to_cover_km}
             />
 
+            </div>
+
             <br/>
+
+            <div data-guide-id="phase3-position" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="execution" componentId="phase3-position" floating/>
 
             <h5 style={{margin:"0 0 10px"}}>Last Known Position</h5>
 
@@ -387,6 +404,12 @@ export default function Phase3Demobilisation({
 
             </div>
 
+            {!phaseStarted && (
+                <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:8}}>
+                    Start Current Phase (in Execution Controls below) before recording progress here.
+                </p>
+            )}
+
             {canUpdateProgress && (
                 <div className="execution-actions">
                     <button
@@ -397,6 +420,8 @@ export default function Phase3Demobilisation({
                     </button>
                 </div>
             )}
+
+            </div>
 
         </div>
 

@@ -16,6 +16,8 @@ import ExecutionRouteMap from "./ExecutionRouteMap";
 
 import { useAuth } from "../../contexts/AuthContext";
 
+import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
+
 // Derived server-side from distance travelled vs. total (see
 // backend's update_execution_progress) - display labels only, the
 // underlying value is never typed by hand.
@@ -40,7 +42,13 @@ export default function Phase1Mobilisation({
 
     const { hasTask } = useAuth();
 
-    const canUpdateProgress = hasTask("enquiry-tab-execution", "update_progress");
+    // Matches the backend's own started-check - route can still be set
+    // before the phase starts (it's a setup step Start Current Phase
+    // itself depends on to compute distance), but progress can only be
+    // recorded once the phase has genuinely begun.
+    const phaseStarted = execution?.phase_1_status !== "PENDING";
+
+    const canUpdateProgress = phaseStarted && hasTask("enquiry-tab-execution", "update_progress");
     const canSetRoute = hasTask("enquiry-tab-execution", "set_execution_route");
 
     const [
@@ -364,6 +372,10 @@ export default function Phase1Mobilisation({
 
             <br/>
 
+            <div data-guide-id="phase1-route" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="execution" componentId="phase1-route" floating/>
+
             <h5 style={{margin:"0 0 10px"}}>Source &amp; Destination</h5>
 
             <div className="execution-form-grid">
@@ -432,7 +444,13 @@ export default function Phase1Mobilisation({
                 distanceKm={execution?.distance_to_cover_km}
             />
 
+            </div>
+
             <br/>
+
+            <div data-guide-id="phase1-position" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="execution" componentId="phase1-position" floating/>
 
             <h5 style={{margin:"0 0 10px"}}>Last Known Position</h5>
 
@@ -602,6 +620,12 @@ export default function Phase1Mobilisation({
 
             </div>
 
+            {!phaseStarted && (
+                <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:8}}>
+                    Start Current Phase (in Execution Controls below) before recording progress here.
+                </p>
+            )}
+
             {canUpdateProgress && (
                 <div className="execution-actions">
 
@@ -619,6 +643,8 @@ export default function Phase1Mobilisation({
 
                 </div>
             )}
+
+            </div>
 
         </div>
 

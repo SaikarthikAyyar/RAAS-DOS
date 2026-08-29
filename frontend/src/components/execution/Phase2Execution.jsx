@@ -18,6 +18,8 @@ from "../../services/executionService";
 
 import { useAuth } from "../../contexts/AuthContext";
 
+import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
+
 
 // ====================================
 // PHASE 2
@@ -33,7 +35,12 @@ export default function Phase2Execution({
 
     const { hasTask } = useAuth();
 
-    const canUpdateProgress = hasTask("enquiry-tab-execution", "update_progress");
+    // Matches the backend's own started-check - progress can only be
+    // recorded once this phase has genuinely begun via Start Current
+    // Phase.
+    const phaseStarted = execution?.phase_2_status !== "PENDING";
+
+    const canUpdateProgress = phaseStarted && hasTask("enquiry-tab-execution", "update_progress");
 
     const [
 
@@ -297,7 +304,9 @@ export default function Phase2Execution({
 
     return(
 
-        <div className="execution-card">
+        <div className="execution-card" data-guide-id="phase2-output" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="execution" componentId="phase2-output" floating/>
 
             <h2 className="execution-section-title">
 
@@ -622,6 +631,12 @@ export default function Phase2Execution({
                 </div>
 
             </div>
+
+            {!phaseStarted && (
+                <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:8}}>
+                    Start Current Phase (in Execution Controls below) before recording progress here.
+                </p>
+            )}
 
             {canUpdateProgress && (
                 <div className="execution-actions">

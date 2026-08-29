@@ -136,6 +136,41 @@ def _resolve_execution_enquiry(db, job_creation_id):
 
 
 # ====================================
+# PHASE STARTED CHECK
+# workflow_status alone can't answer "has THIS phase been started" -
+# it only ever moves forward (READY -> CURRENTLY_WORKING once, at
+# Phase 1's own start) and stays CURRENTLY_WORKING across every later
+# phase transition, even while that new phase's own phase_N_status is
+# still PENDING. Real per-phase status is what start_phase/complete_phase
+# actually track, so that's what has to be checked here - reporting
+# progress or completing a phase that was never started via "Start
+# Current Phase" would be recording work that was never actually
+# begun.
+# ====================================
+
+def _current_phase_status(execution):
+
+    return {
+        "PHASE_1": execution.phase_1_status,
+        "PHASE_2": execution.phase_2_status,
+        "PHASE_3": execution.phase_3_status
+    }.get(execution.current_phase)
+
+
+def _require_phase_started(execution, action_label):
+
+    if _current_phase_status(execution) == "PENDING":
+
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"Start Current Phase before {action_label} - "
+                f"this phase hasn't begun yet."
+            )
+        )
+
+
+# ====================================
 # PHASE COMPLETION TARGET VALIDATION
 # "Complete Current Phase" must not be allowed to mark a phase done
 # before its real, measurable target has actually been met - otherwise
@@ -869,6 +904,8 @@ def update_execution_progress(
 
         )
 
+    _require_phase_started(execution, "recording progress")
+
 
     # ====================================
     # PARTIAL UPDATE
@@ -1576,6 +1613,8 @@ def complete_execution_phase(
     print(f"Execution ID    : {execution.id}")
     print(f"Job Creation ID : {execution.job_creation_id}")
     print(f"Phase Before    : {execution.current_phase}")
+
+    _require_phase_started(execution, "completing it")
 
     # Reject the completion outright if this phase's real target
     # hasn't actually been reached yet - a phase must not be markable

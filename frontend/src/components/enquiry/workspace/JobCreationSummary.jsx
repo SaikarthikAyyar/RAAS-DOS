@@ -24,6 +24,8 @@ import { STAGE_LABELS } from "../../../data/workflowStages";
 
 import { useAuth } from "../../../contexts/AuthContext";
 
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 const STAGE_ORDER = Object.keys(STAGE_LABELS);
 
 function formatDate(value){
@@ -382,6 +384,10 @@ export default function JobCreationSummary({
 
                         <>
 
+                            <div data-guide-id="job-recommendation" style={{position:"relative"}}>
+
+                            <ComponentExplainerIcon tabId="job-created" componentId="job-recommendation" floating/>
+
                             <h4 className="ops-subheading">
                                 {jobInfo.generated_job_id}
                             </h4>
@@ -402,6 +408,12 @@ export default function JobCreationSummary({
                                     </tr>
                                 </tbody>
                             </table>
+
+                            </div>
+
+                            <div data-guide-id="job-planned-dates" style={{position:"relative"}}>
+
+                            <ComponentExplainerIcon tabId="job-created" componentId="job-planned-dates" floating/>
 
                             <div className="ops-override-form">
 
@@ -437,10 +449,16 @@ export default function JobCreationSummary({
                                 </div>
                             )}
 
+                            </div>
+
                             {
                                 schedule ? (
 
                                     <>
+                                        <div data-guide-id="job-fleet-summary" style={{position:"relative"}}>
+
+                                        <ComponentExplainerIcon tabId="job-created" componentId="job-fleet-summary" floating/>
+
                                         <h4 className="ops-subheading">Fleet Unit booking</h4>
 
                                         <table className="ops-scoring-table" style={{marginBottom:12}}>
@@ -468,6 +486,8 @@ export default function JobCreationSummary({
                                             </tbody>
                                         </table>
 
+                                        </div>
+
                                         {
                                             jobCreationConfirmed ? (
 
@@ -478,7 +498,7 @@ export default function JobCreationSummary({
                                             ) : (
 
                                                 hasTask("enquiry-tab-job-created", "confirm_job_creation") && (
-                                                    <div className="survey-actions" style={{marginBottom:12}}>
+                                                    <div className="survey-actions" style={{marginBottom:12}} data-guide-id="job-confirm">
                                                         <button
                                                             className="survey-action-button survey-action-button-orange"
                                                             onClick={handleConfirmJobCreation}
@@ -486,6 +506,8 @@ export default function JobCreationSummary({
                                                         >
                                                             {confirming ? "Confirming..." : "Confirm Job Creation"}
                                                         </button>
+
+                                                        <ComponentExplainerIcon tabId="job-created" componentId="job-confirm"/>
                                                     </div>
                                                 )
 
@@ -495,8 +517,11 @@ export default function JobCreationSummary({
                                         {
                                             schedule.schedule_status==="QUEUED" && (
 
-                                                <>
-                                                    <div className="ops-override-form">
+                                                <div data-guide-id="job-reschedule-cancel" style={{position:"relative"}}>
+
+                                                <ComponentExplainerIcon tabId="job-created" componentId="job-reschedule-cancel" floating/>
+
+                                                <div className="ops-override-form">
 
                                                         <label>
                                                             Reschedule start
@@ -541,7 +566,7 @@ export default function JobCreationSummary({
                                                         )}
 
                                                     </div>
-                                                </>
+                                                </div>
 
                                             )
                                         }
@@ -550,7 +575,10 @@ export default function JobCreationSummary({
 
                                 ) : (
 
-                                    <>
+                                    <div data-guide-id="job-fleet-booking" style={{position:"relative"}}>
+
+                                        <ComponentExplainerIcon tabId="job-created" componentId="job-fleet-booking" floating/>
+
                                         <h4 className="ops-subheading">Book a Fleet Unit</h4>
 
                                         <p className="survey-empty" style={{marginBottom:8}}>
@@ -605,7 +633,7 @@ export default function JobCreationSummary({
                                             </div>
                                         )}
 
-                                    </>
+                                    </div>
 
                                 )
                             }

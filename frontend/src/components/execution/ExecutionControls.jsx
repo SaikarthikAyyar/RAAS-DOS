@@ -6,6 +6,8 @@ import "./Execution.css";
 
 import { useAuth } from "../../contexts/AuthContext";
 
+import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
+
 
 // ====================================
 // EXECUTION CONTROLS
@@ -37,21 +39,36 @@ export default function ExecutionControls({
 
         "EXECUTION_COMPLETED";
 
+    // Matches the backend's own _current_phase_status() check - the
+    // current phase's own status field, not workflow_status (which
+    // only ever moves READY -> CURRENTLY_WORKING once, at Phase 1's
+    // start, and stays that way across every later phase transition
+    // even while a new phase's own status is still PENDING).
+    const currentPhaseStatus = {
+        PHASE_1: execution.phase_1_status,
+        PHASE_2: execution.phase_2_status,
+        PHASE_3: execution.phase_3_status
+    }[execution.current_phase];
+
+    const phaseStarted = currentPhaseStatus !== "PENDING";
+
     const canStart =
 
-        !completed && hasTask("enquiry-tab-execution", "start_phase");
+        !completed && !phaseStarted && hasTask("enquiry-tab-execution", "start_phase");
 
     const canUpdate =
 
-        !completed && hasTask("enquiry-tab-execution", "update_progress");
+        !completed && phaseStarted && hasTask("enquiry-tab-execution", "update_progress");
 
     const canComplete =
 
-        !completed && hasTask("enquiry-tab-execution", "complete_phase");
+        !completed && phaseStarted && hasTask("enquiry-tab-execution", "complete_phase");
 
     return(
 
-        <div className="execution-card">
+        <div className="execution-card" data-guide-id="execution-controls" style={{position:"relative"}}>
+
+            <ComponentExplainerIcon tabId="execution" componentId="execution-controls" floating/>
 
             <h2 className="execution-section-title">
 
@@ -81,6 +98,8 @@ export default function ExecutionControls({
 
                     onClick={startCurrentPhase}
 
+                    title={phaseStarted ? "This phase has already been started." : undefined}
+
                 >
 
                     Start Current Phase
@@ -95,6 +114,8 @@ export default function ExecutionControls({
 
                     onClick={updateExecution}
 
+                    title={!phaseStarted ? "Start Current Phase before recording any progress." : undefined}
+
                 >
 
                     Update Execution
@@ -108,6 +129,8 @@ export default function ExecutionControls({
                     disabled={!canComplete}
 
                     onClick={completeCurrentPhase}
+
+                    title={!phaseStarted ? "Start Current Phase before it can be completed." : undefined}
 
                 >
 

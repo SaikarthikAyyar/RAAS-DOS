@@ -21,6 +21,8 @@ import Phase1Mobilisation from "../../execution/Phase1Mobilisation";
 import Phase2Execution from "../../execution/Phase2Execution";
 import Phase3Demobilisation from "../../execution/Phase3Demobilisation";
 
+import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
 import "../../execution/Execution.css";
 
 
@@ -230,7 +232,9 @@ export default function ExecutionWorkspaceSummary({
     if(!execution){
 
         return(
-            <div className="execution-card">
+            <div className="execution-card" data-guide-id="execution-create" style={{position:"relative"}}>
+
+                <ComponentExplainerIcon tabId="execution" componentId="execution-create" floating/>
 
                 <h2 className="execution-section-title">Execution</h2>
 
