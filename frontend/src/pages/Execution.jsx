@@ -262,10 +262,6 @@ export default function Execution(){
 
                         execution.current_activity,
 
-                    transport_status:
-
-                        execution.transport_status,
-
                     remarks:
 
                         execution.remarks

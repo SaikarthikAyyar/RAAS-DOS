@@ -10,6 +10,8 @@ from backend.models.machine_inventory import MachineInventory
 from backend.models.personnel import Personnel
 from backend.models.job_creation import JobCreation
 
+from backend.utils.geocode import reverse_geocode
+
 
 # ====================================
 # CREW LOOKUP
@@ -341,7 +343,20 @@ def dequeue_fleet_schedules(db, execution):
             if machine is not None:
                 machine.status = "AVAILABLE"
                 machine.current_job_id = None
-                machine.current_site = None
+
+                # Genuinely idle - no next job to name a site after.
+                # Rather than clearing this to a blank/None (a real
+                # position with no readable label), it's reverse-
+                # geocoded from the machine's own just-synced
+                # current_latitude/current_longitude (set by
+                # complete_execution_phase right before this call, to
+                # the execution's real source point) - same mechanism
+                # already used for the "in transit" position labels.
+                if machine.current_latitude is not None and machine.current_longitude is not None:
+                    place_name = reverse_geocode(machine.current_latitude, machine.current_longitude)
+                    machine.current_site = f"Available - {place_name}" if place_name else None
+                else:
+                    machine.current_site = None
 
             for person in crew:
                 person.availability_status = "AVAILABLE"

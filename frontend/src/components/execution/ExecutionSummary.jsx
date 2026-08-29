@@ -4,6 +4,15 @@
 
 import "./Execution.css";
 
+// Matches Phase1Mobilisation.jsx/Phase3Demobilisation.jsx's own map -
+// the underlying value is derived server-side, this is display only.
+const TRANSPORT_STATUS_LABELS = {
+    WAITING: "Not started",
+    IN_TRANSIT: "In transit",
+    REACHED: "Reached",
+    COMPLETED: "Completed"
+};
+
 
 // ====================================
 // EXECUTION SUMMARY
@@ -139,7 +148,7 @@ export default function ExecutionSummary({
 
                     <strong>
 
-                        {execution.transport_status}
+                        {TRANSPORT_STATUS_LABELS[execution.transport_status] || execution.transport_status}
 
                     </strong>
 

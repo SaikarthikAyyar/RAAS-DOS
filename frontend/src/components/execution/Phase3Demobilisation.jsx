@@ -7,14 +7,23 @@ import { useEffect, useState } from "react";
 import "./Execution.css";
 
 import {
-    updateExecutionProgress,
-    setExecutionRoute
+    updateExecutionProgress
 }
 from "../../services/executionService";
 
 import ExecutionRouteMap from "./ExecutionRouteMap";
 
 import { useAuth } from "../../contexts/AuthContext";
+
+// Derived server-side from distance travelled vs. total (see
+// backend's update_execution_progress) - display labels only, the
+// underlying value is never typed by hand.
+const TRANSPORT_STATUS_LABELS = {
+    WAITING: "Not started",
+    IN_TRANSIT: "In transit",
+    REACHED: "Reached",
+    COMPLETED: "Completed"
+};
 
 
 // ====================================
@@ -32,7 +41,6 @@ export default function Phase3Demobilisation({
     const { hasTask } = useAuth();
 
     const canUpdateProgress = hasTask("enquiry-tab-execution", "update_progress");
-    const canSetRoute = hasTask("enquiry-tab-execution", "set_execution_route");
 
     const [
         form,
@@ -40,8 +48,6 @@ export default function Phase3Demobilisation({
     ] = useState({
 
         current_activity:"",
-
-        transport_status:"",
 
         remarks:"",
 
@@ -51,24 +57,9 @@ export default function Phase3Demobilisation({
 
         speed_kmph:0,
 
-        eta_minutes:0,
-
-        distance_travelled_km:0,
-
         proof_uploaded:false
 
     });
-
-    const [route, setRoute] = useState({
-
-        source_latitude:"",
-        source_longitude:"",
-        destination_latitude:"",
-        destination_longitude:""
-
-    });
-
-    const [savingRoute, setSavingRoute] = useState(false);
 
 
     // ====================================
@@ -87,8 +78,6 @@ export default function Phase3Demobilisation({
 
             current_activity: execution.current_activity ?? "",
 
-            transport_status: execution.transport_status ?? "",
-
             remarks: execution.remarks ?? "",
 
             latitude: execution.latitude ?? 0,
@@ -97,20 +86,7 @@ export default function Phase3Demobilisation({
 
             speed_kmph: execution.speed_kmph ?? 0,
 
-            eta_minutes: execution.eta_minutes ?? 0,
-
-            distance_travelled_km: execution.distance_travelled_km ?? 0,
-
             proof_uploaded: execution.proof_uploaded ?? false
-
-        });
-
-        setRoute({
-
-            source_latitude:execution.source_latitude ?? "",
-            source_longitude:execution.source_longitude ?? "",
-            destination_latitude:execution.destination_latitude ?? "",
-            destination_longitude:execution.destination_longitude ?? ""
 
         });
 
@@ -127,12 +103,6 @@ export default function Phase3Demobilisation({
 
     }
 
-    function updateRouteField(field, value){
-
-        setRoute(previous=>({ ...previous, [field]:value }));
-
-    }
-
 
     // ====================================
     // CALCULATIONS
@@ -144,7 +114,7 @@ export default function Phase3Demobilisation({
 
     const totalDistance = Number(execution?.distance_to_cover_km ?? 0);
 
-    const travelledDistance = Number(form.distance_travelled_km ?? 0);
+    const travelledDistance = Number(execution?.distance_travelled_km ?? 0);
 
     const remainingDistance = Math.max(totalDistance - travelledDistance, 0);
 
@@ -155,44 +125,12 @@ export default function Phase3Demobilisation({
 
     const executionContribution = 66 + (phaseProgress * 0.34);
 
-
-    // ====================================
-    // SAVE ROUTE
-    // ====================================
-
-    async function saveRoute(){
-
-        setSavingRoute(true);
-
-        try{
-
-            await setExecutionRoute(execution.id, {
-
-                source_latitude: route.source_latitude === "" ? null : Number(route.source_latitude),
-                source_longitude: route.source_longitude === "" ? null : Number(route.source_longitude),
-                destination_latitude: route.destination_latitude === "" ? null : Number(route.destination_latitude),
-                destination_longitude: route.destination_longitude === "" ? null : Number(route.destination_longitude)
-
-            });
-
-            if(refreshExecution){
-                await refreshExecution(execution.id);
-            }
-
-        }
-        catch(error){
-
-            console.error(error);
-            alert("Unable to save the route.");
-
-        }
-        finally{
-
-            setSavingRoute(false);
-
-        }
-
-    }
+    // ETA is stored in minutes (matches the DB column/every other
+    // consumer of it, e.g. the invoice sync) - only the display here
+    // is reformatted to hours + minutes, nothing about the stored unit
+    // changes.
+    const etaMinutesTotal = Number(execution?.eta_minutes ?? 0);
+    const etaDisplay = `${Math.floor(etaMinutesTotal / 60)}h ${etaMinutesTotal % 60}m`;
 
 
     // ====================================
@@ -214,12 +152,6 @@ export default function Phase3Demobilisation({
                     longitude: Number(form.longitude),
 
                     speed_kmph: Number(form.speed_kmph),
-
-                    eta_minutes: Number(form.eta_minutes),
-
-                    distance_travelled_km: Number(form.distance_travelled_km),
-
-                    transport_status: form.transport_status,
 
                     current_activity: form.current_activity,
 
@@ -314,69 +246,37 @@ export default function Phase3Demobilisation({
 
             <br/>
 
-            <h5 style={{margin:"0 0 10px"}}>Return Route (Source &amp; Destination)</h5>
+            <h5 style={{margin:"0 0 10px"}}>Return Route</h5>
 
-            <div className="execution-form-grid">
+            {/*
+                The two physical endpoints of the job (hub <-> site)
+                were already fixed via Phase 1's "Save Route" - they
+                don't change for the return leg, so this is read-only
+                rather than a second editable form writing into the
+                same shared source_latitude/longitude columns (that
+                previously invited re-entering the SAME two points
+                here, with no real purpose).
 
-                <div className="execution-form-group">
-                    <label>Source Latitude</label>
-                    <input
-                        className="execution-input"
-                        type="number"
-                        value={route.source_latitude}
-                        onChange={e=>updateRouteField("source_latitude", e.target.value)}
-                    />
-                </div>
+                Direction is swapped for display: this leg physically
+                starts at the site (Phase 1's "destination") and ends
+                back at the hub (Phase 1's "source") - showing them in
+                Phase 1's original orientation here would have the
+                blue "Source" pin sitting at the hub and the orange
+                "Destination" pin at the site while the machine is
+                actually travelling the opposite way.
+            */}
 
-                <div className="execution-form-group">
-                    <label>Source Longitude</label>
-                    <input
-                        className="execution-input"
-                        type="number"
-                        value={route.source_longitude}
-                        onChange={e=>updateRouteField("source_longitude", e.target.value)}
-                    />
-                </div>
-
-                <div className="execution-form-group">
-                    <label>Destination Latitude</label>
-                    <input
-                        className="execution-input"
-                        type="number"
-                        value={route.destination_latitude}
-                        onChange={e=>updateRouteField("destination_latitude", e.target.value)}
-                    />
-                </div>
-
-                <div className="execution-form-group">
-                    <label>Destination Longitude</label>
-                    <input
-                        className="execution-input"
-                        type="number"
-                        value={route.destination_longitude}
-                        onChange={e=>updateRouteField("destination_longitude", e.target.value)}
-                    />
-                </div>
-
-            </div>
-
-            {canSetRoute && (
-                <div className="execution-actions">
-                    <button
-                        className="execution-btn"
-                        onClick={saveRoute}
-                        disabled={savingRoute}
-                    >
-                        {savingRoute ? "Saving Route..." : "Save Route"}
-                    </button>
-                </div>
-            )}
+            <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:10}}>
+                Returning from {execution?.site_location || "the site"}
+                {" "}({execution?.destination_latitude}, {execution?.destination_longitude})
+                {" "}back to source ({execution?.source_latitude}, {execution?.source_longitude}).
+            </p>
 
             <ExecutionRouteMap
-                sourceLat={execution?.source_latitude}
-                sourceLng={execution?.source_longitude}
-                destinationLat={execution?.destination_latitude}
-                destinationLng={execution?.destination_longitude}
+                sourceLat={execution?.destination_latitude}
+                sourceLng={execution?.destination_longitude}
+                destinationLat={execution?.source_latitude}
+                destinationLng={execution?.source_longitude}
                 currentLat={execution?.latitude}
                 currentLng={execution?.longitude}
                 distanceKm={execution?.distance_to_cover_km}
@@ -419,31 +319,23 @@ export default function Phase3Demobilisation({
                 </div>
 
                 <div className="execution-form-group">
-                    <label>ETA (Minutes)</label>
+                    <label>ETA (calculated)</label>
                     <input
                         className="execution-input"
-                        type="number"
-                        value={form.eta_minutes}
-                        onChange={e=>updateField("eta_minutes", e.target.value)}
+                        type="text"
+                        value={etaDisplay}
+                        disabled
+                        readOnly
                     />
                 </div>
 
                 <div className="execution-form-group">
-                    <label>Distance Travelled (km)</label>
+                    <label>Transport Status (calculated)</label>
                     <input
                         className="execution-input"
-                        type="number"
-                        value={form.distance_travelled_km}
-                        onChange={e=>updateField("distance_travelled_km", e.target.value)}
-                    />
-                </div>
-
-                <div className="execution-form-group">
-                    <label>Transport Status</label>
-                    <input
-                        className="execution-input"
-                        value={form.transport_status}
-                        onChange={e=>updateField("transport_status", e.target.value)}
+                        value={TRANSPORT_STATUS_LABELS[execution?.transport_status] || "Not started"}
+                        disabled
+                        readOnly
                     />
                 </div>
 

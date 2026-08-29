@@ -888,9 +888,6 @@ def update_execution_progress(
     if payload.current_activity is not None:
         execution.current_activity = payload.current_activity
 
-    if payload.transport_status is not None:
-        execution.transport_status = payload.transport_status
-
     if payload.latitude is not None:
         execution.latitude = payload.latitude
 
@@ -915,19 +912,85 @@ def update_execution_progress(
     if payload.latitude is not None or payload.longitude is not None:
         execution.last_update_source = "OPS"
 
-    if payload.distance_travelled_km is not None:
-        execution.distance_travelled_km = payload.distance_travelled_km
+    # ====================================
+    # DISTANCE + ETA - DERIVED FROM POSITION, NOT TYPED
+    # A previous version of this endpoint accepted distance_travelled_km
+    # as its own manually-entered figure - first as a raw overwrite,
+    # then (still wrong) as a manually-entered increment. Either way,
+    # it let latitude/longitude and "how far I've come" drift apart
+    # into two disconnected numbers a non-technical field user had to
+    # keep in sync themselves - exactly the kind of incoherence this
+    # is meant to prevent. Distance travelled is now always the real
+    # haversine distance from wherever this phase's leg physically
+    # starts to wherever the machine's last known position now is, so
+    # entering a position is the only thing that moves it. ETA follows
+    # the same reasoning - remaining distance divided by the just-
+    # entered speed, not a second independently-typed guess.
+    # ====================================
 
-    if payload.eta_minutes is not None:
-        execution.eta_minutes = payload.eta_minutes
+    if (
+        execution.current_phase in ("PHASE_1", "PHASE_3")
+        and execution.latitude is not None
+        and execution.longitude is not None
+    ):
 
+        # Phase 1 travels source -> destination, so "distance covered"
+        # is measured from source. Phase 3 is the return leg
+        # (destination -> source), so it's measured from destination -
+        # matches the same swapped orientation already applied to the
+        # Phase 3 map/route display.
+        if execution.current_phase == "PHASE_1":
+            reference_lat = execution.source_latitude
+            reference_lng = execution.source_longitude
+        else:
+            reference_lat = execution.destination_latitude
+            reference_lng = execution.destination_longitude
+
+        if reference_lat is not None and reference_lng is not None:
+
+            execution.distance_travelled_km = haversine_km(
+                reference_lat, reference_lng,
+                execution.latitude, execution.longitude
+            )
+
+        remaining_km = max(
+            (execution.distance_to_cover_km or 0) - (execution.distance_travelled_km or 0),
+            0
+        )
+
+        if execution.speed_kmph:
+            execution.eta_minutes = round((remaining_km / execution.speed_kmph) * 60)
+
+        # Transport Status is the same story - a free-typed field lets
+        # it say "Reached" while distance/position show 0% covered,
+        # exactly the incoherence being fixed here. It's now read
+        # straight off the same distance figure just derived above,
+        # so it can never disagree with what the map/metrics show.
+        total_km = execution.distance_to_cover_km or 0
+
+        if total_km > 0 and execution.distance_travelled_km >= total_km:
+            execution.transport_status = "REACHED"
+        elif execution.distance_travelled_km and execution.distance_travelled_km > 0:
+            execution.transport_status = "IN_TRANSIT"
+        else:
+            execution.transport_status = "WAITING"
+
+    # Today's Output is this save's own increment - it folds into
+    # Total Output (the real, cumulative production figure) rather
+    # than being a second independently-typed number that could drift
+    # from it. total_output is never accepted as a direct overwrite
+    # (same reasoning already applied to distance_to_cover_km/
+    # distance_travelled_km above) - it's derived by summing every
+    # Today's Output entry as it comes in.
     if payload.today_output is not None:
         execution.today_output = payload.today_output
+        execution.total_output = (execution.total_output or 0) + payload.today_output
 
-    if payload.total_output is not None:
-        execution.total_output = payload.total_output
-
-    if payload.daily_target is not None:
+    # Daily Target is a fixed planning figure, not a running log entry
+    # - settable once, while still at its 0 default, then frozen. A
+    # later save must not be able to silently redefine what "on
+    # target" means partway through the phase.
+    if payload.daily_target is not None and not execution.daily_target:
         execution.daily_target = payload.daily_target
 
     if payload.output_unit is not None:
@@ -1055,15 +1118,19 @@ def update_execution_progress(
 
         progress = 66 + phase_progress * 34
 
+    # Reaching 100% distance/output coverage means this LEG is done,
+    # not that the phase (or the whole execution) has been marked
+    # complete - that's an explicit action (complete_execution_phase,
+    # the "Complete Current Phase" button), which runs real completion
+    # logic (the target-met validation just added, dequeue, syncing
+    # the machine back to source, advancing the enquiry's stage). A
+    # workflow_status flip here bypassed all of that from a routine
+    # position/output save the moment progress hit 100 - exactly the
+    # same "marked complete without actually completing it" problem,
+    # just at the whole-execution level instead of the button level.
     execution.execution_progress = round(
         min(progress,100)
     )
-
-    if execution.execution_progress >= 100:
-
-        execution.execution_progress = 100
-
-        execution.workflow_status = "EXECUTION_COMPLETED"
 
 
     print("\n========== EXECUTION UPDATE ==========")

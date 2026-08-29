@@ -297,6 +297,21 @@
 }
 
 
+.execution-input:disabled,
+
+.execution-input[readonly]{
+
+    background:#f8fafc;
+
+    border-color:var(--line);
+
+    color:var(--muted);
+
+    cursor:not-allowed;
+
+}
+
+
 /* ===========================================
    MAP
 =========================================== */

@@ -43,10 +43,6 @@ export default function Phase2Execution({
 
     ] = useState({
 
-        today_output:0,
-
-        total_output:0,
-
         daily_target:0,
 
         output_unit:"m³",
@@ -58,6 +54,14 @@ export default function Phase2Execution({
         proof_uploaded:false
 
     });
+
+    // How much was completed since the LAST save - deliberately never
+    // synced from `execution` (that would carry over a stale delta or
+    // the cumulative figure into a field meant to always start
+    // fresh). The backend adds this onto Total Output rather than
+    // replacing it - Total Output is never independently editable,
+    // it's just the running sum of every one of these entries.
+    const [todayOutputDelta, setTodayOutputDelta] = useState(0);
 
 
     // ====================================
@@ -73,14 +77,6 @@ export default function Phase2Execution({
         }
 
         setForm({
-
-            today_output:
-
-                execution.today_output ?? 0,
-
-            total_output:
-
-                execution.total_output ?? 0,
 
             daily_target:
 
@@ -146,9 +142,11 @@ export default function Phase2Execution({
 
         Number(
 
-            form.total_output
+            execution?.total_output ?? 0
 
         );
+
+    const targetIsSet = Boolean(execution?.daily_target);
 
     const remainingVolume =
 
@@ -215,15 +213,15 @@ export default function Phase2Execution({
 
                     today_output:
 
-                        Number(form.today_output),
+                        Number(todayOutputDelta),
 
-                    total_output:
-
-                        Number(form.total_output),
-
+                    // Only ever sent while the target hasn't been set
+                    // yet - the backend freezes it after that anyway,
+                    // but there's no editable field to send a changed
+                    // value from once targetIsSet is true.
                     daily_target:
 
-                        Number(form.daily_target),
+                        targetIsSet ? undefined : Number(form.daily_target),
 
                     output_unit:
 
@@ -264,6 +262,11 @@ export default function Phase2Execution({
                 );
 
             }
+
+            // Reset the delta back to 0 - it represented "since the
+            // last save", which has now happened; leaving the old
+            // value in place would double-count it on the next save.
+            setTodayOutputDelta(0);
 
             alert(
 
@@ -421,7 +424,7 @@ export default function Phase2Execution({
 
                     <label>
 
-                        Today's Output
+                        Output Completed Since Last Update
 
                     </label>
 
@@ -431,15 +434,9 @@ export default function Phase2Execution({
 
                         type="number"
 
-                        value={form.today_output}
+                        value={todayOutputDelta}
 
-                        onChange={e=>updateField(
-
-                            "today_output",
-
-                            e.target.value
-
-                        )}
+                        onChange={e=>setTodayOutputDelta(e.target.value)}
 
                     />
 
@@ -449,7 +446,7 @@ export default function Phase2Execution({
 
                     <label>
 
-                        Total Output
+                        Total Output (cumulative)
 
                     </label>
 
@@ -459,15 +456,11 @@ export default function Phase2Execution({
 
                         type="number"
 
-                        value={form.total_output}
+                        value={totalOutput}
 
-                        onChange={e=>updateField(
+                        disabled
 
-                            "total_output",
-
-                            e.target.value
-
-                        )}
+                        readOnly
 
                     />
 
@@ -477,7 +470,7 @@ export default function Phase2Execution({
 
                     <label>
 
-                        Daily Target
+                        Daily Target{targetIsSet ? " (fixed)" : ""}
 
                     </label>
 
@@ -488,6 +481,10 @@ export default function Phase2Execution({
                         type="number"
 
                         value={form.daily_target}
+
+                        disabled={targetIsSet}
+
+                        readOnly={targetIsSet}
 
                         onChange={e=>updateField(
 

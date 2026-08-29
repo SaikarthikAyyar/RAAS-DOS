@@ -144,19 +144,23 @@ class ExecutionProgressUpdateSchema(BaseModel):
 
     gps_timestamp: datetime | None = None
 
-    eta_minutes: int | None = None
+    # eta_minutes and distance_travelled_km are deliberately NOT
+    # accepted here - both are derived server-side from wherever
+    # latitude/longitude (and speed, for ETA) land, exactly like
+    # distance_to_cover_km already is from source/destination (see
+    # set_execution_route below). Accepting them as separate typed
+    # fields is what let a non-technical field user's position and
+    # "how far I've come" drift apart into two disconnected numbers.
 
-    # distance_to_cover_km is deliberately NOT accepted here anymore -
-    # it's derived from source/destination via haversine_km (see
-    # set_execution_route below), not typed by hand. distance_travelled
-    # stays manual - that's the "how far has it actually gone so far"
-    # figure a real GPS device would supply instead, later.
+    # total_output is deliberately NOT accepted here either - it's
+    # derived server-side by summing every today_output entry as it
+    # arrives, never typed/overwritten by hand (same reasoning as
+    # distance_to_cover_km above).
 
-    distance_travelled_km: float | None = None
-    
     today_output: float | None = None
 
-    total_output: float | None = None
+    # daily_target: a fixed planning figure, settable once (while
+    # still 0) and frozen after - see update_execution_progress.
 
     daily_target: float | None = None
 
@@ -166,6 +170,8 @@ class ExecutionProgressUpdateSchema(BaseModel):
 
     current_activity: str | None = None
 
-    transport_status: str | None = None
+    # transport_status is deliberately NOT accepted here either - it's
+    # derived from the same distance figure above (WAITING/IN_TRANSIT/
+    # REACHED), same reasoning as eta_minutes/distance_travelled_km.
 
     remarks: str | None = None

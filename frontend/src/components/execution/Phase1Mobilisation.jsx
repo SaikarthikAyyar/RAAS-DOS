@@ -16,6 +16,15 @@ import ExecutionRouteMap from "./ExecutionRouteMap";
 
 import { useAuth } from "../../contexts/AuthContext";
 
+// Derived server-side from distance travelled vs. total (see
+// backend's update_execution_progress) - display labels only, the
+// underlying value is never typed by hand.
+const TRANSPORT_STATUS_LABELS = {
+    WAITING: "Not started",
+    IN_TRANSIT: "In transit",
+    REACHED: "Reached"
+};
+
 
 // ====================================
 // PHASE 1
@@ -50,12 +59,6 @@ export default function Phase1Mobilisation({
         altitude:0,
 
         accuracy_meters:0,
-
-        eta_minutes:0,
-
-        distance_travelled_km:0,
-
-        transport_status:"",
 
         current_activity:"",
 
@@ -100,12 +103,6 @@ export default function Phase1Mobilisation({
             altitude:execution.altitude ?? 0,
 
             accuracy_meters:execution.accuracy_meters ?? 0,
-
-            eta_minutes:execution.eta_minutes ?? 0,
-
-            distance_travelled_km:execution.distance_travelled_km ?? 0,
-
-            transport_status:execution.transport_status ?? "",
 
             current_activity:execution.current_activity ?? "",
 
@@ -153,13 +150,14 @@ export default function Phase1Mobilisation({
     // Mirrors exactly what the backend's own update_execution_progress
     // formula computes, so what's shown here never drifts from what
     // actually gets saved - total is the derived route distance
-    // (source -> destination, no longer hand-typed here), travelled
-    // is the one figure still manually entered.
+    // (source -> destination, no longer hand-typed here). travelled is
+    // read straight from the persisted execution row (the real,
+    // accumulated total), never from the delta input below.
     // ====================================
 
     const totalDistance = Number(execution?.distance_to_cover_km ?? 0);
 
-    const travelledDistance = Number(form.distance_travelled_km ?? 0);
+    const travelledDistance = Number(execution?.distance_travelled_km ?? 0);
 
     const remainingDistance = Math.max(totalDistance - travelledDistance, 0);
 
@@ -167,6 +165,13 @@ export default function Phase1Mobilisation({
         totalDistance > 0
         ? Math.min(travelledDistance / totalDistance, 1) * 100
         : 0;
+
+    // ETA is stored in minutes (matches the DB column/every other
+    // consumer of it, e.g. the invoice sync) - only the display here
+    // is reformatted to hours + minutes, nothing about the stored unit
+    // changes.
+    const etaMinutesTotal = Number(execution?.eta_minutes ?? 0);
+    const etaDisplay = `${Math.floor(etaMinutesTotal / 60)}h ${etaMinutesTotal % 60}m`;
 
 
     // ====================================
@@ -233,12 +238,6 @@ export default function Phase1Mobilisation({
                     altitude:Number(form.altitude),
 
                     accuracy_meters:Number(form.accuracy_meters),
-
-                    eta_minutes:Number(form.eta_minutes),
-
-                    distance_travelled_km:Number(form.distance_travelled_km),
-
-                    transport_status:form.transport_status,
 
                     current_activity:form.current_activity,
 
@@ -509,7 +508,7 @@ export default function Phase1Mobilisation({
 
                     <label>
 
-                        ETA (Minutes)
+                        ETA (calculated)
 
                     </label>
 
@@ -517,11 +516,13 @@ export default function Phase1Mobilisation({
 
                         className="execution-input"
 
-                        type="number"
+                        type="text"
 
-                        value={form.eta_minutes}
+                        value={etaDisplay}
 
-                        onChange={e=>updateField("eta_minutes",e.target.value)}
+                        disabled
+
+                        readOnly
 
                     />
 
@@ -531,7 +532,7 @@ export default function Phase1Mobilisation({
 
                     <label>
 
-                        Distance Travelled (km)
+                        Transport Status (calculated)
 
                     </label>
 
@@ -539,31 +540,11 @@ export default function Phase1Mobilisation({
 
                         className="execution-input"
 
-                        type="number"
+                        value={TRANSPORT_STATUS_LABELS[execution?.transport_status] || "Not started"}
 
-                        value={form.distance_travelled_km}
+                        disabled
 
-                        onChange={e=>updateField("distance_travelled_km",e.target.value)}
-
-                    />
-
-                </div>
-
-                <div className="execution-form-group">
-
-                    <label>
-
-                        Transport Status
-
-                    </label>
-
-                    <input
-
-                        className="execution-input"
-
-                        value={form.transport_status}
-
-                        onChange={e=>updateField("transport_status",e.target.value)}
+                        readOnly
 
                     />
 

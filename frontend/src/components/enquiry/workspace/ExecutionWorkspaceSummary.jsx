@@ -193,7 +193,6 @@ export default function ExecutionWorkspaceSummary({
             await updateExecutionProgress(execution.id, {
 
                 current_activity: execution.current_activity,
-                transport_status: execution.transport_status,
                 remarks: execution.remarks
 
             });
