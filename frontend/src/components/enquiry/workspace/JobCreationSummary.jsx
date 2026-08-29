@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import {
     getJobByEnquiry,
     saveJobCreation,
-    updateJobCreation
+    updateJobCreation,
+    confirmJobCreation
 } from "../../../services/jobCreationService";
 
 import {
@@ -72,6 +73,8 @@ export default function JobCreationSummary({
     const [rescheduleCompletion, setRescheduleCompletion] = useState("");
     const [rescheduling, setRescheduling] = useState(false);
     const [cancelling, setCancelling] = useState(false);
+
+    const [confirming, setConfirming] = useState(false);
 
     async function load(){
 
@@ -158,6 +161,9 @@ export default function JobCreationSummary({
     const stageIndex = STAGE_ORDER.indexOf(enquiry.stage);
     const poReceivedIndex = STAGE_ORDER.indexOf("PO_RECEIVED");
     const eligible = stageIndex >= poReceivedIndex;
+
+    const jobCreationIndex = STAGE_ORDER.indexOf("JOB_CREATION");
+    const jobCreationConfirmed = stageIndex >= jobCreationIndex;
 
     async function handleCreateJob(){
 
@@ -271,6 +277,29 @@ export default function JobCreationSummary({
         }
         finally{
             setRescheduling(false);
+        }
+
+    }
+
+    async function handleConfirmJobCreation(){
+
+        setConfirming(true);
+        setError("");
+
+        try{
+
+            await confirmJobCreation(jobInfo.id);
+
+            await load();
+            reload?.();
+
+        }
+        catch(err){
+            console.error(err);
+            setError(formatApiError(err, "Unable to confirm Job Creation."));
+        }
+        finally{
+            setConfirming(false);
         }
 
     }
@@ -440,6 +469,30 @@ export default function JobCreationSummary({
                                         </table>
 
                                         {
+                                            jobCreationConfirmed ? (
+
+                                                <p className="survey-empty" style={{marginBottom:12}}>
+                                                    Job Creation confirmed - this case has moved on to {STAGE_LABELS[enquiry.stage] || enquiry.stage}.
+                                                </p>
+
+                                            ) : (
+
+                                                hasTask("enquiry-tab-job-created", "confirm_job_creation") && (
+                                                    <div className="survey-actions" style={{marginBottom:12}}>
+                                                        <button
+                                                            className="survey-action-button survey-action-button-orange"
+                                                            onClick={handleConfirmJobCreation}
+                                                            disabled={confirming}
+                                                        >
+                                                            {confirming ? "Confirming..." : "Confirm Job Creation"}
+                                                        </button>
+                                                    </div>
+                                                )
+
+                                            )
+                                        }
+
+                                        {
                                             schedule.schedule_status==="QUEUED" && (
 
                                                 <>
@@ -499,6 +552,10 @@ export default function JobCreationSummary({
 
                                     <>
                                         <h4 className="ops-subheading">Book a Fleet Unit</h4>
+
+                                        <p className="survey-empty" style={{marginBottom:8}}>
+                                            Book a Fleet Unit before Job Creation can be confirmed.
+                                        </p>
 
                                         <div className="ops-override-form">
 

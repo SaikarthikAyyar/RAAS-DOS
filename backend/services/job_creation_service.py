@@ -66,7 +66,14 @@ from backend.services.status_service import (
 
 from backend.models.enquiry import Enquiry
 
+from backend.models.fleet_schedule import FleetSchedule
+
 from backend.services.enquiry_consolidated_service import update_module_reference
+
+from backend.services.workflow_service import (
+    advance_stage_at_least,
+    WorkflowStage
+)
 
 # Replace this with your actual invoice service once it exists
 from backend.services.invoice_service import create_invoice_request
@@ -442,6 +449,57 @@ def update_job_request(
 
 
 # ====================================
+# CONFIRM JOB CREATION
+# The explicit action that actually advances the enquiry's overall
+# stage to JOB_CREATION - previously nothing in this file ever touched
+# enquiry.stage at all, so a case sat at PO_RECEIVED forever even once
+# a job existed and a fleet unit had been booked against it. Requires
+# a real Fleet Unit booking to already exist (not just a bare job row)
+# before it can be confirmed - "job creation" isn't genuinely done
+# until resources have actually been allocated to it.
+# ====================================
+
+def confirm_job_creation_request(db, job_id):
+
+    job = get_job(db, job_id)
+
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found.")
+
+    has_booking = (
+        db.query(FleetSchedule)
+        .filter(FleetSchedule.job_creation_id == job_id)
+        .first()
+    )
+
+    if not has_booking:
+        raise HTTPException(
+            status_code=422,
+            detail="Book a Fleet Unit before confirming Job Creation."
+        )
+
+    enquiry = (
+        db.query(Enquiry)
+        .filter(Enquiry.job_creation_id == job_id)
+        .first()
+    )
+
+    if enquiry is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No enquiry is linked to this job."
+        )
+
+    job.workflow_status = "CONFIRMED"
+    db.commit()
+    db.refresh(job)
+
+    advance_stage_at_least(db, enquiry.id, WorkflowStage.JOB_CREATION.value)
+
+    return job
+
+
+# ====================================
 # GET JOB BY ENQUIRY (Phase 33D)
 # Resolves the enquiry's own linked job_creation_id if set; otherwise
 # reports "not yet created" plus the approval_board_id the frontend
@@ -475,7 +533,9 @@ def get_job_by_enquiry_request(db, enquiry):
         "approved_service_configuration": job.approved_service_configuration,
         "approved_machine": job.approved_machine,
         "approved_pump_package": job.approved_pump_package,
-        "approved_accessories": job.approved_accessories
+        "approved_accessories": job.approved_accessories,
+        "workflow_status": job.workflow_status,
+        "enquiry_stage": enquiry.stage
     }
 
 

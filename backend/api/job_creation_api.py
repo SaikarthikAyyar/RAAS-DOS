@@ -28,7 +28,9 @@ from backend.services.job_creation_service import (
 
     get_job_creation_request,
 
-    get_job_by_enquiry_request
+    get_job_by_enquiry_request,
+
+    confirm_job_creation_request
 
 )
 
@@ -140,6 +142,37 @@ def update_job(
     )
 
     return job
+
+
+# ====================================
+# CONFIRM JOB CREATION
+# ====================================
+
+@router.put(
+
+    "/job-creation/{job_id}/confirm"
+
+)
+
+def confirm_job_creation(
+
+    job_id: int,
+
+    db: Session = Depends(
+
+        get_db
+
+    )
+
+):
+
+    return confirm_job_creation_request(
+
+        db,
+
+        job_id
+
+    )
 
 
 # ====================================

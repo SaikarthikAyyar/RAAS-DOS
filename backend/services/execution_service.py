@@ -53,6 +53,13 @@ from backend.utils.geo import haversine_km
 
 from backend.utils.geocode import reverse_geocode
 
+from backend.models.enquiry import Enquiry
+
+from backend.services.workflow_service import (
+    advance_stage_at_least,
+    WorkflowStage
+)
+
 
 # ====================================
 # MACHINE RESOLUTION (Phase 38)
@@ -106,6 +113,88 @@ def _resolve_execution_machine(db, job_creation_id):
         )
 
     return None
+
+
+# ====================================
+# ENQUIRY RESOLUTION
+# Execution has no direct FK to Enquiry - the real link is
+# Enquiry.job_creation_id, set once by create_job_request. Needed so
+# starting/completing a phase can advance the enquiry's own overall
+# stage (previously never touched by anything in this file - stage
+# stayed frozen at PO_RECEIVED through the entire Job Creation and
+# Execution lifecycle, so the workflow stepper's own final two steps
+# could never actually be reached).
+# ====================================
+
+def _resolve_execution_enquiry(db, job_creation_id):
+
+    return (
+        db.query(Enquiry)
+        .filter(Enquiry.job_creation_id == job_creation_id)
+        .first()
+    )
+
+
+# ====================================
+# PHASE COMPLETION TARGET VALIDATION
+# "Complete Current Phase" must not be allowed to mark a phase done
+# before its real, measurable target has actually been met - otherwise
+# it's just a label, not a real completion. Phase 1/3 are "has the
+# machine covered the distance"; Phase 2 is "has output reached the
+# survey's estimated volume". A phase with no real target set yet
+# (route never entered, no estimated volume on the survey) is let
+# through rather than permanently blocked - there's nothing honest to
+# validate against, and this must never trap a case with a data gap.
+# ====================================
+
+def _validate_phase_completion(db, execution):
+
+    phase = execution.current_phase
+
+    if phase in ("PHASE_1", "PHASE_3"):
+
+        total = execution.distance_to_cover_km or 0
+        travelled = execution.distance_travelled_km or 0
+
+        if total > 0 and travelled < total:
+
+            leg = "to the site" if phase == "PHASE_1" else "back to source"
+
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"Cannot complete {'Mobilisation' if phase == 'PHASE_1' else 'Demobilisation'} yet - "
+                    f"only {travelled:.2f} km of {total:.2f} km {leg} has been covered. "
+                    f"Update Distance Travelled once the machine has actually arrived."
+                )
+            )
+
+    elif phase == "PHASE_2":
+
+        survey = (
+            db.query(SalesSurvey)
+            .filter(SalesSurvey.id == execution.sales_survey_id)
+            .first()
+        )
+
+        estimated_volume = (
+            survey.estimated_volume
+            if survey and survey.estimated_volume
+            else 0
+        )
+
+        total_output = execution.total_output or 0
+
+        if estimated_volume > 0 and total_output < estimated_volume:
+
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"Cannot complete Job Execution yet - only {total_output:.2f} "
+                    f"{execution.output_unit or 'units'} of {estimated_volume:.2f} estimated "
+                    f"has been recorded. Update Total Output once the target has been reached."
+                )
+            )
 
 
 # ====================================
@@ -1146,6 +1235,22 @@ def start_execution_phase(
     )
 
     # ====================================
+    # ENQUIRY STAGE -> EXECUTION
+    # Starting any phase means the enquiry has genuinely entered
+    # execution - advance_stage_at_least only ever moves forward and
+    # no-ops once already at/past EXECUTION, so this is safe to call
+    # on every phase start (1, 2, or 3), not just the very first one.
+    # Previously nothing in this file ever touched enquiry.stage at
+    # all, so it stayed frozen at PO_RECEIVED for the entire Job
+    # Creation + Execution lifecycle.
+    # ====================================
+
+    stage_enquiry = _resolve_execution_enquiry(db, execution.job_creation_id)
+
+    if stage_enquiry:
+        advance_stage_at_least(db, stage_enquiry.id, WorkflowStage.EXECUTION.value)
+
+    # ====================================
     # ROUTE DISTANCE + MACHINE LOCATION SYNC (Phase 38)
     # distance_to_cover_km is derived from source/destination via
     # haversine_km on Phase 1 start and again on Phase 3 start (the
@@ -1405,6 +1510,11 @@ def complete_execution_phase(
     print(f"Job Creation ID : {execution.job_creation_id}")
     print(f"Phase Before    : {execution.current_phase}")
 
+    # Reject the completion outright if this phase's real target
+    # hasn't actually been reached yet - a phase must not be markable
+    # "complete" just because the button was clicked.
+    _validate_phase_completion(db, execution)
+
     execution = complete_phase(db, execution)
 
     if execution is None:
@@ -1422,6 +1532,21 @@ def complete_execution_phase(
         return execution
 
     print("Final phase reached -> dequeuing machine schedules")
+
+    # ====================================
+    # ENQUIRY STAGE -> COMPLETED
+    # This enquiry's own execution has genuinely finished (all 3
+    # phases done) - its overall stage should reach the workflow
+    # stepper's final step. Deliberately keyed to THIS enquiry, not
+    # whatever job gets promoted next below - a machine being
+    # reassigned to someone else's queued job has no bearing on
+    # whether this enquiry's own case is done.
+    # ====================================
+
+    completed_enquiry = _resolve_execution_enquiry(db, execution.job_creation_id)
+
+    if completed_enquiry:
+        advance_stage_at_least(db, completed_enquiry.id, WorkflowStage.COMPLETED.value)
 
     # ====================================
     # MACHINE RETURNED TO SOURCE (Phase 38)

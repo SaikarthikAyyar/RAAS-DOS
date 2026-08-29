@@ -164,6 +164,31 @@ export async function updateJobCreation(jobId, payload){
 
 
 // ====================================
+// CONFIRM JOB CREATION
+// ====================================
+
+export async function confirmJobCreation(jobId){
+
+    const response = await fetch(
+
+        `${API}/job-creation/${jobId}/confirm`,
+
+        { method:"PUT" }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // SAVE HEADER
 // ====================================
 

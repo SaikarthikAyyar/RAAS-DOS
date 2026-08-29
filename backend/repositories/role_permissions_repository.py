@@ -261,7 +261,8 @@ MODULE_TASKS = {
         ("save_planned_dates", "Save planned dates"),
         ("book_fleet_unit", "Book Fleet Unit"),
         ("reschedule_fleet_booking", "Reschedule booking"),
-        ("cancel_fleet_booking", "Cancel booking")
+        ("cancel_fleet_booking", "Cancel booking"),
+        ("confirm_job_creation", "Confirm Job Creation")
     ],
     "enquiry-tab-execution": [
         ("create_execution", "Create execution"),
