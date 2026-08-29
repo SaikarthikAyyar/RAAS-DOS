@@ -18,7 +18,7 @@ export const components = {
 
     "job-fleet-booking": {
         title: "Book a Fleet Unit",
-        explanation: "Assigns a real Fleet Unit — a specific machine bundled with its own crew — to this job. Booking assigns the machine and every crew member together in one action. If the chosen unit already has bookings ahead of it, this job queues behind them instead of starting immediately; the note under the form states which will happen before the booking is made."
+        explanation: "Assigns a real Fleet Unit — a specific machine bundled with its own crew — to this job. Booking assigns the machine and every crew member together in one action. If the chosen unit already has bookings ahead of it, this job queues behind them instead of starting immediately; the note under the form states which will happen before the booking is made. The site location typed here is also looked up automatically to set the Execution tab's destination coordinates — if it can't be found, a message says so right after booking, so it can be set manually on the Execution tab instead of silently staying blank."
     },
 
     "job-fleet-summary": {

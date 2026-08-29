@@ -20,7 +20,7 @@ export const components = {
 
     "phase1-route": {
         title: "Source & Destination",
-        explanation: "Sets the two fixed endpoints of the job — the hub the machine is mobilising from, and the site it's heading to. Saving a route computes the real straight-line distance between them and draws it on the map. These two points stay fixed for the rest of the job; Phase 3's return leg reuses them rather than asking for a new route to be entered."
+        explanation: "Sets the two fixed endpoints of the job — the hub the machine is mobilising from, and the site it's heading to. Both are pre-filled automatically as soon as the execution exists: the source from the enquiry's own hub, the destination from the job's site location, each looked up as real coordinates rather than requiring anyone to find and type them in. Either can still be corrected here if the automatic lookup isn't precise enough. Saving computes the real straight-line distance between the two points and draws it on the map; these stay fixed for the rest of the job, and Phase 3's return leg reuses them rather than asking for a new route."
     },
 
     "phase1-position": {

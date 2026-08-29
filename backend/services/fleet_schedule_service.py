@@ -46,11 +46,29 @@ def book_fleet_unit_request(db, payload):
 
     job = get_job(db, payload.job_id)
 
-    update_execution_after_allocation(db, job, payload)
+    updated_execution = update_execution_after_allocation(db, job, payload)
 
     schedule.execution_id = execution.id
     db.commit()
     db.refresh(schedule)
+
+    # Site location is geocoded into the execution's destination
+    # coordinates as part of the call above (see
+    # update_execution_after_allocation) - if a real site was given but
+    # nothing could be found for it, surface that now rather than
+    # leaving it as a silent blank the user only discovers later on
+    # the Execution tab's map. destination_geocode_warning is a plain
+    # attribute set on the ORM object here, not a real column - picked
+    # up by FleetScheduleResponse purely for this one response.
+    if (
+        updated_execution is not None
+        and payload.site_location
+        and updated_execution.destination_latitude is None
+    ):
+        schedule.destination_geocode_warning = (
+            f"Couldn't find coordinates for site location \"{payload.site_location}\" - "
+            f"the destination will need to be set manually on the Execution tab's Save Route form."
+        )
 
     return schedule
 

@@ -67,3 +67,8 @@ class FleetScheduleResponse(BaseModel):
     actual_start: Optional[date] = None
     actual_completion: Optional[date] = None
     schedule_status: str
+
+    # Not a real column - set only when booking this schedule tried to
+    # geocode the site location into the execution's destination
+    # coordinates and found nothing. See book_fleet_unit_request.
+    destination_geocode_warning: Optional[str] = None

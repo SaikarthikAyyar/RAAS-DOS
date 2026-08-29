@@ -234,7 +234,7 @@ export default function JobCreationSummary({
 
         try{
 
-            await bookFleetUnit({
+            const booked = await bookFleetUnit({
                 job_id: jobInfo.id,
                 fleet_unit_id: Number(selectedFleetUnitId),
                 site_location: siteLocation.trim(),
@@ -244,6 +244,10 @@ export default function JobCreationSummary({
 
             await load();
             reload?.();
+
+            if(booked?.destination_geocode_warning){
+                alert(booked.destination_geocode_warning);
+            }
 
         }
         catch(err){

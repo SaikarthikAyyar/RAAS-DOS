@@ -51,7 +51,7 @@ from backend.repositories.fleet_schedule_repository import dequeue_fleet_schedul
 
 from backend.utils.geo import haversine_km
 
-from backend.utils.geocode import reverse_geocode
+from backend.utils.geocode import reverse_geocode, forward_geocode, extract_hub_city
 
 from backend.models.enquiry import Enquiry
 
@@ -354,12 +354,19 @@ def create_execution_request(
     )
 
     # ====================================
-    # PREFILL SOURCE COORDINATES (Phase 38)
-    # Convenience prefill from the assigned machine's own "last known
-    # position," not a lock - still editable via set_execution_route
-    # before Phase 1 starts if the real pickup point differs. Same
-    # "picking one thing prefills another" pattern already used for
-    # Fleet Unit's hub-from-machine prefill (Phase 36).
+    # PREFILL SOURCE COORDINATES
+    # Convenience prefill, not a lock - still editable via
+    # set_execution_route before Phase 1 starts if the real pickup
+    # point differs. Same "picking one thing prefills another" pattern
+    # already used for Fleet Unit's hub-from-machine prefill (Phase 36).
+    #
+    # Priority 1: the assigned machine's own last known position - the
+    # most physically accurate source when it exists (Phase 38).
+    # Priority 2 (new): geocoded straight from the enquiry's own hub
+    # name - covers the far more common case of a machine that has
+    # never had a real position recorded yet (every brand-new
+    # machine/fleet unit, confirmed dead end otherwise per Phase 38's
+    # own flagged scope gap).
     # ====================================
 
     machine = _resolve_execution_machine(db, job.id)
@@ -371,6 +378,29 @@ def create_execution_request(
 
         db.commit()
         db.refresh(execution)
+
+    else:
+
+        survey = (
+            db.query(SalesSurvey)
+            .filter(SalesSurvey.id == job.sales_survey_id)
+            .first()
+        )
+
+        hub_name = survey.nearest_hub if survey else None
+
+        hub_city = extract_hub_city(hub_name)
+
+        if hub_city:
+
+            coordinates = forward_geocode(hub_city)
+
+            if coordinates:
+
+                execution.source_latitude, execution.source_longitude = coordinates
+
+                db.commit()
+                db.refresh(execution)
 
     invoice = get_invoice_by_job(
 
@@ -499,7 +529,22 @@ def update_execution_after_allocation(
     execution.current_activity = "Resources Allocated"
 
     if execution.site_location is None and payload.site_location is not None:
+
         execution.site_location = payload.site_location
+
+        # Prefill destination coordinates from the real site name
+        # being set right now, the same "convenience prefill, not a
+        # lock" way source coordinates are handled above - still
+        # editable via set_execution_route afterward if this doesn't
+        # land precisely enough. Only fires while destination hasn't
+        # already been set (e.g. by hand, before booking) so this
+        # never overwrites something already there.
+        if execution.destination_latitude is None:
+
+            coordinates = forward_geocode(payload.site_location)
+
+            if coordinates:
+                execution.destination_latitude, execution.destination_longitude = coordinates
 
     if execution.planned_start is not None and payload.planned_start is not None:
         execution.planned_start = payload.planned_start
@@ -530,6 +575,8 @@ def update_execution_after_allocation(
     print(f"Start : {execution.planned_start}")
 
     print(f"Completion : {execution.estimated_completion}")
+
+    return execution
 
 
     # ====================================
