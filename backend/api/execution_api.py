@@ -25,7 +25,9 @@ from backend.services.execution_service import (
 
     update_execution_progress,
 
-    set_execution_route
+    set_execution_route,
+
+    refresh_execution_coordinates
 
 )
 
@@ -204,6 +206,41 @@ def set_route(
         execution_id,
 
         payload
+
+    )
+
+
+# ====================================
+# GET COORDINATES (manual re-search of the hub/site text)
+# ====================================
+
+@router.post(
+
+    "/execution/{execution_id}/geocode"
+
+)
+
+def geocode_coordinates(
+
+    execution_id: int,
+
+    db: Session = Depends(get_db)
+
+):
+
+    print("\n========== EXECUTION API ==========")
+
+    print(
+
+        f"Get Coordinates : {execution_id}"
+
+    )
+
+    return refresh_execution_coordinates(
+
+        db,
+
+        execution_id
 
     )
 

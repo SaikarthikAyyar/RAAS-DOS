@@ -1020,6 +1020,95 @@ def _fill_missing_route_coordinates(
     return warnings
 
 
+# ====================================
+# GET COORDINATES (manual button, Phase 1's Source & Destination card)
+# Callable on demand, any number of times - Start Current Phase can
+# only ever be clicked once per phase, so an execution that still has
+# a gap after that (the hub/site text didn't resolve the first time,
+# or the site location was corrected afterward) needs its own
+# always-available trigger, not just the one-shot automatic occasions
+# at creation/booking/phase-start.
+#
+# Deliberately simple, exactly two text fields in, two coordinate
+# pairs out - no machine-position lookup, no "only if currently
+# blank" gate: Source is always re-resolved from the job's hub name
+# text (via extract_hub_city + forward_geocode), Destination is
+# always re-resolved from the job's own site_location text
+# (forward_geocode directly). A field is only ever left alone when
+# its own text has no match at all (real coordinates already there
+# aren't wiped by a failed lookup) - otherwise every click genuinely
+# re-searches both, which is what "Get Coordinates" should do.
+# ====================================
+
+def refresh_execution_coordinates(
+
+    db,
+
+    execution_id
+
+):
+
+    execution = get_execution(db, execution_id)
+
+    if execution is None:
+        raise HTTPException(status_code=404, detail="Execution not found.")
+
+    warnings = {"source": None, "destination": None}
+
+    survey = (
+        db.query(SalesSurvey)
+        .filter(SalesSurvey.id == execution.sales_survey_id)
+        .first()
+    )
+
+    hub_name = survey.nearest_hub if survey else None
+    hub_city = extract_hub_city(hub_name)
+
+    if hub_city:
+
+        coordinates = forward_geocode(hub_city)
+
+        if coordinates:
+            execution.source_latitude, execution.source_longitude = coordinates
+        else:
+            warnings["source"] = f"Couldn't find coordinates for hub \"{hub_city}\"."
+    else:
+        warnings["source"] = "No hub on file for this job's survey."
+
+    if execution.site_location:
+
+        coordinates = forward_geocode(execution.site_location)
+
+        if coordinates:
+            execution.destination_latitude, execution.destination_longitude = coordinates
+        else:
+            warnings["destination"] = f"Couldn't find coordinates for \"{execution.site_location}\"."
+    else:
+        warnings["destination"] = "No site location on file for this job."
+
+    distance = haversine_km(
+        execution.source_latitude,
+        execution.source_longitude,
+        execution.destination_latitude,
+        execution.destination_longitude
+    )
+
+    if distance is not None:
+        execution.distance_to_cover_km = distance
+
+    execution.last_updated = datetime.utcnow()
+
+    db.commit()
+    db.refresh(execution)
+
+    sync_invoice_from_execution(db, execution)
+
+    result = execution.__dict__.copy()
+    result["geocode_warnings"] = warnings
+
+    return result
+
+
 def update_execution_progress(
     db,
     execution_id,

@@ -8,7 +8,8 @@ import "./Execution.css";
 
 import {
     updateExecutionProgress,
-    setExecutionRoute
+    setExecutionRoute,
+    geocodeExecutionCoordinates
 }
 from "../../services/executionService";
 
@@ -84,6 +85,8 @@ export default function Phase1Mobilisation({
     });
 
     const [savingRoute, setSavingRoute] = useState(false);
+    const [geocoding, setGeocoding] = useState(false);
+    const [geocodeWarnings, setGeocodeWarnings] = useState(null);
 
 
     // ====================================
@@ -215,6 +218,46 @@ export default function Phase1Mobilisation({
         finally{
 
             setSavingRoute(false);
+
+        }
+
+    }
+
+
+    // ====================================
+    // GET COORDINATES
+    // Re-searches this job's own hub name (source) and site location
+    // (destination) text via the backend's geocode lookup and fills
+    // in whatever's found - safe to click any number of times, e.g.
+    // if the job's site location text was corrected after the phase
+    // was already started once.
+    // ====================================
+
+    async function handleGetCoordinates(){
+
+        setGeocoding(true);
+        setGeocodeWarnings(null);
+
+        try{
+
+            const result = await geocodeExecutionCoordinates(execution.id);
+
+            setGeocodeWarnings(result.geocode_warnings ?? null);
+
+            if(refreshExecution){
+                await refreshExecution(execution.id);
+            }
+
+        }
+        catch(error){
+
+            console.error(error);
+            alert("Unable to search for coordinates.");
+
+        }
+        finally{
+
+            setGeocoding(false);
 
         }
 
@@ -426,12 +469,27 @@ export default function Phase1Mobilisation({
                 <div className="execution-actions">
                     <button
                         className="execution-btn"
+                        onClick={handleGetCoordinates}
+                        disabled={geocoding}
+                        title="Search coordinates for this job's hub (source) and site location (destination) text"
+                    >
+                        {geocoding ? "Searching..." : "Get Coordinates"}
+                    </button>
+                    <button
+                        className="execution-btn"
                         onClick={saveRoute}
                         disabled={savingRoute}
                     >
                         {savingRoute ? "Saving Route..." : "Save Route"}
                     </button>
                 </div>
+            )}
+
+            {geocodeWarnings && (geocodeWarnings.source || geocodeWarnings.destination) && (
+                <p style={{color:"var(--orange)", fontSize:13, marginTop:6}}>
+                    {geocodeWarnings.source && <>⚠ Source: {geocodeWarnings.source}<br/></>}
+                    {geocodeWarnings.destination && <>⚠ Destination: {geocodeWarnings.destination}</>}
+                </p>
             )}
 
             <ExecutionRouteMap

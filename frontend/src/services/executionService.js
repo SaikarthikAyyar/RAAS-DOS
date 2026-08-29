@@ -138,6 +138,36 @@ export async function setExecutionRoute(executionId, payload){
 
 
 // ====================================
+// GET COORDINATES
+// Re-searches the job's own hub name (source) and site location
+// (destination) text via Nominatim and fills in whatever matches -
+// callable any time, independent of the phase's own lifecycle.
+// ====================================
+
+export async function geocodeExecutionCoordinates(executionId){
+
+    const response = await fetch(
+
+        `${API}/execution/${executionId}/geocode`,
+
+        {
+            method:"POST"
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // LIST EXECUTIONS
 // ====================================
 
