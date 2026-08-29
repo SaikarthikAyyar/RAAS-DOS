@@ -17,6 +17,8 @@ import { useAuth } from "../../contexts/AuthContext";
 
 import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
 
+import { isBeforePlannedStart } from "../../utils/executionSchedule";
+
 // Derived server-side from distance travelled vs. total (see
 // backend's update_execution_progress) - display labels only, the
 // underlying value is never typed by hand.
@@ -47,7 +49,12 @@ export default function Phase3Demobilisation({
     // Phase.
     const phaseStarted = execution?.phase_3_status !== "PENDING";
 
-    const canUpdateProgress = phaseStarted && hasTask("enquiry-tab-execution", "update_progress");
+    // Pure date check, independent of phaseStarted - see
+    // ExecutionControls.jsx / Phase1Mobilisation.jsx for the full
+    // reasoning.
+    const beforePlannedStart = isBeforePlannedStart(execution);
+
+    const canUpdateProgress = phaseStarted && !beforePlannedStart && hasTask("enquiry-tab-execution", "update_progress");
 
     const [
         form,
@@ -404,7 +411,13 @@ export default function Phase3Demobilisation({
 
             </div>
 
-            {!phaseStarted && (
+            {beforePlannedStart && (
+                <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:8}}>
+                    This job isn't scheduled to start until {execution.planned_start} - no updates can be recorded before then.
+                </p>
+            )}
+
+            {!beforePlannedStart && !phaseStarted && (
                 <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:8}}>
                     Start Current Phase (in Execution Controls below) before recording progress here.
                 </p>

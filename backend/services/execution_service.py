@@ -172,21 +172,22 @@ def _require_phase_started(execution, action_label):
 
 # ====================================
 # PLANNED START DATE GATE
-# Every job is scheduled against a real planned_start date (set at
-# booking, editable via Job Creation's "Save planned dates") - Phase 1
-# is the machine's actual mobilisation leg, so it must not be startable
-# before that date has genuinely arrived, no matter how early someone
-# clicks the button. Phase 2/3 have no equivalent gate - they only ever
-# begin once Phase 1 has genuinely completed, which is itself already a
-# real event, not a scheduled date to jump ahead of.
+# A pure date check, unconditional on current_phase or any phase
+# status - every job is scheduled against a real planned_start date
+# (set at booking, editable via Job Creation's "Save planned dates"),
+# and nothing that records or advances execution should be usable
+# before that date has genuinely arrived, no matter what state the
+# execution otherwise happens to be in. Applied to start/update-
+# progress/complete-phase; deliberately NOT applied to
+# set_execution_route or refresh_execution_coordinates, which stay
+# available at any time so the route/map can be prepared ahead of the
+# actual scheduled start.
 # ====================================
 
 def _require_planned_start_reached(execution):
 
     if (
-        execution.current_phase == "PHASE_1"
-        and execution.phase_1_status == "PENDING"
-        and execution.planned_start
+        execution.planned_start
         and datetime.utcnow().date() < execution.planned_start
     ):
 
@@ -194,7 +195,7 @@ def _require_planned_start_reached(execution):
             status_code=422,
             detail=(
                 f"This job isn't scheduled to start until {execution.planned_start} - "
-                f"execution can't begin before then."
+                f"no updates can be recorded before then."
             )
         )
 
@@ -1162,6 +1163,8 @@ def update_execution_progress(
 
         )
 
+    _require_planned_start_reached(execution)
+
     _require_phase_started(execution, "recording progress")
 
 
@@ -1880,6 +1883,8 @@ def complete_execution_phase(
     print(f"Execution ID    : {execution.id}")
     print(f"Job Creation ID : {execution.job_creation_id}")
     print(f"Phase Before    : {execution.current_phase}")
+
+    _require_planned_start_reached(execution)
 
     _require_phase_started(execution, "completing it")
 

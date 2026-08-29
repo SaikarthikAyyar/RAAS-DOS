@@ -8,6 +8,8 @@ import { useAuth } from "../../contexts/AuthContext";
 
 import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
 
+import { isBeforePlannedStart } from "../../utils/executionSchedule";
+
 
 // ====================================
 // EXECUTION CONTROLS
@@ -52,20 +54,15 @@ export default function ExecutionControls({
 
     const phaseStarted = currentPhaseStatus !== "PENDING";
 
-    // Every job is scheduled against a real planned_start date (set at
-    // booking, editable via Job Creation) - Phase 1's mobilisation leg
-    // can't genuinely begin before that date has arrived, no matter how
-    // early the button gets clicked. Only applies to Phase 1/while
-    // still PENDING - Phase 2/3 have no separate scheduled date of
-    // their own to jump ahead of, they only ever begin once the prior
-    // phase has actually completed. Update/Complete automatically
-    // reflect this too, since they're already gated on phaseStarted,
-    // which stays false the whole time this blocks Start.
-    const beforePlannedStart =
-        execution.current_phase === "PHASE_1" &&
-        !phaseStarted &&
-        execution.planned_start &&
-        new Date().toISOString().slice(0, 10) < execution.planned_start;
+    // A pure date check, unconditional on phaseStarted/current_phase -
+    // every job is scheduled against a real planned_start date, and
+    // nothing that records or advances execution should be usable
+    // before that date has genuinely arrived, no matter what state the
+    // execution otherwise happens to be in. Only Get Coordinates and
+    // Save Route (Phase 1's own Source & Destination card) stay
+    // available before this date, so the user can still view/prepare
+    // the map ahead of time - every action here is blocked.
+    const beforePlannedStart = isBeforePlannedStart(execution);
 
     const canStart =
 
@@ -73,20 +70,30 @@ export default function ExecutionControls({
 
     const canUpdate =
 
-        !completed && phaseStarted && hasTask("enquiry-tab-execution", "update_progress");
+        !completed && phaseStarted && !beforePlannedStart && hasTask("enquiry-tab-execution", "update_progress");
 
     const canComplete =
 
-        !completed && phaseStarted && hasTask("enquiry-tab-execution", "complete_phase");
+        !completed && phaseStarted && !beforePlannedStart && hasTask("enquiry-tab-execution", "complete_phase");
+
+    const plannedStartTitle = `This job isn't scheduled to start until ${execution.planned_start} - no updates can be recorded before then.`;
 
     let startTitle;
 
-    if(phaseStarted){
+    if(beforePlannedStart){
+        startTitle = plannedStartTitle;
+    }
+    else if(phaseStarted){
         startTitle = "This phase has already been started.";
     }
-    else if(beforePlannedStart){
-        startTitle = `This job isn't scheduled to start until ${execution.planned_start} - execution can't begin before then.`;
-    }
+
+    const updateTitle = beforePlannedStart
+        ? plannedStartTitle
+        : (!phaseStarted ? "Start Current Phase before recording any progress." : undefined);
+
+    const completeTitle = beforePlannedStart
+        ? plannedStartTitle
+        : (!phaseStarted ? "Start Current Phase before it can be completed." : undefined);
 
     return(
 
@@ -138,7 +145,7 @@ export default function ExecutionControls({
 
                     onClick={updateExecution}
 
-                    title={!phaseStarted ? "Start Current Phase before recording any progress." : undefined}
+                    title={updateTitle}
 
                 >
 
@@ -154,7 +161,7 @@ export default function ExecutionControls({
 
                     onClick={completeCurrentPhase}
 
-                    title={!phaseStarted ? "Start Current Phase before it can be completed." : undefined}
+                    title={completeTitle}
 
                 >
 

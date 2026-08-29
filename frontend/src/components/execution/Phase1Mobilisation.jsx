@@ -19,6 +19,8 @@ import { useAuth } from "../../contexts/AuthContext";
 
 import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
 
+import { isBeforePlannedStart } from "../../utils/executionSchedule";
+
 // Derived server-side from distance travelled vs. total (see
 // backend's update_execution_progress) - display labels only, the
 // underlying value is never typed by hand.
@@ -49,7 +51,14 @@ export default function Phase1Mobilisation({
     // recorded once the phase has genuinely begun.
     const phaseStarted = execution?.phase_1_status !== "PENDING";
 
-    const canUpdateProgress = phaseStarted && hasTask("enquiry-tab-execution", "update_progress");
+    // Pure date check, independent of phaseStarted - no progress can be
+    // recorded before this job's own scheduled start date, no matter
+    // what state the execution is otherwise in. Get Coordinates and
+    // Save Route are deliberately excluded from this gate (canSetRoute
+    // below) so the map/route can still be prepared ahead of time.
+    const beforePlannedStart = isBeforePlannedStart(execution);
+
+    const canUpdateProgress = phaseStarted && !beforePlannedStart && hasTask("enquiry-tab-execution", "update_progress");
     const canSetRoute = hasTask("enquiry-tab-execution", "set_execution_route");
 
     const [
@@ -678,7 +687,13 @@ export default function Phase1Mobilisation({
 
             </div>
 
-            {!phaseStarted && (
+            {beforePlannedStart && (
+                <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:8}}>
+                    This job isn't scheduled to start until {execution.planned_start} - no updates can be recorded before then.
+                </p>
+            )}
+
+            {!beforePlannedStart && !phaseStarted && (
                 <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:8}}>
                     Start Current Phase (in Execution Controls below) before recording progress here.
                 </p>
