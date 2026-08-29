@@ -13,7 +13,8 @@ import {
     getSchedulesForJob,
     bookFleetUnit,
     rescheduleFleetSchedule,
-    cancelFleetSchedule
+    cancelFleetSchedule,
+    checkGeocode
 } from "../../../services/fleetUnitsService";
 
 import { buildActor } from "../../../utils/actor";
@@ -70,6 +71,8 @@ export default function JobCreationSummary({
     const [queueDepth, setQueueDepth] = useState(null);
     const [siteLocation, setSiteLocation] = useState("");
     const [booking, setBooking] = useState(false);
+    const [siteLocationWarning, setSiteLocationWarning] = useState("");
+    const [checkingSiteLocation, setCheckingSiteLocation] = useState(false);
 
     const [rescheduleStart, setRescheduleStart] = useState("");
     const [rescheduleCompletion, setRescheduleCompletion] = useState("");
@@ -213,6 +216,38 @@ export default function JobCreationSummary({
         }
         finally{
             setSavingDates(false);
+        }
+
+    }
+
+    async function handleSiteLocationBlur(){
+
+        const text = siteLocation.trim();
+
+        if(!text){
+            setSiteLocationWarning("");
+            return;
+        }
+
+        setCheckingSiteLocation(true);
+
+        try{
+            const result = await checkGeocode(text);
+
+            setSiteLocationWarning(
+                result?.found
+                    ? ""
+                    : "Couldn't find coordinates for this location - the destination will need to be set manually on the Execution tab after booking."
+            );
+        }
+        catch(err){
+            // A failed check must never block typing/booking - just
+            // leave whatever warning (or lack of one) was already
+            // showing.
+            console.error(err);
+        }
+        finally{
+            setCheckingSiteLocation(false);
         }
 
     }
@@ -610,11 +645,25 @@ export default function JobCreationSummary({
                                                 Site location
                                                 <input
                                                     value={siteLocation}
-                                                    onChange={e=>setSiteLocation(e.target.value)}
+                                                    onChange={e=>{
+                                                        setSiteLocation(e.target.value);
+                                                        if(siteLocationWarning) setSiteLocationWarning("");
+                                                    }}
+                                                    onBlur={handleSiteLocationBlur}
                                                 />
                                             </label>
 
                                         </div>
+
+                                        {checkingSiteLocation && (
+                                            <p className="survey-empty" style={{marginTop:4}}>Checking coordinates...</p>
+                                        )}
+
+                                        {!checkingSiteLocation && siteLocationWarning && (
+                                            <p className="survey-empty" style={{marginTop:4, color:"var(--orange)"}}>
+                                                ⚠ {siteLocationWarning}
+                                            </p>
+                                        )}
 
                                         {
                                             selectedUnit && (

@@ -927,6 +927,99 @@ def set_execution_route(
     return execution
 
 
+# ====================================
+# FILL MISSING ROUTE COORDINATES
+# The two prefill points above (execution creation for source, fleet
+# booking for destination) only ever fire once, at that exact moment -
+# an execution created before either existed, or one whose first
+# geocode attempt genuinely failed (no match for the hub/site text at
+# the time), had no other way to pick up a coordinate later without
+# someone editing the DB directly. Rather than a separate manual
+# button, this same resolution logic is re-run as a third, automatic
+# occasion - right when "Start Current Phase" is clicked (see
+# start_execution_phase below) - so a stale gap quietly closes itself
+# the moment it would actually matter, with zero extra action needed
+# from the user. Only ever fills whichever of the 4 fields is still
+# blank - never overwrites a coordinate that's already set (manually
+# or otherwise), so it's always safe to call again on every phase
+# start, not just the first.
+# ====================================
+
+def _fill_missing_route_coordinates(
+
+    db,
+
+    execution
+
+):
+
+    warnings = {"source": None, "destination": None}
+
+    if execution.source_latitude is None or execution.source_longitude is None:
+
+        machine = _resolve_execution_machine(db, execution.job_creation_id)
+
+        if machine and machine.current_latitude is not None and machine.current_longitude is not None:
+
+            execution.source_latitude = machine.current_latitude
+            execution.source_longitude = machine.current_longitude
+
+        else:
+
+            survey = (
+                db.query(SalesSurvey)
+                .filter(SalesSurvey.id == execution.sales_survey_id)
+                .first()
+            )
+
+            hub_name = survey.nearest_hub if survey else None
+            hub_city = extract_hub_city(hub_name)
+
+            if hub_city:
+
+                coordinates = forward_geocode(hub_city)
+
+                if coordinates:
+                    execution.source_latitude, execution.source_longitude = coordinates
+                else:
+                    warnings["source"] = (
+                        f"Couldn't find coordinates for hub \"{hub_city}\" - "
+                        f"set the source manually below."
+                    )
+            else:
+                warnings["source"] = (
+                    "No machine position or hub on file for this job - "
+                    "set the source manually below."
+                )
+
+    if execution.destination_latitude is None or execution.destination_longitude is None:
+
+        if execution.site_location:
+
+            coordinates = forward_geocode(execution.site_location)
+
+            if coordinates:
+                execution.destination_latitude, execution.destination_longitude = coordinates
+            else:
+                warnings["destination"] = (
+                    f"Couldn't find coordinates for \"{execution.site_location}\" - "
+                    f"set the destination manually below."
+                )
+        else:
+            warnings["destination"] = (
+                "No site location on file for this job - "
+                "set the destination manually below."
+            )
+
+    if warnings["source"]:
+        print(f"[GEOCODE] {warnings['source']}")
+
+    if warnings["destination"]:
+        print(f"[GEOCODE] {warnings['destination']}")
+
+    return warnings
+
+
 def update_execution_progress(
     db,
     execution_id,
@@ -1416,6 +1509,13 @@ def start_execution_phase(
     route_machine = _resolve_execution_machine(db, execution.job_creation_id)
 
     if execution.current_phase in ("PHASE_1", "PHASE_3"):
+
+        # Third and final occasion the source/destination geocode fill
+        # gets a chance to run (after creation and after booking) -
+        # closes the gap for any execution that still has a blank
+        # coordinate right before it would actually be needed to
+        # compute a real distance below.
+        _fill_missing_route_coordinates(db, execution)
 
         distance = haversine_km(
             execution.source_latitude,

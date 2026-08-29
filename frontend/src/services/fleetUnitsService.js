@@ -230,6 +230,22 @@ export async function downloadFleetForecastXlsx(weeks=13){
 }
 
 
+// ====================================
+// GEOCODE CHECK
+// Lets a site-location field warn the moment a typed value won't
+// resolve, instead of only finding out after booking (via the
+// destination_geocode_warning on bookFleetUnit above).
+// ====================================
+
+export async function checkGeocode(text){
+
+    const response = await fetch(`${API}/geocode/check?text=${encodeURIComponent(text)}`);
+
+    return response.json();
+
+}
+
+
 export async function cancelFleetSchedule(scheduleId, actor, remark){
 
     const response = await fetch(

@@ -54,6 +54,10 @@ from backend.api.execution_api import (
     router as execution_router
 )
 
+from backend.api.geocode_api import (
+    router as geocode_router
+)
+
 from backend.api.enquiry_api import (
     router as enquiry_router
 )
@@ -341,6 +345,8 @@ app.include_router(
     execution_router
 
 )
+
+app.include_router(geocode_router)
 
 app.include_router(customer_live_order_api)
 

@@ -210,6 +210,9 @@ def set_route(
 
 # ====================================
 # START CURRENT PHASE
+# (Also re-attempts any still-missing source/destination geocode as
+# a third, automatic fill occasion - see _fill_missing_route_coordinates
+# in execution_service.py.)
 # ====================================
 
 @router.post(
