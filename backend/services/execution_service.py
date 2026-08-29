@@ -51,6 +51,8 @@ from backend.repositories.fleet_schedule_repository import dequeue_fleet_schedul
 
 from backend.utils.geo import haversine_km
 
+from backend.utils.geocode import reverse_geocode
+
 
 # ====================================
 # MACHINE RESOLUTION (Phase 38)
@@ -779,45 +781,123 @@ def update_execution_progress(
         )
 
 
-    execution.current_activity = payload.current_activity
+    # ====================================
+    # PARTIAL UPDATE
+    # This endpoint is shared by two very different callers: the full
+    # per-phase forms (Phase1Mobilisation/Phase2Execution/
+    # Phase3Demobilisation, which always send every field, even 0) and
+    # Execution Controls' generic "Update Execution" button (which only
+    # ever sends current_activity/transport_status/remarks). Every
+    # field here used to be assigned unconditionally, so the smaller
+    # payload's missing fields (defaulting to None per the schema)
+    # silently wiped GPS/output data the fuller forms had just saved.
+    # Guarding every assignment the same way distance_travelled_km
+    # already was makes this a genuine partial update - a field is
+    # only ever touched when the caller actually sent it.
+    # ====================================
 
-    execution.transport_status = payload.transport_status
+    if payload.current_activity is not None:
+        execution.current_activity = payload.current_activity
 
-    execution.latitude = payload.latitude
+    if payload.transport_status is not None:
+        execution.transport_status = payload.transport_status
 
-    execution.longitude = payload.longitude
+    if payload.latitude is not None:
+        execution.latitude = payload.latitude
 
-    execution.speed_kmph = payload.speed_kmph
+    if payload.longitude is not None:
+        execution.longitude = payload.longitude
 
-    execution.heading = payload.heading
+    if payload.speed_kmph is not None:
+        execution.speed_kmph = payload.speed_kmph
 
-    execution.altitude = payload.altitude
+    if payload.heading is not None:
+        execution.heading = payload.heading
 
-    execution.accuracy_meters = payload.accuracy_meters
+    if payload.altitude is not None:
+        execution.altitude = payload.altitude
 
-    execution.gps_timestamp = payload.gps_timestamp
+    if payload.accuracy_meters is not None:
+        execution.accuracy_meters = payload.accuracy_meters
 
-    execution.last_update_source = "OPS"
+    if payload.gps_timestamp is not None:
+        execution.gps_timestamp = payload.gps_timestamp
 
+    if payload.latitude is not None or payload.longitude is not None:
+        execution.last_update_source = "OPS"
 
     if payload.distance_travelled_km is not None:
         execution.distance_travelled_km = payload.distance_travelled_km
 
-    execution.eta_minutes = payload.eta_minutes
+    if payload.eta_minutes is not None:
+        execution.eta_minutes = payload.eta_minutes
 
-    execution.today_output = payload.today_output
+    if payload.today_output is not None:
+        execution.today_output = payload.today_output
 
-    execution.total_output = payload.total_output
+    if payload.total_output is not None:
+        execution.total_output = payload.total_output
 
-    execution.daily_target = payload.daily_target
+    if payload.daily_target is not None:
+        execution.daily_target = payload.daily_target
 
-    execution.output_unit = payload.output_unit
+    if payload.output_unit is not None:
+        execution.output_unit = payload.output_unit
 
-    execution.proof_uploaded = payload.proof_uploaded
+    if payload.proof_uploaded is not None:
+        execution.proof_uploaded = payload.proof_uploaded
 
-    execution.remarks = payload.remarks
+    if payload.remarks is not None:
+        execution.remarks = payload.remarks
 
     execution.last_updated = datetime.utcnow()
+
+    # ====================================
+    # LIVE MACHINE POSITION SYNC
+    # Phase 1/3's "Last Known Position" fields only ever reached the
+    # execution row itself - MachineInventory (and therefore Fleet
+    # Units' "Current Location" column, resolved live from it) only
+    # got updated at phase transitions (arrival, return), so a machine
+    # correctly reported as "at Kanpur" mid-transit still showed its
+    # stale pre-departure site name everywhere outside this one form.
+    # Every save while genuinely in transit now pushes the same
+    # position through, closing that gap without waiting for the next
+    # phase boundary. The site text itself is reverse-geocoded to a
+    # real place name (best-effort, falls back to raw coordinates if
+    # the lookup fails) rather than showing bare numbers.
+    # ====================================
+
+    if (
+        execution.current_phase in ("PHASE_1", "PHASE_3")
+        and execution.latitude is not None
+        and execution.longitude is not None
+    ):
+
+        transit_machine = _resolve_execution_machine(
+            db, execution.job_creation_id
+        )
+
+        if transit_machine:
+
+            transit_machine.current_latitude = execution.latitude
+            transit_machine.current_longitude = execution.longitude
+
+            direction = (
+                "to" if execution.current_phase == "PHASE_1" else "from"
+            )
+
+            place_name = reverse_geocode(execution.latitude, execution.longitude)
+
+            location_text = (
+                place_name
+                if place_name
+                else f"{execution.latitude}, {execution.longitude}"
+            )
+
+            transit_machine.current_site = (
+                f"In transit {direction} {execution.site_location} "
+                f"- near {location_text}"
+            )
 
     # ====================================
     # AUTO PROGRESS CALCULATION
