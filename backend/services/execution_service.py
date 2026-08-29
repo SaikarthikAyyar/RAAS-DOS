@@ -171,6 +171,35 @@ def _require_phase_started(execution, action_label):
 
 
 # ====================================
+# PLANNED START DATE GATE
+# Every job is scheduled against a real planned_start date (set at
+# booking, editable via Job Creation's "Save planned dates") - Phase 1
+# is the machine's actual mobilisation leg, so it must not be startable
+# before that date has genuinely arrived, no matter how early someone
+# clicks the button. Phase 2/3 have no equivalent gate - they only ever
+# begin once Phase 1 has genuinely completed, which is itself already a
+# real event, not a scheduled date to jump ahead of.
+# ====================================
+
+def _require_planned_start_reached(execution):
+
+    if (
+        execution.current_phase == "PHASE_1"
+        and execution.phase_1_status == "PENDING"
+        and execution.planned_start
+        and datetime.utcnow().date() < execution.planned_start
+    ):
+
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"This job isn't scheduled to start until {execution.planned_start} - "
+                f"execution can't begin before then."
+            )
+        )
+
+
+# ====================================
 # PHASE COMPLETION TARGET VALIDATION
 # "Complete Current Phase" must not be allowed to mark a phase done
 # before its real, measurable target has actually been met - otherwise
@@ -1558,6 +1587,8 @@ def start_execution_phase(
             detail="Execution not found."
 
         )
+
+    _require_planned_start_reached(execution)
 
     execution = start_phase(
 

@@ -52,9 +52,24 @@ export default function ExecutionControls({
 
     const phaseStarted = currentPhaseStatus !== "PENDING";
 
+    // Every job is scheduled against a real planned_start date (set at
+    // booking, editable via Job Creation) - Phase 1's mobilisation leg
+    // can't genuinely begin before that date has arrived, no matter how
+    // early the button gets clicked. Only applies to Phase 1/while
+    // still PENDING - Phase 2/3 have no separate scheduled date of
+    // their own to jump ahead of, they only ever begin once the prior
+    // phase has actually completed. Update/Complete automatically
+    // reflect this too, since they're already gated on phaseStarted,
+    // which stays false the whole time this blocks Start.
+    const beforePlannedStart =
+        execution.current_phase === "PHASE_1" &&
+        !phaseStarted &&
+        execution.planned_start &&
+        new Date().toISOString().slice(0, 10) < execution.planned_start;
+
     const canStart =
 
-        !completed && !phaseStarted && hasTask("enquiry-tab-execution", "start_phase");
+        !completed && !phaseStarted && !beforePlannedStart && hasTask("enquiry-tab-execution", "start_phase");
 
     const canUpdate =
 
@@ -63,6 +78,15 @@ export default function ExecutionControls({
     const canComplete =
 
         !completed && phaseStarted && hasTask("enquiry-tab-execution", "complete_phase");
+
+    let startTitle;
+
+    if(phaseStarted){
+        startTitle = "This phase has already been started.";
+    }
+    else if(beforePlannedStart){
+        startTitle = `This job isn't scheduled to start until ${execution.planned_start} - execution can't begin before then.`;
+    }
 
     return(
 
@@ -98,7 +122,7 @@ export default function ExecutionControls({
 
                     onClick={startCurrentPhase}
 
-                    title={phaseStarted ? "This phase has already been started." : undefined}
+                    title={startTitle}
 
                 >
 
