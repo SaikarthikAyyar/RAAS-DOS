@@ -39,16 +39,32 @@ def get_kpi_summary(db):
 
     invoices = db.query(Invoice).all()
 
-    # Same real precedence as the Revenue tab's own per-job figure
-    # (_invoice_value_for_job below) - not just the frozen invoice_value
-    # snapshot, which stays blank for any job whose PO didn't exist yet
-    # at the moment its Invoice was created.
-    value_cache = {}
+    # Deduped by the real PurchaseOrder id, not summed once per job -
+    # see _resolve_po_for_expected's own docstring for why. Without
+    # this, two jobs/invoices resolving to the SAME real PO (a PO
+    # covering more than one job, or two Invoice rows both tracing
+    # back to one enquiry - a real, already-documented duplicate-
+    # enquiry artifact in this app) would each independently
+    # contribute that PO's FULL value, silently multiplying the real
+    # PO figure - this is what let Expected Invoice Revenue exceed
+    # Total PO Revenue even after the Collected-status double-count
+    # was fixed. This dedup makes Expected <= Total PO Revenue a real,
+    # structural guarantee rather than a coincidence of clean data.
+    po_cache = {}
+    job_cache = {}
+    seen_po_ids = set()
+    expected_invoice_revenue = 0.0
 
-    expected_invoice_revenue = sum(
-        _invoice_value_for_job(db, inv.job_creation_id, value_cache, include_collected=False)
-        for inv in invoices
-    )
+    for inv in invoices:
+
+        po_id, value = _resolve_po_for_expected(db, inv.job_creation_id, po_cache, job_cache)
+
+        if po_id is not None:
+            if po_id in seen_po_ids:
+                continue
+            seen_po_ids.add(po_id)
+
+        expected_invoice_revenue += value
 
     collected_invoice_revenue = sum(
         float(inv.amount_collected)
@@ -207,6 +223,56 @@ def _build_buckets(start, end, granularity):
 # showing a completed job's real historical value there, since that's
 # a factual record of what the job was worth, not a forward-looking
 # figure that must stay disjoint from "already collected".
+# KPI-level "Expected" dedup helper. Returns (po_id, value) instead of
+# a bare value so the KPI summary can dedupe on the real PurchaseOrder
+# identity before summing - see the caller's own comment for why this
+# matters. po_id is None in two cases: the job is Collected (value is
+# always 0.0 then, nothing to dedupe), or the value came from a bare
+# invoice_value snapshot with no resolvable PO at all - that figure
+# has no PO identity to key on, so it's kept as an independent,
+# ungrouped contribution, matching this function's pre-dedup behavior
+# for that one rare/legacy edge case.
+def _resolve_po_for_expected(db, job_creation_id, po_cache, job_cache):
+
+    invoice = (
+        db.query(Invoice)
+        .filter(Invoice.job_creation_id == job_creation_id)
+        .first()
+    )
+
+    if invoice is None or invoice.collection_status == "Collected":
+        return None, 0.0
+
+    if job_creation_id in job_cache:
+        job = job_cache[job_creation_id]
+    else:
+        job = db.query(JobCreation).filter(JobCreation.id == job_creation_id).first()
+        job_cache[job_creation_id] = job
+
+    po = None
+
+    if invoice.purchase_order_id is not None:
+
+        cache_key = invoice.purchase_order_id
+
+        if cache_key in po_cache:
+            po = po_cache[cache_key]
+        else:
+            po = db.query(PurchaseOrder).filter(PurchaseOrder.id == cache_key).first()
+            po_cache[cache_key] = po
+
+    if po is None and job is not None:
+        po = _resolve_purchase_order_for_job(db, job)
+
+    if po is not None and po.po_value is not None:
+        return po.id, float(po.po_value)
+
+    if invoice.invoice_value is not None:
+        return None, float(invoice.invoice_value)
+
+    return None, 0.0
+
+
 def _invoice_value_for_job(db, job_creation_id, cache, include_collected=True):
 
     cache_key = (job_creation_id, include_collected)
