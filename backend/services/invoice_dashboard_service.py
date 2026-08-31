@@ -17,6 +17,9 @@ from backend.models.hub import Hub
 
 from backend.utils.geocode import forward_geocode
 
+from backend.services.invoice_service import _resolve_purchase_order_for_job
+from backend.repositories.techno_commercial_quote_repository import get_quote_by_ops_selection
+
 
 # ====================================
 # KPI SUMMARY
@@ -36,10 +39,15 @@ def get_kpi_summary(db):
 
     invoices = db.query(Invoice).all()
 
+    # Same real precedence as the Revenue tab's own per-job figure
+    # (_invoice_value_for_job below) - not just the frozen invoice_value
+    # snapshot, which stays blank for any job whose PO didn't exist yet
+    # at the moment its Invoice was created.
+    value_cache = {}
+
     expected_invoice_revenue = sum(
-        float(inv.invoice_value)
+        _invoice_value_for_job(db, inv.job_creation_id, value_cache)
         for inv in invoices
-        if inv.invoice_value is not None
     )
 
     collected_invoice_revenue = sum(
@@ -174,6 +182,17 @@ def _build_buckets(start, end, granularity):
 # per (machine, period) combination, nothing pre-computed/cached.
 # ====================================
 
+# A real, honest revenue precedence for a job - not just the frozen
+# invoice_value snapshot, which only ever gets set from whatever PO
+# existed at the exact moment Invoice was created (usually before any
+# PO exists at all, since Job Creation happens before PO upload in the
+# real workflow). Falls through, in order: the stored snapshot; the
+# invoice's linked PO; a PO that exists now but wasn't linked yet
+# (re-resolved live, same chain create_invoice_request itself uses);
+# the job's own finalized Quote value. Matches the exact precedence
+# already established for the Enquiries list's own "Value" column
+# (value_display.py) - a real, actively-allocated job with no PO yet
+# must still show its real expected value, not a silent zero.
 def _invoice_value_for_job(db, job_creation_id, cache):
 
     if job_creation_id in cache:
@@ -185,11 +204,39 @@ def _invoice_value_for_job(db, job_creation_id, cache):
         .first()
     )
 
-    value = (
-        float(invoice.invoice_value)
-        if invoice is not None and invoice.invoice_value is not None
-        else 0.0
-    )
+    value = 0.0
+
+    if invoice is not None and invoice.invoice_value is not None:
+
+        value = float(invoice.invoice_value)
+
+    else:
+
+        job = db.query(JobCreation).filter(JobCreation.id == job_creation_id).first()
+
+        po = None
+
+        if invoice is not None and invoice.purchase_order_id is not None:
+            po = db.query(PurchaseOrder).filter(PurchaseOrder.id == invoice.purchase_order_id).first()
+
+        if po is None and job is not None:
+            po = _resolve_purchase_order_for_job(db, job)
+
+        if po is not None and po.po_value is not None:
+
+            value = float(po.po_value)
+
+        elif job is not None and job.ops_selection_id is not None:
+
+            quote = get_quote_by_ops_selection(db, job.ops_selection_id)
+
+            if quote is not None:
+
+                if quote.final_approved_value is not None:
+                    value = float(quote.final_approved_value)
+
+                elif quote.combined_budgetary_value_min is not None and quote.combined_budgetary_value_max is not None:
+                    value = (float(quote.combined_budgetary_value_min) + float(quote.combined_budgetary_value_max)) / 2
 
     cache[job_creation_id] = value
 
