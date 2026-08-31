@@ -1,256 +1,119 @@
+// ====================================
+// CUSTOMER PORTAL - LIVE ORDER (READ ONLY)
+// The Execution tab in read-only form, nothing more. Every field here
+// is presented, never editable - no inputs, no Save/Start/Complete
+// actions, no mutation calls anywhere on this page. Driven by the same
+// real GET /execution endpoints the internal Execution page already
+// uses, not the old, disconnected customer_live_order_service (which
+// crashed on mount and read from a stale Invoice-keyed shape).
+// ====================================
+
 import { useEffect, useState } from "react";
 
-import ExecutionSummary
-from "../components/execution/ExecutionSummary";
+import "../components/execution/Execution.css";
 
-import Phase1Mobilisation
-from "../components/execution/Phase1Mobilisation";
+import { listExecutions, getExecution } from "../services/executionService";
 
-import Phase2Execution
-from "../components/execution/Phase2Execution";
-
-import Phase3Demobilisation
-from "../components/execution/Phase3Demobilisation";
-
-import {
-
-    getCustomerLiveOrder,
-
-    getCustomerExecutionIds
-
-}
-
-from "../services/customerLiveOrderService";
+import ExecutionSummary from "../components/execution/ExecutionSummary";
+import ExecutionTravelReadOnly from "../components/execution/ExecutionTravelReadOnly";
+import ExecutionOutputReadOnly from "../components/execution/ExecutionOutputReadOnly";
 
 
 export default function CustomerLiveOrder(){
 
-    const [
-
-        customerRequestId,
-
-        setCustomerRequestId
-
-    ] = useState("");
-
-    const [
-
-        invoice,
-
-        setInvoice
-
-    ] = useState(null);
-
-    const [
-
-        customerIds,
-
-        setCustomerIds
-
-    ] = useState([]);
+    const [executions, setExecutions] = useState([]);
+    const [selectedExecutionId, setSelectedExecutionId] = useState("");
+    const [execution, setExecution] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(()=>{
 
-        loadCustomerIds();
+        listExecutions()
+            .then(data=>setExecutions(data || []))
+            .catch(error=>console.error(error));
 
-    },[]);
+    }, []);
 
+    useEffect(()=>{
 
-
-    async function loadExecution(){
-
-        if(!customerRequestId){
-
+        if(!selectedExecutionId){
+            setExecution(null);
             return;
-
         }
 
-        try{
+        setLoading(true);
 
-            const response = await getCustomerLiveOrder(
+        getExecution(selectedExecutionId)
+            .then(data=>setExecution(data))
+            .catch(error=>console.error(error))
+            .finally(()=>setLoading(false));
 
-                customerRequestId
-
-            );
-
-            setInvoice(response);
-
-        }
-
-        catch(error){
-
-            console.error(error);
-
-        }
-
-    }
-
-    
-
-
-    if(
-
-        !invoice ||
-
-        !invoice.execution
-
-    ){
-
-        return(
-
-            <div className="customer-live-order-page">
-
-                <h1>
-
-                    Customer Live Order
-
-                </h1>
-
-                <div
-                    style={{
-                        display:"flex",
-                        gap:"12px",
-                        marginBottom:"20px"
-                    }}
-                >
-
-                    <input
-
-                        type="number"
-
-                        placeholder="Customer Request ID"
-
-                        value={customerRequestId}
-
-                        onChange={e=>
-
-                            setCustomerRequestId(
-
-                                e.target.value
-
-                            )
-
-                        }
-
-                    />
-
-                    <button
-
-                        onClick={loadExecution}
-
-                    >
-
-                        Load Execution
-
-                    </button>
-
-                </div>
-
-                <p>
-
-                    No active execution found.
-
-                </p>
-
-            </div>
-
-        );
-
-    }
-
-
-
-
-    const execution =
-
-        invoice.execution;
-
+    }, [selectedExecutionId]);
 
     return(
 
-        <div className="customer-live-order-page">
+        <div className="execution-page">
 
-            <h1>
-
-                Customer Live Order
-
+            <h1 className="execution-title">
+                Customer Portal - Job Progress
             </h1>
 
-            <div className="dashboard-section">
+            <p style={{color:"var(--muted)", marginTop:-8, marginBottom:16, fontSize:13}}>
+                A read-only view of your job's execution progress - nothing on this page can be edited.
+            </p>
 
-                <ExecutionSummary
+            <select
+                className="execution-selector"
+                value={selectedExecutionId}
+                onChange={e=>setSelectedExecutionId(e.target.value)}
+            >
 
-                    execution={execution}
+                <option value="">Select Job</option>
 
-                />
+                {executions.map(item=>(
+                    <option key={item.id} value={item.id}>
+                        Job {item.job_creation_id} - Execution {item.id}
+                    </option>
+                ))}
 
-            </div>
+            </select>
 
-            {
+            <br/>
+            <br/>
 
-                execution.current_phase === "PHASE_1" && (
+            {loading && <p className="execution-map-empty">Loading...</p>}
 
-                    <div className="dashboard-section">
+            {!loading && selectedExecutionId && !execution && (
+                <p className="execution-map-empty">No execution found for this job.</p>
+            )}
 
-                        <Phase1Mobilisation
+            {execution && (
 
+                <>
+
+                    <ExecutionSummary execution={execution}/>
+
+                    {execution.current_phase === "PHASE_1" && (
+                        <ExecutionTravelReadOnly
                             execution={execution}
-
-                            refreshExecution={()=>{}}
-
-                            readOnly={true}
-
+                            title="Phase 1 - Mobilisation"
                         />
+                    )}
 
-                    </div>
+                    {execution.current_phase === "PHASE_2" && (
+                        <ExecutionOutputReadOnly execution={execution}/>
+                    )}
 
-                )
-
-            }
-
-            {
-
-                execution.current_phase === "PHASE_2" && (
-
-                    <div className="dashboard-section">
-
-                        <Phase2Execution
-
+                    {execution.current_phase === "PHASE_3" && (
+                        <ExecutionTravelReadOnly
                             execution={execution}
-
-                            refreshExecution={()=>{}}
-
-                            readOnly={true}
-
+                            title="Phase 3 - Demobilisation"
                         />
+                    )}
 
-                    </div>
+                </>
 
-                )
-
-            }
-
-            {
-
-                execution.current_phase === "PHASE_3" && (
-
-                    <div className="dashboard-section">
-
-                        <Phase3Demobilisation
-
-                            execution={execution}
-
-                            refreshExecution={()=>{}}
-
-                            readOnly={true}
-
-                        />
-
-                    </div>
-
-                )
-
-            }
+            )}
 
         </div>
 
