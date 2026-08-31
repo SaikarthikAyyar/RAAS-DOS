@@ -46,7 +46,7 @@ def get_kpi_summary(db):
     value_cache = {}
 
     expected_invoice_revenue = sum(
-        _invoice_value_for_job(db, inv.job_creation_id, value_cache)
+        _invoice_value_for_job(db, inv.job_creation_id, value_cache, include_collected=False)
         for inv in invoices
     )
 
@@ -182,21 +182,37 @@ def _build_buckets(start, end, granularity):
 # per (machine, period) combination, nothing pre-computed/cached.
 # ====================================
 
-# A real, honest revenue precedence for a job - not just the frozen
-# invoice_value snapshot, which only ever gets set from whatever PO
-# existed at the exact moment Invoice was created (usually before any
-# PO exists at all, since Job Creation happens before PO upload in the
-# real workflow). Falls through, in order: the stored snapshot; the
-# invoice's linked PO; a PO that exists now but wasn't linked yet
-# (re-resolved live, same chain create_invoice_request itself uses);
-# the job's own finalized Quote value. Matches the exact precedence
-# already established for the Enquiries list's own "Value" column
-# (value_display.py) - a real, actively-allocated job with no PO yet
-# must still show its real expected value, not a silent zero.
-def _invoice_value_for_job(db, job_creation_id, cache):
+# Strictly PO-backed - the stored invoice_value snapshot, its linked
+# PO, or a PO that exists now but wasn't linked yet (re-resolved live,
+# same chain create_invoice_request itself uses). Deliberately never
+# falls back to a Quote estimate - this is what "Expected Invoice
+# Revenue" is built from, shown right next to "Total PO Revenue" on
+# the same KPI card, so it must never exceed the real PO pool it's
+# drawn from. A job with no real PO at all correctly contributes 0
+# here - see _job_value_detail below for a version that also surfaces
+# a pre-PO quote estimate, clearly labeled as such, for the Deployment
+# tab's per-job display (where showing nothing at all was the actual
+# complaint - the KPI/forecast total must still stay PO-backed only).
+#
+# include_collected=False (the KPI/Revenue-tab "Expected" callers)
+# excludes any job whose invoice has already reached
+# collection_status == "Collected" - once a job is genuinely done and
+# its value has moved into Collected Invoice Revenue, it is no longer
+# "expected" (direct correction: the same job's value was being
+# counted in BOTH totals at once, which is exactly why Expected could
+# read higher than Total PO Revenue - a job that's Collected is a
+# strict subset of PO-backed jobs, so double-counting it was the only
+# way Expected could ever exceed the PO pool). include_collected=True
+# (the default, used by Deployment's own _job_value_detail) keeps
+# showing a completed job's real historical value there, since that's
+# a factual record of what the job was worth, not a forward-looking
+# figure that must stay disjoint from "already collected".
+def _invoice_value_for_job(db, job_creation_id, cache, include_collected=True):
 
-    if job_creation_id in cache:
-        return cache[job_creation_id]
+    cache_key = (job_creation_id, include_collected)
+
+    if cache_key in cache:
+        return cache[cache_key]
 
     invoice = (
         db.query(Invoice)
@@ -206,7 +222,11 @@ def _invoice_value_for_job(db, job_creation_id, cache):
 
     value = 0.0
 
-    if invoice is not None and invoice.invoice_value is not None:
+    if not include_collected and invoice is not None and invoice.collection_status == "Collected":
+
+        value = 0.0
+
+    elif invoice is not None and invoice.invoice_value is not None:
 
         value = float(invoice.invoice_value)
 
@@ -223,24 +243,48 @@ def _invoice_value_for_job(db, job_creation_id, cache):
             po = _resolve_purchase_order_for_job(db, job)
 
         if po is not None and po.po_value is not None:
-
             value = float(po.po_value)
 
-        elif job is not None and job.ops_selection_id is not None:
-
-            quote = get_quote_by_ops_selection(db, job.ops_selection_id)
-
-            if quote is not None:
-
-                if quote.final_approved_value is not None:
-                    value = float(quote.final_approved_value)
-
-                elif quote.combined_budgetary_value_min is not None and quote.combined_budgetary_value_max is not None:
-                    value = (float(quote.combined_budgetary_value_min) + float(quote.combined_budgetary_value_max)) / 2
-
-    cache[job_creation_id] = value
+    cache[cache_key] = value
 
     return value
+
+
+# ====================================
+# JOB VALUE DETAIL (Deployment tab only)
+# Prefers the real PO-backed figure above; only when that's genuinely
+# 0 (no PO on file at all) falls back to the job's own finalized Quote
+# value, explicitly labeled "quote_estimate" rather than folded
+# silently into a real committed figure - so a job the user is looking
+# at in Deployment always shows something meaningful, without ever
+# contaminating the strictly-PO-backed revenue totals above.
+# ====================================
+
+def _job_value_detail(db, job_creation_id):
+
+    po_value = _invoice_value_for_job(db, job_creation_id, {})
+
+    if po_value > 0:
+        return {"value": po_value, "source": "po"}
+
+    job = db.query(JobCreation).filter(JobCreation.id == job_creation_id).first()
+
+    if job is not None and job.ops_selection_id is not None:
+
+        quote = get_quote_by_ops_selection(db, job.ops_selection_id)
+
+        if quote is not None:
+
+            if quote.final_approved_value is not None:
+                return {"value": float(quote.final_approved_value), "source": "quote_estimate"}
+
+            if quote.combined_budgetary_value_min is not None and quote.combined_budgetary_value_max is not None:
+                return {
+                    "value": (float(quote.combined_budgetary_value_min) + float(quote.combined_budgetary_value_max)) / 2,
+                    "source": "quote_estimate"
+                }
+
+    return {"value": 0.0, "source": "none"}
 
 
 def _bookings_for_machine(db, machine_inventory_id):
@@ -287,7 +331,7 @@ def get_revenue_forecast(db, machine_inventory_id, start, end):
 
         for booking in bookings:
             if booking.planned_start <= bucket["end"] and booking.planned_completion >= bucket["start"]:
-                total += _invoice_value_for_job(db, booking.job_creation_id, value_cache)
+                total += _invoice_value_for_job(db, booking.job_creation_id, value_cache, include_collected=False)
 
         series.append({"label": bucket["label"], "value": round(total, 2)})
 
@@ -308,7 +352,7 @@ def get_revenue_forecast(db, machine_inventory_id, start, end):
 
         for booking in machine_bookings:
             if booking.planned_start <= end and booking.planned_completion >= start:
-                total += _invoice_value_for_job(db, booking.job_creation_id, value_cache)
+                total += _invoice_value_for_job(db, booking.job_creation_id, value_cache, include_collected=False)
 
         comparison.append({
             "machine_id": machine.id,
@@ -374,6 +418,31 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
 
     real_segments = [s for s in all_segments if _segment_overlaps_range(s)]
 
+    # Resolves a segment's own job value once per execution_id, not
+    # once per segment - a job's 3 phases share the same execution, so
+    # this avoids re-querying the same Invoice/PO/Quote chain 3 times.
+    job_value_cache_by_execution = {}
+
+    def _value_for_segment(segment):
+
+        if segment.execution_id is None:
+            return {"value": 0.0, "source": "none"}
+
+        if segment.execution_id not in job_value_cache_by_execution:
+
+            segment_execution = (
+                db.query(Execution)
+                .filter(Execution.id == segment.execution_id)
+                .first()
+            )
+
+            job_value_cache_by_execution[segment.execution_id] = (
+                _job_value_detail(db, segment_execution.job_creation_id)
+                if segment_execution else {"value": 0.0, "source": "none"}
+            )
+
+        return job_value_cache_by_execution[segment.execution_id]
+
     actual = [
         {
             "segment_type": s.segment_type,
@@ -384,7 +453,8 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
             "place_name": s.place_name,
             "purpose_label": s.purpose_label,
             "started_at": s.started_at,
-            "ended_at": s.ended_at
+            "ended_at": s.ended_at,
+            **_value_for_segment(s)
         }
         for s in real_segments
     ]
@@ -448,7 +518,8 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
                 "place_name": booking.site_location,
                 "purpose_label": purpose,
                 "started_at": booking.planned_start,
-                "ended_at": booking.planned_completion
+                "ended_at": booking.planned_completion,
+                **_job_value_detail(db, booking.job_creation_id)
             })
 
     machine = db.query(MachineInventory).filter(MachineInventory.id == machine_inventory_id).first()
@@ -473,9 +544,21 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
     # or purely future range shouldn't show a "here's where it is at
     # this instant" pin that has nothing to do with the period being
     # looked at.
+    #
+    # Shows whenever there's EITHER a real position to plot OR a real
+    # job to report on - not the AND of both. A machine can be
+    # genuinely idle with only a last-known position (no job, still
+    # worth a pin), or have a genuine current job with no GPS position
+    # ever recorded (no pin possible, but its job value/dates are
+    # still real and worth showing). latitude/longitude stay null in
+    # the response when unavailable - the frontend only plots a map
+    # pin when they're present, but still renders the job info either
+    # way.
     today_in_range = start <= date.today() <= end
+    has_position = machine and machine.current_latitude is not None and machine.current_longitude is not None
+    has_current_job = open_segment or (machine and machine.current_job_id)
 
-    if today_in_range and machine and machine.current_latitude is not None and machine.current_longitude is not None:
+    if today_in_range and machine and (has_position or has_current_job):
 
         if open_segment:
 
@@ -486,6 +569,7 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
             # actually means here.
             job_start = None
             job_end = None
+            job_value = _value_for_segment(open_segment)
 
             if open_segment.execution_id:
 
@@ -506,7 +590,8 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
                 "purpose_label": open_segment.purpose_label,
                 "started_at": open_segment.started_at,
                 "job_start": job_start,
-                "job_end": job_end
+                "job_end": job_end,
+                **job_value
             }
 
         else:
@@ -514,6 +599,7 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
             job_purpose = None
             job_start = None
             job_end = None
+            job_value = {"value": 0.0, "source": "none"}
 
             if machine.current_job_id:
 
@@ -534,6 +620,8 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
                     job_start = job_row.planned_start
                     job_end = job_row.planned_completion
 
+                job_value = _job_value_detail(db, machine.current_job_id)
+
             current_position = {
                 "latitude": machine.current_latitude,
                 "longitude": machine.current_longitude,
@@ -541,7 +629,8 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
                 "purpose_label": job_purpose or machine.current_site or "No current job on record",
                 "started_at": None,
                 "job_start": job_start,
-                "job_end": job_end
+                "job_end": job_end,
+                **job_value
             }
 
     return {

@@ -91,6 +91,23 @@ function formatDuration(startedAt, endedAt){
 }
 
 
+function inr(value){
+    if(value===null || value===undefined) return "-";
+    return "Rs " + Math.round(value).toLocaleString("en-IN");
+}
+
+
+// Distinguishes a real, PO-backed figure from a pre-PO quote estimate
+// - never conflated (Expected Invoice Revenue on the KPI card is
+// strictly PO-backed; this label is what makes the difference visible
+// wherever a job's value shows up instead).
+function jobValueLabel(entry){
+    if(!entry || entry.source === "none" || !entry.value) return "No PO or quote value on record";
+    if(entry.source === "po") return `${inr(entry.value)} (PO-backed)`;
+    return `${inr(entry.value)} (quote estimate - no PO yet)`;
+}
+
+
 function formatDateOnly(value){
     if(!value) return "-";
     return String(value).slice(0, 10);
@@ -152,13 +169,15 @@ export default function DeploymentTab(){
     const actualWithCoords = (timeline?.actual || []).filter(s=>s.start_latitude!=null || s.end_latitude!=null);
     const plannedWithCoords = (timeline?.planned || []).filter(s=>s.latitude!=null);
 
+    const currentPositionHasCoords = timeline?.current_position?.latitude!=null && timeline?.current_position?.longitude!=null;
+
     const points = [
         ...actualWithCoords.flatMap(s=>[
             s.start_latitude!=null ? [s.start_latitude, s.start_longitude] : null,
             s.end_latitude!=null ? [s.end_latitude, s.end_longitude] : null
         ]),
         ...plannedWithCoords.map(s=>[s.latitude, s.longitude]),
-        timeline?.current_position ? [timeline.current_position.latitude, timeline.current_position.longitude] : null
+        currentPositionHasCoords ? [timeline.current_position.latitude, timeline.current_position.longitude] : null
     ].filter(Boolean);
 
     return(
@@ -271,7 +290,8 @@ export default function DeploymentTab(){
                                                                     <b>{s.place_name || "Unknown location"}</b><br/>
                                                                     {SEGMENT_LABELS[s.segment_type]}<br/>
                                                                     Duration: {formatDuration(s.started_at, s.ended_at)}<br/>
-                                                                    Purpose: {s.purpose_label || "-"}
+                                                                    Purpose: {s.purpose_label || "-"}<br/>
+                                                                    Job value: {jobValueLabel(s)}
                                                                 </div>
                                                             </Tooltip>
                                                         </Marker>
@@ -287,13 +307,14 @@ export default function DeploymentTab(){
                                                     <div>
                                                         <b>{s.place_name}</b> (Planned)<br/>
                                                         {formatDateOnly(s.started_at)} to {formatDateOnly(s.ended_at)}<br/>
-                                                        Purpose: {s.purpose_label || "-"}
+                                                        Purpose: {s.purpose_label || "-"}<br/>
+                                                        Job value: {jobValueLabel(s)}
                                                     </div>
                                                 </Tooltip>
                                             </Marker>
                                         ))}
 
-                                        {timeline.current_position && (
+                                        {timeline.current_position && currentPositionHasCoords && (
                                             <Marker
                                                 position={[timeline.current_position.latitude, timeline.current_position.longitude]}
                                                 icon={LIVE_ICON}
@@ -310,7 +331,8 @@ export default function DeploymentTab(){
                                                         Job: {(timeline.current_position.job_start || timeline.current_position.job_end)
                                                             ? `${formatDateOnly(timeline.current_position.job_start)} to ${formatDateOnly(timeline.current_position.job_end)}`
                                                             : "No current job on record"
-                                                        }
+                                                        }<br/>
+                                                        Job value: {jobValueLabel(timeline.current_position)}
                                                     </div>
                                                 </Tooltip>
                                             </Marker>
@@ -333,6 +355,7 @@ export default function DeploymentTab(){
                                         <th>Place</th>
                                         <th>Duration</th>
                                         <th>Purpose</th>
+                                        <th>Job Value</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -342,6 +365,7 @@ export default function DeploymentTab(){
                                             <td>{s.place_name || "-"}</td>
                                             <td>{formatDuration(s.started_at, s.ended_at)}</td>
                                             <td>{s.purpose_label || "-"}</td>
+                                            <td>{jobValueLabel(s)}</td>
                                         </tr>
                                     ))}
                                     {(timeline.planned || []).map((s, i)=>(
@@ -350,12 +374,13 @@ export default function DeploymentTab(){
                                             <td>{s.place_name || "-"}</td>
                                             <td>{formatDateOnly(s.started_at)} to {formatDateOnly(s.ended_at)}</td>
                                             <td>{s.purpose_label || "-"}</td>
+                                            <td>{jobValueLabel(s)}</td>
                                         </tr>
                                     ))}
                                     {timeline.current_position && (
                                         <tr style={{background:"#fef2f2"}}>
                                             <td>Current position ({SEGMENT_LABELS[timeline.current_position.segment_type] || timeline.current_position.segment_type})</td>
-                                            <td>{timeline.current_position.latitude.toFixed(4)}, {timeline.current_position.longitude.toFixed(4)}</td>
+                                            <td>{currentPositionHasCoords ? `${timeline.current_position.latitude.toFixed(4)}, ${timeline.current_position.longitude.toFixed(4)}` : "No position on record"}</td>
                                             <td>{timeline.current_position.started_at ? formatDuration(timeline.current_position.started_at, null) : "-"}</td>
                                             <td>
                                                 {timeline.current_position.purpose_label || "-"}
@@ -367,10 +392,11 @@ export default function DeploymentTab(){
                                                     }
                                                 </span>
                                             </td>
+                                            <td>{jobValueLabel(timeline.current_position)}</td>
                                         </tr>
                                     )}
                                     {(!timeline.actual || timeline.actual.length===0) && (!timeline.planned || timeline.planned.length===0) && !timeline.current_position && (
-                                        <tr><td colSpan={4} className="bm-muted">No deployment history yet for this machine.</td></tr>
+                                        <tr><td colSpan={5} className="bm-muted">No deployment history yet for this machine.</td></tr>
                                     )}
                                 </tbody>
                             </table>
