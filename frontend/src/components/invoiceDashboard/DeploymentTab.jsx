@@ -258,8 +258,7 @@ export default function DeploymentTab(){
                             </p>
 
                             {points.length > 0 ? (
-
-                                <div style={{height:420, borderRadius:8, overflow:"hidden", border:"1px solid #eee", marginBottom:14}}>
+                                <div style={{height:420, borderRadius:8, overflow:"hidden", border:"1px solid #eee", marginBottom:14, isolation:"isolate"}}>
 
                                     <MapContainer center={points[0]} zoom={10} scrollWheelZoom style={{height:"100%", width:"100%"}}>
 
