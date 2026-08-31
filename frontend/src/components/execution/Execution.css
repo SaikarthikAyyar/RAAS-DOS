@@ -344,6 +344,16 @@
 
     margin-top:14px;
 
+    /* Leaflet's own zoom controls default to z-index:1000, which with
+       no stacking context of its own here escapes straight past the
+       sidebar drawer's z-index:100 (.app-sidebar) and paints on top of
+       it whenever the map and an open sidebar are both on screen.
+       isolation:isolate contains Leaflet's internal z-index values to
+       within this wrapper - it competes at the page level only as
+       this one element, well below the sidebar, with zero effect on
+       the map's own internal tile/marker/control layering. */
+    isolation:isolate;
+
 }
 
 .execution-map-wrap .execution-map{
