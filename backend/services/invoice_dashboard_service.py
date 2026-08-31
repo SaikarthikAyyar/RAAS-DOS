@@ -39,38 +39,52 @@ def get_kpi_summary(db):
 
     invoices = db.query(Invoice).all()
 
-    # Deduped by the real PurchaseOrder id, not summed once per job -
-    # see _resolve_po_for_expected's own docstring for why. Without
-    # this, two jobs/invoices resolving to the SAME real PO (a PO
-    # covering more than one job, or two Invoice rows both tracing
-    # back to one enquiry - a real, already-documented duplicate-
-    # enquiry artifact in this app) would each independently
-    # contribute that PO's FULL value, silently multiplying the real
-    # PO figure - this is what let Expected Invoice Revenue exceed
-    # Total PO Revenue even after the Collected-status double-count
-    # was fixed. This dedup makes Expected <= Total PO Revenue a real,
-    # structural guarantee rather than a coincidence of clean data.
+    # Expected and Collected are two segments of the SAME pool, not two
+    # independently-computed numbers: every created invoice's real PO
+    # value sits in exactly one of them - Expected while the job isn't
+    # done, Collected once it is - so together they must reconstruct
+    # Total PO Revenue exactly. That only holds if both draw from the
+    # SAME resolved-PO value (via _resolve_po_value_for_invoice below).
+    # Previously Collected pulled from the separately-stored
+    # amount_collected column instead - correct in the normal flow
+    # (it's set from invoice_value at completion, which is itself
+    # PO-derived), but it silently drifted whenever invoice_value had
+    # been set directly with no real PO behind it (e.g. manually-seeded
+    # test data) - exactly what let Expected + Collected exceed Total
+    # PO Revenue. An invoice with no resolvable PO at all now
+    # contributes 0 to both segments, rather than inflating Collected
+    # on its own with a figure Total PO Revenue never included in the
+    # first place.
+    #
+    # One shared dedup set across BOTH segments, not one per segment -
+    # if the same real PO ever backs two invoices where one has been
+    # collected and the other hasn't, per-segment dedup would still let
+    # that PO's value land in both buckets at once (double-counted
+    # across Expected+Collected even though neither segment
+    # double-counted it on its own). Whichever invoice is processed
+    # first claims that PO's value into its own bucket; any later
+    # invoice referencing the same PO is skipped entirely, regardless
+    # of its own status - so every real PO's value lands in exactly one
+    # segment, never split or duplicated across the two.
     po_cache = {}
     job_cache = {}
     seen_po_ids = set()
     expected_invoice_revenue = 0.0
+    collected_invoice_revenue = 0.0
 
     for inv in invoices:
 
-        po_id, value = _resolve_po_for_expected(db, inv.job_creation_id, po_cache, job_cache)
+        po_id, value = _resolve_po_value_for_invoice(db, inv, po_cache, job_cache)
 
         if po_id is not None:
             if po_id in seen_po_ids:
                 continue
             seen_po_ids.add(po_id)
 
-        expected_invoice_revenue += value
-
-    collected_invoice_revenue = sum(
-        float(inv.amount_collected)
-        for inv in invoices
-        if inv.amount_collected is not None
-    )
+        if inv.collection_status == "Collected":
+            collected_invoice_revenue += value
+        else:
+            expected_invoice_revenue += value
 
     total_machines = (
         db.query(MachineInventory)
@@ -223,25 +237,24 @@ def _build_buckets(start, end, granularity):
 # showing a completed job's real historical value there, since that's
 # a factual record of what the job was worth, not a forward-looking
 # figure that must stay disjoint from "already collected".
-# KPI-level "Expected" dedup helper. Returns (po_id, value) instead of
-# a bare value so the KPI summary can dedupe on the real PurchaseOrder
-# identity before summing - see the caller's own comment for why this
-# matters. po_id is None in two cases: the job is Collected (value is
-# always 0.0 then, nothing to dedupe), or the value came from a bare
-# invoice_value snapshot with no resolvable PO at all - that figure
-# has no PO identity to key on, so it's kept as an independent,
-# ungrouped contribution, matching this function's pre-dedup behavior
-# for that one rare/legacy edge case.
-def _resolve_po_for_expected(db, job_creation_id, po_cache, job_cache):
+# KPI-level shared resolver. Returns (po_id, value) for ANY invoice's
+# real, resolvable Purchase Order - regardless of collection status.
+# This is the one resolution both Expected and Collected build from in
+# get_kpi_summary, so the two segments are genuinely built from the
+# same PO-backed figure and partition Total PO Revenue between them,
+# rather than each pulling from a different source that can drift.
+# Deliberately does NOT fall back to a bare invoice_value with no
+# resolvable PO - a value only counts here if it traces back to a real
+# Purchase Order, matching "expected invoice is only when jobs are
+# created" extended equally to the Collected side: an invoice with no
+# real PO contributes 0 to both segments instead of inflating either
+# one on its own.
+def _resolve_po_value_for_invoice(db, invoice, po_cache, job_cache):
 
-    invoice = (
-        db.query(Invoice)
-        .filter(Invoice.job_creation_id == job_creation_id)
-        .first()
-    )
-
-    if invoice is None or invoice.collection_status == "Collected":
+    if invoice is None:
         return None, 0.0
+
+    job_creation_id = invoice.job_creation_id
 
     if job_creation_id in job_cache:
         job = job_cache[job_creation_id]
@@ -266,9 +279,6 @@ def _resolve_po_for_expected(db, job_creation_id, po_cache, job_cache):
 
     if po is not None and po.po_value is not None:
         return po.id, float(po.po_value)
-
-    if invoice.invoice_value is not None:
-        return None, float(invoice.invoice_value)
 
     return None, 0.0
 
