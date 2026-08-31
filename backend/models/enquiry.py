@@ -65,6 +65,16 @@ class Enquiry(Base):
         nullable=True
     )
 
+    # Set the moment Invoice is created (job creation time, see
+    # job_creation_service.py::create_job_request) via the same
+    # update_module_reference pattern as every other reference above -
+    # Invoice is a subset of the Enquiry per Phase 39's design, so this
+    # is the anchor the whole Invoice Dashboard resolves from.
+    invoice_id = Column(
+        Integer,
+        nullable=True
+    )
+
     # ====================================
     # BUSINESS MASTER LINKAGE
     # ====================================

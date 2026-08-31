@@ -39,7 +39,8 @@ NAV_MODULES = [
     ("/analytics", "Analytics"),
     ("/audit-trail", "Audit Trail"),
     ("/reviews-approvals", "Reviews & Approvals"),
-    ("/fleet-availability", "Fleet & Availability")
+    ("/fleet-availability", "Fleet & Availability"),
+    ("/invoice-dashboard", "Invoice Dashboard")
 
 ]
 
@@ -319,11 +320,11 @@ ROLE_NAV_ACCESS = {
     "ops": [
         "/ops-approval", "/ops-selector",
         "/job-creation", "/allocation", "/execution",
-        "/reviews-approvals", "/fleet-availability"
+        "/reviews-approvals", "/fleet-availability", "/invoice-dashboard"
     ],
 
     "management": [
-        "/approval", "/reviews-approvals", "/fleet-availability"
+        "/approval", "/reviews-approvals", "/fleet-availability", "/invoice-dashboard"
     ],
 
     "customer": [

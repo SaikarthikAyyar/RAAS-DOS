@@ -25,6 +25,18 @@ class InvoiceSchema(
 
     purchase_order_id: int | None = None
 
+    execution_id: int | None = None
+
+    invoice_number: str | None = None
+
+    invoice_value: float | None = None
+
+    amount_collected: float | None = None
+
+    collection_status: str | None = None
+
+    collected_date: date | None = None
+
     invoice_status: str
 
     execution_phase: str

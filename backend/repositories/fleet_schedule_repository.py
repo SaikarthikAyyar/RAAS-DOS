@@ -9,6 +9,7 @@ from backend.models.fleet_schedule import FleetSchedule
 from backend.models.machine_inventory import MachineInventory
 from backend.models.personnel import Personnel
 from backend.models.job_creation import JobCreation
+from backend.models.invoice import Invoice
 
 from backend.utils.geocode import reverse_geocode
 
@@ -98,10 +99,17 @@ def book_fleet_unit(db, fleet_unit_id, job_id, site_location, planned_start, pla
             machine.current_job_id = job.id
             machine.current_site = site_location
 
+        # Real reference chain (Phase 39) - a Personnel row's
+        # current_invoice_id was declared on the model but never
+        # written anywhere until now. Invoice already exists by this
+        # point (created at Job Creation time, before any booking).
+        booking_invoice = db.query(Invoice).filter(Invoice.job_creation_id == job.id).first()
+
         for person in crew:
             person.availability_status = "ALLOCATED"
             person.current_job_id = job.id
             person.current_location = site_location
+            person.current_invoice_id = booking_invoice.id if booking_invoice else None
 
     db.commit()
     db.refresh(schedule)
@@ -333,10 +341,15 @@ def dequeue_fleet_schedules(db, execution):
                 machine.current_job_id = next_schedule.job_creation_id
                 machine.current_site = next_schedule.site_location
 
+            promoted_invoice = db.query(Invoice).filter(
+                Invoice.job_creation_id == next_schedule.job_creation_id
+            ).first()
+
             for person in crew:
                 person.availability_status = "ALLOCATED"
                 person.current_job_id = next_schedule.job_creation_id
                 person.current_location = next_schedule.site_location
+                person.current_invoice_id = promoted_invoice.id if promoted_invoice else None
 
         else:
 
@@ -361,6 +374,7 @@ def dequeue_fleet_schedules(db, execution):
             for person in crew:
                 person.availability_status = "AVAILABLE"
                 person.current_job_id = None
+                person.current_invoice_id = None
 
         if machine is not None:
             machine.queue_count = len(remaining)

@@ -408,6 +408,13 @@ def create_job_request(
 
     )
 
+    # Invoice is a subset of the Enquiry (Phase 39) - this is the
+    # anchor the Invoice Dashboard/future Customer Portal resolve their
+    # whole reference chain from, same update_module_reference pattern
+    # already used for job_creation_id above.
+    if consolidated_enquiry:
+        update_module_reference(db, consolidated_enquiry.id, "invoice_id", invoice.id)
+
     print("[Workflow] Invoice generation pending")
 
     print("========== JOB CREATION COMPLETE ==========\n")

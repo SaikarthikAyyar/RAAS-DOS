@@ -58,6 +58,10 @@ from backend.api.geocode_api import (
     router as geocode_router
 )
 
+from backend.api.invoice_dashboard_api import (
+    router as invoice_dashboard_router
+)
+
 from backend.api.enquiry_api import (
     router as enquiry_router
 )
@@ -347,6 +351,8 @@ app.include_router(
 )
 
 app.include_router(geocode_router)
+
+app.include_router(invoice_dashboard_router)
 
 app.include_router(customer_live_order_api)
 

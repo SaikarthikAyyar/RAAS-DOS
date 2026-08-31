@@ -8,7 +8,7 @@ from backend.schemas.execution_schema import (
     ExecutionSchema
 )
 
-from datetime import datetime
+from datetime import datetime, date
 
 from backend.models.sales_survey import SalesSurvey
 
@@ -59,6 +59,8 @@ from backend.services.workflow_service import (
     advance_stage_at_least,
     WorkflowStage
 )
+
+from backend.services.deployment_segment_service import open_deployment_segment
 
 
 # ====================================
@@ -441,6 +443,10 @@ def create_execution_request(
     )
 
     if invoice:
+
+        # Real reference chain (Phase 39) - was declared on the model
+        # since Phase 33B, never actually written until now.
+        invoice.execution_id = execution.id
 
         invoice.execution_phase = "READY"
 
@@ -1631,6 +1637,8 @@ def start_execution_phase(
 
     route_machine = _resolve_execution_machine(db, execution.job_creation_id)
 
+    phase_start_time = datetime.utcnow()
+
     if execution.current_phase in ("PHASE_1", "PHASE_3"):
 
         # Third and final occasion the source/destination geocode fill
@@ -1652,7 +1660,45 @@ def start_execution_phase(
 
         execution.distance_travelled_km = 0
 
+        # ====================================
+        # PHASE TIMESTAMP + DEPLOYMENT SEGMENT (Phase 39)
+        # Phase 1 start = the machine genuinely departs source, so the
+        # MOBILISATION_TRANSIT segment opens here (closing whatever was
+        # open before - an AVAILABLE segment in the normal case).
+        # Phase 3 start = the return journey genuinely begins, closing
+        # the ON_SITE segment that's been open the whole job duration.
+        # This IS the "site personnel confirm start of journey" moment
+        # the deployment history is built from - no separate action.
+        # ====================================
+
+        if execution.current_phase == "PHASE_1":
+            execution.phase_1_started_at = phase_start_time
+        else:
+            execution.phase_3_started_at = phase_start_time
+
+        if route_machine:
+
+            segment_type = "MOBILISATION_TRANSIT" if execution.current_phase == "PHASE_1" else "DEMOBILISATION_TRANSIT"
+            transit_start_lat = execution.source_latitude if execution.current_phase == "PHASE_1" else execution.destination_latitude
+            transit_start_lng = execution.source_longitude if execution.current_phase == "PHASE_1" else execution.destination_longitude
+            transit_end_lat = execution.destination_latitude if execution.current_phase == "PHASE_1" else execution.source_latitude
+            transit_end_lng = execution.destination_longitude if execution.current_phase == "PHASE_1" else execution.source_longitude
+
+            open_deployment_segment(
+                db,
+                route_machine.id,
+                execution,
+                segment_type,
+                transit_start_lat,
+                transit_start_lng,
+                transit_end_lat,
+                transit_end_lng,
+                when=phase_start_time
+            )
+
     elif execution.current_phase == "PHASE_2":
+
+        execution.phase_2_started_at = phase_start_time
 
         if route_machine and execution.destination_latitude is not None:
 
@@ -1893,6 +1939,13 @@ def complete_execution_phase(
     # "complete" just because the button was clicked.
     _validate_phase_completion(db, execution)
 
+    # Captured before complete_phase() mutates execution.current_phase
+    # to the NEXT phase - everything below needs to know which phase
+    # just genuinely finished, not which one is now current.
+    phase_just_completed = execution.current_phase
+
+    phase_complete_time = datetime.utcnow()
+
     execution = complete_phase(db, execution)
 
     if execution is None:
@@ -1901,9 +1954,47 @@ def complete_execution_phase(
             detail="Execution not found."
         )
 
+    # ====================================
+    # PHASE TIMESTAMP (Phase 39)
+    # ====================================
+
+    if phase_just_completed == "PHASE_1":
+        execution.phase_1_completed_at = phase_complete_time
+    elif phase_just_completed == "PHASE_2":
+        execution.phase_2_completed_at = phase_complete_time
+    elif phase_just_completed == "PHASE_3":
+        execution.phase_3_completed_at = phase_complete_time
+
     if execution.workflow_status != "EXECUTION_COMPLETED":
 
         print(f"Phase After     : {execution.current_phase} (not final yet)")
+
+        # ====================================
+        # DEPLOYMENT SEGMENT - ARRIVAL (Phase 39)
+        # Phase 1 completing is the machine genuinely arriving at the
+        # job site - this is the "confirm end of journey" moment the
+        # ON_SITE segment is built from, closing MOBILISATION_TRANSIT.
+        # Phase 2 completing has no segment change (still ON_SITE) -
+        # only its own timestamp above matters.
+        # ====================================
+
+        if phase_just_completed == "PHASE_1":
+
+            arrival_machine = _resolve_execution_machine(db, execution.job_creation_id)
+
+            if arrival_machine:
+
+                open_deployment_segment(
+                    db,
+                    arrival_machine.id,
+                    execution,
+                    "ON_SITE",
+                    execution.destination_latitude,
+                    execution.destination_longitude,
+                    when=phase_complete_time
+                )
+
+        db.commit()
 
         sync_invoice_from_execution(db, execution)
 
@@ -1938,6 +2029,45 @@ def complete_execution_phase(
     # ====================================
 
     return_machine = _resolve_execution_machine(db, execution.job_creation_id)
+
+    # ====================================
+    # DEPLOYMENT SEGMENT - RETURNED TO SOURCE (Phase 39)
+    # Demobilisation just completed - close DEMOBILISATION_TRANSIT and
+    # open an AVAILABLE segment at source. Always opened here regardless
+    # of whether dequeue below promotes a next job for this same
+    # machine - if it does, that job's own Phase 1 start will close
+    # this AVAILABLE segment again the moment it's genuinely begun,
+    # same as any other transition. Keeps the state machine uniform -
+    # no special-casing "will a promotion happen" here.
+    # ====================================
+
+    if return_machine:
+
+        open_deployment_segment(
+            db,
+            return_machine.id,
+            None,
+            "AVAILABLE",
+            execution.source_latitude,
+            execution.source_longitude,
+            when=phase_complete_time
+        )
+
+    # ====================================
+    # INVOICE COLLECTED (Phase 39)
+    # "Collected" is the invoice lifecycle reaching completion, not a
+    # real payment confirmation (no payment gateway exists in this
+    # app) - direct instruction. Fires exactly once, at the same
+    # moment workflow_status genuinely reaches EXECUTION_COMPLETED.
+    # ====================================
+
+    completed_invoice = get_invoice_by_job(db, execution.job_creation_id)
+
+    if completed_invoice:
+
+        completed_invoice.amount_collected = completed_invoice.invoice_value or 0
+        completed_invoice.collection_status = "Collected"
+        completed_invoice.collected_date = date.today()
 
     if return_machine and execution.source_latitude is not None:
 

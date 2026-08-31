@@ -51,6 +51,8 @@ import ReviewsApprovals from "./pages/ReviewsApprovals";
 
 import FleetReadiness from "./pages/FleetReadiness";
 
+import InvoiceDashboard from "./pages/InvoiceDashboard";
+
 
 function App() {
 
@@ -132,6 +134,8 @@ function App() {
           <Route path="reviews-approvals" element={<ReviewsApprovals />} />
 
           <Route path="fleet-availability" element={<FleetReadiness />} />
+
+          <Route path="invoice-dashboard" element={<InvoiceDashboard />} />
 
         </Route>
 

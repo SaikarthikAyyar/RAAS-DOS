@@ -157,6 +157,18 @@ def create_invoice_request(
 
         purchase_order.id if purchase_order else None,
 
+        # Real stored snapshot (Phase 39), defaults to the resolved PO
+        # value at creation time - editable afterward if it ever needs
+        # correcting, distinct from the old always-live-resolved figure
+        # get_invoice_by_job_request separately still returns.
+        invoice_number =
+
+        f"INV-{job.id}",
+
+        invoice_value =
+
+        purchase_order.po_value if purchase_order else None,
+
         invoice_status =
 
         "ACTIVE",
@@ -315,12 +327,17 @@ def get_invoice_by_job_request(
 
     print(f"Invoice ID : {invoice.id}")
 
-    invoice_value = None
-
-    if invoice.purchase_order_id:
-        po = db.query(PurchaseOrder).filter(PurchaseOrder.id == invoice.purchase_order_id).first()
-        if po is not None:
-            invoice_value = float(po.po_value) if po.po_value is not None else None
+    # Prefers the real stored snapshot (Phase 39) - falls back to the
+    # live PO resolution only for an invoice created before that
+    # column existed (invoice_value still null on it).
+    if invoice.invoice_value is not None:
+        invoice_value = float(invoice.invoice_value)
+    else:
+        invoice_value = None
+        if invoice.purchase_order_id:
+            po = db.query(PurchaseOrder).filter(PurchaseOrder.id == invoice.purchase_order_id).first()
+            if po is not None:
+                invoice_value = float(po.po_value) if po.po_value is not None else None
 
     response = {
 

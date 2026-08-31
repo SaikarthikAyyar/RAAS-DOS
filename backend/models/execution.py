@@ -93,6 +93,23 @@ class Execution(Base):
     )
 
     # ====================================
+    # PHASE TIMESTAMPS (Phase 39)
+    # Real per-phase start/complete timestamps, set automatically inside
+    # start_execution_phase/complete_execution_phase - zero new user
+    # input. This is what "how long was this machine stationed at X"
+    # (the Invoice Dashboard's Deployment tab) is actually computed
+    # from - previously only the status enums above existed, with no
+    # way to answer that for any job, past or present.
+    # ====================================
+
+    phase_1_started_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    phase_1_completed_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    phase_2_started_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    phase_2_completed_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    phase_3_started_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    phase_3_completed_at = Column(TIMESTAMP(timezone=True), nullable=True)
+
+    # ====================================
     # SITE DETAILS
     # ====================================
 

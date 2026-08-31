@@ -80,8 +80,21 @@ def update_customer_request_status(
         print("Committed (None case)")
         return
 
-    current_index = WORKFLOW_STATUS.index(customer.status)
-    new_index = WORKFLOW_STATUS.index(status)
+    # A legacy/out-of-vocabulary status value here must never turn an
+    # otherwise-real, already-persisted completion into a 500 - this
+    # call sits at the very end of complete_execution_phase, after
+    # dequeue/deployment-segment/invoice-collected writes have already
+    # committed successfully (Phase 39). Falls back to a direct set
+    # (skipping the ordering guard) rather than crashing.
+    try:
+        current_index = WORKFLOW_STATUS.index(customer.status)
+        new_index = WORKFLOW_STATUS.index(status)
+    except ValueError:
+        print(f"[WARNING] Unrecognized status '{customer.status}' or '{status}' - setting directly.")
+        customer.status = status
+        db.commit()
+        db.refresh(customer)
+        return
 
     print(current_index, new_index)
 

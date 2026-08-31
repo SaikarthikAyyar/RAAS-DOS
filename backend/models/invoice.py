@@ -6,6 +6,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Float
+from sqlalchemy import Numeric
 from sqlalchemy import Date
 from sqlalchemy import DateTime
 from sqlalchemy import JSON
@@ -85,6 +86,45 @@ class Invoice(
 
         nullable=True
 
+    )
+
+    # ====================================
+    # FINANCIAL (Phase 39)
+    # invoice_value is a real stored snapshot (defaults to the resolved
+    # PO value at creation, see create_invoice_request) - distinct from
+    # the old live-resolved-from-PO figure get_invoice_by_job_request
+    # already returns. amount_collected/collection_status/collected_date
+    # are never fabricated - collection_status flips to "Collected" and
+    # amount_collected is set to invoice_value automatically, exactly
+    # once, the moment this job's Execution reaches EXECUTION_COMPLETED
+    # (see execution_service.py::complete_execution_phase) - "collected"
+    # here means the job/invoice lifecycle is done, not a real payment
+    # confirmation (no payment gateway exists in this app).
+    # ====================================
+
+    invoice_number = Column(
+        String(50),
+        nullable=True
+    )
+
+    invoice_value = Column(
+        Numeric(14, 2),
+        nullable=True
+    )
+
+    amount_collected = Column(
+        Numeric(14, 2),
+        default=0
+    )
+
+    collection_status = Column(
+        String(30),
+        default="Pending"
+    )
+
+    collected_date = Column(
+        Date,
+        nullable=True
     )
 
     # ====================================

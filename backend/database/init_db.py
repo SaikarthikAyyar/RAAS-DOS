@@ -22,6 +22,8 @@ from backend.models.job_creation import JobCreation
 
 from backend.models.invoice import Invoice
 
+from backend.models.machine_deployment_segment import MachineDeploymentSegment
+
 from backend.models.users import User
 from backend.models.enquiry import Enquiry
 from backend.models.roles import Role
