@@ -260,7 +260,7 @@ function MachineModal({ editing, pumps, serviceConfigs, accessoriesMaster, onClo
                     </div>
 
                     <div>
-                        <label>Minimum height (mm)</label>
+                        <label>Minimum length (mm)</label>
                         <input type="number" value={minimumHeight} onChange={e=>setMinimumHeight(e.target.value)} />
                     </div>
 
