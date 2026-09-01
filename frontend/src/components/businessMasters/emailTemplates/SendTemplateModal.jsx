@@ -11,35 +11,36 @@ import { isValidEmail } from "../../../utils/validators";
 
 import { formatApiError } from "../../../utils/apiError";
 
-import { withDateStamp } from "../../../utils/exportFilename";
-
 
 // ====================================
-// BASE64 HELPERS (for embedding a real binary attachment into a
-// downloaded .eml - chunked to avoid a call-stack overflow from
-// String.fromCharCode(...bytes) on a large file, and line-wrapped at
-// 76 chars per RFC 2045 so mail clients parse it correctly).
+// DOWNLOAD ATTACHMENT
+// Plain file download of the real document, untouched - no MIME
+// wrapping. mailto: (below) cannot carry an attachment under any
+// browser/client (a hard, universal web-platform limitation, not
+// something fixable client-side), so when this template has a real
+// attachmentUrl the user gets the compose window opened AND the real
+// file downloaded separately, to drag in themselves.
 // ====================================
 
-async function blobToBase64(blob){
+async function downloadFile(url, fileName){
 
-    const buffer = await blob.arrayBuffer();
-    const bytes = new Uint8Array(buffer);
+    const response = await fetch(url);
 
-    let binary = "";
-    const chunkSize = 0x8000;
-
-    for(let i=0; i<bytes.length; i+=chunkSize){
-        binary += String.fromCharCode(...bytes.subarray(i, i+chunkSize));
+    if(!response.ok){
+        throw new Error("Unable to fetch the attachment for this email.");
     }
 
-    return btoa(binary);
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
 
-}
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-function wrapBase64(base64){
-
-    return base64.match(/.{1,76}/g).join("\r\n");
+    URL.revokeObjectURL(objectUrl);
 
 }
 
@@ -109,8 +110,6 @@ export default function SendTemplateModal({
     const [error, setError] = useState("");
 
     const [sending, setSending] = useState(false);
-
-    const [downloading, setDownloading] = useState(false);
 
     const debounceRef = useRef(null);
 
@@ -219,118 +218,45 @@ export default function SendTemplateModal({
 
     }
 
-    // Download the currently-resolved subject/body as a .eml file - the
-    // user's own mail client opens it (as a draft or via Forward) letting
-    // them pick their own account/address to send from, instead of going
-    // through this app's SMTP relay. When attachmentUrl is supplied (the
-    // Quote Release flow), the real document is fetched and embedded as
-    // a genuine MIME attachment rather than just a text-only email.
+    // Opens a real compose pane directly inside Outlook on the web,
+    // using whichever Microsoft account is already signed in in this
+    // browser - no OS-level default-mail-app registration involved at
+    // all. This is Microsoft's own documented "deep link to compose"
+    // URL for Outlook Web
+    // (learn.microsoft.com/en-us/exchange/outlook-on-the-web-deep-links) -
+    // outlook.office.com serves both Microsoft 365 work/school accounts
+    // and personal Microsoft accounts today, so one link covers both.
+    // Opened in a new tab so the app itself is never navigated away
+    // from.
     //
-    // Deliberately never writes a "To:" header - downloading means the
-    // sender hasn't committed to a recipient through this app at all,
-    // and whatever they typed into the recipient field here (which only
+    // mailto: cannot carry a file attachment under any browser or mail
+    // client - a hard, universal limitation of the protocol itself,
+    // and the same is true of this deep-link's query params. When this
+    // template has a real attachmentUrl (the Quote Release flow), the
+    // actual document is downloaded separately, as a plain, correctly-
+    // typed file (not wrapped in a broken MIME envelope) - the user
+    // drags it into the compose pane that just opened.
+    //
+    // Deliberately never pre-fills "To:" - opening this means the
+    // sender hasn't committed to a recipient through this app, and
+    // whatever they typed into the recipient field here (which only
     // ever matters for the in-app Send action, if one is even offered
-    // alongside Download) may not be who they actually end up mailing.
-    // Baking it in would silently pre-fill the wrong address the moment
-    // the download is opened, contradicting a body that's otherwise
-    // recipient-agnostic. Their mail client's own "To" field is where a
-    // real recipient belongs - filled in there, by them, at send time.
-    async function handleDownload(){
+    // alongside this) may not be who they actually end up mailing.
+    // Outlook's own To field is where a real recipient belongs -
+    // filled in there, by them, at send time.
+    function handleOpenInOutlookWeb(){
 
-        setDownloading(true);
-        setError("");
+        const composeUrl =
+            `https://outlook.office.com/mail/deeplink/compose` +
+            `?subject=${encodeURIComponent(subjectText)}` +
+            `&body=${encodeURIComponent(bodyText)}`;
 
-        try{
+        window.open(composeUrl, "_blank", "noopener,noreferrer");
 
-            const headerLines = [];
+        if(attachmentUrl){
 
-            headerLines.push(`Subject: ${subjectText}`);
-
-            // X-Unsent tells a mail client that respects it (Apple Mail,
-            // notably) to open this .eml straight into an editable
-            // compose window instead of a read-only "received message"
-            // preview - skips the Reply/Forward step entirely there.
-            // Clients that don't recognize it (Outlook, most others)
-            // just ignore it and fall back to their normal read view,
-            // where Forward still turns it into an editable draft with
-            // the subject/body/attachment carried over.
-            headerLines.push(`X-Unsent: 1`);
-            headerLines.push(`Date: ${new Date().toUTCString()}`);
-            headerLines.push(`MIME-Version: 1.0`);
-
-            let bodyContent;
-
-            if(attachmentUrl){
-
-                const response = await fetch(attachmentUrl);
-
-                if(!response.ok){
-                    throw new Error("Unable to fetch the attachment for this email.");
-                }
-
-                const fileBlob = await response.blob();
-                const base64 = wrapBase64(await blobToBase64(fileBlob));
-                const mediaType = fileBlob.type || "application/octet-stream";
-                const fileName = attachmentFileName || "attachment";
-                const boundary = `----=_Part_${Date.now()}`;
-
-                headerLines.push(`Content-Type: multipart/mixed; boundary="${boundary}"`);
-
-                bodyContent = [
-
-                    `--${boundary}`,
-                    `Content-Type: text/plain; charset="UTF-8"`,
-                    `Content-Transfer-Encoding: 8bit`,
-                    ``,
-                    bodyText,
-                    ``,
-                    `--${boundary}`,
-                    `Content-Type: ${mediaType}; name="${fileName}"`,
-                    `Content-Transfer-Encoding: base64`,
-                    `Content-Disposition: attachment; filename="${fileName}"`,
-                    ``,
-                    base64,
-                    ``,
-                    `--${boundary}--`
-
-                ].join("\r\n");
-
-            }
-
-            else{
-
-                headerLines.push(`Content-Type: text/plain; charset="UTF-8"`);
-                headerLines.push(`Content-Transfer-Encoding: 8bit`);
-
-                bodyContent = bodyText;
-
-            }
-
-            const emlContent = [...headerLines, "", bodyContent].join("\r\n");
-
-            const blob = new Blob([emlContent], { type: "message/rfc822" });
-            const url = URL.createObjectURL(blob);
-
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = withDateStamp(`${template.name.replace(/\s+/g, "_")}.eml`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            URL.revokeObjectURL(url);
-
-        }
-
-        catch(err){
-
-            setError(formatApiError(err, "Unable to prepare the download."));
-
-        }
-
-        finally{
-
-            setDownloading(false);
+            downloadFile(attachmentUrl, attachmentFileName || "attachment")
+                .catch(err=>setError(formatApiError(err, "Unable to download the attachment.")));
 
         }
 
@@ -473,15 +399,13 @@ export default function SendTemplateModal({
 
                         className={downloadOnly ? "bm-btn bm-btn-primary" : "bm-btn"}
 
-                        onClick={handleDownload}
+                        onClick={handleOpenInOutlookWeb}
 
-                        disabled={downloading}
-
-                        title={attachmentUrl ? "Download this email with the quote document attached, as a .eml file - no recipient is set, pick one in your own mail client when you send it" : "Download this email (subject + body) as a .eml file - no recipient is set, pick one in your own mail client when you send it"}
+                        title={attachmentUrl ? "Opens a compose window directly in Outlook on the web (uses whichever Microsoft account is already signed in), and downloads the quote document separately to attach yourself - no recipient is set, pick one in Outlook when you send it" : "Opens a compose window directly in Outlook on the web (uses whichever Microsoft account is already signed in) - no recipient is set, pick one in Outlook when you send it"}
 
                     >
 
-                        {downloading ? "Preparing..." : "Download (.eml)"}
+                        Open in Outlook Web
 
                     </button>
 
