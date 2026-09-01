@@ -209,6 +209,15 @@ geometry.sludge_depth
 ) || 0;
 
 
+const sludgeHeight=
+
+Number(
+
+geometry.drop_to_floor
+
+) || 0;
+
+
 const setupDistance=
 
 Number(
@@ -283,6 +292,66 @@ estimatedVolume=
 Number(
 
 estimatedVolume.toFixed(
+
+2
+
+)
+
+);
+
+
+// ====================================
+// SLUDGE VOLUME
+// Same shape as Estimated Volume above (cylindrical vs rectangular),
+// but using Sludge Height (geometry.drop_to_floor) as the height
+// factor instead of Height (geometry.sludge_depth) - Estimated Volume
+// is the tank's own volume; this is specifically how much of that is
+// actually sludge.
+// ====================================
+
+let sludgeVolume
+
+
+if(
+
+geometry.tank_type==="Cylindrical"
+
+){
+
+sludgeVolume=
+
+Math.PI*
+
+Math.pow(
+
+length/2,
+
+2
+
+)*
+
+sludgeHeight;
+
+}
+
+else{
+
+sludgeVolume=
+
+length*
+
+width*
+
+sludgeHeight;
+
+}
+
+
+sludgeVolume=
+
+Number(
+
+sludgeVolume.toFixed(
 
 2
 
@@ -731,6 +800,8 @@ const completion = Math.min(
 const metrics={
 
 estimatedVolume,
+
+sludgeVolume,
 
 averageOutput,
 

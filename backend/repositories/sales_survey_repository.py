@@ -145,6 +145,10 @@ def create_sales_survey(
 
         payload.estimated_volume,
 
+        sludge_volume=
+
+        payload.sludge_volume,
+
         average_output=
 
         payload.average_output,
@@ -544,6 +548,8 @@ def update_sales_survey(
     survey.flow_after_agitation = payload.flow_after_agitation
 
     survey.estimated_volume = payload.estimated_volume
+
+    survey.sludge_volume = payload.sludge_volume
 
     survey.average_output = payload.average_output
 

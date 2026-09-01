@@ -428,6 +428,10 @@ def get_customer_survey_request(
 
             survey.estimated_volume,
 
+            "sludge_volume":
+
+            survey.sludge_volume,
+
             "average_output":
 
             survey.average_output,

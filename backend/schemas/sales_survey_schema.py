@@ -117,6 +117,8 @@ class SalesSurveySchema(BaseModel):
 
     estimated_volume:Optional[float]=None
 
+    sludge_volume:Optional[float]=None
+
     tank_type: Optional[str] = None
 
     tank_length: Optional[float] = None
@@ -338,6 +340,7 @@ class GeometrySection(BaseModel):
     width: Optional[float]
     sludge_depth: Optional[float]
     estimated_volume: Optional[float]
+    sludge_volume: Optional[float] = None
     average_output: Optional[float]
     opening_length: Optional[float]
     opening_width: Optional[float]

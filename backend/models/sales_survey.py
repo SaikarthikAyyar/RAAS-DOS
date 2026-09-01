@@ -100,6 +100,10 @@ class SalesSurvey(Base):
         Float
     )
 
+    sludge_volume = Column(
+        Float
+    )
+
     average_output = Column(
         Float
     )

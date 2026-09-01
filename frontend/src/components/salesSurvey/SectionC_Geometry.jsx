@@ -51,7 +51,7 @@ const {
 
 estimatedVolume = 0,
 
-
+sludgeVolume = 0,
 
 totalDuration = 0,
 
@@ -171,7 +171,7 @@ tooltip="The tank's width, in metres (leave the same as Length/Dia for a round t
 
 <FieldInput
 
-label="Sludge Depth (m)*"
+label="Height (m)*"
 
 value={geometry.sludge_depth}
 
@@ -189,9 +189,9 @@ onBlur={()=>touchField("geometry", "sludge_depth")}
 
 error={fieldError("sludge_depth")}
 
-errorMessage="Sludge Depth is required."
+errorMessage="Height is required."
 
-tooltip="How deep the sludge/material sits in the tank, in metres."
+tooltip="The tank's overall height, in metres."
 
 />
 
@@ -222,6 +222,17 @@ tooltip="How the machine/hose can get into the tank (e.g. manhole, open top, sid
 label="Estimated Volume (m³)"
 
 value={estimatedVolume}
+
+unit="m³"
+
+/>
+
+
+<FieldReadOnly
+
+label="Sludge Volume (m³)"
+
+value={sludgeVolume}
 
 unit="m³"
 
@@ -324,7 +335,7 @@ tooltip="The height of the access opening above ground level, in metres."
 
 <FieldInput
 
-label="Drop to Floor / Sludge (m)"
+label="Sludge Height (m)"
 
 value={geometry.drop_to_floor}
 
@@ -338,7 +349,7 @@ type="number"
 
 updateSection={updateSection}
 
-tooltip="The vertical distance from the access opening down to the tank floor or sludge surface, in metres."
+tooltip="The height/thickness of the sludge layer in the tank, in metres - used to calculate Sludge Volume."
 
 />
 

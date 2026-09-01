@@ -542,7 +542,7 @@ export default function SurveySummary({
 
                     {
 
-                        label:"Sludge Depth",
+                        label:"Height",
 
                         value:survey.geometry.sludge_depth
 
@@ -574,9 +574,17 @@ export default function SurveySummary({
 
                     {
 
-                        label:"Drop To Floor",
+                        label:"Sludge Height",
 
                         value:survey.geometry.drop_to_floor
+
+                    },
+
+                    {
+
+                        label:"Sludge Volume",
+
+                        value:survey.geometry.sludge_volume
 
                     },
 
