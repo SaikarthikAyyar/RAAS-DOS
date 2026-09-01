@@ -24,6 +24,7 @@ from backend.utils.template_rendering import substitute_tokens
 
 from backend.reporting.quote_release_docx import (
     build_tank_machine_table,
+    build_machine_section,
     build_techno_commercial_summary_table,
     add_cover_logo,
     add_header_logo,
@@ -45,7 +46,8 @@ FALLBACK_BODY = (
     "Proposal No: {proposal_no}\nEnquiry reference no: {enquiry_ref}\n"
     "Proposal Submission Date: {proposal_date}\n\n"
     "TANK / MACHINE DETAILS\n{tank_machine_table}\n\n"
-    "TECHNO-COMMERCIAL QUOTE SUMMARY\n{commercial_table}\n\n"
+    "Machine Overview:\n{machine_features}\n\n"
+    "COMMERCIAL PROPOSAL\n{commercial_table}\n\n"
     "Valid till: {valid_till}\n\n"
     "Thanks & regards,\nJanyu Technologies Pvt Ltd"
 )
@@ -145,6 +147,10 @@ def generate_quote_release_docx(db, quote_id, enquiry_id, generated_by):
 
             build_tank_machine_table(doc, sales_survey, machine)
 
+        elif stripped == "{machine_features}":
+
+            build_machine_section(doc, format_state, machine, ops.accessories_plan if ops else None)
+
         elif stripped == "{commercial_table}":
 
             build_techno_commercial_summary_table(doc, quote)
@@ -207,12 +213,24 @@ SAMPLE_SALES_SURVEY = SimpleNamespace(
 
 SAMPLE_MACHINE = SimpleNamespace(
     name="Sample Machine XYZ",
+    description="Sample machine used to preview this template with no real enquiry attached.",
     power_type="Diesel",
     base_output_per_day=40,
     base_output_basis="m3 sludge per shift",
     max_vertical_lift=6,
-    hazard_rating="Standard"
+    hazard_rating="Standard",
+    minimum_width=600,
+    minimum_height=600,
+    crane_required="No",
+    vehicle="Flatbed truck",
+    vehicle_payload="2 tonne"
 )
+
+SAMPLE_ACCESSORIES_PLAN = [
+    {"name": "Safety kit", "needed": "Yes"},
+    {"name": "Retrieval kit", "needed": "Yes"},
+    {"name": "GPS", "needed": "No"}
+]
 
 SAMPLE_QUOTE = SimpleNamespace(
     mobilisation_cost_min=175000, mobilisation_cost_max=175000,
@@ -253,6 +271,10 @@ def generate_quote_template_preview_docx(template):
         if stripped == "{tank_machine_table}":
 
             build_tank_machine_table(doc, SAMPLE_SALES_SURVEY, SAMPLE_MACHINE)
+
+        elif stripped == "{machine_features}":
+
+            build_machine_section(doc, format_state, SAMPLE_MACHINE, SAMPLE_ACCESSORIES_PLAN)
 
         elif stripped == "{commercial_table}":
 

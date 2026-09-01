@@ -154,6 +154,22 @@
     color:#9ca3af;
 }
 
+/* A real, actionable error (e.g. a fleet booking rejected for a date
+   clash) - deliberately NOT survey-empty's muted gray, which reads as
+   a benign "nothing here yet" placeholder and let a genuine rejection
+   message (e.g. "FU-019 is already scheduled until 2026-09-01.") go
+   unnoticed. Matches the app's established inline-error color
+   (#991b1b) already used for this exact kind of message elsewhere
+   (e.g. FleetReadiness.jsx's own reschedule-conflict error). */
+.survey-error{
+    color:#991b1b;
+    font-weight:700;
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    border-radius:6px;
+    padding:8px 10px;
+}
+
 .survey-actions{
     display:flex;
     flex-wrap:wrap;

@@ -388,7 +388,7 @@ export default function JobCreationSummary({
                     </span>
                 </h3>
 
-                {error && <div className="survey-empty" style={{marginTop:8}}>{error}</div>}
+                {error && <div className="survey-error" style={{marginTop:8}}>{error}</div>}
 
                 {
                     loading ? (
