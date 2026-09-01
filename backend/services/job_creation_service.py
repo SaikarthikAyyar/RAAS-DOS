@@ -70,6 +70,8 @@ from backend.models.fleet_schedule import FleetSchedule
 
 from backend.services.enquiry_consolidated_service import update_module_reference
 
+from backend.utils.enquiry_resolution import resolve_enquiry_by_job_creation_id
+
 from backend.services.workflow_service import (
     advance_stage_at_least,
     WorkflowStage
@@ -364,30 +366,18 @@ def create_job_request(
 
     print("[Workflow] Customer Status -> READY_FOR_ALLOCATION")
 
-
-    EnquiryService.create_allocation_enquiry(
-
-        db,
-
-        customer.id,
-
-        survey.id,
-
-        job.id,
-
-        {
-
-            "customer_request_id": customer.id,
-
-            "sales_survey_id": survey.id,
-
-            "job_creation_id": job.id
-
-        }
-
-    )
-
-    print("[Workflow] Allocation enquiry created")
+    # A stub Enquiry used to be created here via
+    # EnquiryService.create_allocation_enquiry() - a leftover from an
+    # older, pre-consolidated-model task-routing system. It carried the
+    # exact same job_creation_id as the real, consolidated enquiry
+    # already linked above (update_module_reference), with
+    # approval_board_id/customer_name always NULL - a genuine second,
+    # blank-looking row in the real Enquiries list on every single job
+    # creation, and a source of real ambiguity for any later code
+    # resolving "the enquiry for this job" by job_creation_id alone
+    # (see backend/utils/enquiry_resolution.py). Removed outright - the
+    # real enquiry's own job_creation_id link is the correct, modern
+    # mechanism and needs no separate stub row alongside it.
 
 
     # ====================================
@@ -485,11 +475,7 @@ def confirm_job_creation_request(db, job_id):
             detail="Book a Fleet Unit before confirming Job Creation."
         )
 
-    enquiry = (
-        db.query(Enquiry)
-        .filter(Enquiry.job_creation_id == job_id)
-        .first()
-    )
+    enquiry = resolve_enquiry_by_job_creation_id(db, job_id)
 
     if enquiry is None:
         raise HTTPException(

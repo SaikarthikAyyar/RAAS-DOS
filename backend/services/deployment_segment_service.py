@@ -8,6 +8,7 @@ from backend.models.machine_deployment_segment import MachineDeploymentSegment
 from backend.models.enquiry import Enquiry
 
 from backend.utils.geocode import reverse_geocode
+from backend.utils.enquiry_resolution import resolve_enquiry_by_job_creation_id
 
 
 # ====================================
@@ -39,11 +40,7 @@ def _resolve_purpose_label(db, execution):
     if execution is None:
         return "Available"
 
-    enquiry = (
-        db.query(Enquiry)
-        .filter(Enquiry.job_creation_id == execution.job_creation_id)
-        .first()
-    )
+    enquiry = resolve_enquiry_by_job_creation_id(db, execution.job_creation_id)
 
     customer = enquiry.customer_name if enquiry else None
     site = execution.site_location

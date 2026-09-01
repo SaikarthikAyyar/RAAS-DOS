@@ -62,6 +62,8 @@ from backend.services.workflow_service import (
 
 from backend.services.deployment_segment_service import open_deployment_segment
 
+from backend.utils.enquiry_resolution import resolve_enquiry_by_job_creation_id
+
 
 # ====================================
 # MACHINE RESOLUTION (Phase 38)
@@ -130,11 +132,7 @@ def _resolve_execution_machine(db, job_creation_id):
 
 def _resolve_execution_enquiry(db, job_creation_id):
 
-    return (
-        db.query(Enquiry)
-        .filter(Enquiry.job_creation_id == job_creation_id)
-        .first()
-    )
+    return resolve_enquiry_by_job_creation_id(db, job_creation_id)
 
 
 # ====================================

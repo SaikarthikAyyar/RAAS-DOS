@@ -19,6 +19,7 @@ from backend.utils.geocode import forward_geocode
 
 from backend.services.invoice_service import _resolve_purchase_order_for_job
 from backend.repositories.techno_commercial_quote_repository import get_quote_by_ops_selection
+from backend.utils.enquiry_resolution import resolve_enquiry_by_job_creation_id
 
 
 # ====================================
@@ -575,11 +576,7 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
 
             coordinates = forward_geocode(booking.site_location) if booking.site_location else None
 
-            enquiry = (
-                db.query(Enquiry)
-                .filter(Enquiry.job_creation_id == booking.job_creation_id)
-                .first()
-            )
+            enquiry = resolve_enquiry_by_job_creation_id(db, booking.job_creation_id)
 
             purpose = (
                 f"{enquiry.customer_name} - {booking.site_location}"
@@ -679,11 +676,7 @@ def get_deployment_timeline(db, machine_inventory_id, start, end):
 
             if machine.current_job_id:
 
-                job_enquiry = (
-                    db.query(Enquiry)
-                    .filter(Enquiry.job_creation_id == machine.current_job_id)
-                    .first()
-                )
+                job_enquiry = resolve_enquiry_by_job_creation_id(db, machine.current_job_id)
                 job_purpose = job_enquiry.customer_name if job_enquiry else None
 
                 job_row = (
