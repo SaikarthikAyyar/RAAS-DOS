@@ -131,6 +131,7 @@ export default function SectionF_Dewatering({
                     value={dewatering.oily_emulsified}
                     section="dewatering"
                     field="oily_emulsified"
+                    disabled={disabled}
                     updateSection={updateSection}
                     tooltip="Whether the material contains oil or an oil-water emulsion - affects the dewatering method."
                 />
@@ -190,6 +191,7 @@ export default function SectionF_Dewatering({
                             value={dewatering.filtrate_route_detail}
                             section="dewatering"
                             field="filtrate_route_detail"
+                            disabled={disabled}
                             updateSection={updateSection}
                             tooltip="A description of where the separated liquid (filtrate) will be routed to."
                         />

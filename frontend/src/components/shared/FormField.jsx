@@ -49,6 +49,23 @@ function renderLabel(label){
 }
 
 
+function wrapperClassName(error, disabled){
+
+    let className = "survey-field";
+
+    if(error){
+        className += " field-error";
+    }
+
+    if(disabled){
+        className += " disabled";
+    }
+
+    return className;
+
+}
+
+
 export function FieldInput({
 
     label,
@@ -70,7 +87,7 @@ export function FieldInput({
 
     return (
 
-        <div className={error ? "survey-field field-error" : "survey-field"}>
+        <div className={wrapperClassName(error, disabled)}>
 
             <label>
                 {renderLabel(label)}
@@ -128,7 +145,7 @@ export function FieldSelect({
 
     return (
 
-        <div className={error ? "survey-field field-error" : "survey-field"}>
+        <div className={wrapperClassName(error, disabled)}>
 
             <label>
                 {renderLabel(label)}
