@@ -8,7 +8,6 @@ from io import BytesIO
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils import get_column_letter
 
 from backend.services.customer_master_service import get_customer_detail_request
 
@@ -31,9 +30,6 @@ SUBTITLE_FONT = Font(bold=True, size=11, color="FFFFFF")
 
 SECTION_FILL = PatternFill("solid", fgColor="8EA9DB")
 SECTION_FONT = Font(bold=True, size=10.5, color="1F3864")
-
-COLUMN_HEADER_FILL = PatternFill("solid", fgColor="D9E2F3")
-COLUMN_HEADER_FONT = Font(bold=True, size=10)
 
 LABEL_FILL = PatternFill("solid", fgColor="F2F2F2")
 LABEL_FONT = Font(bold=True, size=10)
@@ -334,18 +330,71 @@ def _build_details_sheet(wb, customer):
 
 
 # ====================================
-# ASSETS SHEET (one column per asset, one row per field - the
-# instance/name spans horizontally across columns, the field names run
-# vertically down the rows)
+# ASSET SHEETS - one sheet per asset, not one shared sheet with an
+# asset per column. Same Field | Value two-column form as the Details
+# sheet, just repeated once per asset so each asset's own data (and
+# its own conditional groups - see the Dewatering skip below) stands
+# on its own rather than being crammed sideways alongside every other
+# asset on file.
 # ====================================
 
-def _build_assets_sheet(wb, customer):
+def _build_asset_sheet(wb, customer, asset):
 
-    assets = customer["assets"] or []
+    label = f"{asset['name'] or 'Asset'} #{asset['id']}"
+
+    ws = wb.create_sheet(_sheet_name(label, customer["company_name"]))
+
+    total_cols = 2
+    row = 1
+
+    _title_row(ws, row, total_cols, "JANYU TECHNOLOGIES")
+    row += 1
+
+    _subtitle_row(ws, row, total_cols, f"Asset & Site Profile — {label}")
+    row += 1
+
+    _section_band(ws, row, total_cols, "Asset Details")
+    row += 1
+
+    for field_label, accessor in ASSET_BASE_FIELDS:
+        _field_row(ws, row, field_label, [accessor(asset)], wrap=field_label in _WRAP_LABELS)
+        row += 1
+
+    profile = asset.get("profile") or {}
+
+    for group_title, fields in SURVEY_PROFILE_GROUPS:
+
+        # This asset's last survey never wrote any of the 15 Dewatering
+        # keys (sync_asset_profile_from_survey only does so when that
+        # survey's own dewatering_required == "Yes") - skip the whole
+        # group rather than showing it as 15 blank rows.
+        if group_title == "Site Profile — Dewatering" and not profile.get("dewatering_required"):
+            continue
+
+        _section_band(ws, row, total_cols, group_title)
+        row += 1
+
+        for key, field_label, is_bool in fields:
+
+            raw = profile.get(key)
+            value = "" if raw is None else (_fmt_bool(raw) if is_bool else raw)
+
+            _field_row(ws, row, field_label, [value])
+            row += 1
+
+    ws.column_dimensions["A"].width = LABEL_COL_WIDTH
+    ws.column_dimensions["B"].width = VALUE_COL_WIDTH
+
+    ws.freeze_panes = "A4"
+
+    return ws
+
+
+def _build_no_assets_sheet(wb, customer):
 
     ws = wb.create_sheet(_sheet_name("Assets", customer["company_name"]))
 
-    total_cols = 1 + max(len(assets), 1)
+    total_cols = 2
     row = 1
 
     _title_row(ws, row, total_cols, "JANYU TECHNOLOGIES")
@@ -354,65 +403,10 @@ def _build_assets_sheet(wb, customer):
     _subtitle_row(ws, row, total_cols, f"Asset & Site Profile Register — {customer['company_name']}")
     row += 1
 
-    if not assets:
-        _field_row(ws, row, "Assets on file", ["None yet."])
-        ws.column_dimensions["A"].width = LABEL_COL_WIDTH
-        ws.column_dimensions["B"].width = VALUE_COL_WIDTH
-        return ws
-
-    # ---- column header row: one column per asset instance ----
-    header_cell = ws.cell(row=row, column=1, value="Field")
-    header_cell.fill = COLUMN_HEADER_FILL
-    header_cell.font = COLUMN_HEADER_FONT
-    header_cell.border = THIN_BORDER
-    header_cell.alignment = Alignment(horizontal="center", vertical="center")
-
-    for i, asset in enumerate(assets, start=2):
-        label = f"{asset['name'] or 'Asset'} (#{asset['id']})"
-        cell = ws.cell(row=row, column=i, value=label)
-        cell.fill = COLUMN_HEADER_FILL
-        cell.font = COLUMN_HEADER_FONT
-        cell.border = THIN_BORDER
-        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-
-    ws.row_dimensions[row].height = 28
-    header_row = row
-    row += 1
-
-    _section_band(ws, row, total_cols, "Asset Details")
-    row += 1
-
-    for label, accessor in ASSET_BASE_FIELDS:
-        _field_row(
-            ws, row, label,
-            [accessor(a) for a in assets],
-            wrap=label in _WRAP_LABELS
-        )
-        row += 1
-
-    for group_title, fields in SURVEY_PROFILE_GROUPS:
-
-        _section_band(ws, row, total_cols, group_title)
-        row += 1
-
-        for key, label, is_bool in fields:
-
-            def value_for(a, key=key, is_bool=is_bool):
-                profile = a.get("profile") or {}
-                raw = profile.get(key)
-                if raw is None:
-                    return ""
-                return _fmt_bool(raw) if is_bool else raw
-
-            _field_row(ws, row, label, [value_for(a) for a in assets])
-            row += 1
+    _field_row(ws, row, "Assets on file", ["None yet."])
 
     ws.column_dimensions["A"].width = LABEL_COL_WIDTH
-
-    for i in range(2, total_cols + 1):
-        ws.column_dimensions[get_column_letter(i)].width = VALUE_COL_WIDTH
-
-    ws.freeze_panes = ws.cell(row=header_row + 1, column=2).coordinate
+    ws.column_dimensions["B"].width = VALUE_COL_WIDTH
 
     return ws
 
@@ -432,7 +426,14 @@ def build_customer_360_workbook(db, customer_id):
     wb.remove(wb.active)
 
     _build_details_sheet(wb, customer)
-    _build_assets_sheet(wb, customer)
+
+    assets = customer["assets"] or []
+
+    if not assets:
+        _build_no_assets_sheet(wb, customer)
+    else:
+        for asset in assets:
+            _build_asset_sheet(wb, customer, asset)
 
     return wb, customer["company_name"]
 
