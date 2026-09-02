@@ -20,6 +20,7 @@ import CustomerListView from "../components/businessMasters/customers/CustomerLi
 import CustomerDetailView from "../components/businessMasters/customers/CustomerDetailView";
 import NewCustomerModal from "../components/businessMasters/customers/NewCustomerModal";
 import EditCustomerModal from "../components/businessMasters/customers/EditCustomerModal";
+import EditAssetModal from "../components/businessMasters/customers/EditAssetModal";
 import AddContactModal from "../components/businessMasters/customers/AddContactModal";
 import SetFollowUpModal from "../components/businessMasters/customers/SetFollowUpModal";
 import SendReminderModal from "../components/businessMasters/customers/SendReminderModal";
@@ -56,6 +57,8 @@ import {
     updateCustomer,
 
     deleteCustomer,
+
+    updateAsset,
 
     deleteAsset,
 
@@ -105,6 +108,8 @@ function CustomersTab({
     const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
 
     const [showEditCustomerModal, setShowEditCustomerModal] = useState(false);
+
+    const [editingAsset, setEditingAsset] = useState(null);
 
     const [showAddContactModal, setShowAddContactModal] = useState(false);
 
@@ -262,6 +267,24 @@ function CustomersTab({
 
     }
 
+    async function handleEditAsset(fields){
+
+        const remark = await promptForRemark("Editing this asset");
+
+        if(remark===null){
+            return;
+        }
+
+        await updateAsset(editingAsset.id, { ...fields, actor:buildActor(user), remark });
+
+        setEditingAsset(null);
+
+        loadDetail(selectedCustomerId);
+
+        onReload();
+
+    }
+
     async function handleDeleteCustomer(){
 
         const remark = await promptForRemark("Deleting this customer");
@@ -370,6 +393,8 @@ function CustomersTab({
 
                         onDelete={handleDeleteCustomer}
 
+                        onEditAsset={setEditingAsset}
+
                         onDeleteAsset={handleDeleteAsset}
 
                         onDeleteContact={handleDeleteContact}
@@ -423,6 +448,24 @@ function CustomersTab({
                         onClose={()=>setShowEditCustomerModal(false)}
 
                         onSave={handleEditCustomer}
+
+                    />
+
+                )
+
+            }
+
+            {
+
+                editingAsset && (
+
+                    <EditAssetModal
+
+                        asset={editingAsset}
+
+                        onClose={()=>setEditingAsset(null)}
+
+                        onSave={handleEditAsset}
 
                     />
 

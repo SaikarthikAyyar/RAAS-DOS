@@ -24,7 +24,8 @@ from backend.schemas.customer_master_schema import (
     ContactSchema,
     FollowUpSchema,
     AssetOptionListResponse,
-    AssetSchema
+    AssetSchema,
+    AssetUpdateSchema
 )
 
 from backend.schemas.notification_schema import BusinessMasterActionSchema
@@ -38,6 +39,7 @@ from backend.services.customer_master_service import (
     update_customer_owner_request,
     update_customer_request,
     delete_customer_request,
+    update_asset_request,
     delete_asset_request,
     delete_contact_request,
     build_customers_report,
@@ -266,6 +268,30 @@ def get_asset_detail(
         db: Session = Depends(get_db)
 ):
     asset = get_asset_detail_request(db, asset_id)
+
+    if not asset:
+        raise HTTPException(
+            status_code=404,
+            detail="Asset not found."
+        )
+
+    return asset
+
+
+# ====================================
+# UPDATE ASSET (division/plant/department/name)
+# ====================================
+
+@router.put(
+    "/business-master/assets/{asset_id}",
+    response_model=AssetSchema
+)
+def update_asset(
+        asset_id: int,
+        payload: AssetUpdateSchema,
+        db: Session = Depends(get_db)
+):
+    asset = update_asset_request(db, asset_id, payload)
 
     if not asset:
         raise HTTPException(

@@ -97,6 +97,7 @@ MODULE_TASKS = {
         ("add_customer", "Add customer"),
         ("add_contact", "Add contact"),
         ("remove_contact", "Remove contact"),
+        ("edit_asset", "Edit asset"),
         ("set_follow_up", "Set / update follow-up"),
         ("send_reminder", "Send reminder"),
         ("reassign_account_owner", "Reassign account owner"),

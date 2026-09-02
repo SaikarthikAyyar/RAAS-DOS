@@ -241,6 +241,47 @@ export async function deleteCustomer(
 
 
 // ====================================
+// UPDATE ASSET (division/plant/department/name)
+// ====================================
+
+export async function updateAsset(
+
+    assetId,
+
+    payload
+
+){
+
+    const response = await fetch(
+
+        `${API}/business-master/assets/${assetId}`,
+
+        {
+
+            method:"PUT",
+
+            headers:{"Content-Type":"application/json"},
+
+            body:JSON.stringify(payload)
+
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+        throw data;
+
+    }
+
+    return data;
+
+}
+
+
+// ====================================
 // DELETE ASSET
 // ====================================
 

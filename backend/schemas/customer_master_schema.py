@@ -159,6 +159,28 @@ class AssetSchema(BaseModel):
 
 
 # ====================================
+# EDIT ASSET (division/plant/department/name only - the mutable
+# site-profile fields, e.g. observed_material, are kept current
+# automatically off the next Sales Survey submission at this asset,
+# not hand-edited here)
+# ====================================
+
+class AssetUpdateSchema(BaseModel):
+
+    division: str | None = None
+
+    plant: str | None = None
+
+    department: str | None = None
+
+    name: str | None = None
+
+    actor: ActorSchema
+
+    remark: str
+
+
+# ====================================
 # LINKED ENQUIRY
 # ====================================
 

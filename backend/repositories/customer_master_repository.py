@@ -344,6 +344,37 @@ def get_asset(
 
 
 # ====================================
+# UPDATE ASSET (structural fields only - division/plant/department/
+# name). Every dependent module (Sales Survey's "Existing asset"
+# picker, the Enquiry Workspace's Asset Profile card, the Customer
+# 360 view/export) reads this same Asset row live rather than a
+# cached copy, so this update alone is what they need to reflect the
+# change - no separate propagation step. The mutable site-profile
+# fields (observed_material, access_opening_type, ...) already have
+# their own update path (see update_asset_profile below), left
+# untouched here.
+# ====================================
+
+def update_asset(
+        db,
+        asset,
+        division,
+        plant,
+        department,
+        name
+):
+    asset.division = division
+    asset.plant = plant
+    asset.department = department
+    asset.name = name
+
+    db.commit()
+    db.refresh(asset)
+
+    return asset
+
+
+# ====================================
 # FIND ASSET BY DIVISION/PLANT/DEPARTMENT/NAME
 # Mirrors findOrCreateAssetPath()'s lookup half - the "find" part.
 # ====================================

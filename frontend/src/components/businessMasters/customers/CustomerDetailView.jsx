@@ -62,6 +62,8 @@ export default function CustomerDetailView({
 
     onDelete,
 
+    onEditAsset,
+
     onDeleteAsset,
 
     onDeleteContact
@@ -288,7 +290,7 @@ export default function CustomerDetailView({
                 <table>
 
                     <thead>
-                        <tr><th>Division</th><th>Plant</th><th>Department</th><th>Asset</th>{isAdmin && <th></th>}</tr>
+                        <tr><th>Division</th><th>Plant</th><th>Department</th><th>Asset</th>{(hasTask("bm-tab-customers", "edit_asset") || isAdmin) && <th></th>}</tr>
                     </thead>
 
                     <tbody>
@@ -297,7 +299,7 @@ export default function CustomerDetailView({
 
                             detail.assets.length===0 ? (
 
-                                <tr><td colSpan={isAdmin ? 5 : 4} className="bm-muted">No assets registered yet.</td></tr>
+                                <tr><td colSpan={(hasTask("bm-tab-customers", "edit_asset") || isAdmin) ? 5 : 4} className="bm-muted">No assets registered yet.</td></tr>
 
                             ) : detail.assets.map(a=>(
 
@@ -313,23 +315,38 @@ export default function CustomerDetailView({
 
                                     {
 
-                                        isAdmin && (
+                                        (hasTask("bm-tab-customers", "edit_asset") || isAdmin) && (
 
-                                            <td>
+                                            <td style={{display:"flex", gap:8}}>
 
-                                                <button
+                                                {
+                                                    hasTask("bm-tab-customers", "edit_asset") && (
+                                                        <button
+                                                            className="bm-backlink"
+                                                            onClick={()=>onEditAsset(a)}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    )
+                                                }
 
-                                                    className="bm-backlink"
+                                                {
+                                                    isAdmin && (
+                                                        <button
 
-                                                    style={{color:"#991b1b"}}
+                                                            className="bm-backlink"
 
-                                                    onClick={()=>onDeleteAsset(a.id)}
+                                                            style={{color:"#991b1b"}}
 
-                                                >
+                                                            onClick={()=>onDeleteAsset(a.id)}
 
-                                                    Remove
+                                                        >
 
-                                                </button>
+                                                            Remove
+
+                                                        </button>
+                                                    )
+                                                }
 
                                             </td>
 

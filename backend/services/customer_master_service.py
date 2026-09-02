@@ -22,6 +22,7 @@ from backend.repositories.customer_master_repository import (
     get_asset,
     find_asset_by_path,
     create_asset,
+    update_asset,
     update_asset_profile,
     delete_asset,
     get_enquiries_by_asset,
@@ -577,6 +578,66 @@ def delete_customer_request(
     )
 
     return "deleted"
+
+
+# ====================================
+# UPDATE ASSET (division/plant/department/name)
+# Every dependent module (Sales Survey's "Existing asset" picker,
+# the Enquiry Workspace's Asset Profile card, this same Customer 360
+# view/export) resolves this Asset row live on every read - there is
+# no separate cached copy of these 4 fields anywhere else in the app
+# for this update to fall out of sync with, so a straight in-place
+# write is all "dependent modules must reflect this change" needs.
+# ====================================
+
+def update_asset_request(
+        db,
+        asset_id,
+        payload
+):
+    asset = get_asset(db, asset_id)
+
+    if not asset:
+        return None
+
+    before = {
+        "division": asset.division,
+        "plant": asset.plant,
+        "department": asset.department,
+        "name": asset.name
+    }
+
+    customer = get_customer(db, asset.customer_id) if asset.customer_id else None
+
+    updated = update_asset(
+        db, asset,
+        payload.division, payload.plant, payload.department, payload.name
+    )
+
+    changes = [
+        {"field": field, "before": before_value, "after": getattr(updated, field)}
+        for field, before_value in before.items()
+        if before_value != getattr(updated, field)
+    ]
+
+    if changes:
+
+        record_business_master_change(
+            db=db,
+            module="Business Masters",
+            action="UPDATE",
+            actor_user_id=payload.actor.user_id,
+            actor_name=payload.actor.name,
+            actor_role=payload.actor.role,
+            title=(
+                f"{payload.actor.name} updated asset '{updated.name or 'Unnamed asset'}' "
+                f"for {customer.company_name if customer else 'a customer'} in Business Masters"
+            ),
+            changes=changes,
+            remark=payload.remark
+        )
+
+    return updated
 
 
 # ====================================
