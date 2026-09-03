@@ -47,7 +47,7 @@ return(
         />
 
         <Row
-            label="Estimated Volume"
+            label="Sludge Volume"
             value={inputs?.estimated_volume}
             unit="m³"
         />

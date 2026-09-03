@@ -12,6 +12,8 @@ from datetime import datetime, date
 
 from backend.models.sales_survey import SalesSurvey
 
+from backend.utils.sludge_volume import resolve_sludge_volume
+
 from backend.repositories.execution_repository import (
     create_execution,
     get_execution,
@@ -242,11 +244,7 @@ def _validate_phase_completion(db, execution):
             .first()
         )
 
-        estimated_volume = (
-            survey.estimated_volume
-            if survey and survey.estimated_volume
-            else 0
-        )
+        estimated_volume = resolve_sludge_volume(survey)
 
         total_output = execution.total_output or 0
 
@@ -1365,11 +1363,7 @@ def update_execution_progress(
         .first()
     )
 
-    estimated_volume = (
-        survey.estimated_volume
-        if survey and survey.estimated_volume
-        else 0
-    )
+    estimated_volume = resolve_sludge_volume(survey)
 
     progress = execution.execution_progress
 
@@ -1501,15 +1495,7 @@ def get_execution_request(
 
     result = execution.__dict__.copy()
 
-    result["estimated_volume"] = (
-
-        survey.estimated_volume
-
-        if survey
-
-        else 0
-
-    )
+    result["estimated_volume"] = resolve_sludge_volume(survey)
 
     return result
 
@@ -1539,11 +1525,7 @@ def get_execution_by_job_request(
 
     result = execution.__dict__.copy()
 
-    result["estimated_volume"] = (
-        survey.estimated_volume
-        if survey
-        else 0
-    )
+    result["estimated_volume"] = resolve_sludge_volume(survey)
 
     return result
 
@@ -1845,7 +1827,10 @@ def start_execution_phase(
 # Actual cleaning / dredging / dewatering operation.
 #
 # Inputs:
-# - Estimated work volume
+# - Sludge volume (via resolve_sludge_volume() - the survey's real
+#   sludge_volume where computed, falling back to the legacy
+#   estimated_volume column for pre-existing surveys - never the
+#   tank's own total volume)
 # - Total output completed
 #
 # Formula:

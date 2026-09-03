@@ -11,6 +11,8 @@ from backend.models.business_masters_pricing import (
 
 from backend.models.machines_pumps import Machine
 
+from backend.utils.sludge_volume import resolve_sludge_volume
+
 
 # ====================================
 # TECHNICAL SNAPSHOT
@@ -373,15 +375,11 @@ def build_dewatering_addon(
 
     )
 
-    volume = (
-
-        survey.estimated_volume
-
-        if survey and survey.estimated_volume
-
-        else 0
-
-    )
+    # Dewatering processes whatever sludge actually came out of the
+    # tank, not the tank's own physical capacity - resolve_sludge_volume
+    # also covers the legacy-survey fallback (see backend/utils/
+    # sludge_volume.py).
+    volume = resolve_sludge_volume(survey)
 
     def rate_for(method_key):
 

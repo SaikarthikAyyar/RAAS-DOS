@@ -37,7 +37,7 @@ export default function ExecutionOutputReadOnly({
             <div className="execution-metric-grid">
 
                 <div className="execution-metric">
-                    <h5>Target (Estimated Volume)</h5>
+                    <h5>Target (Sludge Volume)</h5>
                     <h2>{estimatedVolume.toFixed(2)} {unit}</h2>
                 </div>
 

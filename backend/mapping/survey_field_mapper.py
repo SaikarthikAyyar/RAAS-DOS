@@ -1,3 +1,6 @@
+from backend.utils.sludge_volume import resolve_sludge_volume
+
+
 # ====================================
 # SALES SURVEY → OPS ENGINE FIELD MAP
 # ====================================
@@ -12,7 +15,14 @@ OPS_FIELD_MAP = {
 
     "sludge_hardness": "sludge_hardness",
 
-    "estimated_volume": "estimated_volume",
+    # "estimated_volume" is deliberately absent from this generic
+    # loop-driven map - every consumer of engineering_inputs["estimated_
+    # volume"] (Ops Engine's volume-fit scoring, its execution-day
+    # duration calc) has always meant the volume of material to be
+    # removed, i.e. the survey's sludge_volume, not its tank_volume-
+    # renamed estimated_volume column. Set explicitly below via
+    # resolve_sludge_volume() instead, which also handles the legacy-
+    # survey fallback - see backend/utils/sludge_volume.py.
 
     "debris_level": "debris_level",
 
@@ -134,5 +144,7 @@ def map_sales_survey_to_ops(
             None
 
         )
+
+    mapped["estimated_volume"] = resolve_sludge_volume(sales_survey)
 
     return mapped
