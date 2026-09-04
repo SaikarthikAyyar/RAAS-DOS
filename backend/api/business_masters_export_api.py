@@ -31,6 +31,8 @@ from backend.models.personnel import Personnel
 from backend.models.personnel_document import PersonnelDocument
 from backend.models.hr_role import HrRole
 from backend.models.gst_settings import GstSettings
+from backend.models.machine_inventory import MachineInventory
+from backend.models.fleet_unit import FleetUnit, FleetUnitPersonnel
 
 
 api = APIRouter(tags=["Business Masters Export"])
@@ -92,7 +94,14 @@ TAB_EXPORT_TABLES = {
 
     "machines": [(Machine, "Machines")],
 
+    "machineinventory": [(MachineInventory, "Machine Inventory")],
+
     "pumps": [(Pump, "Pumps")],
+
+    "fleetunits": [
+        (FleetUnit, "Fleet Units"),
+        (FleetUnitPersonnel, "Fleet Unit Personnel")
+    ],
 
     "personnel": [
         (Personnel, "Personnel"),
