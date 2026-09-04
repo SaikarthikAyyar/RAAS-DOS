@@ -369,29 +369,6 @@ export async function deleteContact(
 }
 
 
-// ====================================
-// CUSTOMERS REPORT (3-sheet Excel export - Summary/Assets/Contacts)
-// ====================================
-
-export async function getCustomersReport(){
-
-    const response = await fetch(
-
-        `${API}/business-master/customers-report`
-
-    );
-
-    const data = await response.json();
-
-    if(!response.ok){
-
-        throw data;
-
-    }
-
-    return data;
-
-}
 
 
 // ====================================

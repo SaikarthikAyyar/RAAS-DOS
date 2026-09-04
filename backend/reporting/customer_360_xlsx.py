@@ -2,49 +2,21 @@
 # IMPORTS
 # ====================================
 
-import re
-
 from io import BytesIO
 
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 from backend.services.customer_master_service import get_customer_detail_request
 
-
-# ====================================
-# STYLE CONSTANTS
-# Matches the field-visit-report look this business already uses on
-# paper (title banner, blue section bands, bordered field/value grid) -
-# the client-side SheetJS export this replaces has no way to apply any
-# of this (no cell fills/fonts/merges in the free/community build), so
-# this whole export is generated server-side instead, the same fix
-# already used for the Fleet Forecast export.
-# ====================================
-
-TITLE_FONT = Font(bold=True, size=14, color="1F3864")
-TITLE_BORDER = Border(bottom=Side(style="medium", color="1F3864"))
-
-SUBTITLE_FILL = PatternFill("solid", fgColor="1F3864")
-SUBTITLE_FONT = Font(bold=True, size=11, color="FFFFFF")
-
-SECTION_FILL = PatternFill("solid", fgColor="8EA9DB")
-SECTION_FONT = Font(bold=True, size=10.5, color="1F3864")
-
-LABEL_FILL = PatternFill("solid", fgColor="F2F2F2")
-LABEL_FONT = Font(bold=True, size=10)
-
-VALUE_FONT = Font(size=10)
-
-THIN_BORDER = Border(*(Side(style="thin", color="BFBFBF"),) * 4)
-
-LABEL_COL_WIDTH = 32
-VALUE_COL_WIDTH = 30
-
-# Longer free-text fields read better with a taller wrapped row instead
-# of one long unreadable line - matches the reference report's own
-# taller rows for its "Sludge type / Viscosity / pH..." style fields.
-WRAP_ROW_HEIGHT = 42
+from backend.reporting.xlsx_style import (
+    LABEL_COL_WIDTH,
+    VALUE_COL_WIDTH,
+    sheet_name as _sheet_name,
+    title_row as _title_row,
+    subtitle_row as _subtitle_row,
+    section_band as _section_band,
+    field_row as _field_row
+)
 
 
 # ====================================
@@ -204,91 +176,6 @@ SURVEY_PROFILE_GROUPS = [
         ("decision_maker", "Decision Maker", False)
     ])
 ]
-
-
-# ====================================
-# SHEET-NAME SAFETY (Excel's 31-char cap)
-# ====================================
-
-def _sheet_name(suffix, company_name):
-
-    clean_company = re.sub(r'[\[\]:*?/\\]', "", company_name or "")
-    clean_suffix = re.sub(r'[\[\]:*?/\\]', "", suffix)
-
-    tail = f" - {clean_suffix}"
-    truncated_company = clean_company[:max(31 - len(tail), 0)]
-
-    return f"{truncated_company}{tail}"
-
-
-# ====================================
-# SHARED ROW HELPERS
-# ====================================
-
-def _title_row(ws, row, total_cols, text):
-
-    cell = ws.cell(row=row, column=1, value=text)
-    cell.font = TITLE_FONT
-    cell.alignment = Alignment(horizontal="center", vertical="center")
-    cell.border = TITLE_BORDER
-
-    for c in range(2, total_cols + 1):
-        ws.cell(row=row, column=c).border = TITLE_BORDER
-
-    if total_cols > 1:
-        ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=total_cols)
-
-    ws.row_dimensions[row].height = 24
-
-
-def _subtitle_row(ws, row, total_cols, text):
-
-    cell = ws.cell(row=row, column=1, value=text)
-    cell.fill = SUBTITLE_FILL
-    cell.font = SUBTITLE_FONT
-    cell.alignment = Alignment(horizontal="center", vertical="center")
-
-    for c in range(2, total_cols + 1):
-        ws.cell(row=row, column=c).fill = SUBTITLE_FILL
-
-    if total_cols > 1:
-        ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=total_cols)
-
-    ws.row_dimensions[row].height = 20
-
-
-def _section_band(ws, row, total_cols, text):
-
-    cell = ws.cell(row=row, column=1, value=text)
-    cell.fill = SECTION_FILL
-    cell.font = SECTION_FONT
-    cell.alignment = Alignment(horizontal="left", vertical="center", indent=1)
-
-    for c in range(2, total_cols + 1):
-        ws.cell(row=row, column=c).fill = SECTION_FILL
-
-    if total_cols > 1:
-        ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=total_cols)
-
-    ws.row_dimensions[row].height = 20
-
-
-def _field_row(ws, row, label, values, wrap=False):
-
-    label_cell = ws.cell(row=row, column=1, value=label)
-    label_cell.fill = LABEL_FILL
-    label_cell.font = LABEL_FONT
-    label_cell.border = THIN_BORDER
-    label_cell.alignment = Alignment(vertical="center", wrap_text=True)
-
-    for i, value in enumerate(values, start=2):
-        cell = ws.cell(row=row, column=i, value=value if value not in (None, "") else None)
-        cell.font = VALUE_FONT
-        cell.border = THIN_BORDER
-        cell.alignment = Alignment(vertical="center", wrap_text=wrap)
-
-    if wrap:
-        ws.row_dimensions[row].height = WRAP_ROW_HEIGHT
 
 
 # Fields whose values tend to be long free text, read better wrapped

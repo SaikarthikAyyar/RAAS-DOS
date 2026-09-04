@@ -8,10 +8,6 @@ import {
 
 } from "react";
 
-import * as XLSX from "xlsx";
-
-import { withDateStamp } from "../utils/exportFilename";
-
 import "../components/businessMasters/BusinessMasters.css";
 
 import { businessMastersTabs } from "../data/businessMastersTabs";
@@ -62,13 +58,11 @@ import {
 
     deleteAsset,
 
-    deleteContact,
-
-    getCustomersReport
+    deleteContact
 
 } from "../services/customerMasterService";
 
-import { exportTab } from "../services/businessMastersExportService";
+import { exportTab, exportCustomersReport } from "../services/businessMastersExportService";
 
 import { getUsers } from "../services/administrationUsersService";
 
@@ -568,59 +562,6 @@ function PlaceholderTab({ label }){
 
 
 // ====================================
-// XLSX EXPORT HELPERS
-// ====================================
-
-// JSONB array/object columns (Machine.preferred_job_types etc.) come
-// back as real arrays/objects - XLSX.utils.json_to_sheet would render
-// those as "[object Object]", so flatten them to readable text first.
-// Every other value (including raw FK ids and timestamp strings) is
-// passed through untouched - the whole point of this export is to
-// show the real DB column values, not a display-formatted version.
-function sanitizeRowsForExport(rows){
-
-    return rows.map(row=>{
-
-        const clean = {};
-
-        for(const key of Object.keys(row)){
-
-            const value = row[key];
-
-            if(Array.isArray(value)){
-                clean[key] = value.join(", ");
-            }
-            else if(value !== null && typeof value === "object"){
-                clean[key] = JSON.stringify(value);
-            }
-            else{
-                clean[key] = value;
-            }
-
-        }
-
-        return clean;
-
-    });
-
-}
-
-function downloadWorkbook(workbook, filename){
-
-    XLSX.writeFile(workbook, filename);
-
-}
-
-// Excel sheet names cap at 31 chars and can't contain []:*?/\ -
-// same truncation convention already used for the Customer 360 export.
-function safeSheetName(name){
-
-    return name.replace(/[\[\]:*?/\\]/g, "").slice(0, 31);
-
-}
-
-
-// ====================================
 // PAGE
 // Matches renderMasters(): .title + .tabs + tab body.
 // ====================================
@@ -701,58 +642,7 @@ export default function BusinessMastersModule(){
 
     async function handleExportCustomersReport(){
 
-        const report = await getCustomersReport();
-
-        const workbook = XLSX.utils.book_new();
-
-        const summarySheet = XLSX.utils.aoa_to_sheet([
-
-            ["Company", "Industry", "Location", "Account Manager", "Total Enquiries", "Total Closed Jobs", "Invoice Value"],
-
-            ...report.summary.map(r=>[
-                r.company, r.industry, r.location, r.account_manager,
-                r.total_enquiries, r.total_closed_jobs, r.invoice_value
-            ])
-
-        ]);
-
-        const assetsSheet = XLSX.utils.aoa_to_sheet([
-
-            [
-                "Company Name", "Asset Name", "Closed Jobs till date (Count)",
-                "Open Enquiries (Till PO Received)", "Enquiry Stage",
-                "Last Closed Job Date", "Next Follow-up Date", "Invoice Value",
-                "Account Manager"
-            ],
-
-            ...report.assets.map(r=>[
-                r.company_name, r.asset_name, r.closed_jobs_count,
-                r.open_enquiries_count, r.enquiry_stage,
-                r.last_closed_job_date, r.next_follow_up_date, r.invoice_value,
-                r.account_manager
-            ])
-
-        ]);
-
-        const contactsSheet = XLSX.utils.aoa_to_sheet([
-
-            [
-                "Company Name", "Category", "Industry", "Region", "GST Number",
-                "Account Manager", "POC Name", "POC Designation", "POC Email", "POC Phone"
-            ],
-
-            ...report.contacts.map(r=>[
-                r.company_name, r.category, r.industry, r.region, r.gst_number,
-                r.account_manager, r.poc_name, r.poc_designation, r.poc_email, r.poc_phone
-            ])
-
-        ]);
-
-        XLSX.utils.book_append_sheet(workbook, summarySheet, "Customer Summary");
-        XLSX.utils.book_append_sheet(workbook, assetsSheet, "Assets");
-        XLSX.utils.book_append_sheet(workbook, contactsSheet, "Company & POC");
-
-        downloadWorkbook(workbook, withDateStamp("Customers_Report.xlsx"));
+        await exportCustomersReport();
 
     }
 
@@ -760,11 +650,9 @@ export default function BusinessMastersModule(){
 
         const label = businessMastersTabs.find(([key])=>key===activeTab)?.[1] || activeTab;
 
-        let data;
-
         try{
 
-            data = await exportTab(activeTab);
+            await exportTab(activeTab, label);
 
         }
 
@@ -772,33 +660,7 @@ export default function BusinessMastersModule(){
 
             alert(formatApiError(err, "Nothing to export for this tab yet."));
 
-            return;
-
         }
-
-        if(!data.sheets || data.sheets.every(sheet=>sheet.rows.length===0)){
-
-            alert("No data to export for this tab yet.");
-
-            return;
-
-        }
-
-        const workbook = XLSX.utils.book_new();
-
-        data.sheets.forEach(sheet=>{
-
-            const rows = sanitizeRowsForExport(sheet.rows);
-
-            const worksheet = rows.length
-                ? XLSX.utils.json_to_sheet(rows)
-                : XLSX.utils.aoa_to_sheet([["No rows yet."]]);
-
-            XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName(sheet.name));
-
-        });
-
-        downloadWorkbook(workbook, withDateStamp(`${label.replace(/\s+/g, "_")}.xlsx`));
 
     }
 

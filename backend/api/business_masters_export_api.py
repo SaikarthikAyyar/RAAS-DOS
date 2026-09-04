@@ -2,10 +2,15 @@
 # IMPORTS
 # ====================================
 
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
+
+from backend.reporting.business_masters_export_xlsx import build_tab_export_workbook_bytes
 
 from backend.models.business_masters_pricing import (
     ServiceConfiguration,
@@ -102,18 +107,45 @@ TAB_EXPORT_TABLES = {
 
 
 # ====================================
-# EXPORT CURRENT TAB
-# Returns full raw rows (every DB column) for whichever tab's
-# backing table(s) - the frontend builds the actual .xlsx from this,
-# matching the client-side workbook-building convention already used
-# for the Customer 360 export (Phase 6).
+# TAB LABELS
+# Mirrors frontend/src/data/businessMastersTabs.js exactly - used only
+# for this export's subtitle banner, not for anything access-related.
 # ====================================
 
-@api.get("/business-master/export/{tab_key}")
-def export_tab(
-        tab_key: str,
-        db: Session = Depends(get_db)
-):
+TAB_LABELS = {
+
+    "customers": "Customers",
+    "machines": "Machine Specs",
+    "machineinventory": "Machine Inventory",
+    "pumps": "Pump Master",
+    "personnel": "Personnel",
+    "accessories": "Accessories",
+    "hr": "Human Resources",
+    "dewatering": "Dewatering Methods",
+    "serviceconfig": "Service Configurations",
+    "rules": "Commercial Rules",
+    "hubs": "Hubs",
+    "fleetunits": "Fleet Units",
+    "quotetemplates": "Quote Templates",
+    "emailtemplates": "Email Templates",
+    "lists": "Lookup Lists",
+    "gst": "GST & Tax"
+
+}
+
+
+# ====================================
+# EXPORT CURRENT TAB
+# Streams a real, styled .xlsx built server-side (matching the
+# Customer 360 export's own design) - one sheet per backing table,
+# every real DB column, in the same order as before. Content is
+# unchanged from what this endpoint used to hand the frontend as raw
+# JSON for it to build client-side; only the rendering moved server-
+# side, the same fix already applied to the Customer 360 export.
+# ====================================
+
+def _gather_tab_sheets(tab_key, db):
+
     if tab_key == "hubs":
 
         hub_rows = [
@@ -134,12 +166,10 @@ def export_tab(
             entry["user_name"] = user_names.get(row.user_id)
             approver_rows.append(entry)
 
-        return {
-            "sheets": [
-                {"name": "Hubs", "rows": hub_rows},
-                {"name": "Hub Approvers", "rows": approver_rows}
-            ]
-        }
+        return [
+            {"name": "Hubs", "rows": hub_rows},
+            {"name": "Hub Approvers", "rows": approver_rows}
+        ]
 
     tables = TAB_EXPORT_TABLES.get(tab_key)
 
@@ -160,4 +190,35 @@ def export_tab(
         for model, sheet_name in tables
     ]
 
-    return {"sheets": sheets}
+    return sheets
+
+
+# ====================================
+# ROUTE
+# ====================================
+
+@api.get("/business-master/export/{tab_key}")
+def export_tab(
+        tab_key: str,
+        db: Session = Depends(get_db)
+):
+    sheets = _gather_tab_sheets(tab_key, db)
+
+    if all(not sheet["rows"] for sheet in sheets):
+        raise HTTPException(
+            status_code=404,
+            detail="No data to export for this tab yet."
+        )
+
+    tab_label = TAB_LABELS.get(tab_key, tab_key)
+
+    buffer = build_tab_export_workbook_bytes(tab_label, sheets)
+
+    safe_label = tab_label.replace(" ", "_")
+    filename = f"{safe_label}_Export_{date.today().isoformat()}.xlsx"
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )

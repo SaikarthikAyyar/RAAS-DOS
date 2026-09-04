@@ -31,6 +31,7 @@ from backend.schemas.customer_master_schema import (
 from backend.schemas.notification_schema import BusinessMasterActionSchema
 
 from backend.reporting.customer_360_xlsx import build_customer_360_workbook_bytes
+from backend.reporting.business_masters_export_xlsx import build_customers_report_workbook_bytes
 
 from backend.services.customer_master_service import (
     list_customers_request,
@@ -178,7 +179,17 @@ def delete_customer(
 def get_customers_report(
         db: Session = Depends(get_db)
 ):
-    return build_customers_report(db)
+    report = build_customers_report(db)
+
+    buffer = build_customers_report_workbook_bytes(report)
+
+    filename = f"Customers_Report_{date.today().isoformat()}.xlsx"
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
 
 
 # ====================================
