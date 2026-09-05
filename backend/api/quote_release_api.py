@@ -2,6 +2,8 @@
 # IMPORTS
 # ====================================
 
+import os
+
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -48,6 +50,18 @@ def get_quote_release_document_for_quote(quote_id: int, db: Session = Depends(ge
 
 # ====================================
 # DOWNLOAD
+# Checks the file's real presence on disk before handing off to
+# FileResponse - on a host with an ephemeral filesystem (Render wipes
+# backend/uploads/... on every redeploy while the DB row referencing
+# it, in Supabase, survives untouched), a stale row pointing at a
+# vanished file is a real, recurring case, not a hypothetical.
+# FileResponse itself doesn't fail cleanly for a missing path - the
+# stat happens after headers may already be underway, which surfaces
+# to the browser as a raw connection failure (net::ERR_FAILED) rather
+# than a parseable 404 the frontend's own regenerate-on-failure logic
+# can react to. Checking here instead makes the failure a clean,
+# ordinary HTTPException every caller (this app's own retry, a direct
+# link click, an email client fetching an attachment URL) can handle.
 # ====================================
 
 @router.get("/quote-release-documents/{document_id}/download")
@@ -57,6 +71,12 @@ def download_quote_release_document(document_id: int, db: Session = Depends(get_
 
     if document is None:
         raise HTTPException(status_code=404, detail="Quote release document not found.")
+
+    if not os.path.exists(document.file_path):
+        raise HTTPException(
+            status_code=404,
+            detail="This quote release document's file is no longer available - regenerate it."
+        )
 
     return FileResponse(
         document.file_path,

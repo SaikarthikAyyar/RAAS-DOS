@@ -434,19 +434,20 @@ export default function CommercialApprovalSummary({
 
     }
 
-    // Generate-on-demand: if Accept has already moved this case to
-    // Quote Released (or beyond) but no quote_release_documents row
-    // actually exists for it yet - never generated, or the DB row's
-    // file went missing - this button produces one on the spot instead
-    // of requiring a detour through the Quotes module's own "Generate
-    // Quote Release" link. Reuses the exact same generate endpoint
-    // that link calls; once a document already exists, this is a
-    // no-op and the plain <a href> below handles the download itself.
+    // Generate-on-demand, resilient to two distinct failure modes: (1)
+    // Accept has moved this case to Quote Released or beyond but no
+    // quote_release_documents row exists for it yet - never generated
+    // - and (2) a row DOES exist but its file is gone from disk, which
+    // genuinely happens on Render's ephemeral filesystem - every
+    // redeploy wipes backend/uploads/... while the DB row referencing
+    // it (in Supabase) survives untouched, so a stale row is a real,
+    // recurring case in production, not a hypothetical. Tries the
+    // existing document first (matches "if present, just download it"),
+    // and only regenerates - via the exact same endpoint the Quotes
+    // module's own "Generate Quote Release" link uses - when that
+    // download genuinely fails, rather than requiring a manual detour
+    // through that other module every time.
     async function handleDownloadQuoteDocument(event){
-
-        if(releaseDocument?.id){
-            return;
-        }
 
         event.preventDefault();
 
@@ -459,33 +460,72 @@ export default function CommercialApprovalSummary({
 
         try{
 
-            const actor = buildActor(user);
+            let blob = null;
+            let filename = releaseDocument?.file_name || `Quote_ENQ${enquiry.id}.docx`;
 
-            const response = await fetch(
-                generateQuoteReleaseUrl(quote.id, actor?.name)
-            );
+            if(releaseDocument?.id){
 
-            if(!response.ok){
-                throw await response.json().catch(()=>({}));
+                // A missing file on disk doesn't always come back as a
+                // clean non-ok response - it can abort the connection
+                // outright (net::ERR_FAILED), which makes fetch() itself
+                // throw rather than resolve. Either failure shape must
+                // fall through to regenerating below, not abort the
+                // whole action - hence the try/catch here rather than
+                // just checking .ok.
+                try{
+
+                    const existingResponse = await fetch(
+                        quoteReleaseDownloadUrl(releaseDocument.id)
+                    );
+
+                    if(existingResponse.ok){
+                        blob = await existingResponse.blob();
+                    }
+
+                }
+
+                catch(existingErr){
+
+                    console.warn("Existing quote release document unavailable, regenerating:", existingErr);
+
+                }
+
             }
 
-            const blob = await response.blob();
+            if(!blob){
+
+                const actor = buildActor(user);
+
+                const generateResponse = await fetch(
+                    generateQuoteReleaseUrl(quote.id, actor?.name)
+                );
+
+                if(!generateResponse.ok){
+                    throw await generateResponse.json().catch(()=>({}));
+                }
+
+                blob = await generateResponse.blob();
+
+                // Refresh so the email attachment (and this button's
+                // own next click) both use the now-real, freshly
+                // generated document instead of hitting the same
+                // stale/missing reference again.
+                const doc = await getQuoteReleaseDocumentForQuote(quote.id);
+                setReleaseDocument(doc);
+                filename = doc?.file_name || filename;
+
+            }
+
             const objectUrl = window.URL.createObjectURL(blob);
 
             const link = document.createElement("a");
             link.href = objectUrl;
-            link.download = `Quote_ENQ${enquiry.id}.docx`;
+            link.download = filename;
             document.body.appendChild(link);
             link.click();
             link.remove();
 
             window.URL.revokeObjectURL(objectUrl);
-
-            // Refresh so the email attachment (and any later click of
-            // this same button) both use the now-real generated
-            // document instead of regenerating it every time.
-            const doc = await getQuoteReleaseDocumentForQuote(quote.id);
-            setReleaseDocument(doc);
 
         }
 
@@ -808,6 +848,12 @@ export default function CommercialApprovalSummary({
             </div>
 
             {
+                // attachmentUrl is always regenerated fresh rather than
+                // reusing releaseDocument's possibly-stale URL - this
+                // modal's own download trigger is a plain link with no
+                // way to retry on a missing-file failure, so the one
+                // guaranteed-correct source is the same generate
+                // endpoint the download button above falls back to.
                 showSendModal && quoteReleaseEmailTemplate && (
 
                     <SendTemplateModal
@@ -818,13 +864,9 @@ export default function CommercialApprovalSummary({
 
                         downloadOnly
 
-                        attachmentUrl={
-                            releaseDocument?.id
-                                ? quoteReleaseDownloadUrl(releaseDocument.id)
-                                : generateQuoteReleaseUrl(quote.id, buildActor(user)?.name)
-                        }
+                        attachmentUrl={generateQuoteReleaseUrl(quote.id, buildActor(user)?.name)}
 
-                        attachmentFileName={releaseDocument?.file_name || `Quote_ENQ${enquiry.id}.docx`}
+                        attachmentFileName={`Quote_ENQ${enquiry.id}.docx`}
 
                     />
 
