@@ -68,6 +68,33 @@ export function computeGateStatus(enquiry, requiredStage, standingFlag, gateLabe
 // logic as computeGateStatus above, just without the standing check.
 // ====================================
 
+// ====================================
+// HAS REACHED STAGE
+// "Has this enquiry gotten at least as far as X" - e.g. Commercial
+// Approval's release actions should be available from the moment
+// Accept moves the case to Quote Released onward (PO Received, Job
+// Creation, ... a release stays valid at every later stage too), not
+// just in the instant right after Accept.
+// ====================================
+
+export function hasReachedStage(enquiry, stage){
+
+    if(!enquiry){
+        return false;
+    }
+
+    const currentIndex = STAGE_ORDER.indexOf(enquiry.stage);
+    const targetIndex = STAGE_ORDER.indexOf(stage);
+
+    if(currentIndex === -1 || targetIndex === -1){
+        return false;
+    }
+
+    return currentIndex >= targetIndex;
+
+}
+
+
 export function computeStageOnly(enquiry, requiredStage){
 
     if(!enquiry){

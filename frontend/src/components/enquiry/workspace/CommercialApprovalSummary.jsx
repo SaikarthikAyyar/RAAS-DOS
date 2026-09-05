@@ -6,7 +6,7 @@ import useApprovalStanding from "../../../hooks/useApprovalStanding";
 
 import { buildActor } from "../../../utils/actor";
 
-import { computeGateStatus, computeStageOnly } from "../../../utils/gateStatus";
+import { computeGateStatus, computeStageOnly, hasReachedStage } from "../../../utils/gateStatus";
 
 import { formatApiError } from "../../../utils/apiError";
 
@@ -24,6 +24,10 @@ import {
     quoteReleaseDownloadUrl,
     getQuoteReleaseDocumentForQuote
 } from "../../../services/quoteReleaseService";
+
+import {
+    generateQuoteReleaseUrl
+} from "../../../services/quotesModuleService";
 
 import { getEmailTemplates } from "../../../services/emailTemplatesService";
 
@@ -91,6 +95,8 @@ export default function CommercialApprovalSummary({
     const [releaseDocument, setReleaseDocument] = useState(null);
     const [quoteReleaseEmailTemplate, setQuoteReleaseEmailTemplate] = useState(null);
     const [showSendModal, setShowSendModal] = useState(false);
+    const [generatingDocument, setGeneratingDocument] = useState(false);
+    const [downloadError, setDownloadError] = useState("");
 
     useEffect(()=>{
 
@@ -428,6 +434,75 @@ export default function CommercialApprovalSummary({
 
     }
 
+    // Generate-on-demand: if Accept has already moved this case to
+    // Quote Released (or beyond) but no quote_release_documents row
+    // actually exists for it yet - never generated, or the DB row's
+    // file went missing - this button produces one on the spot instead
+    // of requiring a detour through the Quotes module's own "Generate
+    // Quote Release" link. Reuses the exact same generate endpoint
+    // that link calls; once a document already exists, this is a
+    // no-op and the plain <a href> below handles the download itself.
+    async function handleDownloadQuoteDocument(event){
+
+        if(releaseDocument?.id){
+            return;
+        }
+
+        event.preventDefault();
+
+        if(generatingDocument){
+            return;
+        }
+
+        setDownloadError("");
+        setGeneratingDocument(true);
+
+        try{
+
+            const actor = buildActor(user);
+
+            const response = await fetch(
+                generateQuoteReleaseUrl(quote.id, actor?.name)
+            );
+
+            if(!response.ok){
+                throw await response.json().catch(()=>({}));
+            }
+
+            const blob = await response.blob();
+            const objectUrl = window.URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = objectUrl;
+            link.download = `Quote_ENQ${enquiry.id}.docx`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            window.URL.revokeObjectURL(objectUrl);
+
+            // Refresh so the email attachment (and any later click of
+            // this same button) both use the now-real generated
+            // document instead of regenerating it every time.
+            const doc = await getQuoteReleaseDocumentForQuote(quote.id);
+            setReleaseDocument(doc);
+
+        }
+
+        catch(err){
+
+            setDownloadError(formatApiError(err, "Unable to generate the quote release document."));
+
+        }
+
+        finally{
+
+            setGeneratingDocument(false);
+
+        }
+
+    }
+
     const kpis = [
 
         { label:"Survey", value: survey ? "Complete" : "Pending" },
@@ -559,7 +634,7 @@ export default function CommercialApprovalSummary({
                 }
 
                 {
-                    releaseDocument?.id && (
+                    hasReachedStage(enquiry, "QUOTE_RELEASED") && (
 
                         <div className="survey-actions" style={{marginTop:10, marginBottom:10}} data-guide-id="ca-release-actions">
 
@@ -568,11 +643,13 @@ export default function CommercialApprovalSummary({
                             {hasTask("enquiry-tab-commercial-approval", "download_quote_document") && (
                                 <a
                                     className="survey-action-button"
-                                    href={quoteReleaseDownloadUrl(releaseDocument.id)}
+                                    href={releaseDocument?.id ? quoteReleaseDownloadUrl(releaseDocument.id) : "#"}
                                     target="_blank"
                                     rel="noreferrer"
+                                    onClick={handleDownloadQuoteDocument}
+                                    aria-disabled={generatingDocument}
                                 >
-                                    Download quote document (.docx)
+                                    {generatingDocument ? "Generating..." : "Download quote document (.docx)"}
                                 </a>
                             )}
 
@@ -583,6 +660,10 @@ export default function CommercialApprovalSummary({
                                 >
                                     Download Quote Release Email
                                 </button>
+                            )}
+
+                            {downloadError && (
+                                <p className="survey-empty" style={{marginTop:8, flexBasis:"100%"}}>{downloadError}</p>
                             )}
 
                         </div>
@@ -737,9 +818,13 @@ export default function CommercialApprovalSummary({
 
                         downloadOnly
 
-                        attachmentUrl={releaseDocument?.id ? quoteReleaseDownloadUrl(releaseDocument.id) : null}
+                        attachmentUrl={
+                            releaseDocument?.id
+                                ? quoteReleaseDownloadUrl(releaseDocument.id)
+                                : generateQuoteReleaseUrl(quote.id, buildActor(user)?.name)
+                        }
 
-                        attachmentFileName={releaseDocument?.file_name}
+                        attachmentFileName={releaseDocument?.file_name || `Quote_ENQ${enquiry.id}.docx`}
 
                     />
 
