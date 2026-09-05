@@ -194,6 +194,8 @@ class LinkedEnquirySchema(BaseModel):
 
     value: float | None = None
 
+    job_on: str | None = None
+
     created_at: datetime | None = None
 
     class Config:

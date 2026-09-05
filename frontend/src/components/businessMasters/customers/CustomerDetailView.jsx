@@ -433,7 +433,7 @@ export default function CustomerDetailView({
                 <table>
 
                     <thead>
-                        <tr><th>Enquiry</th><th>Stage</th><th>Value</th><th></th></tr>
+                        <tr><th>Enquiry</th><th>Job On</th><th>Stage</th><th>Value</th><th></th></tr>
                     </thead>
 
                     <tbody>
@@ -442,13 +442,15 @@ export default function CustomerDetailView({
 
                             detail.linked_enquiries.length===0 ? (
 
-                                <tr><td colSpan={4} className="bm-muted">None yet.</td></tr>
+                                <tr><td colSpan={5} className="bm-muted">None yet.</td></tr>
 
                             ) : detail.linked_enquiries.map(e=>(
 
                                 <tr key={e.id}>
 
                                     <td>#{e.id}</td>
+
+                                    <td>{e.job_on || "—"}</td>
 
                                     <td>{e.stage}</td>
 

@@ -60,6 +60,8 @@ class EnquiryConsolidatedListItem(BaseModel):
 
     customer_name: Optional[str] = None
 
+    job_on: Optional[str] = None
+
     nature: Optional[str] = None
 
     owner: Optional[str] = None

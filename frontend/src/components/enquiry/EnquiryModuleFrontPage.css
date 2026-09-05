@@ -252,11 +252,15 @@
 
     overflow-x:auto;
 
-}
-
-.enquiry-table table{
-
-    width:100%;
+    /* table-layout:fixed makes the <colgroup> percentages in
+       EnquiryTable.jsx authoritative - without it, the browser's
+       default auto layout still expands a column past its given
+       width to fit its longest unbroken content (e.g. a Job On value
+       with no wrap points), forcing the whole table wider than its
+       container and triggering exactly the horizontal scroll this
+       is meant to avoid. Long values wrap within their fixed column
+       instead (see the word-wrap rule on td below). */
+    table-layout:fixed;
 
     border-collapse:collapse;
 
@@ -275,7 +279,7 @@
 
 .enquiry-table th{
 
-    padding:16px 18px;
+    padding:16px 12px;
 
     text-align:left;
 
@@ -286,6 +290,14 @@
     letter-spacing:.04em;
 
     color:#475569;
+
+    /* Narrower columns (Enquiry ID, Aging, Owner, Created) can't fit
+       their header label on one line under table-layout:fixed - by
+       default an overflowing header just visually bleeds into the
+       next column's space instead of wrapping, reading as garbled
+       overlapping text. Wrapping (and allowing a mid-word break as a
+       last resort) keeps each header cleanly inside its own column. */
+    overflow-wrap:break-word;
 
     font-weight:800;
 
@@ -307,6 +319,12 @@
     border-top:1px solid #edf1f5;
 
     vertical-align:middle;
+
+    /* table-layout:fixed above makes column widths strict - long
+       unbroken values (a combined Job On string, a long customer
+       name) must wrap within that fixed width rather than forcing
+       the column, and therefore the table, wider. */
+    overflow-wrap:break-word;
 
 }
 
@@ -401,9 +419,11 @@
 
     gap:5px;
 
-    flex-wrap:nowrap;
-
-    white-space:nowrap;
+    /* Wraps onto a second line within the cell rather than forcing
+       the column (and, under table-layout:fixed, the whole table)
+       wider than its allotted percentage - a taller row is fine,
+       horizontal overflow isn't. */
+    flex-wrap:wrap;
 
 }
 
@@ -689,11 +709,12 @@
 
 }
 
-.enquiry-table td:last-child{
-
-    min-width:260px;
-
-}
+/* min-width removed - the Actions column's width now comes solely
+   from EnquiryTable.jsx's <colgroup> under table-layout:fixed; a
+   min-width here would fight that and could force the table wider
+   than its container again. .enquiry-actions wraps its buttons onto
+   a second line instead if the column is ever too narrow for all of
+   them on one row. */
 
 
 /* ==========================================================

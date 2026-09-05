@@ -28,23 +28,36 @@ from backend.services.workflow_service import (
 from backend.models.techno_commercial_quote import Quote
 from backend.models.customer_master import Customer
 from backend.models.users import User
+from backend.models.asset import Asset
+from backend.models.customer_requests import CustomerRequest
 
 from backend.utils.aging import compute_aging_seconds, aging_seconds_to_days_display
 from backend.utils.value_display import compute_value_display
+from backend.utils.job_on import compute_job_on
 
 
 # ====================================
-# ATTACH AGING + VALUE + OWNER
+# ATTACH AGING + VALUE + OWNER + CUSTOMER NAME + JOB ON
 # Aging/value are computed live (never stored/cached) - matches the
 # wireframe's own daysInStage(), which recomputes at render time
-# rather than keeping a background job in sync. Owner is resolved the
-# same way: Enquiry.owner is a dead snapshot column (never written by
-# any code path - Customer.owner was superseded by the real
+# rather than keeping a background job in sync. Owner and Customer
+# Name are resolved the same way: both Enquiry.owner and
+# Enquiry.customer_name are dead snapshot columns (never written by
+# any code path since Customer.owner was superseded by the real
 # Customer.owner_user_id "Account Owner" FK in Phase 21B), so instead
-# of relying on that stale field, the Enquiries list's Owner column is
-# resolved live from the linked Customer's current owner_user_id ->
-# User.name every time, so reassigning a customer's Account Owner in
-# Business Masters is immediately reflected here with no backfill.
+# of relying on those stale fields, both columns are resolved live
+# from the linked Customer row every time, so renaming a customer or
+# reassigning its Account Owner in Business Masters is immediately
+# reflected here with no backfill - and, since this is what every
+# other place that looks up "this customer's enquiries" should also
+# key off, it's the direct fix for enquiries silently disappearing
+# from a customer's Linked Orders list after a rename (see
+# list_linked_enquiries, which now matches by customer_id the same
+# way). Job On (site location + asset name) is resolved live too, for
+# the same never-store-a-value-that-can-go-stale reason. All four
+# fall back to the stale snapshot / stay blank only for legacy rows
+# with no real customer_id/asset_id link (customer_id/asset_id were
+# introduced by Phase 2 - older rows may simply never have one).
 # Attached as plain Python attributes (not real ORM columns) so
 # EnquiryConsolidatedListItem's from_attributes=True picks them up via
 # getattr, same as any other field.
@@ -65,6 +78,7 @@ def _attach_aging_and_value(db, enquiries):
     customer_ids = [e.customer_id for e in enquiries if e.customer_id]
 
     owner_user_id_by_customer_id = {}
+    company_name_by_customer_id = {}
 
     if customer_ids:
 
@@ -72,6 +86,10 @@ def _attach_aging_and_value(db, enquiries):
 
         owner_user_id_by_customer_id = {
             c.id: c.owner_user_id for c in customers if c.owner_user_id
+        }
+
+        company_name_by_customer_id = {
+            c.id: c.company_name for c in customers
         }
 
     owner_user_ids = set(owner_user_id_by_customer_id.values())
@@ -83,6 +101,30 @@ def _attach_aging_and_value(db, enquiries):
         owners = db.query(User).filter(User.id.in_(owner_user_ids)).all()
 
         owner_name_by_user_id = {u.id: u.name for u in owners}
+
+    asset_ids = [e.asset_id for e in enquiries if e.asset_id]
+
+    assets_by_id = {}
+
+    if asset_ids:
+
+        assets = db.query(Asset).filter(Asset.id.in_(asset_ids)).all()
+
+        assets_by_id = {a.id: a for a in assets}
+
+    customer_request_ids = [e.customer_request_id for e in enquiries if e.customer_request_id]
+
+    customer_requests_by_id = {}
+
+    if customer_request_ids:
+
+        customer_requests = (
+            db.query(CustomerRequest)
+            .filter(CustomerRequest.id.in_(customer_request_ids))
+            .all()
+        )
+
+        customer_requests_by_id = {r.id: r for r in customer_requests}
 
     for enquiry in enquiries:
 
@@ -102,6 +144,18 @@ def _attach_aging_and_value(db, enquiries):
 
         enquiry.owner = (
             owner_name_by_user_id.get(owner_user_id) if owner_user_id else None
+        )
+
+        if enquiry.customer_id and company_name_by_customer_id.get(enquiry.customer_id):
+            enquiry.customer_name = company_name_by_customer_id[enquiry.customer_id]
+
+        asset = assets_by_id.get(enquiry.asset_id) if enquiry.asset_id else None
+        customer_request = customer_requests_by_id.get(enquiry.customer_request_id)
+
+        enquiry.job_on = compute_job_on(
+            asset.plant if asset else None,
+            asset.name if asset else None,
+            customer_request.plant_site_location if customer_request else None
         )
 
     return enquiries

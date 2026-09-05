@@ -338,9 +338,13 @@ from backend.models.enquiry import Enquiry
 
 from backend.models.asset import Asset
 
+from backend.models.customer_requests import CustomerRequest
+
 from backend.models.customer_master import CustomerContact
 
 from backend.services.workflow_service import WorkflowStage, WORKFLOW_ORDER
+
+from backend.utils.job_on import compute_job_on
 
 
 # ====================================
@@ -555,7 +559,7 @@ def delete_customer_request(
     if not customer:
         return "not_found"
 
-    if count_assets(db, customer_id) or list_linked_enquiries(db, customer.company_name):
+    if count_assets(db, customer_id) or list_linked_enquiries(db, customer.id, customer.company_name):
 
         raise ValueError(
             "Cannot delete a customer with assets or enquiries on file. Remove them first."
@@ -726,9 +730,11 @@ def get_customer_detail_request(
         for asset in list_assets(db, customer_id)
     ]
 
+    assets_by_id = {a["id"]: a for a in assets}
+
     linked_enquiries = []
 
-    for enquiry in list_linked_enquiries(db, customer.company_name):
+    for enquiry in list_linked_enquiries(db, customer.id, customer.company_name):
 
         value = None
 
@@ -743,11 +749,26 @@ def get_customer_detail_request(
             if quote:
                 value = quote.final_approved_value or quote.combined_budgetary_value_max
 
+        asset = assets_by_id.get(enquiry.asset_id)
+
+        customer_request = (
+            db.query(CustomerRequest)
+            .filter(CustomerRequest.id == enquiry.customer_request_id)
+            .first()
+        )
+
+        job_on = compute_job_on(
+            asset["plant"] if asset else None,
+            asset["name"] if asset else None,
+            customer_request.plant_site_location if customer_request else None
+        )
+
         linked_enquiries.append({
             "id": enquiry.id,
             "stage": enquiry.stage,
             "status": enquiry.status,
             "value": value,
+            "job_on": job_on,
             "created_at": enquiry.created_at
         })
 

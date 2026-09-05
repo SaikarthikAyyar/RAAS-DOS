@@ -2,7 +2,7 @@
 # IMPORTS
 # ====================================
 
-from sqlalchemy import func
+from sqlalchemy import func, or_, and_
 
 from backend.models.customer_master import Customer, CustomerContact
 from backend.models.asset import Asset
@@ -602,20 +602,40 @@ def get_enquiry_by_customer_request(
 # directly). Read-only display join, not a foreign key.
 # ====================================
 
+# ====================================
+# LIST LINKED ENQUIRIES
+# Matches by the real Enquiry.customer_id link (set on every enquiry
+# created since Phase 2) rather than a name string, so renaming a
+# customer in Business Masters can never make its own enquiries
+# disappear from this list - a name is mutable, an id isn't. The
+# name-based match against the *enquiry's own* CustomerRequest.company_name
+# snapshot (not the live Customer row) is kept only as a fallback for
+# enquiries that predate customer_id ever being set - real historical
+# rows that would otherwise vanish from view entirely, not something
+# to silently drop just because a cleaner mechanism now exists.
+# ====================================
+
 def list_linked_enquiries(
         db,
+        customer_id,
         company_name
 ):
     return (
         db.query(
             Enquiry
         )
-        .join(
+        .outerjoin(
             CustomerRequest,
             Enquiry.customer_request_id == CustomerRequest.id
         )
         .filter(
-            CustomerRequest.company_name.ilike(company_name)
+            or_(
+                Enquiry.customer_id == customer_id,
+                and_(
+                    Enquiry.customer_id.is_(None),
+                    CustomerRequest.company_name.ilike(company_name)
+                )
+            )
         )
         .order_by(
             Enquiry.id.desc()

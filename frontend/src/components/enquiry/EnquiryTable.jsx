@@ -99,6 +99,26 @@ export default function EnquiryTable({
 
         <table className="enquiry-table">
 
+            {/* Explicit column widths - Enquiry ID/Nature/Stage are
+                trimmed down (short content: a number, a couple of
+                words, a stage label) to make room for Job On without
+                the table needing to scroll horizontally. */}
+            <colgroup>
+
+                <col style={{width:"5%"}}/>
+                <col style={{width:"13%"}}/>
+                <col style={{width:"15%"}}/>
+                <col style={{width:"7%"}}/>
+                <col style={{width:"8%"}}/>
+                <col style={{width:"5%"}}/>
+                <col style={{width:"8%"}}/>
+                <col style={{width:"6%"}}/>
+                <col style={{width:"8%"}}/>
+                <col style={{width:"5%"}}/>
+                <col style={{width:"20%"}}/>
+
+            </colgroup>
+
             <thead>
 
                 <tr>
@@ -112,6 +132,12 @@ export default function EnquiryTable({
                     <th>
 
                         Customer
+
+                    </th>
+
+                    <th>
+
+                        Job On
 
                     </th>
 
