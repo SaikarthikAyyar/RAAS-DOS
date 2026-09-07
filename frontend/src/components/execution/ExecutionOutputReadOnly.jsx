@@ -9,6 +9,8 @@
 
 import "./Execution.css";
 
+import ExecutionMediaGallery from "./ExecutionMediaGallery";
+
 export default function ExecutionOutputReadOnly({
 
     execution
@@ -27,6 +29,8 @@ export default function ExecutionOutputReadOnly({
     const totalOutput = Number(execution.total_output ?? 0);
 
     return(
+
+        <>
 
         <div className="execution-card">
 
@@ -59,6 +63,13 @@ export default function ExecutionOutputReadOnly({
             </div>
 
         </div>
+
+        {/* Read-only mirror of the same set uploaded from the staff
+            Execution tab - no upload control ever renders here, so a
+            customer can view but never interact with this media. */}
+        <ExecutionMediaGallery executionId={execution.id} readOnly/>
+
+        </>
 
     );
 

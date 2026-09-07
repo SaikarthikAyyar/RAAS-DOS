@@ -22,6 +22,8 @@ import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
 
 import { isBeforePlannedStart } from "../../utils/executionSchedule";
 
+import ExecutionMediaGallery from "./ExecutionMediaGallery";
+
 
 // ====================================
 // PHASE 2
@@ -312,6 +314,8 @@ export default function Phase2Execution({
     // ====================================
 
     return(
+
+        <>
 
         <div className="execution-card" data-guide-id="phase2-output" style={{position:"relative"}}>
 
@@ -672,6 +676,13 @@ export default function Phase2Execution({
             )}
 
         </div>
+
+        <ExecutionMediaGallery
+            executionId={execution?.id}
+            readOnly={!hasTask("enquiry-tab-execution", "upload_media")}
+        />
+
+        </>
 
     );
 

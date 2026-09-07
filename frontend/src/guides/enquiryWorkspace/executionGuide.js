@@ -33,6 +33,11 @@ export const components = {
         explanation: "Reports today's cleaning output. Total Output is never typed directly — it's the running sum of every 'Output Completed Since Last Update' entry, so it can't be accidentally overwritten by a later save. Daily Target can only be set once, on the very first save of this phase; after that it stays fixed for the rest of the job, since it's a planning figure rather than something that should change mid-way through. Reporting output is only possible once this phase has been started from Execution Controls below."
     },
 
+    "phase2-media": {
+        title: "Media",
+        explanation: "Photos and videos captured during Job Execution — works the same way as the Sales Survey's own media upload: pick files and they upload immediately, then pick any item from the list to preview it. This set is only ever uploaded to or edited from here; the Customer Portal shows the exact same set to the customer, but in read-only form — there is no upload control on that side at all."
+    },
+
     "phase3-route": {
         title: "Return Route",
         explanation: "A read-only summary of the return leg — the machine travelling from the site back to its source hub. It reuses the exact same two coordinates set in Phase 1, in reverse, so there is nothing to re-enter here; the map's Source and Destination pins are shown in that same reversed order to match the real direction of travel."
@@ -75,6 +80,11 @@ export const workflowSteps = [
     {
         componentId: "phase2-output",
         stepText: "Phase 2 - Job Execution: once mobilisation is complete, report cleaning output as it happens; the running total builds up on its own."
+    },
+
+    {
+        componentId: "phase2-media",
+        stepText: "Upload photos/videos of the work as it happens — the same set is visible to the customer in read-only form on their own portal."
     },
 
     {

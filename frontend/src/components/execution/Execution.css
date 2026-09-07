@@ -562,3 +562,122 @@
     }
 
 }
+
+
+/* ===========================================
+   PHASE 2 MEDIA (photos/videos captured during Job Execution)
+   Same visual language as the Sales Survey's own media picker/gallery
+   (frontend/src/components/salesSurvey/SalesSurvey.css) - deliberately
+   duplicated here under the same class names rather than cross-
+   imported, so the Execution module owns its own styling and isn't
+   coupled to Sales Survey's stylesheet lifecycle.
+=========================================== */
+
+.media-upload-box{
+
+    height:auto;
+    min-height:44px;
+    border:1.5px dashed var(--orange);
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    padding:0 14px;
+    font-size:12.5px;
+    cursor:pointer;
+    background:#fff;
+    transition:0.2s;
+    color:var(--ink);
+
+}
+
+.media-upload-box:hover{
+
+    border-color:var(--orange);
+    background:#fff7ed;
+
+}
+
+.media-container{
+
+    display:flex;
+    gap:16px;
+    margin-top:14px;
+    align-items:flex-start;
+
+}
+
+.media-selector{
+
+    width:220px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    max-height:280px;
+    overflow-y:auto;
+
+}
+
+.media-item{
+
+    padding:7px 10px;
+    border:1px solid var(--line);
+    cursor:pointer;
+    text-align:left;
+    border-radius:8px;
+    font-size:12.5px;
+    background:#fff;
+
+}
+
+.media-item.active{
+
+    font-weight:800;
+    border-color:var(--orange);
+    color:var(--orange);
+
+}
+
+.media-preview{
+
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:260px;
+    border-radius:10px;
+    overflow:hidden;
+    background:#f8fafc;
+    border:1px solid var(--line);
+
+}
+
+.preview-image{
+
+    max-width:400px;
+    max-height:240px;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+    border-radius:8px;
+
+}
+
+.preview-video{
+
+    width:400px;
+    height:240px;
+    border-radius:8px;
+    background:black;
+
+}
+
+.media-empty{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:260px;
+    color:var(--muted);
+    font-size:12.5px;
+
+}

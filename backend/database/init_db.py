@@ -40,6 +40,8 @@ from backend.models.personnel_document import PersonnelDocument
 
 from backend.models.execution import Execution
 
+from backend.models.execution_media import ExecutionMedia
+
 from backend.models.partners import Partner
 
 from backend.models.customer_master import Customer, CustomerContact
