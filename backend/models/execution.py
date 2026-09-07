@@ -266,6 +266,17 @@ class Execution(Base):
         default="m³"
     )
 
+    # Phase 40: which Phase 2 output mechanism this execution uses -
+    # 'MANUAL' (the plain typed number above, untouched) or 'SLUDGE_LOG'
+    # (real per-day Flow Meter/Settling calculations, see
+    # execution_sludge_daily_log.py). Flips to SLUDGE_LOG automatically
+    # on the first daily log and stays that way permanently, so a job
+    # can never mix manually-typed and calculated output in one total.
+    progress_tracking_mode = Column(
+        String(20),
+        server_default="MANUAL"
+    )
+
     proof_uploaded = Column(
         Boolean,
         default=False

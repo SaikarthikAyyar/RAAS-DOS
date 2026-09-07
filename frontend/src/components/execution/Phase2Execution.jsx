@@ -24,6 +24,8 @@ import { isBeforePlannedStart } from "../../utils/executionSchedule";
 
 import ExecutionMediaGallery from "./ExecutionMediaGallery";
 
+import ExecutionSludgeLog from "./ExecutionSludgeLog";
+
 
 // ====================================
 // PHASE 2
@@ -229,9 +231,16 @@ export default function Phase2Execution({
 
                 {
 
+                    // Omitted entirely (not just 0) once this execution is
+                    // tracked via real daily sludge logs - sending 0 here
+                    // would silently overwrite the sludge-log-computed
+                    // today_output back to 0 on every unrelated save (e.g.
+                    // just updating Current Activity/Remarks).
                     today_output:
 
-                        Number(todayOutputDelta),
+                        execution?.progress_tracking_mode === "SLUDGE_LOG"
+                            ? undefined
+                            : Number(todayOutputDelta),
 
                     // Only ever sent while the target hasn't been set
                     // yet - the backend freezes it after that anyway,
@@ -442,27 +451,31 @@ export default function Phase2Execution({
 
             <div className="execution-form-grid">
 
-                <div className="execution-form-group">
+                {execution?.progress_tracking_mode !== "SLUDGE_LOG" && (
 
-                    <label>
+                    <div className="execution-form-group">
 
-                        Output Completed Since Last Update
+                        <label>
 
-                    </label>
+                            Output Completed Since Last Update
 
-                    <input
+                        </label>
 
-                        className="execution-input"
+                        <input
 
-                        type="number"
+                            className="execution-input"
 
-                        value={todayOutputDelta}
+                            type="number"
 
-                        onChange={e=>setTodayOutputDelta(e.target.value)}
+                            value={todayOutputDelta}
 
-                    />
+                            onChange={e=>setTodayOutputDelta(e.target.value)}
 
-                </div>
+                        />
+
+                    </div>
+
+                )}
 
                 <div className="execution-form-group">
 
@@ -676,6 +689,19 @@ export default function Phase2Execution({
             )}
 
         </div>
+
+        <ExecutionSludgeLog
+            executionId={execution?.id}
+            readOnly={!hasTask("enquiry-tab-execution", "record_sludge_output")}
+            onChange={()=>{
+                if(refreshExecution){
+                    refreshExecution(execution.id);
+                }
+                else{
+                    getExecution(execution.id);
+                }
+            }}
+        />
 
         <ExecutionMediaGallery
             executionId={execution?.id}

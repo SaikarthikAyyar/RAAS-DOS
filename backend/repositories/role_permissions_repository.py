@@ -271,6 +271,7 @@ MODULE_TASKS = {
         ("set_execution_route", "Set source/destination route"),
         ("start_phase", "Start current phase"),
         ("update_progress", "Update execution progress"),
+        ("record_sludge_output", "Record daily sludge output readings"),
         ("upload_media", "Upload execution media (photos/videos)"),
         ("complete_phase", "Complete current phase")
     ],

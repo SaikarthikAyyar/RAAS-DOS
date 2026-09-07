@@ -203,6 +203,29 @@ def _require_planned_start_reached(execution):
 
 
 # ====================================
+# PHASE 2 PROGRESS FORMULA
+# Extracted so the sludge-log tracking path (execution_sludge_service.py)
+# can recompute progress the exact same way a manual today_output save
+# already does here - both paths must always agree on what "% through
+# Phase 2" means, regardless of how total_output was actually arrived
+# at (typed by hand, or summed from daily flow-meter/settling logs).
+# ====================================
+
+def compute_phase2_progress(total_output, estimated_volume, current_progress):
+
+    if estimated_volume and estimated_volume > 0:
+
+        phase_progress = min(
+            (total_output or 0) / estimated_volume,
+            1
+        )
+
+        return 33 + phase_progress * 33
+
+    return current_progress
+
+
+# ====================================
 # PHASE COMPLETION TARGET VALIDATION
 # "Complete Current Phase" must not be allowed to mark a phase done
 # before its real, measurable target has actually been met - otherwise
@@ -1389,14 +1412,11 @@ def update_execution_progress(
 
     elif execution.current_phase == "PHASE_2":
 
-        if estimated_volume > 0:
-
-            phase_progress = min(
-                execution.total_output / estimated_volume,
-                1
-            )
-
-            progress = 33 + phase_progress * 33
+        progress = compute_phase2_progress(
+            execution.total_output,
+            estimated_volume,
+            progress
+        )
 
     # -------------------------------
     # PHASE 3

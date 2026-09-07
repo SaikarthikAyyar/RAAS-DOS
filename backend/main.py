@@ -58,6 +58,10 @@ from backend.api.execution_media_api import (
     router as execution_media_router
 )
 
+from backend.api.execution_sludge_api import (
+    router as execution_sludge_router
+)
+
 from backend.api.geocode_api import (
     router as geocode_router
 )
@@ -355,6 +359,8 @@ app.include_router(
 )
 
 app.include_router(execution_media_router)
+
+app.include_router(execution_sludge_router)
 
 app.include_router(geocode_router)
 

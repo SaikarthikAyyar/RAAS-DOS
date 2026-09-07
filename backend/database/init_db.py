@@ -42,6 +42,10 @@ from backend.models.execution import Execution
 
 from backend.models.execution_media import ExecutionMedia
 
+from backend.models.execution_sludge_daily_log import ExecutionSludgeDailyLog
+
+from backend.models.execution_sludge_reading import ExecutionSludgeReading
+
 from backend.models.partners import Partner
 
 from backend.models.customer_master import Customer, CustomerContact

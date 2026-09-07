@@ -38,6 +38,11 @@ export const components = {
         explanation: "Photos and videos captured during Job Execution — works the same way as the Sales Survey's own media upload: pick files and they upload immediately, then pick any item from the list to preview it. This set is only ever uploaded to or edited from here; the Customer Portal shows the exact same set to the customer, but in read-only form — there is no upload control on that side at all."
     },
 
+    "phase2-sludge-log": {
+        title: "Daily Sludge Output",
+        explanation: "Real, formula-backed daily output tracking, replacing the plain manual output number. Each day, pick a method — Flow Meter Reading (periodic TF/FR checkpoints, using flow-rate sampling reconciled against the totalizer) or Sample Collection (settled-sludge lab samples, measuring composition directly) — and add readings through the day. Once End TF is entered, that day's sludge volume is calculated automatically and becomes that day's contribution to Total Output. Every reading stays directly editable at any time, even after the day's output has been calculated — correcting a value immediately and correctly updates Total Output, with nothing to reopen or reconcile separately. Once a job starts using this real tracking, the old manual entry disappears for it for good."
+    },
+
     "phase3-route": {
         title: "Return Route",
         explanation: "A read-only summary of the return leg — the machine travelling from the site back to its source hub. It reuses the exact same two coordinates set in Phase 1, in reverse, so there is nothing to re-enter here; the map's Source and Destination pins are shown in that same reversed order to match the real direction of travel."
@@ -85,6 +90,11 @@ export const workflowSteps = [
     {
         componentId: "phase2-media",
         stepText: "Upload photos/videos of the work as it happens — the same set is visible to the customer in read-only form on their own portal."
+    },
+
+    {
+        componentId: "phase2-sludge-log",
+        stepText: "Start a day, pick Flow Meter or Sample Collection, add readings and enter End TF — the day's real sludge output is calculated automatically and rolls into Total Output above."
     },
 
     {
