@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
 
-from backend.services.execution_media_service import save_media, get_media
+from backend.services.execution_media_service import save_media, get_media, delete_media
 
 
 router = APIRouter()
@@ -46,3 +46,14 @@ def list_execution_media(
 ):
 
     return get_media(db, execution_id)
+
+
+@router.delete("/execution/media/{media_id}")
+def remove_execution_media(
+
+    media_id: int,
+    db: Session = Depends(get_db)
+
+):
+
+    return delete_media(db, media_id)

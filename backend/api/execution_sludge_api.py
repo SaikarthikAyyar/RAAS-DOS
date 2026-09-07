@@ -6,7 +6,10 @@
 # no server-side auth, consistent with this app's current trust model.
 # ====================================
 
+from datetime import date
+
 from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
@@ -25,7 +28,8 @@ from backend.services.execution_sludge_service import (
     update_daily_log,
     add_reading,
     update_reading,
-    delete_reading
+    delete_reading,
+    export_execution_sludge_log
 )
 
 
@@ -48,6 +52,20 @@ def create_daily_log(execution_id: int, payload: DailyLogCreateSchema, db: Sessi
 def list_execution_daily_logs(execution_id: int, db: Session = Depends(get_db)):
 
     return list_daily_logs(db, execution_id)
+
+
+@router.get("/execution/{execution_id}/sludge-logs/export")
+def export_execution_daily_logs(execution_id: int, db: Session = Depends(get_db)):
+
+    buffer = export_execution_sludge_log(db, execution_id)
+
+    filename = f"Execution_{execution_id}_Sludge_Output_{date.today().isoformat()}.xlsx"
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
 
 
 @router.get("/execution/sludge-logs/{daily_log_id}")

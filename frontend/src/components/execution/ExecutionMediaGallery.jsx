@@ -22,7 +22,8 @@ import ComponentExplainerIcon from "../guide/ComponentExplainerIcon";
 
 import {
     getExecutionMedia,
-    uploadExecutionMedia
+    uploadExecutionMedia,
+    deleteExecutionMedia
 } from "../../services/executionMediaService";
 
 
@@ -72,6 +73,35 @@ export default function ExecutionMediaGallery({
         }
 
     }, [executionId, loadMedia]);
+
+
+    // ====================================
+    // DELETE
+    // ====================================
+
+    async function handleDeleteMedia(event, item){
+
+        event.stopPropagation();
+
+        if(!window.confirm(`Remove ${item.file_name}? This cannot be undone.`)){
+            return;
+        }
+
+        try{
+
+            await deleteExecutionMedia(item.id);
+
+            await loadMedia();
+
+        }
+        catch(err){
+
+            console.error(err);
+            alert("Unable to remove this file. Please try again.");
+
+        }
+
+    }
 
 
     // ====================================
@@ -162,15 +192,42 @@ export default function ExecutionMediaGallery({
 
                     {media.map(item=>(
 
-                        <button
-                            key={item.id}
-                            type="button"
-                            className={selected?.id === item.id ? "media-item active" : "media-item"}
-                            onClick={()=>setSelected(item)}
-                        >
-                            {item.media_type === "photo" ? "📷" : "🎥"}{" "}
-                            {item.file_name}
-                        </button>
+                        <div key={item.id} style={{position:"relative"}}>
+
+                            <button
+                                type="button"
+                                className={selected?.id === item.id ? "media-item active" : "media-item"}
+                                onClick={()=>setSelected(item)}
+                                style={readOnly ? undefined : {paddingRight:26}}
+                            >
+                                {item.media_type === "photo" ? "📷" : "🎥"}{" "}
+                                {item.file_name}
+                            </button>
+
+                            {!readOnly && (
+                                <button
+                                    type="button"
+                                    title="Remove"
+                                    onClick={event=>handleDeleteMedia(event, item)}
+                                    style={{
+                                        position:"absolute",
+                                        top:"50%",
+                                        right:6,
+                                        transform:"translateY(-50%)",
+                                        border:"none",
+                                        background:"transparent",
+                                        color:"#991b1b",
+                                        fontWeight:800,
+                                        cursor:"pointer",
+                                        fontSize:"13px",
+                                        lineHeight:1
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                            )}
+
+                        </div>
 
                     ))}
 

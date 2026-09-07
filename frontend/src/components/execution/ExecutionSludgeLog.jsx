@@ -32,7 +32,8 @@ import {
     updateSludgeDailyLog,
     addSludgeReading,
     updateSludgeReading,
-    deleteSludgeReading
+    deleteSludgeReading,
+    exportSludgeLog
 } from "../../services/executionSludgeService";
 
 
@@ -285,6 +286,19 @@ export default function ExecutionSludgeLog({
 
     }
 
+    async function handleExport(){
+
+        setError("");
+
+        try{
+            await exportSludgeLog(executionId);
+        }
+        catch(err){
+            setError(formatApiError(err, "Unable to export the sludge log."));
+        }
+
+    }
+
     async function handleDeleteReading(readingId){
 
         if(!window.confirm("Remove this reading? Total Output will recompute immediately.")){
@@ -326,9 +340,24 @@ export default function ExecutionSludgeLog({
 
             <ComponentExplainerIcon tabId="execution" componentId="phase2-sludge-log" floating/>
 
-            <h2 className="execution-section-title">
-                Daily Sludge Output
-            </h2>
+            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10}}>
+
+                <h2 className="execution-section-title" style={{marginBottom:0}}>
+                    Daily Sludge Output
+                </h2>
+
+                {logs.length > 0 && (
+                    <button
+                        type="button"
+                        className="execution-btn"
+                        style={{background:"white", color:"var(--ink)"}}
+                        onClick={handleExport}
+                    >
+                        ⬇ Export to Excel
+                    </button>
+                )}
+
+            </div>
 
             {error && (
                 <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginBottom:10, color:"var(--orange)"}}>

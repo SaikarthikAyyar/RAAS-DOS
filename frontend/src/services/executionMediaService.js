@@ -54,3 +54,22 @@ export async function getExecutionMedia(executionId){
     return response.json();
 
 }
+
+
+export async function deleteExecutionMedia(mediaId){
+
+    const response = await fetch(
+
+        `${API}/execution/media/${mediaId}`,
+
+        {method: "DELETE"}
+
+    );
+
+    if(!response.ok){
+        throw await response.json().catch(()=>({detail:"Unable to remove media."}));
+    }
+
+    return response.json();
+
+}

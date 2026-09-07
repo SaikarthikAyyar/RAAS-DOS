@@ -4,9 +4,11 @@
 
 import mimetypes
 
+from fastapi import HTTPException
+
 from backend.models.execution_media import ExecutionMedia
 
-from backend.services.storage_client import upload_object
+from backend.services.storage_client import upload_object, delete_object
 
 
 # ====================================
@@ -90,3 +92,27 @@ def get_media(
         }
         for item in media
     ]
+
+
+# ====================================
+# DELETE MEDIA
+# Lets the uploading side remove a file it no longer wants shown - the
+# real object is deleted from Supabase Storage first, then the DB row,
+# so a failed/partial delete never leaves a dangling row pointing at
+# nothing (the reverse order - delete row, then storage - risks the
+# opposite failure mode: a real file nobody can ever reach again).
+# ====================================
+
+def delete_media(db, media_id):
+
+    item = db.query(ExecutionMedia).filter(ExecutionMedia.id == media_id).first()
+
+    if item is None:
+        raise HTTPException(status_code=404, detail="Media not found.")
+
+    delete_object(item.file_path)
+
+    db.delete(item)
+    db.commit()
+
+    return {"message": "deleted"}

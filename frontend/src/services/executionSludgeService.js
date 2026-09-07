@@ -145,3 +145,29 @@ export async function deleteSludgeReading(readingId){
     return handle(response, "Unable to remove this reading.");
 
 }
+
+
+export async function exportSludgeLog(executionId){
+
+    const response = await fetch(`${API}/execution/${executionId}/sludge-logs/export`);
+
+    if(!response.ok){
+        throw await response.json().catch(()=>({detail:"Unable to export the sludge log."}));
+    }
+
+    const disposition = response.headers.get("Content-Disposition") || "";
+    const match = disposition.match(/filename="?([^";]+)"?/);
+    const filename = match ? match[1] : `Execution_${executionId}_Sludge_Output.xlsx`;
+
+    const blob = await response.blob();
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+}

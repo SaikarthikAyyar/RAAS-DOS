@@ -25,6 +25,8 @@ from backend.models.sales_survey import SalesSurvey
 from backend.utils.sludge_volume import resolve_sludge_volume
 from backend.utils.sludge_progress import compute_daily_log
 
+from backend.reporting.execution_sludge_export_xlsx import build_execution_sludge_workbook_bytes
+
 from backend.services.execution_service import (
     compute_phase2_progress,
     sync_invoice_from_execution
@@ -51,33 +53,14 @@ def start_daily_log(db, execution_id, log_date, method, start_tf=None):
             detail="Method must be either FLOW_METER or SETTLING."
         )
 
-    # An execution already carrying real manual output (typed under
-    # the plain MANUAL mode) can never switch into calculated tracking
-    # part-way through - the two would double-count into the same
-    # total_output with no way to tell which portion came from which
-    # mechanism. Mode flips to SLUDGE_LOG automatically below on this
-    # execution's very first real daily log, and stays that way for
-    # good.
-    existing_logs = (
-        db.query(ExecutionSludgeDailyLog)
-        .filter(ExecutionSludgeDailyLog.execution_id == execution_id)
-        .count()
-    )
-
-    if (
-        existing_logs == 0
-        and execution.progress_tracking_mode == "MANUAL"
-        and (execution.total_output or 0) > 0
-    ):
-        raise HTTPException(
-            status_code=422,
-            detail=(
-                "This execution already has manually-entered output recorded. "
-                "Real sludge-reading tracking can only be used on an execution "
-                "with no prior manual output, to avoid double-counting."
-            )
-        )
-
+    # Mode flips to SLUDGE_LOG automatically below on this execution's
+    # very first real daily log, and stays that way for good. Any
+    # manually-entered total_output that existed before this point is
+    # deliberately superseded, not preserved - _recompute_execution_
+    # totals always SETS total_output to the live sum of daily logs
+    # (never adds to whatever was there before), so switching a real
+    # in-progress job onto real tracking is a normal, expected action,
+    # not something that needs to be blocked to avoid double-counting.
     if start_tf is None:
 
         previous_log = (
@@ -373,6 +356,39 @@ def _recompute_execution_totals(db, execution):
     db.refresh(execution)
 
     sync_invoice_from_execution(db, execution)
+
+
+# ====================================
+# EXPORT TO EXCEL
+# One sheet per day plus a Summary sheet - see
+# backend/reporting/execution_sludge_export_xlsx.py for the layout,
+# modelled on the real client worksheets these formulas came from.
+# ====================================
+
+def export_execution_sludge_log(db, execution_id):
+
+    execution = db.query(Execution).filter(Execution.id == execution_id).first()
+
+    if execution is None:
+        raise HTTPException(status_code=404, detail="Execution not found.")
+
+    daily_logs = (
+        db.query(ExecutionSludgeDailyLog)
+        .filter(ExecutionSludgeDailyLog.execution_id == execution_id)
+        .order_by(ExecutionSludgeDailyLog.log_date)
+        .all()
+    )
+
+    for log in daily_logs:
+
+        log.readings = (
+            db.query(ExecutionSludgeReading)
+            .filter(ExecutionSludgeReading.daily_log_id == log.id)
+            .order_by(ExecutionSludgeReading.recorded_at)
+            .all()
+        )
+
+    return build_execution_sludge_workbook_bytes(execution, daily_logs)
 
 
 def _serialize_daily_log(daily_log, readings=None):
