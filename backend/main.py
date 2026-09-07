@@ -1,10 +1,8 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Response
 
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi.responses import JSONResponse
-
-from fastapi.staticfiles import StaticFiles
 
 from backend.api.customer_api import router as customer_router
 
@@ -134,10 +132,6 @@ from backend.api.machine_inventory_api import api as machine_inventory_api
 
 from backend.database.init_db import create_tables
 
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
-import os
-
 app = FastAPI()
 
 
@@ -184,20 +178,36 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 
 
 
-UPLOAD_DIR = os.path.abspath("backend/uploads")
+# ====================================
+# UPLOADS - proxied through Supabase Storage, not local disk
+# Render's own filesystem is ephemeral (wiped on every redeploy), so a
+# static local-disk mount here used to mean every uploaded file was
+# lost the moment the app next redeployed while the DB row referencing
+# it survived untouched. Every upload path (execution media, customer
+# media, personnel documents, purchase orders, quote release docs) now
+# writes to Supabase Storage instead (backend/services/storage_client.py)
+# and stores a plain "storage key" (e.g. "execution_6/photo.jpg") where
+# a local disk path used to live - this single route is what every
+# existing `/uploads/{key}`-shaped URL across the whole app resolves
+# through, so no frontend code needed to change to keep working.
+# ====================================
 
-print("=" * 60)
-print("UPLOAD_DIR =", UPLOAD_DIR)
-print("EXISTS =", os.path.exists(UPLOAD_DIR))
-print("=" * 60)
+import mimetypes
 
-app.mount(
-    "/uploads",
-    StaticFiles(directory=UPLOAD_DIR),
-    name="uploads"
-)
+from backend.services.storage_client import download_object
 
-print("UPLOADS MOUNTED")
+
+@app.get("/uploads/{path:path}")
+def serve_upload(path: str):
+
+    content = download_object(path)
+
+    if content is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+
+    media_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
+
+    return Response(content=content, media_type=media_type)
 # ====================================
 # CORS
 # ====================================

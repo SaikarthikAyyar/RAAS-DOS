@@ -22,6 +22,8 @@ getMedia
 
 from "../../services/customerMediaService";
 
+const API = import.meta.env.VITE_API_URL;
+
 
 // ====================================
 // COMPONENT
@@ -253,7 +255,7 @@ selected.media_type==="photo"
 
 src={
 
-`https://raas-dos.onrender.com${selected.url}`
+`${API}${selected.url}`
 
 }
 
@@ -296,7 +298,7 @@ className="preview-video"
 
 src={
 
-`https://raas-dos.onrender.com${encodeURI(selected.url)}`
+`${API}${encodeURI(selected.url)}`
 
 }
 

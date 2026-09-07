@@ -25,3 +25,9 @@ class PurchaseOrder(Base):
     po_value = Column(Numeric(14, 2))
     uploaded_by = Column(String(150))
     uploaded_at = Column(DateTime, server_default=func.now())
+
+    # file_path is a Supabase Storage key (e.g. "purchase_orders/12/po.pdf"),
+    # not a local disk path - see PersonnelDocument.url for the same pattern.
+    @property
+    def url(self):
+        return f"/uploads/{self.file_path}"

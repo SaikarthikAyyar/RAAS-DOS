@@ -17,6 +17,7 @@ class PurchaseOrderResponse(BaseModel):
     id: int
     enquiry_id: int
     file_name: str
+    url: str
     po_number: Optional[str] = None
     po_value: Optional[float] = None
     uploaded_by: Optional[str] = None

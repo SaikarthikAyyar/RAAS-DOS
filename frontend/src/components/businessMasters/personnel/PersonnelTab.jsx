@@ -39,24 +39,19 @@ function isExpired(validTill){
 
 // ====================================
 // DOCUMENT URL
-// file_path is stored as a real disk path rooted at the backend's own
-// working directory (e.g. "backend/uploads/personnel_documents/16/
-// test_doc.pdf") - the "/uploads" static mount in main.py serves
-// everything under "backend/uploads" at that prefix, so stripping the
-// leading "backend/" is what turns the stored path into the URL that
-// mount actually answers to.
+// The backend now supplies a ready-to-use relative `url` per document
+// (PersonnelDocumentResponse.url, backend/models/personnel_document.py)
+// - no more guessing at the stored storage key's shape here.
 // ====================================
 
 const API = import.meta.env.VITE_API_URL;
 
-function documentUrl(filePath){
-
-    const relativePath = filePath.replace(/^backend\//, "");
+function documentUrl(url){
 
     // encodeURI (not encodeURIComponent) so real "/" separators survive -
     // only characters like spaces in a real filename ("Heavy Machine
     // License.pdf") get escaped.
-    return `${API}/${encodeURI(relativePath)}`;
+    return `${API}${encodeURI(url)}`;
 
 }
 
@@ -754,7 +749,7 @@ export default function PersonnelTab(){
 
                                             <td>
                                                 <a
-                                                    href={documentUrl(d.file_path)}
+                                                    href={documentUrl(d.url)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="bm-backlink"

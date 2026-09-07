@@ -20,6 +20,8 @@ import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
 
 const STAGE_ORDER = Object.keys(STAGE_LABELS);
 
+const API = import.meta.env.VITE_API_URL;
+
 function inr(value){
 
     if(value===null || value===undefined) return "-";
@@ -272,7 +274,13 @@ export default function POSummary({
                                     orders.map(po=>(
 
                                         <tr key={po.id}>
-                                            <td>{po.file_name}</td>
+                                            <td>
+                                                {po.url ? (
+                                                    <a href={`${API}${po.url}`} target="_blank" rel="noreferrer">
+                                                        {po.file_name}
+                                                    </a>
+                                                ) : po.file_name}
+                                            </td>
                                             <td>{po.po_number ?? "-"}</td>
                                             <td>{inr(po.po_value)}</td>
                                             <td>{po.uploaded_by ?? "-"}</td>

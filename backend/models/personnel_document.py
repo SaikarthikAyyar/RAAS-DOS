@@ -72,3 +72,11 @@ class PersonnelDocument(Base):
         TIMESTAMP,
         server_default=text("CURRENT_TIMESTAMP")
     )
+
+    # file_path is a Supabase Storage key (e.g. "personnel_documents/6/x.pdf"),
+    # not a local disk path - this property is what PersonnelDocumentResponse's
+    # from_attributes=True picks up as `url`, so the frontend never needs to
+    # know or guess how to turn a stored key into a fetchable path.
+    @property
+    def url(self):
+        return f"/uploads/{self.file_path}"

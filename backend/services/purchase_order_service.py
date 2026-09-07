@@ -2,7 +2,9 @@
 # IMPORTS
 # ====================================
 
-import os
+import mimetypes
+
+from backend.services.storage_client import upload_object, delete_object
 
 from backend.repositories.purchase_order_repository import (
     list_purchase_orders,
@@ -112,15 +114,13 @@ async def upload_purchase_order_request(db, enquiry_id, file, uploaded_by, actor
     if count_purchase_orders(db, enquiry_id) > 0:
         raise ValueError("A PO is already on file for this enquiry. Remove it before uploading a new one.")
 
-    folder = f"backend/uploads/purchase_orders/{enquiry_id}"
-    os.makedirs(folder, exist_ok=True)
-
-    file_path = f"{folder}/{file.filename}"
+    key = f"purchase_orders/{enquiry_id}/{file.filename}"
 
     contents = await file.read()
 
-    with open(file_path, "wb") as f:
-        f.write(contents)
+    content_type = file.content_type or mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
+
+    upload_object(key, contents, content_type)
 
     quote = db.query(Quote).filter(Quote.id == enquiry.quote_id).first() if enquiry.quote_id else None
 
@@ -128,7 +128,7 @@ async def upload_purchase_order_request(db, enquiry_id, file, uploaded_by, actor
         db,
         enquiry_id,
         file.filename,
-        file_path,
+        key,
         _compute_po_number(enquiry, quote),
         _compute_po_value(quote),
         uploaded_by
@@ -171,8 +171,8 @@ def delete_purchase_order_request(db, po_id, actor=None):
     po_number = po.po_number
     po_value = po.po_value
 
-    if os.path.exists(po.file_path):
-        os.remove(po.file_path)
+    if po.file_path:
+        delete_object(po.file_path)
 
     delete_purchase_order(db, po)
 

@@ -3,7 +3,6 @@
 # ====================================
 
 import io
-import os
 
 from datetime import date
 from types import SimpleNamespace
@@ -19,6 +18,8 @@ from backend.repositories.quote_template_repository import get_active_template
 from backend.repositories.quote_release_document_repository import create_quote_release_document
 
 from backend.services.sales_survey_service import get_sales_survey_request
+
+from backend.services.storage_client import upload_object
 
 from backend.utils.template_rendering import substitute_tokens
 
@@ -159,20 +160,25 @@ def generate_quote_release_docx(db, quote_id, enquiry_id, generated_by):
 
             add_body_paragraph(doc, substitute_tokens(line, tokens), format_state)
 
-    folder = f"backend/uploads/quote_releases/{enquiry_id}"
-    os.makedirs(folder, exist_ok=True)
-
     file_name = f"Quote_ENQ{enquiry_id}_v{quote.revision_number or 1}.docx"
-    file_path = f"{folder}/{file_name}"
+    key = f"quote_releases/{enquiry_id}/{file_name}"
 
-    doc.save(file_path)
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+
+    upload_object(
+        key,
+        buffer.getvalue(),
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
 
     return create_quote_release_document(
         db,
         quote_id=quote.id,
         enquiry_id=enquiry_id,
         file_name=file_name,
-        file_path=file_path,
+        file_path=key,
         generated_by=generated_by
     )
 

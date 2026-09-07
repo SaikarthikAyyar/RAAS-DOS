@@ -23,6 +23,7 @@ class PersonnelDocumentResponse(BaseModel):
     document_type: str
     insurance_type: Optional[str] = None
     file_path: str
+    url: str
     verification_status: Optional[str] = None
     valid_till: Optional[date] = None
 

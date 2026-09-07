@@ -2,279 +2,76 @@
 # IMPORTS
 # ====================================
 
-import os
+import mimetypes
 
 from backend.models.customer_media import CustomerMedia
+
+from backend.services.storage_client import upload_object
 
 
 # ====================================
 # SAVE FILES
+# Stored in Supabase Storage (backend/services/storage_client.py)
+# rather than local disk, which Render wipes on every redeploy.
 # ====================================
 
-async def save_media(
+async def save_media(db, customer_request_id, photos, videos, layouts):
 
-db,
+    folder = f"customer_{customer_request_id}"
 
-customer_request_id,
-
-photos,
-
-videos,
-
-layouts
-
-):
-
-    folder = (
-
-        f"backend/uploads/customer_{customer_request_id}"
-
-    )
-
-    os.makedirs(
-
-        folder,
-
-        exist_ok=True
-
-    )
-
-
-    await process_files(
-
-        db,
-
-        customer_request_id,
-
-        photos,
-
-        "photo",
-
-        folder
-
-    )
-
-
-    await process_files(
-
-        db,
-
-        customer_request_id,
-
-        videos,
-
-        "video",
-
-        folder
-
-    )
-
-
-    await process_files(
-
-        db,
-
-        customer_request_id,
-
-        layouts,
-
-        "layout",
-
-        folder
-
-    )
-
-    print(
-
-        "photos:",
-
-        len(photos)
-
-        )
-
-    print(
-
-        "videos:",
-
-        len(videos)
-
-    )
-
-    print(
-
-    "layouts:",
-
-    len(layouts)
-
-    )
-
+    await process_files(db, customer_request_id, photos, "photo", folder)
+    await process_files(db, customer_request_id, videos, "video", folder)
+    await process_files(db, customer_request_id, layouts, "layout", folder)
 
     db.commit()
 
-
-    return {
-
-        "message":"uploaded"
-
-    }
+    return {"message": "uploaded"}
 
 
 # ====================================
 # PROCESS FILES
 # ====================================
 
-async def process_files(
-
-db,
-
-customer_request_id,
-
-files,
-
-media_type,
-
-folder
-
-):
-
+async def process_files(db, customer_request_id, files, media_type, folder):
 
     for file in files:
 
+        key = f"{folder}/{file.filename}"
 
-        filepath=(
+        contents = await file.read()
 
-            f"{folder}/{file.filename}"
+        content_type = file.content_type or mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
 
-        )
-
-
-        contents=await file.read()
-
-
-        with open(
-
-            filepath,
-
-            "wb"
-
-        ) as f:
-
-            f.write(
-
-                contents
-
-            )
-
-
-        media=CustomerMedia(
-
-            customer_request_id=
-
-            customer_request_id,
-
-            media_type=
-
-            media_type,
-
-            file_name=
-
-            file.filename,
-
-            file_path=
-
-            filepath
-
-        )
-
+        upload_object(key, contents, content_type)
 
         db.add(
-
-            media
-
-        )
-        for file in files:
-
-            print(
-
-                media_type,
-
-                file.filename
-
+            CustomerMedia(
+                customer_request_id=customer_request_id,
+                media_type=media_type,
+                file_name=file.filename,
+                file_path=key
+            )
         )
 
-        filepath=(
-
-            f"{folder}/{file.filename}"
-
-        )
-
-        print(
-
-            filepath
-
-        )
 
 # ====================================
 # GET MEDIA
 # ====================================
 
-def get_media(
+def get_media(db, customer_request_id):
 
-db,
+    media = (
+        db.query(CustomerMedia)
+        .filter(CustomerMedia.customer_request_id == customer_request_id)
+        .all()
+    )
 
-customer_request_id
-
-):
-
-
-    media= db.query(
-
-        CustomerMedia
-
-    ).filter(
-
-        CustomerMedia.customer_request_id
-
-        ==
-
-        customer_request_id
-
-    ).all()
-
-
-    output=[]
-
-
-    for item in media:
-
-
-        output.append(
-
-            {
-
-                "id":item.id,
-
-                "media_type":item.media_type,
-
-                "file_name":item.file_name,
-
-                "url":(
-
-                    item.file_path
-
-                    .replace(
-
-                        "backend",
-
-                        ""
-
-                    )
-
-                )
-
-            }
-
-        )
-
-
-    return output
+    return [
+        {
+            "id": item.id,
+            "media_type": item.media_type,
+            "file_name": item.file_name,
+            "url": f"/uploads/{item.file_path}"
+        }
+        for item in media
+    ]

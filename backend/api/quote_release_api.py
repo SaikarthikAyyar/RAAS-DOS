@@ -2,12 +2,9 @@
 # IMPORTS
 # ====================================
 
-import os
-
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
@@ -21,7 +18,21 @@ from backend.repositories.quote_release_document_repository import (
 
 from backend.services.quote_release_service import generate_quote_release_docx
 
+from backend.services.storage_client import download_object
+
 from backend.services.workflow_service import WORKFLOW_ORDER, WorkflowStage
+
+
+QUOTE_RELEASE_DOCX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+
+def _docx_response(content, file_name):
+
+    return Response(
+        content=content,
+        media_type=QUOTE_RELEASE_DOCX_MEDIA_TYPE,
+        headers={"Content-Disposition": f'attachment; filename="{file_name}"'}
+    )
 
 
 router = APIRouter()
@@ -72,17 +83,15 @@ def download_quote_release_document(document_id: int, db: Session = Depends(get_
     if document is None:
         raise HTTPException(status_code=404, detail="Quote release document not found.")
 
-    if not os.path.exists(document.file_path):
+    content = download_object(document.file_path)
+
+    if content is None:
         raise HTTPException(
             status_code=404,
             detail="This quote release document's file is no longer available - regenerate it."
         )
 
-    return FileResponse(
-        document.file_path,
-        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        filename=document.file_name
-    )
+    return _docx_response(content, document.file_name)
 
 
 # ====================================
@@ -129,11 +138,7 @@ def generate_quote_release_for_quote(
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error))
 
-    return FileResponse(
-        document.file_path,
-        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        filename=document.file_name
-    )
+    return _docx_response(download_object(document.file_path), document.file_name)
 
 
 # ====================================

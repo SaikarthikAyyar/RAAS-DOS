@@ -2,7 +2,9 @@
 # IMPORTS
 # ====================================
 
-import os
+import mimetypes
+
+from backend.services.storage_client import upload_object, delete_object
 
 from backend.repositories.personnel_repository import (
     list_personnel,
@@ -151,8 +153,8 @@ def delete_personnel_request(db, personnel_id, actor, remark):
     full_name = row.full_name
 
     for doc in list_documents(db, personnel_id):
-        if doc.file_path and os.path.exists(doc.file_path):
-            os.remove(doc.file_path)
+        if doc.file_path:
+            delete_object(doc.file_path)
 
     success = delete_personnel(db, personnel_id)
 
@@ -205,17 +207,15 @@ async def upload_document_request(db, personnel_id, file, document_type, valid_t
     elif not filename_lower.endswith(".pdf"):
         raise ValueError("Only PDF files are accepted for personnel documents.")
 
-    folder = f"backend/uploads/personnel_documents/{personnel_id}"
-    os.makedirs(folder, exist_ok=True)
-
-    file_path = f"{folder}/{file.filename}"
+    key = f"personnel_documents/{personnel_id}/{file.filename}"
 
     contents = await file.read()
 
-    with open(file_path, "wb") as f:
-        f.write(contents)
+    content_type = file.content_type or mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
 
-    row = create_document(db, personnel_id, file.filename, document_type, file_path, valid_till, insurance_type, verification_status)
+    upload_object(key, contents, content_type)
+
+    row = create_document(db, personnel_id, file.filename, document_type, key, valid_till, insurance_type, verification_status)
 
     recompute_documents_verified(db, personnel_id)
 
@@ -300,8 +300,8 @@ def delete_document_request(db, document_id, actor, remark):
     document_name = row.document_name
     document_type = row.document_type
 
-    if row.file_path and os.path.exists(row.file_path):
-        os.remove(row.file_path)
+    if row.file_path:
+        delete_object(row.file_path)
 
     deleted = delete_document(db, document_id)
 

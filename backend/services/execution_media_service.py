@@ -2,16 +2,20 @@
 # IMPORTS
 # ====================================
 
-import os
+import mimetypes
 
 from backend.models.execution_media import ExecutionMedia
+
+from backend.services.storage_client import upload_object
 
 
 # ====================================
 # SAVE FILES
 # Mirrors customer_media_service.py::save_media's shape (same upload
 # flow the Sales Survey's own media picker already uses), scoped to
-# an execution instead of a customer request.
+# an execution instead of a customer request. Stored in Supabase
+# Storage (backend/services/storage_client.py) rather than local disk,
+# which Render wipes on every redeploy.
 # ====================================
 
 async def save_media(
@@ -21,9 +25,7 @@ async def save_media(
         videos,
         uploaded_by=None
 ):
-    folder = f"backend/uploads/execution_{execution_id}"
-
-    os.makedirs(folder, exist_ok=True)
+    folder = f"execution_{execution_id}"
 
     await _process_files(db, execution_id, photos, "photo", folder, uploaded_by)
 
@@ -44,19 +46,20 @@ async def _process_files(
 ):
     for file in files:
 
-        filepath = f"{folder}/{file.filename}"
+        key = f"{folder}/{file.filename}"
 
         contents = await file.read()
 
-        with open(filepath, "wb") as f:
-            f.write(contents)
+        content_type = file.content_type or mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
+
+        upload_object(key, contents, content_type)
 
         db.add(
             ExecutionMedia(
                 execution_id=execution_id,
                 media_type=media_type,
                 file_name=file.filename,
-                file_path=filepath,
+                file_path=key,
                 uploaded_by=uploaded_by
             )
         )
@@ -83,7 +86,7 @@ def get_media(
             "media_type": item.media_type,
             "file_name": item.file_name,
             "uploaded_by": item.uploaded_by,
-            "url": item.file_path.replace("backend", "", 1)
+            "url": f"/uploads/{item.file_path}"
         }
         for item in media
     ]
