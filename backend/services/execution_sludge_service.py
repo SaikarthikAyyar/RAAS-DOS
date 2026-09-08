@@ -144,7 +144,7 @@ def get_daily_log(db, daily_log_id):
 # UPDATE DAY-LEVEL FIELDS (End TF / pump minutes / flask volume)
 # ====================================
 
-def update_daily_log(db, daily_log_id, end_tf=None, total_sludge_pump_minutes=None, flask_volume_ml=None):
+def update_daily_log(db, daily_log_id, end_tf=None, total_sludge_pump_minutes=None):
 
     daily_log = _require_daily_log(db, daily_log_id)
 
@@ -153,9 +153,6 @@ def update_daily_log(db, daily_log_id, end_tf=None, total_sludge_pump_minutes=No
 
     if total_sludge_pump_minutes is not None:
         daily_log.total_sludge_pump_minutes = total_sludge_pump_minutes
-
-    if flask_volume_ml is not None:
-        daily_log.flask_volume_ml = flask_volume_ml
 
     db.commit()
 
@@ -168,17 +165,18 @@ def update_daily_log(db, daily_log_id, end_tf=None, total_sludge_pump_minutes=No
 # READINGS - always editable regardless of source (MANUAL or DEVICE)
 # ====================================
 
-def add_reading(db, daily_log_id, tf_reading, fr_reading=None, settled_sludge_volume_ml=None, source="MANUAL", recorded_by=None):
+def add_reading(db, daily_log_id, tf_reading, fr_reading=None, settled_sludge_volume_ml=None, flask_volume_ml=None, source="MANUAL", recorded_by=None):
 
     daily_log = _require_daily_log(db, daily_log_id)
 
-    _validate_reading_fields(daily_log.method, fr_reading, settled_sludge_volume_ml)
+    _validate_reading_fields(daily_log.method, fr_reading, settled_sludge_volume_ml, flask_volume_ml)
 
     reading = ExecutionSludgeReading(
         daily_log_id=daily_log_id,
         tf_reading=tf_reading,
         fr_reading=fr_reading,
         settled_sludge_volume_ml=settled_sludge_volume_ml,
+        flask_volume_ml=flask_volume_ml,
         source=source or "MANUAL",
         recorded_by=recorded_by
     )
@@ -192,7 +190,7 @@ def add_reading(db, daily_log_id, tf_reading, fr_reading=None, settled_sludge_vo
     return _serialize_reading(reading)
 
 
-def update_reading(db, reading_id, tf_reading=None, fr_reading=None, settled_sludge_volume_ml=None, recorded_by=None):
+def update_reading(db, reading_id, tf_reading=None, fr_reading=None, settled_sludge_volume_ml=None, flask_volume_ml=None, recorded_by=None):
 
     reading = db.query(ExecutionSludgeReading).filter(ExecutionSludgeReading.id == reading_id).first()
 
@@ -212,6 +210,9 @@ def update_reading(db, reading_id, tf_reading=None, fr_reading=None, settled_slu
 
     if settled_sludge_volume_ml is not None:
         reading.settled_sludge_volume_ml = settled_sludge_volume_ml
+
+    if flask_volume_ml is not None:
+        reading.flask_volume_ml = flask_volume_ml
 
     if recorded_by is not None:
         reading.recorded_by = recorded_by
@@ -264,7 +265,7 @@ def _require_daily_log(db, daily_log_id):
     return daily_log
 
 
-def _validate_reading_fields(method, fr_reading, settled_sludge_volume_ml):
+def _validate_reading_fields(method, fr_reading, settled_sludge_volume_ml, flask_volume_ml=None):
 
     if method == "FLOW_METER" and fr_reading is None:
         raise HTTPException(
@@ -276,6 +277,16 @@ def _validate_reading_fields(method, fr_reading, settled_sludge_volume_ml):
         raise HTTPException(
             status_code=422,
             detail="Settled sludge volume is required for a Sample Collection method day."
+        )
+
+    # Flask volume is captured per reading (not once for the whole day)
+    # since different flask sizes may genuinely be used sample to
+    # sample - so it's required alongside the settled volume itself,
+    # not a day-level default.
+    if method == "SETTLING" and flask_volume_ml is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Flask volume is required for each Sample Collection reading."
         )
 
 
@@ -292,7 +303,8 @@ def _recompute_day(db, daily_log):
         {
             "tf_reading": r.tf_reading,
             "fr_reading": r.fr_reading,
-            "settled_sludge_volume_ml": r.settled_sludge_volume_ml
+            "settled_sludge_volume_ml": r.settled_sludge_volume_ml,
+            "flask_volume_ml": r.flask_volume_ml
         }
         for r in readings
     ]
@@ -302,8 +314,7 @@ def _recompute_day(db, daily_log):
         daily_log.start_tf,
         daily_log.end_tf,
         reading_dicts,
-        daily_log.total_sludge_pump_minutes,
-        daily_log.flask_volume_ml
+        daily_log.total_sludge_pump_minutes
     )
 
     for key, value in result.items():
@@ -410,7 +421,12 @@ def _serialize_daily_log(daily_log, readings=None):
         "pct_water": daily_log.pct_water,
         "sludge_output_m3": daily_log.sludge_output_m3,
         "water_output_m3": daily_log.water_output_m3,
-        "status": "COMPLETE" if daily_log.sludge_output_m3 is not None else "PENDING"
+        "invalid_reason": daily_log.invalid_reason,
+        "status": (
+            "INVALID" if daily_log.invalid_reason
+            else "COMPLETE" if daily_log.sludge_output_m3 is not None
+            else "PENDING"
+        )
     }
 
     if readings is not None:
@@ -428,6 +444,7 @@ def _serialize_reading(reading):
         "tf_reading": reading.tf_reading,
         "fr_reading": reading.fr_reading,
         "settled_sludge_volume_ml": reading.settled_sludge_volume_ml,
+        "flask_volume_ml": reading.flask_volume_ml,
         "source": reading.source,
         "recorded_by": reading.recorded_by
     }

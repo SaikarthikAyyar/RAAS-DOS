@@ -81,8 +81,8 @@ export default function ExecutionSludgeLog({
         startTf: ""
     });
 
-    const [dayForm, setDayForm] = useState({endTf: "", pumpMinutes: "", flaskVolumeMl: ""});
-    const [readingForm, setReadingForm] = useState({tfReading: "", frReading: "", settledMl: ""});
+    const [dayForm, setDayForm] = useState({endTf: "", pumpMinutes: ""});
+    const [readingForm, setReadingForm] = useState({tfReading: "", frReading: "", settledMl: "", flaskMl: ""});
     const [editingReadingId, setEditingReadingId] = useState(null);
     const [editForm, setEditForm] = useState({});
 
@@ -129,8 +129,7 @@ export default function ExecutionSludgeLog({
             setSelectedLog(detail);
             setDayForm({
                 endTf: detail.end_tf ?? "",
-                pumpMinutes: detail.total_sludge_pump_minutes ?? "",
-                flaskVolumeMl: detail.flask_volume_ml ?? ""
+                pumpMinutes: detail.total_sludge_pump_minutes ?? ""
             });
         }
         catch(err){
@@ -192,8 +191,7 @@ export default function ExecutionSludgeLog({
 
             await updateSludgeDailyLog(selectedLogId, {
                 endTf: dayForm.endTf === "" ? null : Number(dayForm.endTf),
-                totalSludgePumpMinutes: dayForm.pumpMinutes === "" ? null : Number(dayForm.pumpMinutes),
-                flaskVolumeMl: dayForm.flaskVolumeMl === "" ? null : Number(dayForm.flaskVolumeMl)
+                totalSludgePumpMinutes: dayForm.pumpMinutes === "" ? null : Number(dayForm.pumpMinutes)
             });
 
             await loadLogs(selectedLogId);
@@ -227,10 +225,11 @@ export default function ExecutionSludgeLog({
                 tfReading: Number(readingForm.tfReading),
                 frReading: readingForm.frReading === "" ? null : Number(readingForm.frReading),
                 settledSludgeVolumeMl: readingForm.settledMl === "" ? null : Number(readingForm.settledMl),
+                flaskVolumeMl: readingForm.flaskMl === "" ? null : Number(readingForm.flaskMl),
                 recordedBy: user?.name
             });
 
-            setReadingForm({tfReading: "", frReading: "", settledMl: ""});
+            setReadingForm({tfReading: "", frReading: "", settledMl: "", flaskMl: ""});
 
             await loadLogs(selectedLogId);
             await loadSelectedLog();
@@ -252,7 +251,8 @@ export default function ExecutionSludgeLog({
         setEditForm({
             tfReading: reading.tf_reading ?? "",
             frReading: reading.fr_reading ?? "",
-            settledMl: reading.settled_sludge_volume_ml ?? ""
+            settledMl: reading.settled_sludge_volume_ml ?? "",
+            flaskMl: reading.flask_volume_ml ?? ""
         });
     }
 
@@ -266,7 +266,8 @@ export default function ExecutionSludgeLog({
             await updateSludgeReading(readingId, {
                 tfReading: editForm.tfReading === "" ? null : Number(editForm.tfReading),
                 frReading: editForm.frReading === "" ? null : Number(editForm.frReading),
-                settledSludgeVolumeMl: editForm.settledMl === "" ? null : Number(editForm.settledMl)
+                settledSludgeVolumeMl: editForm.settledMl === "" ? null : Number(editForm.settledMl),
+                flaskVolumeMl: editForm.flaskMl === "" ? null : Number(editForm.flaskMl)
             });
 
             setEditingReadingId(null);
@@ -383,8 +384,14 @@ export default function ExecutionSludgeLog({
                     >
                         <span>{log.log_date}</span>
                         <span>{METHOD_LABELS[log.method] || log.method}</span>
-                        <span className={log.status === "COMPLETE" ? "sludge-log-status-pill complete" : "sludge-log-status-pill pending"}>
-                            {log.status === "COMPLETE" ? `${round(log.sludge_output_m3, 2)} m³` : "Pending"}
+                        <span className={
+                            log.status === "COMPLETE" ? "sludge-log-status-pill complete"
+                                : log.status === "INVALID" ? "sludge-log-status-pill invalid"
+                                    : "sludge-log-status-pill pending"
+                        }>
+                            {log.status === "COMPLETE" ? `${round(log.sludge_output_m3, 2)} m³`
+                                : log.status === "INVALID" ? "⚠ Check data"
+                                    : "Pending"}
                         </span>
                     </button>
 
@@ -496,20 +503,6 @@ export default function ExecutionSludgeLog({
                             </div>
                         )}
 
-                        {method === "SETTLING" && (
-                            <div className="execution-form-group">
-                                <label>Flask Volume (ml)</label>
-                                <input
-                                    type="number"
-                                    className="execution-input"
-                                    value={dayForm.flaskVolumeMl}
-                                    readOnly={!canRecord}
-                                    disabled={!canRecord}
-                                    onChange={e=>setDayForm(p=>({...p, flaskVolumeMl: e.target.value}))}
-                                />
-                            </div>
-                        )}
-
                     </div>
 
                     {canRecord && (
@@ -520,26 +513,44 @@ export default function ExecutionSludgeLog({
                         </div>
                     )}
 
-                    <div className="sludge-log-breakdown">
+                    {selectedLog.invalid_reason ? (
 
-                        {method === "FLOW_METER" && (
-                            <>
-                                <div><span>Avg FR</span><strong>{round(selectedLog.avg_fr, 2)} m³/hr</strong></div>
-                                <div><span>Estimated Volume</span><strong>{round(selectedLog.total_sludge_pumping_estimate_m3, 2)} m³</strong></div>
-                            </>
-                        )}
-
-                        <div><span>Total TF (ground truth)</span><strong>{round(selectedLog.total_tf_m3, 2)} m³</strong></div>
-                        <div><span>% Sludge / % Water</span><strong>{round(selectedLog.pct_sludge, 1)}% / {round(selectedLog.pct_water, 1)}%</strong></div>
-                        <div><span>Sludge Output</span><strong>{round(selectedLog.sludge_output_m3, 3)} m³</strong></div>
-                        <div><span>Water Output</span><strong>{round(selectedLog.water_output_m3, 3)} m³</strong></div>
-
-                    </div>
-
-                    {selectedLog.sludge_output_m3 === null && (
-                        <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginTop:8}}>
-                            Add readings and set End TF{method === "FLOW_METER" ? " and pump time" : ""} to see the computed output.
+                        <p style={{
+                            textAlign:"left", padding:"10px 12px", marginTop:8,
+                            background:"#fef2f2", border:"1px solid #fecaca", borderRadius:8,
+                            color:"#991b1b", fontSize:"12.5px", fontWeight:600
+                        }}>
+                            ⚠ Not computed - {selectedLog.invalid_reason}
                         </p>
+
+                    ) : (
+
+                        <>
+
+                            <div className="sludge-log-breakdown">
+
+                                {method === "FLOW_METER" && (
+                                    <>
+                                        <div><span>Avg FR</span><strong>{round(selectedLog.avg_fr, 2)} m³/hr</strong></div>
+                                        <div><span>Estimated Volume</span><strong>{round(selectedLog.total_sludge_pumping_estimate_m3, 2)} m³</strong></div>
+                                    </>
+                                )}
+
+                                <div><span>Total TF (ground truth)</span><strong>{round(selectedLog.total_tf_m3, 2)} m³</strong></div>
+                                <div><span>% Sludge / % Water</span><strong>{round(selectedLog.pct_sludge, 1)}% / {round(selectedLog.pct_water, 1)}%</strong></div>
+                                <div><span>Sludge Output</span><strong>{round(selectedLog.sludge_output_m3, 3)} m³</strong></div>
+                                <div><span>Water Output</span><strong>{round(selectedLog.water_output_m3, 3)} m³</strong></div>
+
+                            </div>
+
+                            {selectedLog.sludge_output_m3 === null && (
+                                <p className="execution-map-empty" style={{textAlign:"left", padding:0, marginTop:8}}>
+                                    Add readings and set End TF{method === "FLOW_METER" ? " and pump time" : ""} to see the computed output.
+                                </p>
+                            )}
+
+                        </>
+
                     )}
 
                     <h4 style={{fontSize:"12px", fontWeight:800, marginTop:16, marginBottom:8}}>
@@ -556,6 +567,7 @@ export default function ExecutionSludgeLog({
                                     <th>TF</th>
                                     {method === "FLOW_METER" && <th>FR</th>}
                                     {method === "SETTLING" && <th>Settled Sludge (ml)</th>}
+                                    {method === "SETTLING" && <th>Flask Volume (ml)</th>}
                                     <th>Source</th>
                                     <th>By</th>
                                     {canRecord && <th></th>}
@@ -595,6 +607,15 @@ export default function ExecutionSludgeLog({
                                                     />
                                                 </td>
                                             )}
+                                            {method === "SETTLING" && (
+                                                <td>
+                                                    <input
+                                                        type="number" className="execution-input"
+                                                        value={editForm.flaskMl}
+                                                        onChange={e=>setEditForm(p=>({...p, flaskMl: e.target.value}))}
+                                                    />
+                                                </td>
+                                            )}
                                             <td>{reading.source}</td>
                                             <td>{reading.recorded_by || "—"}</td>
                                             {canRecord && (
@@ -619,6 +640,7 @@ export default function ExecutionSludgeLog({
                                             <td>{round(reading.tf_reading, 3)}</td>
                                             {method === "FLOW_METER" && <td>{round(reading.fr_reading, 2)}</td>}
                                             {method === "SETTLING" && <td>{round(reading.settled_sludge_volume_ml, 0)}</td>}
+                                            {method === "SETTLING" && <td>{round(reading.flask_volume_ml, 0)}</td>}
                                             <td>{reading.source}</td>
                                             <td>{reading.recorded_by || "—"}</td>
                                             {canRecord && (
@@ -636,7 +658,7 @@ export default function ExecutionSludgeLog({
 
                                 {(selectedLog.readings || []).length === 0 && (
                                     <tr>
-                                        <td colSpan={5}>No readings yet.</td>
+                                        <td colSpan={4 + (method === "SETTLING" ? 1 : 0) + (canRecord ? 1 : 0)}>No readings yet.</td>
                                     </tr>
                                 )}
 
@@ -681,6 +703,14 @@ export default function ExecutionSludgeLog({
                                         />
                                     </div>
                                     <div className="execution-form-group">
+                                        <label>Flask Volume (ml)</label>
+                                        <input
+                                            type="number" className="execution-input"
+                                            value={readingForm.flaskMl}
+                                            onChange={e=>setReadingForm(p=>({...p, flaskMl: e.target.value}))}
+                                        />
+                                    </div>
+                                    <div className="execution-form-group">
                                         <label>FR Reading (m³/hr, optional/reference)</label>
                                         <input
                                             type="number" className="execution-input"
@@ -694,7 +724,12 @@ export default function ExecutionSludgeLog({
                             <div className="execution-actions" style={{gridColumn:"1 / -1"}}>
                                 <button
                                     className="execution-btn"
-                                    disabled={saving || readingForm.tfReading === ""}
+                                    disabled={
+                                        saving
+                                        || readingForm.tfReading === ""
+                                        || (method === "SETTLING" && (readingForm.settledMl === "" || readingForm.flaskMl === ""))
+                                        || (method === "FLOW_METER" && readingForm.frReading === "")
+                                    }
                                     onClick={handleAddReading}
                                 >
                                     + Add Reading

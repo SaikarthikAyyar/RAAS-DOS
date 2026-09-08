@@ -51,6 +51,13 @@ class ExecutionSludgeReading(Base):
 
     settled_sludge_volume_ml = Column(Float, nullable=True)
 
+    # Sample Collection (Settling) method only - captured per-reading
+    # rather than once for the whole day, since different flask sizes
+    # may genuinely be used sample to sample. The daily log's own
+    # flask_volume_ml column is superseded by this for any reading
+    # that sets its own value.
+    flask_volume_ml = Column(Float, nullable=True)
+
     source = Column(String(20), nullable=False, default="MANUAL")  # MANUAL | DEVICE
 
     recorded_by = Column(String(150), nullable=True)

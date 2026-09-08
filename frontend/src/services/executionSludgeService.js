@@ -60,7 +60,7 @@ export async function getSludgeDailyLog(dailyLogId){
 }
 
 
-export async function updateSludgeDailyLog(dailyLogId, {endTf, totalSludgePumpMinutes, flaskVolumeMl}){
+export async function updateSludgeDailyLog(dailyLogId, {endTf, totalSludgePumpMinutes}){
 
     const response = await fetch(
 
@@ -71,8 +71,7 @@ export async function updateSludgeDailyLog(dailyLogId, {endTf, totalSludgePumpMi
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 end_tf: endTf ?? null,
-                total_sludge_pump_minutes: totalSludgePumpMinutes ?? null,
-                flask_volume_ml: flaskVolumeMl ?? null
+                total_sludge_pump_minutes: totalSludgePumpMinutes ?? null
             })
         }
 
@@ -83,7 +82,7 @@ export async function updateSludgeDailyLog(dailyLogId, {endTf, totalSludgePumpMi
 }
 
 
-export async function addSludgeReading(dailyLogId, {tfReading, frReading, settledSludgeVolumeMl, recordedBy}){
+export async function addSludgeReading(dailyLogId, {tfReading, frReading, settledSludgeVolumeMl, flaskVolumeMl, recordedBy}){
 
     const response = await fetch(
 
@@ -96,6 +95,7 @@ export async function addSludgeReading(dailyLogId, {tfReading, frReading, settle
                 tf_reading: tfReading,
                 fr_reading: frReading ?? null,
                 settled_sludge_volume_ml: settledSludgeVolumeMl ?? null,
+                flask_volume_ml: flaskVolumeMl ?? null,
                 source: "MANUAL",
                 recorded_by: recordedBy ?? null
             })
@@ -108,7 +108,7 @@ export async function addSludgeReading(dailyLogId, {tfReading, frReading, settle
 }
 
 
-export async function updateSludgeReading(readingId, {tfReading, frReading, settledSludgeVolumeMl, recordedBy}){
+export async function updateSludgeReading(readingId, {tfReading, frReading, settledSludgeVolumeMl, flaskVolumeMl, recordedBy}){
 
     const response = await fetch(
 
@@ -121,6 +121,7 @@ export async function updateSludgeReading(readingId, {tfReading, frReading, sett
                 tf_reading: tfReading ?? null,
                 fr_reading: frReading ?? null,
                 settled_sludge_volume_ml: settledSludgeVolumeMl ?? null,
+                flask_volume_ml: flaskVolumeMl ?? null,
                 recorded_by: recordedBy ?? null
             })
         }

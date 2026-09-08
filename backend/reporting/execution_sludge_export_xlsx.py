@@ -58,7 +58,11 @@ def _build_summary_sheet(wb, execution, daily_logs):
 
     for log in daily_logs:
 
-        status = "Complete" if log.sludge_output_m3 is not None else "Pending"
+        status = (
+            "Invalid - see sheet" if log.invalid_reason
+            else "Complete" if log.sludge_output_m3 is not None
+            else "Pending"
+        )
 
         table_data_row(ws, row, [
             log.log_date.isoformat() if log.log_date else "-",
@@ -82,7 +86,7 @@ def _build_day_sheet(wb, execution, log):
 
     ws = wb.create_sheet(safe_sheet_name(log.log_date.isoformat() if log.log_date else f"Day {log.id}"))
 
-    total_cols = 3
+    total_cols = 3 if log.method == "FLOW_METER" else 4
 
     row = 1
     title_row(ws, row, total_cols, "JANYU TECHNOLOGIES")
@@ -100,9 +104,6 @@ def _build_day_sheet(wb, execution, log):
     if log.method == "FLOW_METER":
         field_row(ws, row, "Total Sludge Pump Time (min)", [_fmt(log.total_sludge_pump_minutes, 1)])
         row += 1
-    else:
-        field_row(ws, row, "Flask Volume (ml)", [_fmt(log.flask_volume_ml, 0)])
-        row += 1
 
     row += 1
 
@@ -112,7 +113,10 @@ def _build_day_sheet(wb, execution, log):
     if log.method == "FLOW_METER":
         headers = ["Time", "TF (m3)", "FR (m3/hr)"]
     else:
-        headers = ["Time", "TF (m3)", "Settled Sludge (ml)"]
+        # Flask volume is captured per reading, not once for the whole
+        # day - different flask sizes may genuinely be used sample to
+        # sample.
+        headers = ["Time", "TF (m3)", "Settled Sludge (ml)", "Flask Volume (ml)"]
 
     table_header_row(ws, row, headers)
     row += 1
@@ -129,7 +133,8 @@ def _build_day_sheet(wb, execution, log):
             values = [
                 reading.recorded_at.strftime("%Y-%m-%d %H:%M") if reading.recorded_at else "-",
                 _fmt(reading.tf_reading),
-                _fmt(reading.settled_sludge_volume_ml, 0)
+                _fmt(reading.settled_sludge_volume_ml, 0),
+                _fmt(reading.flask_volume_ml, 0)
             ]
 
         table_data_row(ws, row, values)
@@ -139,6 +144,20 @@ def _build_day_sheet(wb, execution, log):
 
     section_band(ws, row, total_cols, "COMPUTED RESULTS")
     row += 1
+
+    if log.invalid_reason:
+
+        field_row(ws, row, "Not Computed - Check Data", [log.invalid_reason], wrap=True)
+        row += 1
+
+        ws.column_dimensions["A"].width = 30
+        ws.column_dimensions["B"].width = 22
+        ws.column_dimensions["C"].width = 22
+
+        if log.method == "SETTLING":
+            ws.column_dimensions["D"].width = 22
+
+        return
 
     if log.method == "FLOW_METER":
 
@@ -168,6 +187,9 @@ def _build_day_sheet(wb, execution, log):
     ws.column_dimensions["A"].width = 30
     ws.column_dimensions["B"].width = 22
     ws.column_dimensions["C"].width = 22
+
+    if log.method == "SETTLING":
+        ws.column_dimensions["D"].width = 22
 
 
 def build_execution_sludge_workbook_bytes(execution, daily_logs):

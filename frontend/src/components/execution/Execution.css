@@ -745,6 +745,13 @@
 
 }
 
+.sludge-log-status-pill.invalid{
+
+    background:#fee2e2;
+    color:#991b1b;
+
+}
+
 .sludge-log-breakdown{
 
     display:grid;

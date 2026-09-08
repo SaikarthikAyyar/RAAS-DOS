@@ -81,8 +81,7 @@ def update_execution_daily_log(daily_log_id: int, payload: DailyLogUpdateSchema,
         db,
         daily_log_id,
         payload.end_tf,
-        payload.total_sludge_pump_minutes,
-        payload.flask_volume_ml
+        payload.total_sludge_pump_minutes
     )
 
 
@@ -95,6 +94,7 @@ def create_reading(daily_log_id: int, payload: ReadingCreateSchema, db: Session 
         payload.tf_reading,
         payload.fr_reading,
         payload.settled_sludge_volume_ml,
+        payload.flask_volume_ml,
         payload.source,
         payload.recorded_by
     )
@@ -109,6 +109,7 @@ def update_sludge_reading(reading_id: int, payload: ReadingUpdateSchema, db: Ses
         payload.tf_reading,
         payload.fr_reading,
         payload.settled_sludge_volume_ml,
+        payload.flask_volume_ml,
         payload.recorded_by
     )
 

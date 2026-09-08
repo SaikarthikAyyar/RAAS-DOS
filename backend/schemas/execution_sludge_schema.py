@@ -36,16 +36,17 @@ class DailyLogUpdateSchema(BaseModel):
 
     total_sludge_pump_minutes: float | None = None
 
-    flask_volume_ml: float | None = None
-
 
 # ====================================
 # READINGS
 # tf_reading is always required (both methods). fr_reading/
 # settled_sludge_volume_ml are validated server-side against the
-# day's own method. source defaults to MANUAL - ready for a future
-# machine-signal ingestion path to set DEVICE instead, through this
-# exact same schema/endpoint.
+# day's own method. flask_volume_ml is required alongside
+# settled_sludge_volume_ml for a Settling reading - captured per
+# reading (not once for the whole day) since different flask sizes may
+# genuinely be used sample to sample. source defaults to MANUAL - ready
+# for a future machine-signal ingestion path to set DEVICE instead,
+# through this exact same schema/endpoint.
 # ====================================
 
 class ReadingCreateSchema(BaseModel):
@@ -55,6 +56,8 @@ class ReadingCreateSchema(BaseModel):
     fr_reading: float | None = None
 
     settled_sludge_volume_ml: float | None = None
+
+    flask_volume_ml: float | None = None
 
     source: str | None = "MANUAL"
 
@@ -68,5 +71,7 @@ class ReadingUpdateSchema(BaseModel):
     fr_reading: float | None = None
 
     settled_sludge_volume_ml: float | None = None
+
+    flask_volume_ml: float | None = None
 
     recorded_by: str | None = None

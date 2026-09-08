@@ -17,6 +17,7 @@ from sqlalchemy import Integer
 from sqlalchemy import BigInteger
 from sqlalchemy import String
 from sqlalchemy import Float
+from sqlalchemy import Text
 from sqlalchemy import Date
 from sqlalchemy import TIMESTAMP
 from sqlalchemy import ForeignKey
@@ -74,6 +75,14 @@ class ExecutionSludgeDailyLog(Base):
     sludge_output_m3 = Column(Float, nullable=True)
 
     water_output_m3 = Column(Float, nullable=True)
+
+    # Set (non-None) exactly when the split couldn't be computed
+    # because the inputs are physically inconsistent - e.g. a
+    # flow-rate estimate smaller than Total(TF), or a settled sample
+    # bigger than its own flask. Never a nonsensical negative/over-100
+    # percentage is computed in that case - see backend/utils/
+    # sludge_progress.py for the guard.
+    invalid_reason = Column(Text, nullable=True)
 
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
