@@ -428,7 +428,7 @@ export default function ExecutionSludgeLog({
 
                     <div className="execution-form-group">
                         <label>
-                            Start TF (m³){logs.length > 0 ? " - leave blank to continue from the previous day" : ""}
+                            Start Reading (m³){logs.length > 0 ? " - leave blank to continue from the previous day" : ""}
                         </label>
                         <input
                             type="number"
@@ -466,12 +466,12 @@ export default function ExecutionSludgeLog({
                     <div className="execution-form-grid">
 
                         <div className="execution-form-group">
-                            <label>Start TF (m³)</label>
+                            <label>Start Reading (m³)</label>
                             <input className="execution-input" value={selectedLog.start_tf} readOnly disabled/>
                         </div>
 
                         <div className="execution-form-group">
-                            <label>End TF (m³)</label>
+                            <label>End Reading (m³)</label>
                             <input
                                 type="number"
                                 className="execution-input"
