@@ -36,7 +36,7 @@ export default function SurveyWorkspace({
 
         return(
 
-            <div className="survey-card">
+            <div className="legacy-survey-workspace-card">
 
                 <h3>
 
@@ -140,7 +140,7 @@ export default function SurveyWorkspace({
 
     return(
 
-        <div className="survey-workspace">
+        <div className="legacy-survey-workspace">
 
             {
 
@@ -226,7 +226,7 @@ export default function SurveyWorkspace({
 
             }
 
-            <div className="survey-card">
+            <div className="legacy-survey-workspace-card">
 
                 <h3>
 
@@ -242,7 +242,7 @@ export default function SurveyWorkspace({
 
             </div>
 
-            <div className="survey-card">
+            <div className="legacy-survey-workspace-card">
 
                 <h3>
 

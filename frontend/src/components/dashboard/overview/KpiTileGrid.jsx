@@ -35,9 +35,13 @@ export default function KpiTileGrid({ kpis }){
         <div className="ovw-grid-6">
 
             {
-                tiles.map(tile=>(
+                tiles.map((tile, i)=>(
 
-                    <div className="ovw-kpi" key={tile.title}>
+                    <div
+                        className="ovw-kpi ui-card-interactive ui-fade-in"
+                        key={tile.title}
+                        style={{ animationDelay: `${i * 40}ms` }}
+                    >
                         <b>{tile.value}</b>
                         <span>{tile.title}</span>
                     </div>

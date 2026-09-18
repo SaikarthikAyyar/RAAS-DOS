@@ -746,7 +746,8 @@
    RESPONSIVE
 ========================================================== */
 
-@media(max-width:900px){
+/* Standardized to this initiative's shared 1024px tier - was 900px. */
+@media(max-width:1024px){
 
     .enquiry-module-front-page{
 
@@ -772,7 +773,14 @@
 
     }
 
-    .enquiry-table table{
+    /* Real pre-existing bug fixed here: this was written as
+       ".enquiry-table table" (a <table> nested inside .enquiry-table),
+       but .enquiry-table IS the <table> element itself (see
+       EnquiryTable.jsx) - the selector never matched anything, so
+       table-layout:fixed's percentage columns had no min-width floor
+       and crushed down to unreadable single-letter-per-line headers
+       instead of triggering the intended horizontal scroll. */
+    .enquiry-table{
 
         min-width:1200px;
 
@@ -793,6 +801,8 @@
     .enquiry-status-tab{
 
         width:100%;
+        min-height:44px;
+        box-sizing:border-box;
 
     }
 
@@ -801,6 +811,36 @@
         flex-direction:column;
 
         align-items:flex-start;
+
+    }
+
+    .enquiry-toolbar{
+
+        flex-wrap:wrap;
+        gap:10px;
+
+    }
+
+}
+
+@media(max-width:480px){
+
+    .enquiry-header-title{
+
+        font-size:22px;
+
+    }
+
+    .enquiry-toolbar-actions{
+
+        width:100%;
+
+    }
+
+    .enquiry-export-button,
+    .enquiry-new-button{
+
+        flex:1 1 auto;
 
     }
 
@@ -817,6 +857,10 @@
     justify-content:space-between;
 
     align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:10px;
 
     margin-bottom:18px;
 

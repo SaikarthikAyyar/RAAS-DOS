@@ -714,7 +714,7 @@ export default function BusinessMastersModule(){
 
         <div className="bm-module">
 
-            <div className="bm-title">
+            <div className="bm-title ui-fade-in">
 
                 <div>
 
@@ -744,7 +744,7 @@ export default function BusinessMastersModule(){
 
             </div>
 
-            <div className="bm-tabs">
+            <div className="bm-tabs ui-fade-in" style={{ animationDelay: "60ms" }}>
 
                 {
 
@@ -769,6 +769,8 @@ export default function BusinessMastersModule(){
                 }
 
             </div>
+
+            <div className="ui-fade-in" key={activeTab}>
 
             {
 
@@ -857,6 +859,8 @@ export default function BusinessMastersModule(){
                 )
 
             }
+
+            </div>
 
         </div>
 

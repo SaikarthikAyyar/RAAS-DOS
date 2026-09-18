@@ -26,6 +26,80 @@
 
 --card:#ffffff;
 
+/* ====================================
+   UI REFRESH (Phase 43) - shared motion + elevation tokens
+   Purely additive: no existing color value above is touched. These
+   are the only tokens every module's new hover/transition/mount-in
+   work should reference, instead of each file inventing its own
+   timing/shadow values - see frontend/UI_REFRESH_ORIGINAL_BACKUPS.md
+   for the rollback mechanism this whole initiative uses.
+
+   Breakpoint convention (documented here since CSS media queries
+   can't reference custom properties): new responsive work in this
+   initiative standardizes on exactly three widths - 1024px (nav/
+   sidebar collapse point), 768px (tablet / stacked-columns point),
+   480px (phone / single-column point) - rather than each module
+   inventing its own numbers.
+==================================== */
+
+--transition-fast:150ms ease;
+--transition-base:220ms ease;
+--transition-slow:320ms ease;
+
+--shadow-sm:0 1px 3px rgba(17,24,39,.06);
+--shadow-md:0 6px 20px rgba(17,24,39,.08);
+--shadow-hover:0 10px 26px rgba(17,24,39,.12), 0 0 0 1px rgba(245,130,32,.25);
+
+}
+
+@media (prefers-reduced-motion: reduce){
+
+    *{
+        animation-duration:.001ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.001ms !important;
+        scroll-behavior:auto !important;
+    }
+
+}
+
+/* ====================================
+   UI REFRESH - shared utility classes
+   Opt-in per module - applying a class here changes nothing until a
+   component actually uses it.
+==================================== */
+
+.ui-card-interactive{
+
+    transition:transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+
+}
+
+.ui-card-interactive:hover{
+
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-hover);
+
+}
+
+@keyframes ui-fade-in-up{
+
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:1; transform:translateY(0); }
+
+}
+
+.ui-fade-in{
+
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.ui-tap-target{
+
+    min-width:44px;
+    min-height:44px;
+
 }
 
 *{

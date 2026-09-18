@@ -234,6 +234,18 @@ margin-bottom:14px;
 
 box-shadow:0 4px 14px rgba(17,24,39,.04);
 
+transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.survey-card:hover{
+
+transform:translateY(-2px);
+
+box-shadow:var(--shadow-hover);
+
 }
 
 
@@ -699,6 +711,20 @@ font-size:12px;
 
 font-weight:750;
 
+transition:opacity var(--transition-fast), transform var(--transition-fast);
+
+}
+
+.survey-btn:hover:not(:disabled){
+
+opacity:.85;
+
+}
+
+.survey-btn:active:not(:disabled){
+
+transform:scale(.97);
+
 }
 
 
@@ -791,7 +817,9 @@ transform:translateY(-2px);
    RESPONSIVE
 =================================== */
 
-@media(max-width:1200px){
+/* Breakpoints standardized to this initiative's shared 1024/768/480
+   convention (see styles/layout.css) - was one single 1200px tier. */
+@media(max-width:1024px){
 
 .survey-grid,
 
@@ -809,9 +837,57 @@ gap:12px;
 
 }
 
+}
+
+@media(max-width:768px){
+
+.survey-grid,
+
+.survey-row{
+
+grid-template-columns:1fr;
+
+}
+
 .survey-actions{
 
 flex-direction:column;
+
+align-items:stretch;
+
+}
+
+.survey-completion-card{
+
+position:static;
+
+width:100%;
+
+margin-bottom:14px;
+
+}
+
+/* Media picker: a fixed-width selector column beside a flex-1
+   preview never had a mobile collapse - stack instead of cramming
+   both into a narrow viewport (same fix as Execution.css). */
+.media-container{
+
+flex-direction:column;
+
+}
+
+.media-selector{
+
+width:100%;
+
+max-height:180px;
+
+}
+
+.preview-image,
+.preview-video{
+
+max-width:100%;
 
 }
 

@@ -204,6 +204,18 @@ box-shadow:0 4px 14px rgba(17,24,39,.04);
 
 overflow-x:auto;
 
+transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.audit-card:hover{
+
+transform:translateY(-2px);
+
+box-shadow:var(--shadow-hover);
+
 }
 
 .audit-table{
@@ -282,6 +294,16 @@ background:none;
 border:none;
 
 padding:0;
+
+transition:opacity var(--transition-fast);
+
+}
+
+.audit-backlink:hover{
+
+opacity:.7;
+
+text-decoration:underline;
 
 }
 

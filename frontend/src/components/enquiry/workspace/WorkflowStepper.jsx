@@ -38,7 +38,7 @@ export default function WorkflowStepper({
 
     return(
 
-        <div className="workflow-stepper">
+        <div className="workflow-stepper ui-fade-in" style={{ animationDelay: "40ms" }}>
 
             {
 

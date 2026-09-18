@@ -10,7 +10,7 @@ export default function PipelineByStageCard({ pipelineByStage = [] }){
 
     return(
 
-        <div className="ovw-card">
+        <div className="ovw-card ui-card-interactive ui-fade-in">
 
             <h3>Pipeline by stage</h3>
 

@@ -62,7 +62,7 @@ export default function WorkspaceHeader({
 
     return(
 
-        <div className="workspace-header">
+        <div className="workspace-header ui-fade-in">
 
             <div className="workspace-header-title">
 

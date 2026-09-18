@@ -29,7 +29,7 @@ export default function FollowUpsCard({ followUps = [] }){
 
     return(
 
-        <div className="ovw-card">
+        <div className="ovw-card ui-card-interactive ui-fade-in">
 
             <h3>
                 Follow-ups
@@ -45,40 +45,44 @@ export default function FollowUpsCard({ followUps = [] }){
 
                 ) : (
 
-                    <table className="ovw-table">
+                    <div className="ovw-table-wrap">
 
-                        <thead>
-                            <tr>
-                                <th>Customer</th>
-                                <th>Owner</th>
-                                <th>Date</th>
-                                <th>Note</th>
-                            </tr>
-                        </thead>
+                        <table className="ovw-table">
 
-                        <tbody>
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Owner</th>
+                                    <th>Date</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
 
-                            {
-                                followUps.map(f=>(
+                            <tbody>
 
-                                    <tr key={f.customer_id}>
-                                        <td>{f.company_name}</td>
-                                        <td>{f.owner || "-"}</td>
-                                        <td>
-                                            <span className={pillClassFor(f.bucket)} style={{marginRight:6}}>
-                                                {pillLabelFor(f.bucket)}
-                                            </span>
-                                            {f.date}
-                                        </td>
-                                        <td>{f.note || "-"}</td>
-                                    </tr>
+                                {
+                                    followUps.map(f=>(
 
-                                ))
-                            }
+                                        <tr key={f.customer_id}>
+                                            <td>{f.company_name}</td>
+                                            <td>{f.owner || "-"}</td>
+                                            <td>
+                                                <span className={pillClassFor(f.bucket)} style={{marginRight:6}}>
+                                                    {pillLabelFor(f.bucket)}
+                                                </span>
+                                                {f.date}
+                                            </td>
+                                            <td>{f.note || "-"}</td>
+                                        </tr>
 
-                        </tbody>
+                                    ))
+                                }
 
-                    </table>
+                            </tbody>
+
+                        </table>
+
+                    </div>
 
                 )
             }

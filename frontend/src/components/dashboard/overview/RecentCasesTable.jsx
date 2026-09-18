@@ -23,7 +23,7 @@ export default function RecentCasesTable({ recentCases = [] }){
 
     return(
 
-        <div className="ovw-card">
+        <div className="ovw-card ui-card-interactive ui-fade-in">
 
             <h3>Recent cases</h3>
 
@@ -34,46 +34,50 @@ export default function RecentCasesTable({ recentCases = [] }){
 
                 ) : (
 
-                    <table className="ovw-table">
+                    <div className="ovw-table-wrap">
 
-                        <thead>
-                            <tr>
-                                <th>Enquiry</th>
-                                <th>Customer</th>
-                                <th>Stage</th>
-                                <th>Value</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
+                        <table className="ovw-table">
 
-                        <tbody>
+                            <thead>
+                                <tr>
+                                    <th>Enquiry</th>
+                                    <th>Customer</th>
+                                    <th>Stage</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
 
-                            {
-                                recentCases.map(c=>(
+                            <tbody>
 
-                                    <tr key={c.enquiry_id}>
-                                        <td>#{c.enquiry_id}</td>
-                                        <td>{c.customer_name || "-"}</td>
-                                        <td>{STAGE_LABELS[c.stage] || c.stage}</td>
-                                        <td>{inr(c.value)}</td>
-                                        <td>{c.quote_commercial_status || "-"}</td>
-                                        <td>
-                                            <span
-                                                className="ovw-link"
-                                                onClick={()=>navigate(`/enquiries/workspace/${c.enquiry_id}`)}
-                                            >
-                                                Open case →
-                                            </span>
-                                        </td>
-                                    </tr>
+                                {
+                                    recentCases.map(c=>(
 
-                                ))
-                            }
+                                        <tr key={c.enquiry_id}>
+                                            <td>#{c.enquiry_id}</td>
+                                            <td>{c.customer_name || "-"}</td>
+                                            <td>{STAGE_LABELS[c.stage] || c.stage}</td>
+                                            <td>{inr(c.value)}</td>
+                                            <td>{c.quote_commercial_status || "-"}</td>
+                                            <td>
+                                                <span
+                                                    className="ovw-link"
+                                                    onClick={()=>navigate(`/enquiries/workspace/${c.enquiry_id}`)}
+                                                >
+                                                    Open case →
+                                                </span>
+                                            </td>
+                                        </tr>
 
-                        </tbody>
+                                    ))
+                                }
 
-                    </table>
+                            </tbody>
+
+                        </table>
+
+                    </div>
 
                 )
             }

@@ -198,6 +198,16 @@
     cursor:pointer;
     font-size:12px;
     color:#374151;
+    transition:border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.workflow-tab:hover{
+    border-color:var(--orange);
+    color:var(--orange);
+}
+
+.workflow-tab:active{
+    transform:scale(.97);
 }
 
 .workflow-tab-active{
@@ -206,18 +216,47 @@
     border-color:var(--deep);
 }
 
+.workflow-tab-active:hover{
+    color:#fff;
+    border-color:var(--deep);
+}
+
+/* Standardized 768px tablet/stacked-columns breakpoint (this
+   initiative's shared convention, see styles/layout.css) - larger
+   touch targets for the tab strip on mobile. */
+@media(max-width:768px){
+
+    .workflow-tab{
+        padding:9px 14px;
+        min-height:44px;
+        display:inline-flex;
+        align-items:center;
+    }
+
+}
+
 
 /* ====================================
    CONTENT
+   .survey-workspace/.survey-card here back SurveyWorkspace.jsx, which
+   is dead - imported in WorkspaceContent.jsx but never actually
+   rendered (the real "survey" tab renders SurveySummary instead).
+   Renamed with a "legacy-" prefix so these no longer collide with
+   SalesSurvey.css's own real, live .survey-card (a genuine, pre-
+   existing same-name-different-file bug found while adding this
+   initiative's hover-lift to the real one - the app eagerly imports
+   every page's CSS regardless of route, so whichever file's import
+   happened to resolve later in the bundle graph was silently winning
+   the cascade on Customer Request / Sales Survey).
 ==================================== */
 
-.survey-workspace{
+.legacy-survey-workspace{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
     gap:16px;
 }
 
-.survey-card{
+.legacy-survey-workspace-card{
     background:#ffffff;
     border-radius:10px;
     padding:18px;

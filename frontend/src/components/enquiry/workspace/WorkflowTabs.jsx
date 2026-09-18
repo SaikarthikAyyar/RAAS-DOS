@@ -83,7 +83,7 @@ export default function WorkflowTabs({
 
     return(
 
-        <div className="workflow-tabs">
+        <div className="workflow-tabs ui-fade-in" style={{ animationDelay: "80ms" }}>
 
             {
 

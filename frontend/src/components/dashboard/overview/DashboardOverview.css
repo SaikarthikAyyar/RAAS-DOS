@@ -69,13 +69,43 @@
     margin-bottom:14px;
 }
 
-@media(max-width:1100px){
+/* Invoice Dashboard's own 5-tile KPI row - a real responsive gap this
+   initiative found: it was previously an inline
+   style={{gridTemplateColumns:"repeat(5,1fr)"}} on top of .ovw-grid-6,
+   which (being inline) overrode every one of that class's breakpoints
+   below and kept 5 cramped columns even on a phone screen. */
+.ovw-grid-5{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:14px;
+    margin-bottom:16px;
+}
+
+@media(max-width:1024px){
+    .ovw-grid-5{ grid-template-columns:repeat(3,1fr); }
+}
+
+@media(max-width:768px){
+    .ovw-grid-5{ grid-template-columns:repeat(2,1fr); }
+}
+
+@media(max-width:480px){
+    .ovw-grid-5{ grid-template-columns:1fr; }
+}
+
+/* Breakpoints standardized to this initiative's shared 1024/768/480
+   convention (see styles/layout.css) - was 1100px/640px. */
+@media(max-width:1024px){
     .ovw-grid-6{ grid-template-columns:repeat(3,1fr); }
     .ovw-grid-3{ grid-template-columns:1fr; }
 }
 
-@media(max-width:640px){
+@media(max-width:768px){
     .ovw-grid-6{ grid-template-columns:repeat(2,1fr); }
+}
+
+@media(max-width:480px){
+    .ovw-grid-6{ grid-template-columns:1fr; }
 }
 
 .ovw-kpi{
@@ -83,6 +113,19 @@
     padding:14px;
     background:var(--card);
     border:1px solid var(--line);
+
+    /* Hover-lift + mount-in fade at the class level, so every consumer
+       of .ovw-kpi/.ovw-card gets this automatically - not just
+       KpiTileGrid.jsx's own JSX-added classes (Invoice Dashboard
+       renders these same classes directly and was missing both until
+       this was moved here). */
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+}
+
+.ovw-kpi:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-hover);
 }
 
 .ovw-kpi b{
@@ -105,6 +148,13 @@
     border-radius:14px;
     padding:16px;
     box-shadow:0 4px 14px rgba(17,24,39,.04);
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+}
+
+.ovw-card:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-hover);
 }
 
 .ovw-card h3{
@@ -196,4 +246,11 @@
     font-weight:800;
     color:var(--orange);
     cursor:pointer;
+}
+
+/* Wraps a .ovw-table so a wide table scrolls horizontally within its
+   own card instead of overflowing the page (the real bug this fixed -
+   FollowUpsCard/RecentCasesTable had no such wrapper before). */
+.ovw-table-wrap{
+    overflow-x:auto;
 }

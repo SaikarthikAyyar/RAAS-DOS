@@ -61,7 +61,7 @@ export default function InvoiceDashboard(){
             {loading ? (
                 <p className="bm-muted">Loading...</p>
             ) : (
-                <div className="ovw-grid-6" style={{gridTemplateColumns:"repeat(5,1fr)"}}>
+                <div className="ovw-grid-5">
                     {tiles.map(tile=>(
                         <div className="ovw-kpi" key={tile.title}>
                             <b>{tile.value}</b>

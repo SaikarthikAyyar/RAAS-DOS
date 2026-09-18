@@ -11,7 +11,7 @@ export default function AgingCard({ agingCases = [] }){
 
     return(
 
-        <div className="ovw-card">
+        <div className="ovw-card ui-card-interactive ui-fade-in">
 
             <h3>Aging — 5+ days in stage</h3>
 

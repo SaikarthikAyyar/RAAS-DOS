@@ -58,6 +58,20 @@
 
     margin-bottom:14px;
 
+    /* Shared hover-lift + mount-in fade (tokens/keyframe from
+       styles/layout.css) - applied here at the class level rather than
+       adding className="ui-card-interactive ui-fade-in" separately in
+       every one of this module's ~8 card-rendering components. */
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.execution-card:hover{
+
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-hover);
+
 }
 
 
@@ -145,6 +159,10 @@
 
     margin-bottom:4px;
 
+    text-transform:uppercase;
+
+    letter-spacing:.02em;
+
 }
 
 
@@ -196,6 +214,10 @@
     font-size:11px;
 
     font-weight:800;
+
+    text-transform:uppercase;
+
+    letter-spacing:.02em;
 
 }
 
@@ -506,7 +528,7 @@
 
     cursor:pointer;
 
-    transition:.15s ease;
+    transition:opacity var(--transition-fast), transform var(--transition-fast);
 
 }
 
@@ -514,6 +536,13 @@
 .execution-btn:hover{
 
     opacity:.85;
+
+}
+
+
+.execution-btn:active:not(:disabled){
+
+    transform:scale(.97);
 
 }
 
@@ -531,7 +560,9 @@
    RESPONSIVE
 =========================================== */
 
-@media(max-width:1000px){
+/* Breakpoints standardized to this initiative's shared 1024/768/480
+   convention (see styles/layout.css) - was 1000px/700px. */
+@media(max-width:1024px){
 
     .execution-summary-grid{
 
@@ -553,11 +584,50 @@
 
 }
 
-@media(max-width:700px){
+@media(max-width:768px){
 
     .execution-metric-grid{
 
         grid-template-columns:1fr;
+
+    }
+
+    /* Media picker: a fixed-width selector column beside a flex-1
+       preview never had a mobile collapse - stack instead of cramming
+       both into a narrow viewport. */
+    .media-container{
+
+        flex-direction:column;
+
+    }
+
+    .media-selector{
+
+        width:100%;
+        max-height:180px;
+
+    }
+
+    .preview-image,
+    .preview-video{
+
+        max-width:100%;
+
+    }
+
+}
+
+@media(max-width:480px){
+
+    .execution-actions{
+
+        flex-direction:column;
+
+    }
+
+    .execution-btn{
+
+        width:100%;
 
     }
 
@@ -626,6 +696,14 @@
     border-radius:8px;
     font-size:12.5px;
     background:#fff;
+    transition:border-color var(--transition-fast), color var(--transition-fast);
+
+}
+
+.media-item:hover{
+
+    border-color:var(--orange);
+    color:var(--orange);
 
 }
 
@@ -710,6 +788,13 @@
     color:var(--ink);
     text-align:left;
     min-width:120px;
+    transition:border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+}
+
+.sludge-log-day-row:hover{
+
+    border-color:var(--orange);
 
 }
 

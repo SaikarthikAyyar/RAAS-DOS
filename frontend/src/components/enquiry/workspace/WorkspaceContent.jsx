@@ -47,6 +47,8 @@ export default function WorkspaceContent({
 
 }){
 
+    let panel;
+
     switch(
 
         activeTab
@@ -55,7 +57,7 @@ export default function WorkspaceContent({
 
         case "survey":
 
-            return(
+            panel = (
 
                 <SurveySummary
 
@@ -75,9 +77,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         case "ops-review":
 
-            return(
+            panel = (
 
                 <OpsReviewSummary
 
@@ -95,9 +99,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         case "techno-commercial-approval":
 
-            return(
+            panel = (
 
                 <TechnoCommercialReviewSummary
 
@@ -109,9 +115,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         case "quote-commercial":
 
-            return(
+            panel = (
 
                 <QuoteCommercialSummary
 
@@ -127,9 +135,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         case "commercial-approval":
 
-            return(
+            panel = (
 
                 <CommercialApprovalSummary
 
@@ -149,9 +159,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         case "po":
 
-            return(
+            panel = (
 
                 <POSummary
 
@@ -163,9 +175,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         case "job-created":
 
-            return(
+            panel = (
 
                 <JobCreationSummary
 
@@ -177,9 +191,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         case "execution":
 
-            return(
+            panel = (
 
                 <ExecutionWorkspaceSummary
 
@@ -191,9 +207,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         case "audit":
 
-            return(
+            panel = (
 
                 <div>
 
@@ -203,9 +221,11 @@ export default function WorkspaceContent({
 
             );
 
+            break;
+
         default:
 
-            return(
+            panel = (
 
                 <div>
 
@@ -216,5 +236,18 @@ export default function WorkspaceContent({
             );
 
     }
+
+    // Keyed on activeTab so a tab switch remounts this wrapper and
+    // re-triggers ui-fade-in - a lightweight cross-fade between panels
+    // without a separate animation library.
+    return(
+
+        <div className="ui-fade-in" key={activeTab}>
+
+            {panel}
+
+        </div>
+
+    );
 
 }
