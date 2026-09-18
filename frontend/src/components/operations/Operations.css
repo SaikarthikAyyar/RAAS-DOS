@@ -108,6 +108,18 @@ padding:16px;
 
 box-shadow:0 4px 14px rgba(17,24,39,.04);
 
+transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.ops-card:hover{
+
+transform:translateY(-2px);
+
+box-shadow:var(--shadow-hover);
+
 }
 
 
@@ -306,6 +318,14 @@ margin-bottom:10px;
 
 border:1px solid var(--line);
 
+transition:opacity var(--transition-fast), background var(--transition-fast);
+
+}
+
+.ops-primary-btn:hover{
+
+opacity:.85;
+
 }
 
 
@@ -347,13 +367,39 @@ background:#f8fafc;
 
 /* ===================================
    RESPONSIVE
+   Standardized to this initiative's shared 1024/768/480 convention
+   (see styles/layout.css) - was a single 900px tier.
 =================================== */
 
-@media (max-width: 900px){
+@media (max-width: 1024px){
 
 .ops-grid{
 
 grid-template-columns:1fr;
+
+}
+
+}
+
+@media (max-width: 480px){
+
+.ops-table-header{
+
+display:none;
+
+}
+
+.ops-table-row{
+
+grid-template-columns:1fr;
+
+gap:2px;
+
+}
+
+.ops-unit{
+
+margin-left:4px;
 
 }
 

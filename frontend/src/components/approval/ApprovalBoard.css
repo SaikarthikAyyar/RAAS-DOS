@@ -81,6 +81,18 @@
 
     box-shadow:0 4px 14px rgba(17,24,39,.04);
 
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.approval-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:var(--shadow-hover);
+
 }
 
 
@@ -229,11 +241,44 @@
    RESPONSIVE
 ==================================== */
 
-@media(max-width:900px){
+/* Standardized to this initiative's shared 1024/768/480 convention -
+   was a single 900px tier (3 columns jumping straight to 1). Also
+   fixes a real gap: .approval-page's 32px/40px padding and .approval-
+   header h1's 52px heading never shrank on any screen size. */
+@media(max-width:1024px){
+
+    .approval-body{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:768px){
 
     .approval-body{
 
         grid-template-columns:1fr;
+
+    }
+
+    .approval-page{
+
+        padding:20px;
+
+    }
+
+    .approval-header h1{
+
+        font-size:28px;
+
+    }
+
+    .approval-card-header{
+
+        flex-wrap:wrap;
+        gap:10px;
 
     }
 

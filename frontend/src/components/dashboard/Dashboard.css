@@ -112,9 +112,13 @@
 
 /* ====================================
    RESPONSIVE
+   Standardized to this initiative's shared 1024/768/480 convention -
+   was a single 900px tier. .dashboard-page's padding and .dashboard-
+   header h1's 54px heading previously only ever shrank once, to 40px -
+   this adds a genuinely smaller mobile size.
 ==================================== */
 
-@media(max-width:900px){
+@media(max-width:1024px){
 
 .dashboard-page{
 
@@ -125,6 +129,32 @@
 .dashboard-header h1{
 
     font-size:40px;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.dashboard-page{
+
+    padding:20px 16px;
+
+}
+
+.dashboard-header h1{
+
+    font-size:30px;
+
+}
+
+}
+
+@media(max-width:480px){
+
+.dashboard-header h1{
+
+    font-size:24px;
 
 }
 
@@ -166,6 +196,18 @@
 
     box-shadow:0 4px 14px rgba(17,24,39,.04);
 
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.dashboard-stat-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:var(--shadow-hover);
+
 }
 
 .dashboard-stat-value{
@@ -192,7 +234,10 @@
 
 }
 
-@media(max-width:1300px){
+/* Standardized to this initiative's shared 1024/768/480 convention -
+   was 1300px/768px, with a genuine 1-column tier added at 480px (the
+   old 2-column floor left 46px stat values cramped on a narrow phone). */
+@media(max-width:1024px){
 
 .dashboard-stats{
 
@@ -207,6 +252,16 @@
 .dashboard-stats{
 
     grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:480px){
+
+.dashboard-stats{
+
+    grid-template-columns:1fr;
 
 }
 
@@ -245,6 +300,8 @@ display:flex;
 gap:14px;
 
 flex:1;
+
+flex-wrap:wrap;
 
 justify-content:center;
 
@@ -436,6 +493,18 @@ font-weight:700;
 
     box-shadow:0 4px 14px rgba(17,24,39,.04);
 
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.dashboard-summary-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:var(--shadow-hover);
+
 }
 
 
@@ -527,7 +596,9 @@ font-weight:700;
    RESPONSIVE
 ==================================== */
 
-@media(max-width:1000px){
+/* Standardized to this initiative's shared 1024/768 tiers - was
+   1000px/700px. */
+@media(max-width:1024px){
 
     .dashboard-summary-grid{
 
@@ -542,7 +613,7 @@ font-weight:700;
 
 }
 
-@media(max-width:700px){
+@media(max-width:768px){
 
     .dashboard-summary-grid{
 
@@ -795,6 +866,18 @@ WORKFLOW TRACKER
 
     box-shadow:0 4px 14px rgba(17,24,39,.04);
 
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.workflow-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:var(--shadow-hover);
+
 }
 
 .workflow-title{
@@ -1025,7 +1108,8 @@ WORKFLOW TRACKER
 
 }
 
-@media(max-width:1200px){
+/* Standardized to this initiative's shared 1024px tier - was 1200px. */
+@media(max-width:1024px){
 
     .dashboard-summary-card{
 
@@ -1082,6 +1166,8 @@ WORKFLOW TRACKER
     display:flex;
 
     gap:16px;
+
+    flex-wrap:wrap;
 
     margin-bottom:32px;
 
@@ -1148,6 +1234,18 @@ WORKFLOW TRACKER
     border-radius:24px;
 
     padding:28px;
+
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.invoice-summary-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:var(--shadow-hover);
 
 }
 
@@ -1299,7 +1397,8 @@ WORKFLOW TRACKER
    RESPONSIVE
 ========================================== */
 
-@media(max-width:1100px){
+/* Standardized to this initiative's shared 1024px tier - was 1100px. */
+@media(max-width:1024px){
 
     .invoice-grid{
 

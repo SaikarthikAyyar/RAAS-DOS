@@ -557,84 +557,6 @@
 
 
 /* ===========================================
-   RESPONSIVE
-=========================================== */
-
-/* Breakpoints standardized to this initiative's shared 1024/768/480
-   convention (see styles/layout.css) - was 1000px/700px. */
-@media(max-width:1024px){
-
-    .execution-summary-grid{
-
-        grid-template-columns:1fr;
-
-    }
-
-    .execution-metric-grid{
-
-        grid-template-columns:repeat(2,1fr);
-
-    }
-
-    .execution-form-grid{
-
-        grid-template-columns:1fr;
-
-    }
-
-}
-
-@media(max-width:768px){
-
-    .execution-metric-grid{
-
-        grid-template-columns:1fr;
-
-    }
-
-    /* Media picker: a fixed-width selector column beside a flex-1
-       preview never had a mobile collapse - stack instead of cramming
-       both into a narrow viewport. */
-    .media-container{
-
-        flex-direction:column;
-
-    }
-
-    .media-selector{
-
-        width:100%;
-        max-height:180px;
-
-    }
-
-    .preview-image,
-    .preview-video{
-
-        max-width:100%;
-
-    }
-
-}
-
-@media(max-width:480px){
-
-    .execution-actions{
-
-        flex-direction:column;
-
-    }
-
-    .execution-btn{
-
-        width:100%;
-
-    }
-
-}
-
-
-/* ===========================================
    PHASE 2 MEDIA (photos/videos captured during Job Execution)
    Same visual language as the Sales Survey's own media picker/gallery
    (frontend/src/components/salesSurvey/SalesSurvey.css) - deliberately
@@ -897,5 +819,93 @@
     font-size:10.5px;
     text-transform:uppercase;
     letter-spacing:.03em;
+
+}
+
+
+/* ===========================================
+   RESPONSIVE
+   Deliberately placed at the END of the file, after every base rule
+   it overrides - a real ordering bug was found here (and in the
+   identical duplicated block in SalesSurvey.css): with equal
+   specificity, CSS cascade resolves by source order regardless of
+   whether a rule sits inside @media, so .media-container/.media-
+   selector/.preview-image/.preview-video's real base rules (defined
+   further up, under PHASE 2 MEDIA) were silently winning over these
+   mobile overrides even when the media condition matched. Moving the
+   whole block last fixes it for every rule here at once.
+
+   Breakpoints standardized to this initiative's shared 1024/768/480
+   convention (see styles/layout.css) - was 1000px/700px.
+=========================================== */
+
+@media(max-width:1024px){
+
+    .execution-summary-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .execution-metric-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+    .execution-form-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .execution-metric-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    /* Media picker: a fixed-width selector column beside a flex-1
+       preview never had a mobile collapse - stack instead of cramming
+       both into a narrow viewport. */
+    .media-container{
+
+        flex-direction:column;
+
+    }
+
+    .media-selector{
+
+        width:100%;
+        max-height:180px;
+
+    }
+
+    .preview-image,
+    .preview-video{
+
+        max-width:100%;
+
+    }
+
+}
+
+@media(max-width:480px){
+
+    .execution-actions{
+
+        flex-direction:column;
+
+    }
+
+    .execution-btn{
+
+        width:100%;
+
+    }
 
 }

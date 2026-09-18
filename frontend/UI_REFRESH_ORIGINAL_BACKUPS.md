@@ -8411,6 +8411,3221 @@ export default function InvoiceDashboard(){
 }
 === END ORIGINAL FILE: frontend/src/components/enquiry/EnquiryModuleFrontPage.css ===
 
+=== BEGIN ORIGINAL FILE: frontend/src/components/operations/Operations.css ===
+/* ===================================
+   PAGE
+   Resized to the same scale as SalesSurvey.css / BusinessMasters.css
+   (h1 21px, card header 14.5px, field text 12.5px, buttons 12px) -
+   this file previously ran on its own much larger scale (56px
+   heading, 24px card headers, 18px table cells, 28px card radius),
+   which is what made Ops Selector look like a different product from
+   the rest of the app.
+=================================== */
+
+.ops-selector-page{
+
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
+
+width:100%;
+
+min-height:100vh;
+
+padding:20px;
+
+background:var(--bg);
+
+font-family:Inter,"Segoe UI",Arial,sans-serif;
+
+color:var(--ink);
+
+font-size:14px;
+
+}
+
+
+/* ===================================
+   PAGE HEADER
+=================================== */
+
+.ops-page-header{
+
+margin-bottom:16px;
+
+}
+
+
+.ops-page-header h1{
+
+font-size:21px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0 0 6px 0;
+
+}
+
+
+.ops-page-header p{
+
+font-size:13px;
+
+color:var(--muted);
+
+margin:0;
+
+max-width:640px;
+
+line-height:1.5;
+
+}
+
+
+/* ===================================
+   GRID
+=================================== */
+
+.ops-grid{
+
+display:grid;
+
+grid-template-columns:repeat(2,minmax(0,1fr));
+
+gap:14px;
+
+margin-bottom:14px;
+
+}
+
+
+/* ===================================
+   CARD
+=================================== */
+
+.ops-card{
+
+width:100%;
+
+background:var(--card);
+
+border:1px solid var(--line);
+
+border-radius:14px;
+
+padding:16px;
+
+box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+}
+
+
+.ops-header{
+
+margin-bottom:12px;
+
+}
+
+
+.ops-header h2{
+
+font-size:14.5px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0;
+
+}
+
+
+/* ===================================
+   TABLE
+   Not a real <table> - a 3-column grid (label / value / unit) shared
+   by OpsInputs, OpsDecision, and OpsDaysManpower.
+=================================== */
+
+.ops-table{
+
+width:100%;
+
+}
+
+
+.ops-table-header{
+
+display:grid;
+
+grid-template-columns:1fr 1.4fr .7fr;
+
+gap:10px;
+
+padding:0 0 8px 0;
+
+border-bottom:1px solid var(--line);
+
+}
+
+
+.ops-table-header > div{
+
+font-size:10.5px;
+
+font-weight:800;
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
+
+color:#475569;
+
+}
+
+
+.ops-table-row{
+
+display:grid;
+
+grid-template-columns:1fr 1.4fr .7fr;
+
+gap:10px;
+
+align-items:center;
+
+padding:8px 0;
+
+border-bottom:1px dashed var(--line);
+
+}
+
+
+.ops-table-row:last-child{
+
+border-bottom:none;
+
+}
+
+
+.ops-label{
+
+font-size:12px;
+
+font-weight:700;
+
+color:var(--ink);
+
+}
+
+
+.ops-value{
+
+font-size:12.5px;
+
+color:var(--ink);
+
+}
+
+
+.ops-unit{
+
+font-size:11px;
+
+color:var(--muted);
+
+}
+
+
+/* ===================================
+   INPUTS
+=================================== */
+
+.ops-input,
+
+.ops-select{
+
+width:100%;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:6px 8px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+}
+
+
+.ops-input:focus,
+
+.ops-select:focus{
+
+border-color:var(--orange);
+
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
+}
+
+
+/* ===================================
+   ACTIONS CARD
+=================================== */
+
+.ops-action-text{
+
+font-size:12.5px;
+
+color:var(--muted);
+
+margin:0 0 14px 0;
+
+line-height:1.5;
+
+}
+
+
+.ops-primary-btn,
+
+.ops-secondary-btn{
+
+display:block;
+
+width:100%;
+
+border-radius:9px;
+
+padding:8px 16px;
+
+font-size:12px;
+
+font-weight:750;
+
+cursor:pointer;
+
+margin-bottom:10px;
+
+border:1px solid var(--line);
+
+}
+
+
+.ops-primary-btn:last-child,
+
+.ops-secondary-btn:last-child{
+
+margin-bottom:0;
+
+}
+
+
+.ops-primary-btn{
+
+background:var(--orange);
+
+border-color:var(--orange);
+
+color:#fff;
+
+}
+
+
+.ops-secondary-btn{
+
+background:#fff;
+
+color:var(--ink);
+
+}
+
+
+.ops-secondary-btn:hover{
+
+background:#f8fafc;
+
+}
+
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media (max-width: 900px){
+
+.ops-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+=== END ORIGINAL FILE: frontend/src/components/operations/Operations.css ===
+
+=== BEGIN ORIGINAL FILE: frontend/src/components/dashboard/Dashboard.css ===
+/* ====================================
+   PAGE
+==================================== */
+
+.dashboard-page{
+
+    width:100%;
+
+    min-height:100vh;
+
+    padding:32px 40px 60px;
+
+    background:var(--bg);
+
+
+    overflow-y:auto;
+
+}
+
+
+/* ====================================
+   PAGE HEADER
+==================================== */
+
+.dashboard-header{
+
+    margin-bottom:36px;
+
+}
+
+.dashboard-header h1{
+
+    margin:0;
+
+    font-size:54px;
+
+    font-weight:800;
+
+    color:var(--ink);
+
+}
+
+.dashboard-header p{
+
+    margin-top:10px;
+
+    font-size:18px;
+
+    color:var(--muted);
+
+}
+
+
+/* ====================================
+   SECTION
+==================================== */
+
+.dashboard-section{
+
+    margin-bottom:28px;
+
+}
+
+
+/* ====================================
+   SECTION TITLE
+==================================== */
+
+.dashboard-section h2{
+
+    margin:0 0 18px;
+
+    font-size:24px;
+
+    font-weight:800;
+
+    color:var(--ink);
+
+}
+
+
+/* ====================================
+   PLACEHOLDER CARD
+==================================== */
+
+.dashboard-placeholder{
+
+    width:100%;
+
+    min-height:90px;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:24px;
+
+    border-radius:24px;
+
+    background:var(--card);
+
+    border:1px solid var(--line);
+
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+    color:#d9e4ee;
+
+    font-size:18px;
+
+}
+
+
+/* ====================================
+   RESPONSIVE
+==================================== */
+
+@media(max-width:900px){
+
+.dashboard-page{
+
+    padding:24px;
+
+}
+
+.dashboard-header h1{
+
+    font-size:40px;
+
+}
+
+}
+
+/* ====================================
+   DASHBOARD STATISTICS
+==================================== */
+
+.dashboard-stats{
+
+    display:grid;
+
+    grid-template-columns:repeat(6,1fr);
+
+    gap:20px;
+
+}
+
+.dashboard-stat-card{
+
+    background:var(--card);
+
+    border:1px solid var(--line);
+
+    border-radius:24px;
+
+    padding:24px;
+
+    min-height:140px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+}
+
+.dashboard-stat-value{
+
+    font-size:46px;
+
+    font-weight:800;
+
+    color:var(--ink);
+
+    margin-bottom:14px;
+
+}
+
+.dashboard-stat-title{
+
+    font-size:17px;
+
+    text-align:center;
+
+    color:var(--ink);
+
+    font-weight:700;
+
+}
+
+@media(max-width:1300px){
+
+.dashboard-stats{
+
+    grid-template-columns:repeat(3,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.dashboard-stats{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+
+
+/* ====================================
+   CUSTOMER BROWSER
+==================================== */
+
+.dashboard-browser{
+
+display:flex;
+
+flex-direction:column;
+
+gap:22px;
+
+}
+
+.dashboard-browser-top{
+
+display:flex;
+
+align-items:center;
+
+gap:20px;
+
+}
+
+.dashboard-customer-strip{
+
+display:flex;
+
+gap:14px;
+
+flex:1;
+
+justify-content:center;
+
+}
+
+.dashboard-customer{
+
+height:62px;
+
+padding:0 28px;
+
+border:none;
+
+border-radius:18px;
+
+cursor:pointer;
+
+font-size:18px;
+
+font-weight:700;
+
+background:white;
+
+color:var(--ink);
+
+transition:.2s;
+
+}
+
+.dashboard-customer:hover{
+
+transform:translateY(-2px);
+
+}
+
+.dashboard-customer.active{
+
+background:var(--orange);
+
+color:white;
+
+}
+
+.dashboard-nav-button{
+
+width:64px;
+
+height:64px;
+
+border:none;
+
+border-radius:18px;
+
+background:#174d62;
+
+color:white;
+
+font-size:24px;
+
+cursor:pointer;
+
+}
+
+.dashboard-browser-bottom select{
+
+width:100%;
+
+height:64px;
+
+border-radius:18px;
+
+padding:0 18px;
+
+font-size:17px;
+
+background:white;
+
+color:var(--ink);
+
+border:1px solid rgba(255,255,255,.12);
+
+}
+
+.dashboard-browser-bottom select{
+
+    background:white;
+
+    color:var(--ink);
+
+}
+
+
+.dashboard-dropdown-button{
+
+width:100%;
+
+height:64px;
+
+border:none;
+
+border-radius:18px;
+
+padding:0 24px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+font-size:18px;
+
+font-weight:600;
+
+cursor:pointer;
+
+background:white;
+
+color:var(--ink);
+
+}
+
+.dashboard-dropdown-list{
+
+    margin-top:10px;
+
+    max-height:320px;
+
+    overflow-y:scroll;
+
+    overflow-x:hidden;
+
+    scrollbar-gutter:stable;
+
+    border-radius:18px;
+
+    background:white;
+
+    border:1px solid rgba(255,255,255,.12);
+
+}
+
+.dashboard-dropdown-item{
+
+padding:18px 24px;
+
+font-size:17px;
+
+color:var(--ink);
+
+cursor:pointer;
+
+transition:.15s;
+
+}
+
+.dashboard-dropdown-item:hover{
+
+background:white;
+
+}
+
+.dashboard-dropdown-item.active{
+
+background:#1d8a83;
+
+font-weight:700;
+
+}
+
+
+/* ====================================
+   SUMMARY CARD
+==================================== */
+
+.dashboard-summary-card{
+
+    width:100%;
+
+    background:var(--card);
+
+    border:1px solid var(--line);
+
+    border-radius:28px;
+
+    padding:28px;
+
+    margin-bottom:28px;
+
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+}
+
+
+/* ====================================
+   SUMMARY HEADER
+==================================== */
+
+.dashboard-summary-header{
+
+    margin-bottom:24px;
+
+}
+
+.dashboard-summary-header h3{
+
+    margin:0;
+
+    font-size:26px;
+
+    font-weight:800;
+
+    color:var(--ink);
+
+}
+
+
+/* ====================================
+   SUMMARY GRID
+==================================== */
+
+.dashboard-summary-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
+
+    gap:22px;
+
+}
+
+
+/* ====================================
+   SUMMARY ITEM
+==================================== */
+
+.dashboard-summary-item{
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:18px;
+
+    border-radius:18px;
+
+    background:white;
+
+    border:1px solid rgba(255,255,255,.08);
+
+}
+
+.dashboard-summary-item span{
+
+    font-size:14px;
+
+    color:var(--muted);
+
+    margin-bottom:8px;
+
+}
+
+.dashboard-summary-item strong{
+
+    font-size:18px;
+
+    color:var(--ink);
+
+    word-break:break-word;
+
+}
+
+
+/* ====================================
+   RESPONSIVE
+==================================== */
+
+@media(max-width:1000px){
+
+    .dashboard-summary-grid{
+
+        grid-template-columns:
+
+            repeat(
+                2,
+                1fr
+            );
+
+    }
+
+}
+
+@media(max-width:700px){
+
+    .dashboard-summary-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+/* ==================================== */
+/* SURVEY BUTTONS */
+/* ==================================== */
+
+.dashboard-survey{
+
+    min-width:96px;
+
+    height:58px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:white;
+
+    color:var(--ink);
+
+    font-size:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.dashboard-survey:hover{
+
+    background:white;
+
+}
+
+.dashboard-survey.active{
+
+    background:var(--orange);
+
+    color:white;
+
+}
+
+/* ====================================
+PRIMARY ACTION
+==================================== */
+
+.dashboard-primary-action{
+
+    min-width:260px;
+
+    height:60px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:var(--orange);
+
+    color:#ffffff;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.dashboard-primary-action:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/* ====================================
+WORK QUEUE
+==================================== */
+
+.dashboard-workqueue{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.dashboard-work-item{
+
+    border:1px solid #d9d9d9;
+
+    border-radius:12px;
+
+    padding:16px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    background:#ffffff;
+
+}
+
+.dashboard-work-item:hover{
+
+    border-color:var(--orange);
+
+}
+
+.dashboard-work-item.active{
+
+    border:2px solid var(--orange);
+
+    background:#eefcf9;
+
+}
+
+.dashboard-work-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:10px;
+
+}
+
+.dashboard-work-body{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:4px;
+
+}
+
+.dashboard-work-footer{
+
+    margin-top:10px;
+
+    font-weight:600;
+
+    color:var(--orange);
+
+}
+
+/* ====================================
+WORKFLOW TRACKER
+==================================== */
+
+.dashboard-workflow{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:20px;
+
+padding:24px;
+
+background:white;
+
+border-radius:22px;
+
+}
+
+.workflow-node{
+
+flex:1;
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+gap:10px;
+
+opacity:.35;
+
+}
+
+.workflow-node.active{
+
+opacity:1;
+
+}
+
+.workflow-circle{
+
+width:22px;
+
+height:22px;
+
+border-radius:50%;
+
+background:#607d8b;
+
+}
+
+.workflow-node.active .workflow-circle{
+
+background:var(--orange);
+
+box-shadow:0 0 18px var(--orange);
+
+}
+
+.workflow-node span{
+
+font-size:14px;
+
+font-weight:700;
+
+color:var(--ink);
+
+}
+
+
+/* ====================================
+WORKFLOW TRACKER
+==================================== */
+
+.workflow-card{
+
+    width:100%;
+
+    padding:28px;
+
+    border-radius:24px;
+
+    background:var(--card);
+
+    border:1px solid var(--line);
+
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+}
+
+.workflow-title{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:var(--ink);
+
+    margin-bottom:28px;
+
+}
+
+.workflow-stage-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:12px;
+
+    flex-wrap:wrap;
+
+}
+
+.workflow-stage{
+
+    flex:1;
+
+    min-width:120px;
+
+    height:58px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:30px;
+
+    background:white;
+
+    border:2px solid rgba(255,255,255,.08);
+
+    color:var(--ink);
+
+    font-weight:700;
+
+    position:relative;
+
+}
+
+.workflow-stage::after{
+
+    content:"";
+
+    position:absolute;
+
+    right:-14px;
+
+    top:50%;
+
+    width:28px;
+
+    height:2px;
+
+    background:#6d8e98;
+
+}
+
+.workflow-stage:last-child::after{
+
+    display:none;
+
+}
+
+.workflow-stage.active{
+
+    background:var(--orange);
+
+    border-color:var(--orange);
+
+    color:#fff;
+
+    box-shadow:0 0 20px rgba(42,182,168,.45);
+
+}
+
+.workflow-footer{
+
+    margin-top:28px;
+
+    color:var(--ink);
+
+    font-size:17px;
+
+}
+
+.workflow-footer strong{
+
+    margin-left:10px;
+
+    color:var(--ink);
+
+}
+
+/* ====================================
+   ENQUIRY SUMMARY
+==================================== */
+
+.dashboard-enquiry-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    table-layout:fixed;
+
+    overflow:hidden;
+
+    border-radius:18px;
+
+}
+
+.dashboard-enquiry-table thead{
+
+    background:white;
+
+}
+
+.dashboard-enquiry-table th{
+
+    padding:16px 12px;
+
+    text-align:center;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    color:var(--muted);
+
+    border-bottom:1px solid rgba(255,255,255,.10);
+
+}
+
+.dashboard-enquiry-table td{
+
+    padding:18px 12px;
+
+    text-align:center;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    color:var(--ink);
+
+    background:white;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+    word-break:break-word;
+
+}
+
+.dashboard-enquiry-table tbody tr:hover td{
+
+    background:white;
+
+}
+
+.dashboard-enquiry-status{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-width:110px;
+
+    height:34px;
+
+    border-radius:18px;
+
+    padding:0 16px;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#ffffff;
+
+}
+
+.dashboard-enquiry-status.pending{
+
+    background:#d4a017;
+
+}
+
+.dashboard-enquiry-status.completed{
+
+    background:var(--orange);
+
+}
+
+.dashboard-enquiry-status.approved{
+
+    background:#2f80ed;
+
+}
+
+.dashboard-enquiry-status.rejected{
+
+    background:#d64545;
+
+}
+
+.dashboard-enquiry-status.inprogress{
+
+    background:#7b61ff;
+
+}
+
+@media(max-width:1200px){
+
+    .dashboard-summary-card{
+
+        overflow-x:auto;
+
+    }
+
+    .dashboard-enquiry-table{
+
+        min-width:1100px;
+
+    }
+
+}
+
+.workflow-success{
+
+    background:#28a745;
+
+    color:white;
+
+    padding:14px;
+
+    border-radius:8px;
+
+    margin-bottom:18px;
+
+    font-weight:600;
+
+}
+
+.workflow-error{
+
+    background:#dc3545;
+
+    color:white;
+
+    padding:14px;
+
+    border-radius:8px;
+
+    margin-bottom:18px;
+
+    font-weight:600;
+
+}
+
+/* ==================================== */
+/* DASHBOARD TABS */
+/* ==================================== */
+
+.dashboard-tabs{
+
+    display:flex;
+
+    gap:16px;
+
+    margin-bottom:32px;
+
+}
+
+.dashboard-tab{
+
+    background:#1b5560;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 28px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.dashboard-tab:hover{
+
+    background:#236c79;
+
+}
+
+.dashboard-tab-active{
+
+    background:var(--orange);
+
+    color:white;
+
+}
+
+
+
+/* ==================================== */
+/* INVOICE SUMMARY */
+/* ==================================== */
+
+.invoice-summary-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:24px;
+
+}
+
+.invoice-summary-card{
+
+    background:var(--card);
+
+    border:1px solid var(--line);
+
+    border-radius:24px;
+
+    padding:28px;
+
+}
+
+.invoice-summary-card h3{
+
+    margin-bottom:18px;
+
+    color:var(--ink);
+
+    font-size:22px;
+
+}
+
+.invoice-summary-item{
+
+    margin-bottom:16px;
+
+}
+
+.invoice-summary-item span{
+
+    display:block;
+
+    font-size:14px;
+
+    color:var(--muted);
+
+    margin-bottom:6px;
+
+}
+
+.invoice-summary-item strong{
+
+    color:white;
+
+    font-size:18px;
+
+}
+
+.dashboard-section-title{
+
+    color:var(--ink);
+
+    margin-top:40px;
+
+    margin-bottom:20px;
+
+}
+
+.summary-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+    margin-bottom:40px;
+
+}
+
+.dashboard-summary-section{
+
+        background:var(--card);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:28px;
+
+    padding:35px;
+
+    margin-bottom:35px;
+
+}
+
+/* ==========================================
+   INVOICE JOB TAB
+   (Same Style as Execution Tab)
+========================================== */
+
+.invoice-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(320px,1fr));
+
+    gap:22px;
+
+    margin-top:30px;
+
+}
+
+.invoice-grid-item{
+
+    background:white;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:20px;
+
+    padding:22px;
+
+    min-height:92px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    transition:.2s;
+
+}
+
+.invoice-grid-item:hover{
+
+    border-color:#41d8d0;
+
+    transform:translateY(-2px);
+
+}
+
+.invoice-label{
+
+    font-size:15px;
+
+    color:#9ebfc7;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+}
+
+.invoice-value{
+
+    font-size:18px;
+
+    color:var(--ink);
+
+    font-weight:700;
+
+    word-break:break-word;
+
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:1100px){
+
+    .invoice-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+=== END ORIGINAL FILE: frontend/src/components/dashboard/Dashboard.css ===
+
+=== BEGIN ORIGINAL FILE: frontend/src/components/jobCreation/JobCreation.css ===
+/* ===================================
+   PAGE
+   Full rewrite matching the wireframe's own scale (same tokens as
+   Ops Selector / Quotes / Techno-Commercial Quote) - this file
+   previously ran on a much larger, disconnected scale (56px inputs/
+   buttons, 26-28px card radii/padding, no page heading at all) built
+   around a 4-card structure (Header/Allocation/Manpower/Readiness)
+   that didn't match the wireframe's actual single stage-gated card.
+=================================== */
+
+.job-page{
+
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
+
+width:100%;
+
+min-height:100vh;
+
+padding:20px;
+
+background:var(--bg);
+
+font-family:Inter,"Segoe UI",Arial,sans-serif;
+
+color:var(--ink);
+
+font-size:14px;
+
+}
+
+
+/* ===================================
+   PAGE HEADER
+=================================== */
+
+.job-page-header{
+
+margin-bottom:16px;
+
+}
+
+
+.job-page-header h1{
+
+font-size:21px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0 0 6px 0;
+
+}
+
+
+.job-page-header p{
+
+font-size:13px;
+
+color:var(--muted);
+
+margin:0;
+
+max-width:640px;
+
+line-height:1.5;
+
+}
+
+
+/* ===================================
+   QUOTE SELECTOR BAR
+=================================== */
+
+.job-selector-bar{
+
+margin-bottom:14px;
+
+max-width:420px;
+
+}
+
+
+.job-selector-bar label{
+
+font-size:11px;
+
+font-weight:800;
+
+color:#475569;
+
+display:block;
+
+margin-bottom:4px;
+
+}
+
+
+.job-selector-bar select{
+
+width:100%;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:7px 10px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+}
+
+
+.job-selector-bar select:focus{
+
+border-color:var(--orange);
+
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
+}
+
+
+/* ===================================
+   CARD
+=================================== */
+
+.job-card{
+
+width:100%;
+
+max-width:640px;
+
+background:var(--card);
+
+border:1px solid var(--line);
+
+border-radius:14px;
+
+padding:16px;
+
+box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+}
+
+
+.job-card-header{
+
+margin-bottom:12px;
+
+}
+
+
+.job-card-header h2{
+
+display:flex;
+
+align-items:center;
+
+gap:10px;
+
+font-size:14.5px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0;
+
+}
+
+
+/* ===================================
+   STATUS PILLS
+   Matches the wireframe's own .pill exactly.
+=================================== */
+
+.job-pill{
+
+display:inline-flex;
+
+align-items:center;
+
+border-radius:999px;
+
+padding:3px 10px;
+
+font-size:11px;
+
+font-weight:800;
+
+border:1px solid var(--line);
+
+background:#fff;
+
+white-space:nowrap;
+
+}
+
+
+.job-pill-green{
+
+color:#166534;
+
+background:#dcfce7;
+
+border-color:#bbf7d0;
+
+}
+
+
+.job-pill-amber{
+
+color:#92400e;
+
+background:#fef3c7;
+
+border-color:#fde68a;
+
+}
+
+
+/* ===================================
+   FIELD ROW
+   Matches the wireframe's .fieldRow exactly.
+=================================== */
+
+.job-field-row{
+
+display:flex;
+
+justify-content:space-between;
+
+padding:6px 0;
+
+border-bottom:1px dashed var(--line);
+
+font-size:12.5px;
+
+gap:10px;
+
+}
+
+
+.job-field-row:last-child{
+
+border-bottom:none;
+
+}
+
+
+.job-field-row span{
+
+color:var(--muted);
+
+}
+
+
+.job-field-row b{
+
+font-weight:700;
+
+color:var(--ink);
+
+text-align:right;
+
+}
+
+
+/* ===================================
+   MUTED TEXT
+=================================== */
+
+.job-muted{
+
+font-size:12.5px;
+
+color:var(--muted);
+
+margin:0 0 14px 0;
+
+line-height:1.5;
+
+}
+
+
+/* ===================================
+   FORM GRID
+=================================== */
+
+.job-formgrid{
+
+display:grid;
+
+grid-template-columns:repeat(2,minmax(0,1fr));
+
+gap:12px;
+
+margin-bottom:14px;
+
+}
+
+
+.job-field label{
+
+font-size:11px;
+
+font-weight:800;
+
+color:#475569;
+
+display:block;
+
+margin-bottom:4px;
+
+}
+
+
+.job-field input,
+
+.job-field select{
+
+width:100%;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:7px 10px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+}
+
+
+.job-field input:focus,
+
+.job-field select:focus{
+
+border-color:var(--orange);
+
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
+}
+
+
+/* ===================================
+   SUBHEADING
+   Matches the wireframe's .card h4 exactly.
+=================================== */
+
+.job-subheading{
+
+margin:14px 0 8px;
+
+font-size:12px;
+
+font-weight:800;
+
+color:#374151;
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
+
+}
+
+
+/* ===================================
+   PRIMARY BUTTON
+=================================== */
+
+.job-primary-btn{
+
+width:100%;
+
+margin-top:14px;
+
+border:1px solid var(--orange);
+
+background:var(--orange);
+
+color:#fff;
+
+border-radius:9px;
+
+padding:8px 16px;
+
+font-size:12px;
+
+font-weight:750;
+
+cursor:pointer;
+
+transition:.15s;
+
+}
+
+
+.job-primary-btn:hover{
+
+background:#d96b0d;
+
+border-color:#d96b0d;
+
+}
+
+
+.job-primary-btn:disabled{
+
+opacity:.6;
+
+cursor:default;
+
+}
+=== END ORIGINAL FILE: frontend/src/components/jobCreation/JobCreation.css ===
+
+=== BEGIN ORIGINAL FILE: frontend/src/components/allocation/Allocation.css ===
+/* ===========================================
+   PAGE
+=========================================== */
+
+.allocation-page{
+
+    min-height:100vh;
+
+    padding:40px;
+
+    background:var(--bg);
+
+    color:var(--ink);
+
+    font-family:Inter,sans-serif;
+
+}
+
+
+/* ===========================================
+   HEADER
+=========================================== */
+
+.allocation-title{
+
+    font-size:42px;
+
+    font-weight:700;
+
+    margin-bottom:30px;
+
+    color:var(--ink);
+
+}
+
+
+/* ===========================================
+   CARD
+=========================================== */
+
+.allocation-card{
+
+    background:var(--card);
+
+    border:1px solid var(--line);
+
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+    border-radius:24px;
+
+    padding:30px;
+
+    margin-bottom:30px;
+
+    backdrop-filter:blur(12px);
+
+}
+
+
+/* ===========================================
+   DROPDOWN
+=========================================== */
+
+.job-selector{
+
+    width:340px;
+
+    padding:12px 16px;
+
+    border:1px solid var(--line);
+
+    border-radius:10px;
+
+    background:white;
+
+    color:var(--ink);
+
+    font-size:16px;
+
+    margin-bottom:25px;
+
+}
+
+
+/* ===========================================
+   SECTION TITLES
+=========================================== */
+
+.section-title{
+
+    font-size:28px;
+
+    margin-bottom:20px;
+
+    font-weight:700;
+
+    color:var(--ink);
+
+}
+
+
+/* ===========================================
+   SUMMARY GRID
+=========================================== */
+
+.summary-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+}
+
+
+.summary-item{
+
+    background:#f8fafc;
+
+    padding:18px;
+
+    border-radius:16px;
+
+    border:1px solid var(--line);
+
+}
+
+
+.summary-item span{
+
+    display:block;
+
+    color:var(--muted);
+
+    font-size:13px;
+
+    margin-bottom:8px;
+
+}
+
+
+.summary-item strong{
+
+    font-size:18px;
+
+    color:var(--ink);
+
+}
+
+
+/* ===========================================
+   RESOURCE GRID
+=========================================== */
+
+.resource-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(380px,1fr));
+
+    gap:18px;
+
+}
+
+
+/* ===========================================
+   MACHINE / PERSONNEL CARD
+=========================================== */
+
+.resource-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    border:1px solid var(--line);
+
+    transition:.25s;
+
+}
+
+
+.resource-card:hover{
+
+    transform:translateY(-4px);
+
+    border-color:var(--orange);
+
+    box-shadow:0 8px 20px rgba(17,24,39,.08);
+
+}
+
+
+.resource-card label{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:12px;
+
+    cursor:pointer;
+
+}
+
+
+.resource-card input{
+
+    margin-top:6px;
+
+    transform:scale(1.2);
+
+}
+
+
+.resource-name{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+    color:var(--ink);
+
+}
+
+
+.resource-info{
+
+    color:var(--muted);
+
+    line-height:1.7;
+
+    font-size:14px;
+
+}
+
+
+/* ===========================================
+   FORM
+=========================================== */
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:20px;
+
+}
+
+
+.form-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+.form-group label{
+
+    margin-bottom:8px;
+
+    color:var(--muted);
+
+}
+
+
+.form-group input{
+
+    padding:12px;
+
+    border:1px solid var(--line);
+
+    border-radius:10px;
+
+    background:white;
+
+    color:var(--ink);
+
+}
+
+
+/* ===========================================
+   BUTTON
+=========================================== */
+
+.allocate-btn{
+
+    margin-top:30px;
+
+    padding:16px 40px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--orange);
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+
+.allocate-btn:hover{
+
+    transform:translateY(-2px);
+
+    background:#d96b0d;
+
+}
+
+
+/* ===========================================
+   MOBILE
+=========================================== */
+
+@media(max-width:900px){
+
+    .summary-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .resource-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .form-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+=== END ORIGINAL FILE: frontend/src/components/allocation/Allocation.css ===
+
+=== BEGIN ORIGINAL FILE: frontend/src/components/quote/TechnoCommercialQuote.css ===
+/* ===================================
+   PAGE
+   Resized to the same scale as SalesSurvey.css / Operations.css /
+   QuotesModule.css - previously this file ran on its own much larger
+   scale (56px heading, 28px card headers, 22px inputs, a 360x72px
+   Save button) with no CSS variables actually defined anywhere in its
+   own scope, which is what made this page look like a different
+   product from the rest of the app.
+=================================== */
+
+.quote-page{
+
+    --orange:#f58220;
+    --deep:#12151c;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#fff;
+
+width:100%;
+
+min-height:100vh;
+
+padding:20px;
+
+background:var(--bg);
+
+font-family:Inter,"Segoe UI",Arial,sans-serif;
+
+color:var(--ink);
+
+font-size:14px;
+
+}
+
+
+/* ===================================
+   HEADER
+=================================== */
+
+.quote-header{
+
+margin-bottom:16px;
+
+}
+
+
+.quote-header h1{
+
+font-size:21px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0 0 6px 0;
+
+}
+
+
+.quote-header p{
+
+font-size:13px;
+
+color:var(--muted);
+
+margin:0;
+
+max-width:640px;
+
+line-height:1.5;
+
+}
+
+
+/* ===================================
+   OPS SELECTOR BAR
+=================================== */
+
+.quote-selector-bar{
+
+margin-bottom:14px;
+
+max-width:420px;
+
+}
+
+
+.quote-ops-select{
+
+width:100%;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:7px 10px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+}
+
+
+.quote-ops-select:focus{
+
+border-color:var(--orange);
+
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
+}
+
+
+/* ===================================
+   GRID
+=================================== */
+
+.quote-grid{
+
+display:grid;
+
+grid-template-columns:repeat(2,minmax(0,1fr));
+
+gap:14px;
+
+}
+
+
+@media (max-width: 900px){
+
+.quote-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+
+/* ===================================
+   CARD
+=================================== */
+
+.quote-card{
+
+width:100%;
+
+background:var(--card);
+
+border:1px solid var(--line);
+
+border-radius:14px;
+
+padding:16px;
+
+box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+}
+
+
+.quote-card-header{
+
+margin-bottom:12px;
+
+}
+
+
+.quote-card-header h2{
+
+font-size:14.5px;
+
+font-weight:800;
+
+color:var(--ink);
+
+margin:0;
+
+}
+
+
+/* ===================================
+   TABLE
+   Not a real <table> - a grid (label / value[/value]) shared by
+   TechnicalSummaryCard (2-col) and CommercialEstimateCard (2-col and
+   3-col min/max rows).
+=================================== */
+
+.quote-table{
+
+width:100%;
+
+}
+
+
+.quote-table-header{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:10px;
+
+padding:0 0 8px 0;
+
+border-bottom:1px solid var(--line);
+
+font-size:10.5px;
+
+font-weight:800;
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
+
+color:#475569;
+
+}
+
+
+.quote-table-header-3{
+
+display:grid;
+
+grid-template-columns:1.2fr .9fr .9fr;
+
+gap:10px;
+
+padding:0 0 8px 0;
+
+border-bottom:1px solid var(--line);
+
+font-size:10.5px;
+
+font-weight:800;
+
+text-transform:uppercase;
+
+letter-spacing:.03em;
+
+color:#475569;
+
+}
+
+
+.quote-table-row{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:10px;
+
+align-items:center;
+
+padding:8px 0;
+
+border-bottom:1px dashed var(--line);
+
+}
+
+
+.quote-table-row-3{
+
+display:grid;
+
+grid-template-columns:1.2fr .9fr .9fr;
+
+gap:10px;
+
+align-items:center;
+
+padding:8px 0;
+
+border-bottom:1px dashed var(--line);
+
+}
+
+
+.quote-table-row:last-child,
+
+.quote-table-row-3:last-child{
+
+border-bottom:none;
+
+}
+
+
+.quote-label{
+
+font-size:12px;
+
+font-weight:700;
+
+color:var(--ink);
+
+}
+
+
+.quote-value{
+
+font-size:12.5px;
+
+color:var(--ink);
+
+}
+
+
+/* ===================================
+   INPUTS
+=================================== */
+
+.quote-input{
+
+width:100%;
+
+border:1.5px solid var(--ink);
+
+border-radius:8px;
+
+padding:6px 8px;
+
+font-size:12.5px;
+
+font-family:inherit;
+
+background:#fff;
+
+color:var(--ink);
+
+outline:none;
+
+text-align:right;
+
+}
+
+.quote-actions .quote-input{
+
+text-align:left;
+
+}
+
+
+.quote-input:focus{
+
+border-color:var(--orange);
+
+box-shadow:0 0 0 3px rgba(245,130,32,.18);
+
+}
+
+
+/* ===================================
+   ACTIONS
+=================================== */
+
+.quote-actions{
+
+display:flex;
+
+align-items:center;
+
+gap:8px;
+
+margin-top:14px;
+
+}
+
+
+.quote-actions .quote-input{
+
+flex:1;
+
+}
+
+
+.quote-primary-btn{
+
+border:1px solid var(--orange);
+
+background:var(--orange);
+
+color:#fff;
+
+border-radius:9px;
+
+padding:8px 16px;
+
+font-size:12px;
+
+font-weight:750;
+
+cursor:pointer;
+
+white-space:nowrap;
+
+transition:.15s;
+
+}
+
+
+.quote-primary-btn:hover{
+
+background:#d96b0d;
+
+border-color:#d96b0d;
+
+}
+=== END ORIGINAL FILE: frontend/src/components/quote/TechnoCommercialQuote.css ===
+
+=== BEGIN ORIGINAL FILE: frontend/src/components/approval/ApprovalBoard.css ===
+/* ====================================
+   PAGE
+==================================== */
+
+.approval-page{
+
+    width:100%;
+
+    min-height:100vh;
+
+    padding:32px 40px 60px;
+
+    background:var(--bg);
+
+}
+
+
+/* ====================================
+   HEADER
+==================================== */
+
+.approval-header{
+
+    margin-bottom:36px;
+
+}
+
+.approval-header h1{
+
+    margin:0;
+
+    font-size:52px;
+
+    font-weight:800;
+
+    color:var(--ink);
+
+}
+
+.approval-header p{
+
+    margin-top:10px;
+
+    color:var(--muted);
+
+    font-size:18px;
+
+}
+
+
+/* ====================================
+   APPROVAL LIST
+==================================== */
+
+.approval-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+}
+
+
+/* ====================================
+   CARD
+==================================== */
+
+.approval-card{
+
+    width:100%;
+
+    background:var(--card);
+
+    border-radius:26px;
+
+    border:1px solid var(--line);
+
+    padding:28px;
+
+    box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+}
+
+
+/* ====================================
+   HEADER
+==================================== */
+
+.approval-card-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:24px;
+
+}
+
+.approval-title{
+
+    font-size:28px;
+
+    font-weight:800;
+
+    color:var(--ink);
+
+}
+
+.approval-flag{
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    background:var(--orange);
+
+    color:white;
+
+    font-size:14px;
+
+    font-weight:700;
+
+}
+
+
+/* ====================================
+   BODY
+==================================== */
+
+.approval-body{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:24px;
+
+    margin-bottom:28px;
+
+}
+
+.approval-field{
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:18px;
+
+    border-radius:18px;
+
+    background:#f8fafc;
+
+    border:1px solid var(--line);
+
+}
+
+.approval-field span{
+
+    color:var(--muted);
+
+    font-size:14px;
+
+    margin-bottom:10px;
+
+}
+
+.approval-field strong{
+
+    color:var(--ink);
+
+    font-size:18px;
+
+    word-break:break-word;
+
+}
+
+
+/* ====================================
+   BUTTON
+==================================== */
+
+.approval-actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+.approval-button{
+
+    min-width:180px;
+
+    height:56px;
+
+    border:none;
+
+    border-radius:16px;
+
+    cursor:pointer;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    color:white;
+
+    background:var(--orange);
+
+    transition:.2s;
+
+}
+
+.approval-button:hover{
+
+    transform:translateY(-2px);
+
+    background:#d96b0d;
+
+}
+
+
+/* ====================================
+   RESPONSIVE
+==================================== */
+
+@media(max-width:900px){
+
+    .approval-body{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+.approval-success{
+
+    background:#28a745;
+
+    color:white;
+
+    padding:14px 18px;
+
+    border-radius:10px;
+
+    margin-bottom:20px;
+
+    font-weight:600;
+
+}
+
+.approval-error{
+
+    background:#dc3545;
+
+    color:white;
+
+    padding:14px 18px;
+
+    border-radius:10px;
+
+    margin-bottom:20px;
+
+    font-weight:600;
+
+}
+
+.verified{
+
+    color:#39d98a;
+
+    font-weight:700;
+
+}
+
+.pending{
+
+    color:#ffb84d;
+
+    font-weight:700;
+
+}
+
+.resource-detail{
+
+    margin-top:6px;
+
+    font-size:15px;
+
+}
+
+.queue-details{
+
+    margin-top:14px;
+
+}
+
+.queue-details summary{
+
+    cursor:pointer;
+
+    color:var(--orange);
+
+    font-weight:600;
+
+}
+
+.queue-item{
+
+    margin-top:10px;
+
+    padding:10px;
+
+    border-radius:10px;
+
+    background:#f8fafc;
+
+    border:1px solid var(--line);
+
+}
+=== END ORIGINAL FILE: frontend/src/components/approval/ApprovalBoard.css ===
+
 === BEGIN ORIGINAL FILE: frontend/src/components/salesSurvey/SalesSurvey.css ===
 /* ===================================
    GLOBAL APP LAYOUT FIX

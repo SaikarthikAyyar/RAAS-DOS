@@ -54,6 +54,18 @@
 
     backdrop-filter:blur(12px);
 
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.allocation-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:var(--shadow-hover);
+
 }
 
 
@@ -64,6 +76,8 @@
 .job-selector{
 
     width:340px;
+
+    max-width:100%;
 
     padding:12px 16px;
 
@@ -327,10 +341,16 @@
 
 
 /* ===========================================
-   MOBILE
+   RESPONSIVE
+   Standardized to this initiative's shared 1024/768/480 convention -
+   was a single 900px tier. Also: .job-selector's fixed 340px width had
+   no max-width:100% fallback, and .allocation-page's 40px padding /
+   .allocation-title's 42px heading never shrank on mobile - on a real
+   375px-wide phone, 40px padding on both sides alone leaves only
+   295px of content width, narrower than the dropdown itself.
 =========================================== */
 
-@media(max-width:900px){
+@media(max-width:1024px){
 
     .summary-grid{
 
@@ -347,6 +367,22 @@
     .form-grid{
 
         grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:480px){
+
+    .allocation-page{
+
+        padding:20px;
+
+    }
+
+    .allocation-title{
+
+        font-size:26px;
 
     }
 

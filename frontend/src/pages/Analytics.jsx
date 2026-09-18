@@ -19,13 +19,14 @@ export default function Analytics() {
 
   return (
 
-    <div>
+    <div style={{ padding: "20px", boxSizing: "border-box" }}>
 
       <h1>Analytics</h1>
 
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           gap: "40px",
           marginBottom: "40px"
         }}
@@ -67,7 +68,9 @@ export default function Analytics() {
 
       <h2>Job Summary</h2>
 
-      <table>
+      <div style={{ overflowX: "auto" }}>
+
+      <table style={{ width: "100%", minWidth: "480px" }}>
 
         <thead>
 
@@ -106,6 +109,8 @@ export default function Analytics() {
         </tbody>
 
       </table>
+
+      </div>
 
     </div>
 

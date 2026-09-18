@@ -813,87 +813,6 @@ transform:translateY(-2px);
 }
 
 
-/* ===================================
-   RESPONSIVE
-=================================== */
-
-/* Breakpoints standardized to this initiative's shared 1024/768/480
-   convention (see styles/layout.css) - was one single 1200px tier. */
-@media(max-width:1024px){
-
-.survey-grid,
-
-.survey-row{
-
-grid-template-columns:repeat(2,1fr);
-
-}
-
-.survey-progress-container{
-
-flex-direction:column;
-
-gap:12px;
-
-}
-
-}
-
-@media(max-width:768px){
-
-.survey-grid,
-
-.survey-row{
-
-grid-template-columns:1fr;
-
-}
-
-.survey-actions{
-
-flex-direction:column;
-
-align-items:stretch;
-
-}
-
-.survey-completion-card{
-
-position:static;
-
-width:100%;
-
-margin-bottom:14px;
-
-}
-
-/* Media picker: a fixed-width selector column beside a flex-1
-   preview never had a mobile collapse - stack instead of cramming
-   both into a narrow viewport (same fix as Execution.css). */
-.media-container{
-
-flex-direction:column;
-
-}
-
-.media-selector{
-
-width:100%;
-
-max-height:180px;
-
-}
-
-.preview-image,
-.preview-video{
-
-max-width:100%;
-
-}
-
-}
-
-
 /* ====================================
 MEDIA CONTAINER
 ==================================== */
@@ -1099,5 +1018,96 @@ font-size:12.5px;
 
     opacity:0.5;
     cursor:not-allowed;
+
+}
+
+
+/* ===================================
+   RESPONSIVE
+   Deliberately placed at the END of the file, after every base rule
+   it overrides (.media-container/.media-selector/.preview-image/
+   .preview-video etc. are all defined further up) - a real ordering
+   bug was found here: with equal specificity, CSS cascade resolves by
+   source order regardless of whether a rule sits inside @media, so
+   the plain base rules defined below this block were silently
+   winning over these mobile overrides even when the media condition
+   matched. Moving the whole block last fixes it for every rule here
+   at once, not just the ones caught during verification.
+
+   Breakpoints standardized to this initiative's shared 1024/768/480
+   convention (see styles/layout.css) - was one single 1200px tier.
+=================================== */
+
+@media(max-width:1024px){
+
+.survey-grid,
+
+.survey-row{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.survey-progress-container{
+
+flex-direction:column;
+
+gap:12px;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.survey-grid,
+
+.survey-row{
+
+grid-template-columns:1fr;
+
+}
+
+.survey-actions{
+
+flex-direction:column;
+
+align-items:stretch;
+
+}
+
+.survey-completion-card{
+
+position:static;
+
+width:100%;
+
+margin-bottom:14px;
+
+}
+
+/* Media picker: a fixed-width selector column beside a flex-1
+   preview never had a mobile collapse - stack instead of cramming
+   both into a narrow viewport (same fix as Execution.css). */
+.media-container{
+
+flex-direction:column;
+
+}
+
+.media-selector{
+
+width:100%;
+
+max-height:180px;
+
+}
+
+.preview-image,
+.preview-video{
+
+max-width:100%;
+
+}
 
 }

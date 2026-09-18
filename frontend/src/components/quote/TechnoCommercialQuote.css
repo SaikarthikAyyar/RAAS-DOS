@@ -133,17 +133,6 @@ gap:14px;
 }
 
 
-@media (max-width: 900px){
-
-.quote-grid{
-
-grid-template-columns:1fr;
-
-}
-
-}
-
-
 /* ===================================
    CARD
 =================================== */
@@ -161,6 +150,18 @@ border-radius:14px;
 padding:16px;
 
 box-shadow:0 4px 14px rgba(17,24,39,.04);
+
+transition:transform var(--transition-base), box-shadow var(--transition-base);
+
+animation:ui-fade-in-up var(--transition-slow) ease-out both;
+
+}
+
+.quote-card:hover{
+
+transform:translateY(-2px);
+
+box-shadow:var(--shadow-hover);
 
 }
 
@@ -366,6 +367,8 @@ display:flex;
 
 align-items:center;
 
+flex-wrap:wrap;
+
 gap:8px;
 
 margin-top:14px;
@@ -410,5 +413,34 @@ transition:.15s;
 background:#d96b0d;
 
 border-color:#d96b0d;
+
+}
+
+
+/* ===================================
+   RESPONSIVE
+   Standardized to this initiative's shared 1024/480 tiers - was a
+   single 900px tier.
+=================================== */
+
+@media (max-width: 1024px){
+
+.quote-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+@media (max-width: 480px){
+
+.quote-table-header-3,
+.quote-table-row-3{
+
+grid-template-columns:1fr;
+gap:2px;
+
+}
 
 }
