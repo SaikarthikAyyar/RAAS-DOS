@@ -61,7 +61,7 @@
 
     flex-direction:column;
 
-    align-items:flex-start;
+    align-items:stretch;
 
     gap:10px;
 
@@ -104,11 +104,10 @@
 
 /* ==========================================
    Role Card
-   width hugs its content (name/type/status + icons) instead of
-   stretching to fill a fixed-width container - the old layout used
-   justify-content:space-between inside a 260px-wide stretched card,
-   which left a large dead gap between the text and the icons on
-   every short role name.
+   Stretched to fill the sidebar's fixed width and given a shared
+   min-height, so every card - short role name or long - lines up as
+   the same size both horizontally and vertically, instead of each
+   one hugging its own content and drifting out of alignment.
 ========================================== */
 
 .role-card{
@@ -117,7 +116,15 @@
 
     align-items:center;
 
+    justify-content:space-between;
+
     gap:20px;
+
+    width:100%;
+
+    min-height:64px;
+
+    box-sizing:border-box;
 
     padding:8px 12px;
 

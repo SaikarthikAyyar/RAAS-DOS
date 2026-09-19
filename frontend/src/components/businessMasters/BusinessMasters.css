@@ -570,25 +570,36 @@
    MODAL
 ==================================== */
 
+/* overflow-y:auto + align-items:safe center (not a bare "center") so
+   a form taller than the viewport scrolls the whole overlay instead of
+   clipping - a plain flex "center" leaves the top of an oversized,
+   centered box permanently unreachable when it overflows upward. */
 .bm-modal-overlay{
     position:fixed;
     inset:0;
     background:rgba(15,23,42,.45);
     display:flex;
-    align-items:center;
+    align-items:safe center;
     justify-content:center;
+    overflow-y:auto;
     z-index:200;
     padding:20px;
 }
 
+/* No max-height/overflow-y here - a form's actual field count decides
+   its height, and the overlay above scrolls the page instead of a
+   clipped inner scrollbar. This was the source of the create/edit
+   modal glitch on longer forms (Machines/Fleet, Personnel, etc.) -
+   fields near the bottom of the old 85vh box could render cut off or
+   fight the inner scroll when a dropdown/checkbox list inside them
+   tried to open. */
 .bm-modal-box{
     background:#fff;
     border-radius:14px;
     padding:20px;
     width:100%;
     max-width:460px;
-    max-height:85vh;
-    overflow-y:auto;
+    margin:auto 0;
     box-shadow:0 20px 45px rgba(0,0,0,.25);
 }
 

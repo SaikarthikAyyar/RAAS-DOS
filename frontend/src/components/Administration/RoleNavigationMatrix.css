@@ -380,6 +380,7 @@
     box-sizing:border-box;
     background:#f8fafc;
     padding:10px 12px;
+    gap:16px;
     font-size:11px;
     font-weight:700;
     text-transform:uppercase;
@@ -392,16 +393,22 @@
 /* width:fit-content (capped at the panel's own width) instead of
    stretching to 100% - a row with 2 tasks must end where its 2
    checkboxes end, not keep going to match whichever other row in
-   this group happens to have the most tasks. */
+   this group happens to have the most tasks. Row and column separator
+   lines: a border-top per row (matching the header's own border
+   color, not the earlier near-invisible tint) plus a border-right on
+   the two fixed-width columns - Tab/Task Access always line up at the
+   same x-position across every row regardless of that row's own
+   width, so the vertical lines stay straight down the table. */
 .role-task-matrix-row{
 
     display:flex;
-    align-items:flex-start;
+    align-items:stretch;
     width:fit-content;
     max-width:100%;
     box-sizing:border-box;
     padding:10px 12px;
-    border-top:1px solid #edf1f5;
+    gap:16px;
+    border-top:1px solid #e5e7eb;
 
 }
 
@@ -415,12 +422,18 @@
 
     flex:0 0 170px;
     min-width:0;
+    box-sizing:border-box;
+    border-right:1px solid #e5e7eb;
+    padding-right:16px;
 
 }
 
 .role-task-matrix-col-access{
 
     flex:0 0 110px;
+    box-sizing:border-box;
+    border-right:1px solid #e5e7eb;
+    padding-right:16px;
 
 }
 
