@@ -153,7 +153,7 @@ box-shadow:0 4px 14px rgba(17,24,39,.04);
 
 transition:transform var(--transition-base), box-shadow var(--transition-base);
 
-animation:ui-fade-in-up var(--transition-slow) ease-out both;
+animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
 
 }
 

@@ -1,10 +1,13 @@
 import { NavLink } from "react-router-dom";
+import { X } from "lucide-react";
 import { MODULE_META } from "../../config/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function Sidebar({
 
-    onNavigate
+    onNavigate,
+
+    onClose
 
 }){
 
@@ -24,6 +27,28 @@ export default function Sidebar({
     return(
 
         <div className="sidebar">
+
+            <div className="sidebar-header">
+
+                <button
+
+                    type="button"
+
+                    className="sidebar-close-btn"
+
+                    aria-label="Close sidebar"
+
+                    title="Close sidebar"
+
+                    onClick={onClose}
+
+                >
+
+                    <X size={18} strokeWidth={2.2}/>
+
+                </button>
+
+            </div>
 
             <div className="sidebar-menu">
 

@@ -63,7 +63,7 @@
        adding className="ui-card-interactive ui-fade-in" separately in
        every one of this module's ~8 card-rendering components. */
     transition:transform var(--transition-base), box-shadow var(--transition-base);
-    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
 
 }
 

@@ -91,7 +91,7 @@
 
 .ui-fade-in{
 
-    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
 
 }
 
@@ -259,11 +259,43 @@ transition:.2s;
 
 }
 
+.menu-item svg{
+
+flex-shrink:0;
+
+transition:transform .2s ease, color .2s ease;
+
+}
+
 .menu-item:hover{
 
 background:#242b36;
 
+transform:translateX(4px);
 
+box-shadow:inset 3px 0 0 var(--orange);
+
+}
+
+.menu-item:hover svg{
+
+transform:scale(1.15);
+
+color:var(--orange);
+
+}
+
+.menu-item:active{
+
+transform:translateX(4px) scale(.98);
+
+}
+
+.menu-item:focus-visible{
+
+outline:2px solid var(--orange);
+
+outline-offset:2px;
 
 }
 
@@ -272,6 +304,94 @@ background:#242b36;
 background:var(--orange);
 
 color:white;
+
+}
+
+.menu-item.active:hover{
+
+background:#ff9b42;
+
+box-shadow:none;
+
+}
+
+.menu-item.active:hover svg,
+.menu-item.active svg{
+
+color:white;
+
+}
+
+/* Sidebar header - holds the close (x) button, right-aligned. */
+
+.sidebar-header{
+
+display:flex;
+
+justify-content:flex-end;
+
+align-items:center;
+
+flex-shrink:0;
+
+padding:12px 14px 0;
+
+}
+
+.sidebar-close-btn{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+width:34px;
+
+height:34px;
+
+border:none;
+
+border-radius:10px;
+
+background:transparent;
+
+color:#c9d1dc;
+
+cursor:pointer;
+
+transition:background .2s ease, color .2s ease, transform .2s ease;
+
+}
+
+.sidebar-close-btn:hover{
+
+background:#2b313b;
+
+color:#ffffff;
+
+transform:rotate(90deg);
+
+}
+
+.sidebar-close-btn:focus-visible{
+
+outline:2px solid var(--orange);
+
+outline-offset:2px;
+
+}
+
+@media (prefers-reduced-motion: reduce){
+
+.menu-item:hover,
+.menu-item:active,
+.menu-item:hover svg,
+.sidebar-close-btn:hover{
+
+transform:none;
+
+}
 
 }
 
@@ -287,7 +407,7 @@ overflow-y:auto;
 
 overflow-x:hidden;
 
-padding:20px;
+padding:16px 8px 20px 14px;
 
 scrollbar-width:thin;
 
@@ -1525,6 +1645,8 @@ position:relative;
 .app-sidebar{
 
 position:fixed;
+
+padding:0;
 
 top:0;
 

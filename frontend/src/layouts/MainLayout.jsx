@@ -45,7 +45,7 @@ export default function MainLayout(){
                 }
             >
 
-                <Sidebar onNavigate={closeSidebar}/>
+                <Sidebar onNavigate={closeSidebar} onClose={closeSidebar}/>
 
             </aside>
 

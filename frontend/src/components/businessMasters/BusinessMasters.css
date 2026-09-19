@@ -140,11 +140,16 @@
        Business Masters tab renders, same treatment as Execution's
        .execution-card and the Enquiry Workspace's .survey-summary-card. */
     transition:transform var(--transition-base), box-shadow var(--transition-base);
-    animation:ui-fade-in-up var(--transition-slow) ease-out both;
+    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
 }
 
+/* No transform on hover (and the mount fade above uses fill-mode
+   "backwards", so no transform lingers after it ends): every Business
+   Masters modal renders INSIDE this card, and any non-"none" transform
+   on an ancestor turns it into the containing block for the modal's
+   position:fixed overlay - which confined every form to the card's own
+   width/height instead of the viewport. */
 .bm-card:hover{
-    transform:translateY(-2px);
     box-shadow:var(--shadow-hover);
 }
 
