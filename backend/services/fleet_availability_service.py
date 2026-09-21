@@ -11,6 +11,7 @@ from backend.models.machines_pumps import Machine
 from backend.models.job_creation import JobCreation
 
 from backend.repositories.fleet_unit_repository import build_fleet_unit_dict
+from backend.repositories.fleet_kit_repository import schedule_kit
 from backend.repositories.customer_repository import get_customer
 from backend.services.invoice_service import _resolve_purchase_order_for_job
 
@@ -103,6 +104,15 @@ def _category_for_fleet_unit(db, fleet_unit, machine_inventory_row, machine_spec
 # OVERVIEW - Fleet Unit list + each one's current queue
 # ====================================
 
+def _queue_kit(db, schedule_id):
+
+    # Phase 44 - each booking's own pumps/accessories (with ids), shown
+    # in the queue next to the unit's standing kit.
+    kit = schedule_kit(db, schedule_id)
+
+    return {"pumps": kit["pumps"], "accessories": kit["accessories"]}
+
+
 def get_fleet_availability_overview_request(db):
 
     units = db.query(FleetUnit).filter(FleetUnit.active == True).order_by(FleetUnit.fleet_code).all()  # noqa: E712
@@ -127,6 +137,7 @@ def get_fleet_availability_overview_request(db):
 
         unit_dict["queue"] = [
             {
+                **_queue_kit(db, r.id),
                 "id": r.id,
                 "job_creation_id": r.job_creation_id,
                 "queue_position": r.queue_position,

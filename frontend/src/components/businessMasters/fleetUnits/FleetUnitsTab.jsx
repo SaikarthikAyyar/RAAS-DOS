@@ -5,8 +5,13 @@ import {
     getAvailableMachines,
     createFleetUnit,
     updateFleetUnit,
-    deleteFleetUnit
+    deleteFleetUnit,
+    getKitOptionsForMachine
 } from "../../../services/fleetUnitsService";
+
+import KitPicker from "../../shared/KitPicker";
+
+import { formatPumpList, formatAccessoryList } from "../../../utils/kitFormat";
 
 import { getPersonnel } from "../../../services/personnelService";
 
@@ -81,6 +86,13 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
     const [active, setActive] = useState(editing ? editing.active : true);
     const [crewIds, setCrewIds] = useState(editing?.crew?.map(c=>c.id) || []);
 
+    // Pumps + accessories this unit is mobilised with (Phase 44). Pump
+    // choices depend on the picked machine's type, so options are
+    // re-fetched whenever the machine changes.
+    const [kitOptions, setKitOptions] = useState(null);
+    const [pumpIds, setPumpIds] = useState(editing?.pumps?.map(p=>p.id) || []);
+    const [accessoryIds, setAccessoryIds] = useState(editing?.accessories?.map(a=>a.id) || []);
+
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
@@ -90,6 +102,43 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
     // Fleet Unit field. Re-assign the machine here, or change that
     // machine's own hub via the Machine Inventory tab, to change it.
     const selectedMachine = machines.find(m=>String(m.id)===String(machineId));
+
+    useEffect(()=>{
+
+        if(!machineId){
+            setKitOptions(null);
+            return;
+        }
+
+        let cancelled = false;
+
+        getKitOptionsForMachine(machineId)
+            .then(options=>{
+
+                if(cancelled) return;
+
+                setKitOptions(options);
+
+                // A swapped machine may not accept the pumps already
+                // ticked - drop any that no longer fit.
+                const allowed = new Set(options.compatible_pumps.map(p=>p.id));
+                setPumpIds(prev=>prev.filter(id=>allowed.has(id)));
+
+                // A brand-new unit starts from the machine's standard
+                // accessory set; an existing one keeps what it has.
+                if(!editing){
+                    setAccessoryIds(options.default_accessory_ids || []);
+                }
+
+            })
+            .catch(err=>{
+                console.error(err);
+                if(!cancelled) setError(formatApiError(err, "Unable to load pumps and accessories."));
+            });
+
+        return ()=>{ cancelled = true; };
+
+    }, [machineId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     async function handleSubmit(){
 
@@ -113,7 +162,9 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
                 fleet_name: fleetName.trim(),
                 machine_inventory_id: Number(machineId),
                 active,
-                crew_personnel_ids: crewIds
+                crew_personnel_ids: crewIds,
+                pump_ids: pumpIds,
+                accessory_ids: accessoryIds
             });
 
         }
@@ -194,6 +245,26 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
                             selected={crewIds}
                             onChange={setCrewIds}
                         />
+                    </div>
+
+                    <div style={{gridColumn:"1 / -1"}}>
+                        {
+                            machineId ? (
+                                <KitPicker
+                                    options={kitOptions}
+                                    pumpIds={pumpIds}
+                                    onPumpIds={setPumpIds}
+                                    accessoryIds={accessoryIds}
+                                    onAccessoryIds={setAccessoryIds}
+                                />
+                            ) : (
+                                <p className="bm-muted">Pick a machine to choose the pumps and accessories it is mobilised with.</p>
+                            )
+                        }
+                        <p className="bm-muted" style={{marginTop:6}}>
+                            What this unit is mobilised with. Job bookings update it as they go live;
+                            changing it here overrides that until the next booking goes live.
+                        </p>
                     </div>
 
                 </div>
@@ -352,6 +423,8 @@ export default function FleetUnitsTab(){
                                 <th>Hub</th>
                                 <th>Current Location</th>
                                 <th>Crew</th>
+                                <th>Pumps</th>
+                                <th>Accessories</th>
                                 <th>Status</th>
                                 <th></th>
                             </tr>
@@ -368,6 +441,8 @@ export default function FleetUnitsTab(){
                                     <td>{f.hub_name || "—"}</td>
                                     <td>{f.current_location || "—"}</td>
                                     <td>{f.crew?.length ? f.crew.map(c=>c.full_name).join(", ") : "—"}</td>
+                                    <td>{formatPumpList(f.pumps, "—")}</td>
+                                    <td>{formatAccessoryList(f.accessories, "—")}</td>
                                     <td>{f.active ? "Active" : "Inactive"}</td>
                                     <td>
 

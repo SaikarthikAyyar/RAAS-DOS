@@ -75,3 +75,50 @@ class FleetUnitPersonnel(Base):
     __table_args__ = (
         UniqueConstraint("fleet_unit_id", "personnel_id", name="uq_fleet_unit_personnel"),
     )
+
+
+# ====================================
+# FLEET UNIT KIT (Phase 44)
+# The pumps and accessories this unit currently carries, by id. Set
+# from the booking that is live on the unit (see
+# fleet_schedule_repository.apply_kit_to_fleet_unit) or edited directly
+# in Business Masters -> Fleet Units. No ON DELETE on the pump/accessory
+# side: an in-use pump or accessory can't be deleted from its master.
+# ====================================
+
+class FleetUnitPump(Base):
+
+    __tablename__ = "fleet_unit_pumps"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    fleet_unit_id = Column(
+        Integer,
+        ForeignKey("fleet_units.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    pump_id = Column(Integer, ForeignKey("pumps.id"), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("fleet_unit_id", "pump_id", name="uq_fleet_unit_pump"),
+    )
+
+
+class FleetUnitAccessory(Base):
+
+    __tablename__ = "fleet_unit_accessories"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    fleet_unit_id = Column(
+        Integer,
+        ForeignKey("fleet_units.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    accessory_id = Column(Integer, ForeignKey("accessories.id"), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("fleet_unit_id", "accessory_id", name="uq_fleet_unit_accessory"),
+    )

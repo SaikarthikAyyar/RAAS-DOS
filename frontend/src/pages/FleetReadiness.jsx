@@ -15,6 +15,8 @@ import { buildActor } from "../utils/actor";
 
 import { formatApiError } from "../utils/apiError";
 
+import { formatPumpList, formatAccessoryList } from "../utils/kitFormat";
+
 
 const MONTH_NAMES = [
     "January", "February", "March", "April", "May", "June",
@@ -399,6 +401,8 @@ export default function FleetReadiness(){
                                             <th>Hub</th>
                                             <th>Current Location</th>
                                             <th>Crew</th>
+                                            <th>Pumps</th>
+                                            <th>Accessories</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -410,6 +414,8 @@ export default function FleetReadiness(){
                                                 <td>{f.hub_name || "-"}</td>
                                                 <td>{f.current_location || "-"}</td>
                                                 <td>{f.crew?.length ? f.crew.map(c=>c.full_name).join(", ") : "-"}</td>
+                                                <td>{formatPumpList(f.pumps)}</td>
+                                                <td>{formatAccessoryList(f.accessories)}</td>
                                                 <td>
                                                     <span
                                                         className="bm-backlink"
@@ -489,6 +495,8 @@ export default function FleetReadiness(){
                                                         <th>Pos</th>
                                                         <th>Customer</th>
                                                         <th>Site</th>
+                                                        <th>Pumps</th>
+                                                        <th>Accessories</th>
                                                         <th>Start</th>
                                                         <th>Completion</th>
                                                         <th>Status</th>
@@ -501,6 +509,8 @@ export default function FleetReadiness(){
                                                             <td>{b.queue_position}</td>
                                                             <td>{b.customer_name || "-"}</td>
                                                             <td>{b.site_location}</td>
+                                                            <td>{formatPumpList(b.pumps)}</td>
+                                                            <td>{formatAccessoryList(b.accessories)}</td>
                                                             <td>{formatDate(b.planned_start)}</td>
                                                             <td>{formatDate(b.planned_completion)}</td>
                                                             <td>{b.schedule_status}</td>

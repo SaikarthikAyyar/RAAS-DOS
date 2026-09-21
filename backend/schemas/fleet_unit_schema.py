@@ -20,6 +20,22 @@ class FleetUnitCrewMemberSchema(BaseModel):
 
 
 # ====================================
+# KIT ITEMS (Phase 44) - the pumps / accessories a unit carries,
+# always shown with their ids.
+# ====================================
+
+class KitPumpSchema(BaseModel):
+    id: int
+    code: str
+    name: str
+
+
+class KitAccessorySchema(BaseModel):
+    id: int
+    name: str
+
+
+# ====================================
 # FLEET UNIT CREATE / UPDATE (33C)
 # ====================================
 
@@ -30,6 +46,8 @@ class FleetUnitCreate(BaseModel):
     hub_id: Optional[int] = None
     active: bool = True
     crew_personnel_ids: list[int] = []
+    pump_ids: list[int] = []
+    accessory_ids: list[int] = []
 
     actor: ActorSchema
     remark: str
@@ -42,6 +60,8 @@ class FleetUnitUpdate(BaseModel):
     hub_id: Optional[int] = None
     active: Optional[bool] = None
     crew_personnel_ids: Optional[list[int]] = None
+    pump_ids: Optional[list[int]] = None
+    accessory_ids: Optional[list[int]] = None
 
     actor: ActorSchema
     remark: str
@@ -69,3 +89,17 @@ class FleetUnitResponse(BaseModel):
     current_location: Optional[str] = None
 
     crew: list[FleetUnitCrewMemberSchema] = []
+
+    pumps: list[KitPumpSchema] = []
+    accessories: list[KitAccessorySchema] = []
+
+
+# ====================================
+# KIT OPTIONS (Phase 44) - what a unit may be given
+# ====================================
+
+class FleetUnitKitOptionsResponse(BaseModel):
+    machine_type_id: Optional[int] = None
+    compatible_pumps: list[KitPumpSchema] = []
+    accessories: list[KitAccessorySchema] = []
+    default_accessory_ids: list[int] = []

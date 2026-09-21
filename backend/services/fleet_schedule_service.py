@@ -7,8 +7,11 @@ from backend.repositories.fleet_schedule_repository import (
     list_fleet_unit_queue,
     list_schedules_for_job,
     reschedule_fleet_schedule,
-    cancel_fleet_schedule
+    cancel_fleet_schedule,
+    update_schedule_kit
 )
+
+from backend.repositories.fleet_kit_repository import schedule_kit
 
 from backend.repositories.job_creation_repository import get_job
 from backend.repositories.execution_repository import get_execution_by_job
@@ -36,7 +39,9 @@ def book_fleet_unit_request(db, payload):
         job_id=payload.job_id,
         site_location=payload.site_location,
         planned_start=payload.planned_start,
-        planned_completion=payload.planned_completion
+        planned_completion=payload.planned_completion,
+        pump_ids=payload.pump_ids,
+        accessory_ids=payload.accessory_ids
     )
 
     execution = get_execution_by_job(db, payload.job_id)
@@ -57,27 +62,31 @@ def book_fleet_unit_request(db, payload):
     # update_execution_after_allocation) - if a real site was given but
     # nothing could be found for it, surface that now rather than
     # leaving it as a silent blank the user only discovers later on
-    # the Execution tab's map. destination_geocode_warning is a plain
-    # attribute set on the ORM object here, not a real column - picked
-    # up by FleetScheduleResponse purely for this one response.
+    # the Execution tab's map. The warning is not a real column - it is
+    # added to this one response only.
+    result = _serialize_schedule(db, schedule)
+
     if (
         updated_execution is not None
         and payload.site_location
         and updated_execution.destination_latitude is None
     ):
-        schedule.destination_geocode_warning = (
+        result["destination_geocode_warning"] = (
             f"Couldn't find coordinates for site location \"{payload.site_location}\" - "
             f"the destination will need to be set manually on the Execution tab's Save Route form."
         )
 
-    return schedule
+    return result
 
 
 # ====================================
 # QUEUE
 # ====================================
 
-def _serialize_schedule(r):
+def _serialize_schedule(db, r):
+
+    kit = schedule_kit(db, r.id)
+
     return {
         "id": r.id,
         "fleet_unit_id": r.fleet_unit_id,
@@ -89,20 +98,22 @@ def _serialize_schedule(r):
         "planned_completion": r.planned_completion,
         "actual_start": r.actual_start,
         "actual_completion": r.actual_completion,
-        "schedule_status": r.schedule_status
+        "schedule_status": r.schedule_status,
+        "pumps": kit["pumps"],
+        "accessories": kit["accessories"]
     }
 
 
 def list_fleet_unit_queue_request(db, fleet_unit_id):
 
     rows = list_fleet_unit_queue(db, fleet_unit_id)
-    return [_serialize_schedule(r) for r in rows]
+    return [_serialize_schedule(db, r) for r in rows]
 
 
 def list_schedules_for_job_request(db, job_id):
 
     rows = list_schedules_for_job(db, job_id)
-    return [_serialize_schedule(r) for r in rows]
+    return [_serialize_schedule(db, r) for r in rows]
 
 
 # ====================================
@@ -111,12 +122,30 @@ def list_schedules_for_job_request(db, job_id):
 
 def reschedule_fleet_schedule_request(db, schedule_id, payload):
 
-    return reschedule_fleet_schedule(
+    schedule = reschedule_fleet_schedule(
         db,
         schedule_id,
         payload.planned_start,
         payload.planned_completion
     )
+
+    return _serialize_schedule(db, schedule)
+
+
+# ====================================
+# EDIT KIT (Phase 44)
+# ====================================
+
+def update_schedule_kit_request(db, schedule_id, payload):
+
+    schedule = update_schedule_kit(
+        db,
+        schedule_id,
+        payload.pump_ids,
+        payload.accessory_ids
+    )
+
+    return _serialize_schedule(db, schedule)
 
 
 def cancel_fleet_schedule_request(db, schedule_id):

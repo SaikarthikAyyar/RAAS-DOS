@@ -10,6 +10,7 @@ from backend.database.connection import get_db
 from backend.schemas.fleet_schedule_schema import (
     BookFleetUnitSchema,
     RescheduleFleetSchedule,
+    UpdateFleetScheduleKit,
     CancelFleetSchedule,
     FleetScheduleResponse
 )
@@ -19,6 +20,7 @@ from backend.services.fleet_schedule_service import (
     list_fleet_unit_queue_request,
     list_schedules_for_job_request,
     reschedule_fleet_schedule_request,
+    update_schedule_kit_request,
     cancel_fleet_schedule_request
 )
 
@@ -48,6 +50,14 @@ def list_schedules_for_job(job_id: int, db: Session = Depends(get_db)):
 def reschedule_fleet_schedule(schedule_id: int, payload: RescheduleFleetSchedule, db: Session = Depends(get_db)):
     try:
         return reschedule_fleet_schedule_request(db, schedule_id, payload)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error))
+
+
+@api.put("/fleet-schedule/{schedule_id}/kit", response_model=FleetScheduleResponse)
+def update_fleet_schedule_kit(schedule_id: int, payload: UpdateFleetScheduleKit, db: Session = Depends(get_db)):
+    try:
+        return update_schedule_kit_request(db, schedule_id, payload)
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error))
 

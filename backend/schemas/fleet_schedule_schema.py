@@ -8,6 +8,7 @@ from datetime import date
 from pydantic import BaseModel, ConfigDict
 
 from backend.schemas.notification_schema import ActorSchema
+from backend.schemas.fleet_unit_schema import KitPumpSchema, KitAccessorySchema
 
 
 # ====================================
@@ -21,6 +22,23 @@ class BookFleetUnitSchema(BaseModel):
     site_location: str
     planned_start: date
     planned_completion: date
+
+    # Phase 44 - pumps/accessories this job takes along, by id.
+    pump_ids: list[int] = []
+    accessory_ids: list[int] = []
+
+    actor: Optional[ActorSchema] = None
+    remark: Optional[str] = None
+
+
+# ====================================
+# EDIT KIT (Phase 44)
+# ====================================
+
+class UpdateFleetScheduleKit(BaseModel):
+
+    pump_ids: list[int] = []
+    accessory_ids: list[int] = []
 
     actor: Optional[ActorSchema] = None
     remark: Optional[str] = None
@@ -67,6 +85,10 @@ class FleetScheduleResponse(BaseModel):
     actual_start: Optional[date] = None
     actual_completion: Optional[date] = None
     schedule_status: str
+
+    # Phase 44 - this booking's kit, each item with its id.
+    pumps: list[KitPumpSchema] = []
+    accessories: list[KitAccessorySchema] = []
 
     # Not a real column - set only when booking this schedule tried to
     # geocode the site location into the execution's destination

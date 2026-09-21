@@ -13,6 +13,12 @@ from backend.models.invoice import Invoice
 
 from backend.utils.geocode import reverse_geocode
 
+from backend.repositories.fleet_kit_repository import (
+    validate_kit,
+    set_schedule_kit,
+    apply_kit_to_fleet_unit
+)
+
 
 # ====================================
 # CREW LOOKUP
@@ -35,7 +41,16 @@ def _crew_for_fleet_unit(db, fleet_unit_id):
 # now at the Fleet Unit level so machine + crew move together.
 # ====================================
 
-def book_fleet_unit(db, fleet_unit_id, job_id, site_location, planned_start, planned_completion):
+def book_fleet_unit(
+    db,
+    fleet_unit_id,
+    job_id,
+    site_location,
+    planned_start,
+    planned_completion,
+    pump_ids=None,
+    accessory_ids=None
+):
 
     fleet_unit = db.query(FleetUnit).filter(FleetUnit.id == fleet_unit_id).first()
 
@@ -74,6 +89,14 @@ def book_fleet_unit(db, fleet_unit_id, job_id, site_location, planned_start, pla
 
     queue_position = 1 if last_schedule is None else last_schedule.queue_position + 1
 
+    # Phase 44 - the pumps/accessories this job takes along. Validated
+    # before anything is written: pumps must be compatible with the
+    # machine, and at least one is required whenever the machine has
+    # any compatible pump at all.
+    pump_ids, accessory_ids = validate_kit(
+        db, fleet_unit, pump_ids, accessory_ids, require_pump=True
+    )
+
     schedule = FleetSchedule(
         fleet_unit_id=fleet_unit_id,
         job_creation_id=job.id,
@@ -85,8 +108,16 @@ def book_fleet_unit(db, fleet_unit_id, job_id, site_location, planned_start, pla
     )
 
     db.add(schedule)
+    db.flush()
+
+    # The booking always keeps its own kit; the unit's standing kit
+    # only takes it on when this booking is the live one (position 1),
+    # so a job queued behind another never overwrites the live kit.
+    set_schedule_kit(db, schedule.id, pump_ids, accessory_ids)
 
     if queue_position == 1:
+
+        apply_kit_to_fleet_unit(db, fleet_unit_id, schedule.id)
 
         # schedule_status stays QUEUED here, matching MachineSchedule's
         # own convention - it's only ever flipped to ACTIVE by a
@@ -200,6 +231,41 @@ def reschedule_fleet_schedule(db, schedule_id, planned_start, planned_completion
 
     schedule.planned_start = planned_start
     schedule.planned_completion = planned_completion
+
+    db.commit()
+    db.refresh(schedule)
+
+    return schedule
+
+
+# ====================================
+# EDIT KIT (Phase 44)
+# Swap a broken pump for another, or send an accessory in later. Allowed
+# on QUEUED and ACTIVE bookings (unlike reschedule/cancel, which are
+# QUEUED-only) since this is exactly what happens mid-job. If the
+# booking is the live one (position 1) the unit's standing kit follows.
+# ====================================
+
+def update_schedule_kit(db, schedule_id, pump_ids, accessory_ids):
+
+    schedule = get_fleet_schedule(db, schedule_id)
+
+    if schedule is None:
+        raise ValueError("Fleet schedule not found.")
+
+    if schedule.schedule_status not in ("QUEUED", "ACTIVE"):
+        raise ValueError("Only a queued or active booking's kit can be edited.")
+
+    fleet_unit = db.query(FleetUnit).filter(FleetUnit.id == schedule.fleet_unit_id).first()
+
+    pump_ids, accessory_ids = validate_kit(
+        db, fleet_unit, pump_ids, accessory_ids, require_pump=True
+    )
+
+    set_schedule_kit(db, schedule.id, pump_ids, accessory_ids)
+
+    if schedule.queue_position == 1:
+        apply_kit_to_fleet_unit(db, schedule.fleet_unit_id, schedule.id)
 
     db.commit()
     db.refresh(schedule)
@@ -335,6 +401,12 @@ def dequeue_fleet_schedules(db, execution):
 
             next_schedule = remaining[0]
             next_schedule.schedule_status = "ACTIVE"
+
+            # Phase 44 - the promoted booking's kit becomes the unit's
+            # standing kit (skipped for a pre-kit booking with none).
+            apply_kit_to_fleet_unit(
+                db, fleet_unit_id, next_schedule.id, only_if_present=True
+            )
 
             if machine is not None:
                 machine.status = "ALLOCATED"

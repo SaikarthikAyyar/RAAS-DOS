@@ -12,6 +12,8 @@ import {
     getFleetUnitQueue,
     getSchedulesForJob,
     bookFleetUnit,
+    getFleetUnitKitOptions,
+    updateScheduleKit,
     rescheduleFleetSchedule,
     cancelFleetSchedule,
     checkGeocode
@@ -26,6 +28,10 @@ import { STAGE_LABELS } from "../../../data/workflowStages";
 import { useAuth } from "../../../contexts/AuthContext";
 
 import ComponentExplainerIcon from "../../guide/ComponentExplainerIcon";
+
+import KitPicker from "../../shared/KitPicker";
+
+import { formatPumpList, formatAccessoryList } from "../../../utils/kitFormat";
 
 const STAGE_ORDER = Object.keys(STAGE_LABELS);
 
@@ -80,6 +86,19 @@ export default function JobCreationSummary({
     const [cancelling, setCancelling] = useState(false);
 
     const [confirming, setConfirming] = useState(false);
+
+    // Pumps + accessories taken along (Phase 44). Options come from the
+    // picked unit's machine type: compatible pumps only, all accessories,
+    // accessory defaults from the job's Deployment Plan.
+    const [kitOptions, setKitOptions] = useState(null);
+    const [pumpIds, setPumpIds] = useState([]);
+    const [accessoryIds, setAccessoryIds] = useState([]);
+
+    const [editingKit, setEditingKit] = useState(false);
+    const [editKitOptions, setEditKitOptions] = useState(null);
+    const [editPumpIds, setEditPumpIds] = useState([]);
+    const [editAccessoryIds, setEditAccessoryIds] = useState([]);
+    const [savingKit, setSavingKit] = useState(false);
 
     async function load(){
 
@@ -145,6 +164,32 @@ export default function JobCreationSummary({
             .catch(err=>console.error(err));
 
     }, [selectedFleetUnitId]);
+
+    useEffect(()=>{
+
+        setKitOptions(null);
+        setPumpIds([]);
+        setAccessoryIds([]);
+
+        if(!selectedFleetUnitId){
+            return;
+        }
+
+        getFleetUnitKitOptions(selectedFleetUnitId, jobInfo?.id)
+            .then(options=>{
+                setKitOptions(options);
+                setAccessoryIds(options.default_accessory_ids || []);
+                // Only one compatible pump - nothing to choose between.
+                if(options.compatible_pumps?.length===1){
+                    setPumpIds([options.compatible_pumps[0].id]);
+                }
+            })
+            .catch(err=>{
+                console.error(err);
+                setError(formatApiError(err, "Unable to load pumps and accessories for this Fleet Unit."));
+            });
+
+    }, [selectedFleetUnitId, jobInfo?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if(!enquiry?.id){
 
@@ -264,6 +309,11 @@ export default function JobCreationSummary({
             return;
         }
 
+        if(kitOptions?.compatible_pumps?.length && pumpIds.length===0){
+            setError("Select at least one compatible pump to take along.");
+            return;
+        }
+
         setBooking(true);
         setError("");
 
@@ -274,7 +324,9 @@ export default function JobCreationSummary({
                 fleet_unit_id: Number(selectedFleetUnitId),
                 site_location: siteLocation.trim(),
                 planned_start: plannedStart,
-                planned_completion: plannedCompletion
+                planned_completion: plannedCompletion,
+                pump_ids: pumpIds,
+                accessory_ids: accessoryIds
             });
 
             await load();
@@ -291,6 +343,61 @@ export default function JobCreationSummary({
         }
         finally{
             setBooking(false);
+        }
+
+    }
+
+    async function handleStartEditKit(){
+
+        setError("");
+
+        try{
+
+            const options = await getFleetUnitKitOptions(schedule.fleet_unit_id, jobInfo?.id);
+
+            setEditKitOptions(options);
+            setEditPumpIds((schedule.pumps ?? []).map(p=>p.id));
+            setEditAccessoryIds((schedule.accessories ?? []).map(a=>a.id));
+            setEditingKit(true);
+
+        }
+        catch(err){
+            console.error(err);
+            setError(formatApiError(err, "Unable to load pumps and accessories."));
+        }
+
+    }
+
+    async function handleSaveKit(){
+
+        if(editKitOptions?.compatible_pumps?.length && editPumpIds.length===0){
+            setError("Select at least one compatible pump to take along.");
+            return;
+        }
+
+        setSavingKit(true);
+        setError("");
+
+        try{
+
+            await updateScheduleKit(schedule.id, {
+                pump_ids: editPumpIds,
+                accessory_ids: editAccessoryIds,
+                actor: buildActor(user)
+            });
+
+            setEditingKit(false);
+
+            await load();
+            reload?.();
+
+        }
+        catch(err){
+            console.error(err);
+            setError(formatApiError(err, "Unable to save pumps and accessories."));
+        }
+        finally{
+            setSavingKit(false);
         }
 
     }
@@ -511,6 +618,14 @@ export default function JobCreationSummary({
                                                     <td>{scheduledUnit?.crew?.length ? scheduledUnit.crew.map(c=>c.full_name).join(", ") : "-"}</td>
                                                 </tr>
                                                 <tr>
+                                                    <td>Pumps taken along</td>
+                                                    <td>{formatPumpList(schedule.pumps)}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Accessories taken along</td>
+                                                    <td>{formatAccessoryList(schedule.accessories)}</td>
+                                                </tr>
+                                                <tr>
                                                     <td>Site</td>
                                                     <td>{schedule.site_location}</td>
                                                 </tr>
@@ -526,6 +641,71 @@ export default function JobCreationSummary({
                                         </table>
 
                                         </div>
+
+                                        {
+                                            hasTask("enquiry-tab-job-created", "edit_fleet_kit") && (
+
+                                                <div style={{marginBottom:12}}>
+
+                                                    {
+                                                        !editingKit ? (
+
+                                                            <button
+                                                                className="survey-action-button"
+                                                                onClick={handleStartEditKit}
+                                                            >
+                                                                Edit pumps &amp; accessories
+                                                            </button>
+
+                                                        ) : (
+
+                                                            <>
+
+                                                                <p className="survey-empty" style={{marginBottom:8}}>
+                                                                    {
+                                                                        schedule.queue_position===1
+                                                                            ? "This booking is live on the Fleet Unit - saving updates the unit's pumps and accessories right away."
+                                                                            : "This booking is queued - the Fleet Unit takes these on once this booking becomes the live one."
+                                                                    }
+                                                                </p>
+
+                                                                <KitPicker
+                                                                    options={editKitOptions}
+                                                                    pumpIds={editPumpIds}
+                                                                    onPumpIds={setEditPumpIds}
+                                                                    accessoryIds={editAccessoryIds}
+                                                                    onAccessoryIds={setEditAccessoryIds}
+                                                                />
+
+                                                                <div className="survey-actions" style={{marginTop:8}}>
+
+                                                                    <button
+                                                                        className="survey-action-button survey-action-button-orange"
+                                                                        onClick={handleSaveKit}
+                                                                        disabled={savingKit}
+                                                                    >
+                                                                        {savingKit ? "Saving..." : "Save pumps & accessories"}
+                                                                    </button>
+
+                                                                    <button
+                                                                        className="survey-action-button survey-create-button"
+                                                                        onClick={()=>setEditingKit(false)}
+                                                                        disabled={savingKit}
+                                                                    >
+                                                                        Cancel
+                                                                    </button>
+
+                                                                </div>
+
+                                                            </>
+
+                                                        )
+                                                    }
+
+                                                </div>
+
+                                            )
+                                        }
 
                                         {
                                             jobCreationConfirmed ? (
@@ -671,6 +851,30 @@ export default function JobCreationSummary({
                                                     {selectedUnit.crew?.length ? `Crew: ${selectedUnit.crew.map(c=>c.full_name).join(", ")}. ` : "No crew assigned yet. "}
                                                     {queueDepth===null ? "" : queueDepth===0 ? "This unit is free - booking will be immediate." : `This unit already has ${queueDepth} booking(s) ahead - this job will queue.`}
                                                 </p>
+                                            )
+                                        }
+
+                                        {
+                                            selectedUnit && (
+
+                                                <div style={{marginTop:10}}>
+
+                                                    <KitPicker
+                                                        options={kitOptions}
+                                                        pumpIds={pumpIds}
+                                                        onPumpIds={setPumpIds}
+                                                        accessoryIds={accessoryIds}
+                                                        onAccessoryIds={setAccessoryIds}
+                                                    />
+
+                                                    <p className="survey-empty" style={{marginTop:6}}>
+                                                        Several pumps can travel with the machine so one can replace another if it breaks down.
+                                                        Accessories start from this job's Deployment Plan and can still be changed later.
+                                                        Once this booking is live these become the Fleet Unit's pumps and accessories until changed in Business Masters.
+                                                    </p>
+
+                                                </div>
+
                                             )
                                         }
 

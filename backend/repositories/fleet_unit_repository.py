@@ -7,6 +7,14 @@ from backend.models.machine_inventory import MachineInventory
 from backend.models.personnel import Personnel
 from backend.models.hub import Hub
 
+from backend.repositories.fleet_kit_repository import (
+    unit_kit,
+    set_unit_kit,
+    validate_kit,
+    compatible_pumps_for_machine_type,
+    _machine_type_for_unit
+)
+
 
 # ====================================
 # READS
@@ -60,6 +68,8 @@ def build_fleet_unit_dict(db, fleet_unit):
 
     crew = list_crew(db, fleet_unit.id)
 
+    kit = unit_kit(db, fleet_unit.id)
+
     return {
         "id": fleet_unit.id,
         "fleet_code": fleet_unit.fleet_code,
@@ -79,7 +89,12 @@ def build_fleet_unit_dict(db, fleet_unit):
         "crew": [
             {"id": p.id, "full_name": p.full_name, "designation": p.designation}
             for p in crew
-        ]
+        ],
+        # Phase 44 - the pumps/accessories this unit is currently
+        # mobilised with, each with its id. Changed by the booking that
+        # is live on the unit, or edited in Business Masters.
+        "pumps": kit["pumps"],
+        "accessories": kit["accessories"]
     }
 
 
@@ -122,19 +137,27 @@ def set_crew(db, fleet_unit_id, personnel_ids):
 # CREATE / UPDATE / DELETE (33C)
 # ====================================
 
-_FLEET_UNIT_PAYLOAD_EXCLUDE = {"actor", "remark", "crew_personnel_ids"}
+_FLEET_UNIT_PAYLOAD_EXCLUDE = {"actor", "remark", "crew_personnel_ids", "pump_ids", "accessory_ids"}
 
 
 def create_fleet_unit(db, payload):
 
     row = FleetUnit(**payload.model_dump(exclude=_FLEET_UNIT_PAYLOAD_EXCLUDE))
+
+    # Validate against the machine BEFORE anything is written - the
+    # row isn't added yet, validate_kit only reads machine_inventory_id.
+    pump_ids, accessory_ids = validate_kit(db, row, payload.pump_ids, payload.accessory_ids)
+
     db.add(row)
     db.commit()
     db.refresh(row)
 
     if payload.crew_personnel_ids:
         set_crew(db, row.id, payload.crew_personnel_ids)
-        db.commit()
+
+    set_unit_kit(db, row.id, pump_ids, accessory_ids)
+
+    db.commit()
 
     return row
 
@@ -145,11 +168,35 @@ def update_fleet_unit(db, fleet_unit_id, payload):
     if not row:
         return None
 
+    old_machine_inventory_id = row.machine_inventory_id
+
     for field, value in payload.model_dump(exclude_unset=True, exclude=_FLEET_UNIT_PAYLOAD_EXCLUDE).items():
         setattr(row, field, value)
 
     if "crew_personnel_ids" in payload.model_fields_set:
         set_crew(db, fleet_unit_id, payload.crew_personnel_ids or [])
+
+    # Kit (Phase 44). Validated against the unit's machine AS IT WILL
+    # BE after this update. If the machine was swapped and no new pump
+    # list was sent, pumps that don't fit the new machine are dropped
+    # rather than left carrying an incompatible pump.
+    pump_ids = payload.pump_ids if "pump_ids" in payload.model_fields_set else None
+    accessory_ids = payload.accessory_ids if "accessory_ids" in payload.model_fields_set else None
+
+    if pump_ids is None and row.machine_inventory_id != old_machine_inventory_id:
+        machine_type = _machine_type_for_unit(db, row)
+        allowed = {p.id for p in compatible_pumps_for_machine_type(db, machine_type.id if machine_type else None)}
+        pump_ids = [p["id"] for p in unit_kit(db, fleet_unit_id)["pumps"] if p["id"] in allowed]
+
+    if pump_ids is not None or accessory_ids is not None:
+        checked_pumps, checked_accessories = validate_kit(db, row, pump_ids, accessory_ids)
+
+        set_unit_kit(
+            db,
+            fleet_unit_id,
+            checked_pumps if pump_ids is not None else None,
+            checked_accessories if accessory_ids is not None else None
+        )
 
     db.commit()
     db.refresh(row)

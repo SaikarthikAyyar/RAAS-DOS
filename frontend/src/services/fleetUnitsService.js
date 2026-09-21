@@ -269,3 +269,74 @@ export async function cancelFleetSchedule(scheduleId, actor, remark){
     return data;
 
 }
+
+
+// ====================================
+// FLEET KIT (pumps + accessories taken along)
+// ====================================
+
+// What a fleet unit may carry: the compatible pumps for its machine
+// type, the whole accessories master, and the default accessory ids
+// (from the job's Deployment Plan when jobId is given, else the machine
+// type's standard set).
+export async function getFleetUnitKitOptions(fleetUnitId, jobId){
+
+    const query = jobId ? `?job_id=${jobId}` : "";
+
+    const response = await fetch(`${API}/fleet-units/${fleetUnitId}/kit-options${query}`);
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+
+// Swap a pump / send an accessory in on an existing booking (queued or
+// active). Body: { pump_ids, accessory_ids, actor, remark }.
+export async function updateScheduleKit(scheduleId, payload){
+
+    const response = await fetch(
+
+        `${API}/fleet-schedule/${scheduleId}/kit`,
+
+        {
+            method:"PUT",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(payload)
+        }
+
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}
+
+
+// Same options, keyed by machine - for the Fleet Units modal, which
+// needs them before the unit exists / when the machine dropdown changes.
+export async function getKitOptionsForMachine(machineInventoryId){
+
+    const response = await fetch(
+        `${API}/fleet-units/support/kit-options?machine_inventory_id=${machineInventoryId}`
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        throw data;
+    }
+
+    return data;
+
+}

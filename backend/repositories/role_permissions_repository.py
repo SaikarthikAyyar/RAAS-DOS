@@ -262,6 +262,7 @@ MODULE_TASKS = {
         ("create_job", "Create job"),
         ("save_planned_dates", "Save planned dates"),
         ("book_fleet_unit", "Book Fleet Unit"),
+        ("edit_fleet_kit", "Edit pumps & accessories taken along"),
         ("reschedule_fleet_booking", "Reschedule booking"),
         ("cancel_fleet_booking", "Cancel booking"),
         ("confirm_job_creation", "Confirm Job Creation")

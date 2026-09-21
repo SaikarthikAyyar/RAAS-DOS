@@ -12,6 +12,8 @@ from backend.repositories.fleet_unit_repository import (
     list_all_machines
 )
 
+from backend.repositories.fleet_kit_repository import kit_options_for_fleet_unit
+
 from backend.repositories.notification_repository import record_business_master_change
 
 from backend.models.hub import Hub
@@ -25,6 +27,28 @@ def list_fleet_units_request(db):
 
     units = list_fleet_units(db)
     return [build_fleet_unit_dict(db, u) for u in units]
+
+
+def get_kit_options_for_machine_request(db, machine_inventory_id):
+
+    # Used by the Fleet Units modal, which needs the options for a
+    # machine BEFORE the unit exists (or when the machine dropdown
+    # changes). A transient, never-saved FleetUnit carries just the
+    # machine id - kit_options_for_fleet_unit only reads that.
+    from backend.models.fleet_unit import FleetUnit
+
+    return kit_options_for_fleet_unit(
+        db, FleetUnit(machine_inventory_id=machine_inventory_id)
+    )
+
+
+def get_kit_options_request(db, fleet_unit_id, job_id=None):
+
+    unit = get_fleet_unit(db, fleet_unit_id)
+    if not unit:
+        return None
+
+    return kit_options_for_fleet_unit(db, unit, job_id)
 
 
 def get_fleet_unit_request(db, fleet_unit_id):
@@ -65,6 +89,19 @@ def list_all_machines_request(db):
 
 
 # ====================================
+# KIT LABEL (Phase 44) - "PMP-004 (#4)" / "Winch (#29)", so a change
+# record names the item AND its id.
+# ====================================
+
+def _kit_label(items, pump=False):
+
+    if pump:
+        return ", ".join(f"{i['code']} (#{i['id']})" for i in items)
+
+    return ", ".join(f"{i['name']} (#{i['id']})" for i in items)
+
+
+# ====================================
 # CREATE / UPDATE / DELETE (33C)
 # ====================================
 
@@ -86,6 +123,12 @@ def create_fleet_unit_request(db, payload):
             "before": None,
             "after": ", ".join(c["full_name"] for c in unit_dict["crew"])
         })
+
+    if unit_dict["pumps"]:
+        changes.append({"field": "pumps", "before": None, "after": _kit_label(unit_dict["pumps"], pump=True)})
+
+    if unit_dict["accessories"]:
+        changes.append({"field": "accessories", "before": None, "after": _kit_label(unit_dict["accessories"])})
 
     record_business_master_change(
         db=db,
@@ -151,6 +194,20 @@ def update_fleet_unit_request(db, fleet_unit_id, payload):
                 "before": ", ".join(before_names) if before_names else None,
                 "after": ", ".join(after_names) if after_names else None
             })
+
+    if before_dict["pumps"] != after_dict["pumps"]:
+        changes.append({
+            "field": "pumps",
+            "before": _kit_label(before_dict["pumps"], pump=True) or None,
+            "after": _kit_label(after_dict["pumps"], pump=True) or None
+        })
+
+    if before_dict["accessories"] != after_dict["accessories"]:
+        changes.append({
+            "field": "accessories",
+            "before": _kit_label(before_dict["accessories"]) or None,
+            "after": _kit_label(after_dict["accessories"]) or None
+        })
 
     if changes:
 

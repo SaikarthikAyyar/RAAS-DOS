@@ -9,6 +9,7 @@ from sqlalchemy import String
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
 from sqlalchemy import DateTime
+from sqlalchemy import UniqueConstraint
 
 from sqlalchemy.sql import func
 
@@ -61,3 +62,49 @@ class FleetSchedule(Base):
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+# ====================================
+# FLEET SCHEDULE KIT (Phase 44)
+# The pumps and accessories chosen for ONE booking. Kept per booking so
+# a job queued behind another never overwrites the live job's kit - the
+# unit's own standing kit (fleet_unit_pumps / fleet_unit_accessories)
+# only takes this on once the booking becomes the live one.
+# ====================================
+
+class FleetSchedulePump(Base):
+
+    __tablename__ = "fleet_schedule_pumps"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    fleet_schedule_id = Column(
+        Integer,
+        ForeignKey("fleet_schedule.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    pump_id = Column(Integer, ForeignKey("pumps.id"), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("fleet_schedule_id", "pump_id", name="uq_fleet_schedule_pump"),
+    )
+
+
+class FleetScheduleAccessory(Base):
+
+    __tablename__ = "fleet_schedule_accessories"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    fleet_schedule_id = Column(
+        Integer,
+        ForeignKey("fleet_schedule.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    accessory_id = Column(Integer, ForeignKey("accessories.id"), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("fleet_schedule_id", "accessory_id", name="uq_fleet_schedule_accessory"),
+    )

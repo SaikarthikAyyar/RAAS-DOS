@@ -84,8 +84,8 @@ from backend.models.machines_pumps import Machine, Pump, MachinePumpCompatibilit
 from backend.models.hr_role import HrRole
 from backend.models.gst_settings import GstSettings
 
-from backend.models.fleet_unit import FleetUnit, FleetUnitPersonnel
-from backend.models.fleet_schedule import FleetSchedule
+from backend.models.fleet_unit import FleetUnit, FleetUnitPersonnel, FleetUnitPump, FleetUnitAccessory
+from backend.models.fleet_schedule import FleetSchedule, FleetSchedulePump, FleetScheduleAccessory
 
 from backend.repositories.allocation_repository import (
     seed_machine_inventory,
