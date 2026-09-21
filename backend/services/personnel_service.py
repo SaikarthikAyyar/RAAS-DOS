@@ -5,6 +5,7 @@
 import mimetypes
 
 from backend.services.storage_client import upload_object, delete_object
+from backend.models.personnel import Personnel
 
 from backend.repositories.personnel_repository import (
     list_personnel,
@@ -112,8 +113,31 @@ def update_personnel_request(db, personnel_id, payload):
     if not before:
         return None
 
+    # Employee code is editable, but it must stay non-empty and unique
+    # (the column is UNIQUE) - checked here so a clash comes back as a
+    # clear message instead of a database error.
+    if "employee_code" in payload.model_fields_set:
+
+        new_code = (payload.employee_code or "").strip()
+
+        if not new_code:
+            raise ValueError("Employee code can't be empty.")
+
+        payload.employee_code = new_code
+
+        clash = (
+            db.query(Personnel)
+            .filter(Personnel.employee_code == new_code, Personnel.id != personnel_id)
+            .first()
+        )
+
+        if clash:
+            raise ValueError(
+                f"Employee code '{new_code}' is already used by {clash.full_name}."
+            )
+
     fields_sent = [
-        f for f in ("full_name", "phone_number", "current_location", "designation", "skill")
+        f for f in ("employee_code", "full_name", "phone_number", "current_location", "designation", "skill")
         if f in payload.model_fields_set
     ]
 

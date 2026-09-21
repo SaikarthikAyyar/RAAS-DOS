@@ -50,7 +50,10 @@ def create_personnel(payload: PersonnelCreate, db: Session = Depends(get_db)):
 
 @api.put("/personnel/{personnel_id}", response_model=PersonnelResponse)
 def update_personnel(personnel_id: int, payload: PersonnelUpdate, db: Session = Depends(get_db)):
-    result = update_personnel_request(db, personnel_id, payload)
+    try:
+        result = update_personnel_request(db, personnel_id, payload)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error))
     if not result:
         raise HTTPException(status_code=404, detail="Person not found.")
     return result

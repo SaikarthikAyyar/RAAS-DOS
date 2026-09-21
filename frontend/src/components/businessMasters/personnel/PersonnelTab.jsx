@@ -74,7 +74,7 @@ function PersonModal({ editing, hrRoles, hubs, onClose, onSave }){
 
     async function handleSubmit(){
 
-        if(!fullName.trim() || (!editing && !employeeCode.trim()) || !designation){
+        if(!fullName.trim() || !employeeCode.trim() || !designation){
 
             setError("Employee code, name and role are required.");
 
@@ -89,6 +89,7 @@ function PersonModal({ editing, hrRoles, hubs, onClose, onSave }){
 
             const payload = editing ? {
 
+                employee_code: employeeCode.trim(),
                 full_name: fullName.trim(),
                 phone_number: phoneNumber.trim() || null,
                 current_location: currentLocation || null,
@@ -134,7 +135,7 @@ function PersonModal({ editing, hrRoles, hubs, onClose, onSave }){
 
                     <div>
                         <label>Employee code</label>
-                        <input value={employeeCode} onChange={e=>setEmployeeCode(e.target.value)} disabled={!!editing} />
+                        <input value={employeeCode} onChange={e=>setEmployeeCode(e.target.value)} />
                     </div>
 
                     <div>
