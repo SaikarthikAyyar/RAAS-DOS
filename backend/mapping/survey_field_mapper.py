@@ -65,14 +65,14 @@ OPS_FIELD_MAP = {
 
     "opening_width": "opening_width",
 
-    # Fixed - this previously pointed at "height_from_ground" (a
-    # different, genuinely separate Section C field), so score_access()
-    # was comparing the site's Height-From-Ground value against each
-    # machine's minimum-opening-height requirement, and the real
-    # opening_height column the user actually fills in ("Opening
-    # Height (mm)") was never read by the algorithm under any key.
-    # height_from_ground is not consumed anywhere in ops_engine.py, so
-    # it's simply left unmapped now rather than given its own inert key.
+    # opening_height is the access opening's VERTICAL clearance. It is
+    # mapped for completeness but score_access() does not use it: a
+    # machine's minimum width / minimum length are the footprint it must
+    # pass through, so they are compared with opening_width and
+    # opening_length (matching the wireframe's openingDims()). An
+    # earlier "fix" pointed the length check at this field, which made
+    # every machine with a minimum length fail whenever it was blank or
+    # entered in different units.
     "opening_height": "opening_height",
 
     "drop_to_floor": "drop_to_floor",

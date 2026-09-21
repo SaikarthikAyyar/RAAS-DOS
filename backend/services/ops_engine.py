@@ -4,6 +4,22 @@
 
 import math
 
+
+# Survey-only machines (bathymetric / sonar boats). Matched by code OR by
+# the SC-SURVEY service configuration, not by one hard-coded code - the
+# original "MATSYA-BATHY" was retired with the old fictional catalog and
+# the real survey boat is MINI-MATSYA-SONAR, so a single hard-coded
+# code silently stopped excluding it from cleaning jobs.
+SURVEY_MACHINE_CODES = {"MATSYA-BATHY", "MINI-MATSYA-SONAR"}
+
+
+def is_survey_machine(machine):
+
+    return (
+        machine.get("code") in SURVEY_MACHINE_CODES
+        or machine.get("service_configuration") == "SC-SURVEY"
+    )
+
 def evaluate_doability(
 
         engineering_inputs
@@ -198,23 +214,25 @@ def score_access(
     Scores whether the machine can
     physically access the asset.
 
-    Excel Basis
+    The machine's minimum width / minimum length (stored as
+    minimum_width / minimum_height, labelled "Minimum length" in
+    Machine Specs) are the footprint it must pass through, so they are
+    compared with the survey's opening WIDTH and opening LENGTH/DIA -
+    never with opening_height (vertical clearance), which is a
+    different thing and is often entered in other units.
 
-        Opening Width >= Min Width
+        Opening fits both minimums                -> +20
+        Machine has no dimensional limit          -> +10
+        Opening dimensions not recorded           -> +10
+            (cannot be verified, so neither rewarded nor penalised -
+             a missing survey value must not read as "too small")
+        A recorded opening dimension is too small -> -20
 
-        AND
+    Then, independently:
 
-        Opening Height >= Min Height
-
-            -> +20
-
-        Machine has no dimensional limit
-
-            -> +10
-
-        Otherwise
-
-            -> -20
+        Vertical lift beyond the machine's limit  -> -15
+        Machine needs a crane, site has none      -> -15
+        Generator-only power, electric machine    -> -10
     """
 
     opening_width = (
@@ -229,11 +247,11 @@ def score_access(
 
     )
 
-    opening_height = (
+    opening_length = (
 
         engineering_inputs.get(
 
-            "opening_height"
+            "opening_length"
 
         )
 
@@ -243,52 +261,38 @@ def score_access(
 
     minimum_width = machine.get(
 
-        "minimum_width",
+        "minimum_width"
 
-        0
+    ) or 0
 
-    )
+    minimum_length = machine.get(
 
-    minimum_height = machine.get(
+        "minimum_height"
 
-        "minimum_height",
-
-        0
-
-    )
+    ) or 0
 
 
     # --------------------------------
     # Base fit score
     # --------------------------------
 
-    if (
-
-        minimum_width == 0
-
-        and
-
-        minimum_height == 0
-
-    ):
+    if minimum_width == 0 and minimum_length == 0:
 
         base_score = 10
 
-    elif (
+    elif opening_width == 0 and opening_length == 0:
 
-        opening_width >= minimum_width
-
-        and
-
-        opening_height >= minimum_height
-
-    ):
-
-        base_score = 20
+        base_score = 10
 
     else:
 
-        base_score = -20
+        # Only dimensions the survey actually recorded are checked.
+
+        width_ok = opening_width == 0 or opening_width >= minimum_width
+
+        length_ok = opening_length == 0 or opening_length >= minimum_length
+
+        base_score = 20 if (width_ok and length_ok) else -20
 
 
     # --------------------------------
@@ -309,14 +313,17 @@ def score_access(
 
 
     # --------------------------------
-    # Crane required, none available
+    # Crane required, none available.
+    # The survey stores crane availability as a boolean (older data and
+    # the wireframe use "No"), so both mean "no crane". A missing
+    # answer (None) is not treated as "no crane".
     # --------------------------------
 
     crane_required = machine.get("crane_required")
 
     crane_available = engineering_inputs.get("crane_available")
 
-    if crane_required == "Yes" and crane_available == "No":
+    if crane_required == "Yes" and crane_available in (False, "No"):
 
         penalty -= 15
 
@@ -406,15 +413,7 @@ def score_material(
     # Survey machine
     # --------------------------------
 
-    if (
-
-        machine["code"]
-
-        ==
-
-        "MATSYA-BATHY"
-
-    ):
+    if is_survey_machine(machine):
 
         if (
 
@@ -513,7 +512,7 @@ def score_job_type(
     # Survey Machine
     # --------------------------------
 
-    if machine["code"] == "MATSYA-BATHY":
+    if is_survey_machine(machine):
 
         if "survey" in job_type:
 
@@ -801,6 +800,13 @@ def score_debris(
         machine.get("debris_tolerance") or ""
 
     ).strip().lower()
+
+    # Tolerance not filled in on the machine: unknown, so neither
+    # rewarded nor penalised. (A real "None" tolerance is a filled-in
+    # value and still ranks 0 below.)
+    if not machine_tolerance:
+
+        return 0
 
     machine_rank = MACHINE_DEBRIS_RANK.get(machine_tolerance, 0)
 
@@ -1309,11 +1315,15 @@ def calculate_duration(
     )
 
 
-    setup_complexity = machine.get(
+    # "or" rather than a .get default: an unfilled Machine Specs field
+    # arrives as None (the key IS present), which the old default never
+    # replaced - a blank setup complexity fell through to the "High"
+    # branch below and added 3 setup days to the plan.
+    setup_complexity = (
 
-        "setup_complexity",
+        machine.get("setup_complexity")
 
-        "Low"
+        or "Low"
 
     )
 
@@ -1377,7 +1387,7 @@ def calculate_duration(
         execution_days = 0
 
 
-    elif machine_code == "MATSYA-BATHY":
+    elif is_survey_machine(machine):
 
         execution_days = 1
 
@@ -1553,7 +1563,7 @@ def determine_approval_gate(
     # INTERNAL NEXT ACTION
     # ====================================
 
-    if machine_code == "MATSYA-BATHY":
+    if is_survey_machine(machine):
 
         internal_next_action = (
 
