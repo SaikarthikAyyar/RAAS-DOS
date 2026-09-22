@@ -8,6 +8,7 @@ from backend.repositories.business_masters_pricing_repository import (
     create_service_configuration,
     update_service_configuration,
     delete_service_configuration,
+    build_service_configuration_dict,
     list_dewatering_methods,
     get_dewatering_method,
     create_dewatering_method,
@@ -57,7 +58,7 @@ def _diff_fields(before_row, payload, field_names):
 # ====================================
 
 def list_service_configurations_request(db):
-    return list_service_configurations(db)
+    return [build_service_configuration_dict(db, row) for row in list_service_configurations(db)]
 
 
 def create_service_configuration_request(db, payload):
@@ -80,7 +81,7 @@ def create_service_configuration_request(db, payload):
         remark=payload.remark
     )
 
-    return row
+    return build_service_configuration_dict(db, row)
 
 
 def update_service_configuration_request(db, config_id, payload):
@@ -110,7 +111,7 @@ def update_service_configuration_request(db, config_id, payload):
             remark=payload.remark
         )
 
-    return row
+    return build_service_configuration_dict(db, row)
 
 
 def delete_service_configuration_request(db, config_id, actor, remark):

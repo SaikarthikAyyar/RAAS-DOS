@@ -10,6 +10,8 @@ from backend.models.business_masters_pricing import (
     CustomerCategory
 )
 
+from backend.models.machines_pumps import Machine
+
 
 # ====================================
 # SERVICE CONFIGURATIONS
@@ -21,6 +23,49 @@ def list_service_configurations(db):
 
 def get_service_configuration(db, config_id):
     return db.query(ServiceConfiguration).filter(ServiceConfiguration.id == config_id).first()
+
+
+# Resolves what falls under a Service Configuration for display purposes
+# only: every Machine whose own service_configuration matches this
+# config's code, plus the union of accessory names those machines carry
+# (matched back to the real Accessory master where a name lines up,
+# falling back to a name-only entry otherwise - same dual-tolerant
+# posture already used by quote_engine.py's accessory-name resolution).
+def build_service_configuration_dict(db, config):
+
+    machines = (
+        db.query(Machine)
+        .filter(Machine.service_configuration == config.code)
+        .order_by(Machine.code)
+        .all()
+    )
+
+    accessory_names = set()
+    for machine in machines:
+        for name in (machine.accessories or []):
+            accessory_names.add(name)
+
+    accessory_by_name = {}
+    if accessory_names:
+        accessory_by_name = {
+            a.name: a
+            for a in db.query(Accessory).filter(Accessory.name.in_(accessory_names)).all()
+        }
+
+    return {
+        "id": config.id,
+        "code": config.code,
+        "name": config.name,
+        "rate_per_day": config.rate_per_day,
+        "machines": [
+            {"id": m.id, "code": m.code, "name": m.name, "active": m.active}
+            for m in machines
+        ],
+        "accessories": [
+            {"id": accessory_by_name[name].id if name in accessory_by_name else None, "name": name}
+            for name in sorted(accessory_names)
+        ]
+    }
 
 
 # actor/remark (Phase 15) ride along on every Business Masters payload

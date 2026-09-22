@@ -29,6 +29,18 @@ class ServiceConfigurationUpdate(BaseModel):
     remark: str
 
 
+class ServiceConfigurationMachineSchema(BaseModel):
+    id: int
+    code: str
+    name: str
+    active: bool
+
+
+class ServiceConfigurationAccessorySchema(BaseModel):
+    id: Optional[int] = None
+    name: str
+
+
 class ServiceConfigurationResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,6 +48,12 @@ class ServiceConfigurationResponse(BaseModel):
     code: str
     name: str
     rate_per_day: float
+
+    # Resolved for display only (Machine.service_configuration == code,
+    # accessories = the union of those machines' own accessory lists) -
+    # not real stored columns on this table.
+    machines: list[ServiceConfigurationMachineSchema] = []
+    accessories: list[ServiceConfigurationAccessorySchema] = []
 
 
 # ====================================

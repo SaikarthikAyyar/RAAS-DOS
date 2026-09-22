@@ -328,6 +328,10 @@ export default function ServiceConfigTab(){
 
                                 <th>Rate per day (₹)</th>
 
+                                <th>Machines</th>
+
+                                <th>Accessories</th>
+
                                 <th></th>
 
                             </tr>
@@ -347,6 +351,22 @@ export default function ServiceConfigTab(){
                                         <td>{c.name}</td>
 
                                         <td>{Number(c.rate_per_day).toLocaleString()}</td>
+
+                                        <td>
+                                            {
+                                                c.machines?.length
+                                                    ? c.machines.map(m=>`${m.code}${m.active ? "" : " (inactive)"}`).join(", ")
+                                                    : "—"
+                                            }
+                                        </td>
+
+                                        <td>
+                                            {
+                                                c.accessories?.length
+                                                    ? c.accessories.map(a=>a.id ? `${a.name} (#${a.id})` : a.name).join(", ")
+                                                    : "—"
+                                            }
+                                        </td>
 
                                         <td>
 
