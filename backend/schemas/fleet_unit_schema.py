@@ -36,13 +36,30 @@ class KitAccessorySchema(BaseModel):
 
 
 # ====================================
-# FLEET UNIT CREATE / UPDATE (33C)
+# MACHINE BUNDLE (Phase 45) - the real machines a fleet unit carries,
+# always shown with their ids and role (PRIMARY does the job, SUPPORT
+# is transport/auxiliary).
+# ====================================
+
+class FleetUnitMachineSchema(BaseModel):
+    id: int
+    machine_code: Optional[str] = None
+    machine_name: Optional[str] = None
+    role: str
+    hub_id: Optional[int] = None
+    hub_name: Optional[str] = None
+    current_site: Optional[str] = None
+
+
+# ====================================
+# FLEET UNIT CREATE / UPDATE (33C, extended 45 for multi-machine)
 # ====================================
 
 class FleetUnitCreate(BaseModel):
     fleet_code: str
     fleet_name: str
-    machine_inventory_id: int
+    machine_ids: list[int]
+    primary_machine_id: int
     hub_id: Optional[int] = None
     active: bool = True
     crew_personnel_ids: list[int] = []
@@ -56,7 +73,8 @@ class FleetUnitCreate(BaseModel):
 class FleetUnitUpdate(BaseModel):
     fleet_code: Optional[str] = None
     fleet_name: Optional[str] = None
-    machine_inventory_id: Optional[int] = None
+    machine_ids: Optional[list[int]] = None
+    primary_machine_id: Optional[int] = None
     hub_id: Optional[int] = None
     active: Optional[bool] = None
     crew_personnel_ids: Optional[list[int]] = None
@@ -79,6 +97,9 @@ class FleetUnitResponse(BaseModel):
     fleet_name: str
     active: bool
 
+    # Describe the PRIMARY machine only - kept for any consumer that
+    # still expects a single machine. "machines" below is the real,
+    # complete bundle and is what every new/updated screen should read.
     machine_inventory_id: int
     machine_code: Optional[str] = None
     machine_name: Optional[str] = None
@@ -88,6 +109,8 @@ class FleetUnitResponse(BaseModel):
 
     current_location: Optional[str] = None
 
+    machines: list[FleetUnitMachineSchema] = []
+
     crew: list[FleetUnitCrewMemberSchema] = []
 
     pumps: list[KitPumpSchema] = []
@@ -95,11 +118,12 @@ class FleetUnitResponse(BaseModel):
 
 
 # ====================================
-# KIT OPTIONS (Phase 44) - what a unit may be given
+# KIT OPTIONS (Phase 44, extended 45) - what a unit may be given,
+# aggregated across every machine it bundles.
 # ====================================
 
 class FleetUnitKitOptionsResponse(BaseModel):
-    machine_type_id: Optional[int] = None
+    machine_type_ids: list[int] = []
     compatible_pumps: list[KitPumpSchema] = []
     accessories: list[KitAccessorySchema] = []
     default_accessory_ids: list[int] = []

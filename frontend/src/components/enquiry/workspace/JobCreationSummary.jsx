@@ -614,6 +614,16 @@ export default function JobCreationSummary({
                                                     <td>{scheduledUnit ? `${scheduledUnit.fleet_code} - ${scheduledUnit.fleet_name}` : schedule.fleet_unit_id}</td>
                                                 </tr>
                                                 <tr>
+                                                    <td>Machines</td>
+                                                    <td>
+                                                        {
+                                                            scheduledUnit?.machines?.length
+                                                                ? scheduledUnit.machines.map(m=>`${m.machine_code} - ${m.machine_name}${m.role==="SUPPORT" ? " (support)" : ""}`).join(", ")
+                                                                : (scheduledUnit?.machine_code ? `${scheduledUnit.machine_code} - ${scheduledUnit.machine_name}` : "-")
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr>
                                                     <td>Crew</td>
                                                     <td>{scheduledUnit?.crew?.length ? scheduledUnit.crew.map(c=>c.full_name).join(", ") : "-"}</td>
                                                 </tr>
@@ -816,6 +826,7 @@ export default function JobCreationSummary({
                                                     {fleetUnits.filter(f=>f.active).map(f=>(
                                                         <option key={f.id} value={f.id}>
                                                             {f.fleet_code} - {f.fleet_name}
+                                                            {f.machines?.length ? ` (${f.machines.map(m=>m.machine_code).join(", ")})` : ""}
                                                         </option>
                                                     ))}
                                                 </select>

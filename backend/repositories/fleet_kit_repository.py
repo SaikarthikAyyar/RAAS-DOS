@@ -2,7 +2,9 @@
 # IMPORTS
 # ====================================
 
-from backend.models.fleet_unit import FleetUnit, FleetUnitPump, FleetUnitAccessory
+from sqlalchemy import case
+
+from backend.models.fleet_unit import FleetUnit, FleetUnitMachine, FleetUnitPump, FleetUnitAccessory
 from backend.models.fleet_schedule import FleetSchedulePump, FleetScheduleAccessory
 from backend.models.machine_inventory import MachineInventory
 from backend.models.machines_pumps import Machine, Pump, MachinePumpCompatibility
@@ -12,13 +14,18 @@ from backend.models.ops_selector import OpsSelection
 
 
 # ====================================
-# FLEET KIT (Phase 44)
-# The compatible pumps and accessories a machine is mobilised with,
+# FLEET KIT (Phase 44) + MULTI-MACHINE (Phase 45)
+# The compatible pumps and accessories a Fleet Unit is mobilised with,
 # stored by id. Two levels - see 061_fleet_kit.sql: the fleet unit's
-# standing kit, and the kit chosen for one specific booking. This
-# module is the only place either is read or written, so
-# fleet_unit_repository and fleet_schedule_repository share it without
-# importing each other.
+# standing kit, and the kit chosen for one specific booking. A Fleet
+# Unit can also bundle several MACHINES together (061_fleet_unit_
+# multi_machine.sql) - some for transport, some for the job itself -
+# so every function here that used to resolve "the machine" now
+# resolves "every machine in the unit" and aggregates across all of
+# them (union of compatible pumps, union of standard accessories).
+# This module is the only place either the kit or the machine
+# membership is read or written, so fleet_unit_repository and
+# fleet_schedule_repository share it without importing each other.
 # ====================================
 
 def pump_dict(pump):
@@ -30,7 +37,55 @@ def accessory_dict(accessory):
 
 
 # ====================================
-# READ
+# MACHINE MEMBERSHIP
+# ====================================
+
+def machine_ids_for_unit(db, fleet_unit_id):
+
+    rows = (
+        db.query(FleetUnitMachine)
+        .filter(FleetUnitMachine.fleet_unit_id == fleet_unit_id)
+        .all()
+    )
+
+    return [r.machine_inventory_id for r in rows]
+
+
+def machine_inventory_rows_for_unit(db, fleet_unit):
+    """Every MachineInventory row bundled onto this Fleet Unit, PRIMARY
+    first. Falls back to the unit's own machine_inventory_id when it
+    has no fleet_unit_machines rows yet (a transient, not-yet-saved
+    FleetUnit built in memory only, e.g. by get_kit_options_for_machine
+    -style call sites) - never returns nothing for a real machine."""
+
+    machine_ids = machine_ids_for_unit(db, fleet_unit.id) if fleet_unit.id else []
+
+    if not machine_ids and fleet_unit.machine_inventory_id:
+        machine_ids = [fleet_unit.machine_inventory_id]
+
+    if not machine_ids:
+        return []
+
+    order_expr = case(
+        (FleetUnitMachine.role == "PRIMARY", 0),
+        else_=1
+    )
+
+    return (
+        db.query(MachineInventory)
+        .outerjoin(
+            FleetUnitMachine,
+            (FleetUnitMachine.machine_inventory_id == MachineInventory.id)
+            & (FleetUnitMachine.fleet_unit_id == fleet_unit.id)
+        )
+        .filter(MachineInventory.id.in_(machine_ids))
+        .order_by(order_expr, MachineInventory.id)
+        .all()
+    )
+
+
+# ====================================
+# READ - kit
 # ====================================
 
 def unit_kit(db, fleet_unit_id):
@@ -83,47 +138,59 @@ def schedule_kit(db, fleet_schedule_id):
 
 # ====================================
 # OPTIONS
-# What a fleet unit may be given. Pumps: only those the machine TYPE
-# is compatible with (Machine Specs -> Compatible pumps). Accessories:
-# the whole Accessories master (an accessory outside the machine's
+# What a Fleet Unit may be given, aggregated across every machine it
+# bundles. Pumps: the union of the pumps each bundled machine TYPE is
+# compatible with (Machine Specs -> Compatible pumps) - a machine with
+# none configured (a plain transport vehicle) simply contributes
+# nothing to the union, it never narrows it. Accessories: the whole
+# Accessories master (an accessory outside any bundled machine's
 # standard set can still be sent along). Defaults: the accessories
 # marked "Needed: Yes" on the job's Deployment Plan when a job_id is
-# given (that's what was quoted), else the machine type's own standard
-# accessory list.
+# given (that's what was quoted), else the union of every bundled
+# machine type's own standard accessory list - each machine's own
+# required set, combined.
 # ====================================
 
-def _machine_type_for_unit(db, fleet_unit):
+def machine_types_for_machine_ids(db, machine_inventory_ids):
 
-    inventory = (
+    if not machine_inventory_ids:
+        return []
+
+    inventory_rows = (
         db.query(MachineInventory)
-        .filter(MachineInventory.id == fleet_unit.machine_inventory_id)
-        .first()
+        .filter(MachineInventory.id.in_(machine_inventory_ids))
+        .all()
     )
 
-    if inventory is None or inventory.machine_type_id is None:
-        return None
+    type_ids = {row.machine_type_id for row in inventory_rows if row.machine_type_id}
 
-    return db.query(Machine).filter(Machine.id == inventory.machine_type_id).first()
+    if not type_ids:
+        return []
+
+    return db.query(Machine).filter(Machine.id.in_(type_ids)).all()
 
 
-def compatible_pumps_for_machine_type(db, machine_type_id):
+def compatible_pumps_for_machine_types(db, machine_type_ids):
 
-    if machine_type_id is None:
+    machine_type_ids = [i for i in (machine_type_ids or []) if i]
+
+    if not machine_type_ids:
         return []
 
     return (
         db.query(Pump)
         .join(MachinePumpCompatibility, MachinePumpCompatibility.pump_id == Pump.id)
         .filter(
-            MachinePumpCompatibility.machine_id == machine_type_id,
+            MachinePumpCompatibility.machine_id.in_(machine_type_ids),
             Pump.active.is_(True)
         )
+        .distinct()
         .order_by(Pump.code)
         .all()
     )
 
 
-def _default_accessory_ids(db, machine_type, job_id):
+def _default_accessory_ids(db, machine_types, job_id):
 
     names = []
 
@@ -144,8 +211,15 @@ def _default_accessory_ids(db, machine_type, job_id):
                 if row.get("needed") == "Yes"
             ]
 
-    if not names and machine_type is not None:
-        names = list(machine_type.accessories or [])
+    if not names:
+
+        seen = set()
+
+        for machine_type in machine_types:
+            for name in (machine_type.accessories or []):
+                if name not in seen:
+                    seen.add(name)
+                    names.append(name)
 
     if not names:
         return []
@@ -155,44 +229,55 @@ def _default_accessory_ids(db, machine_type, job_id):
     return [row.id for row in rows]
 
 
-def kit_options_for_fleet_unit(db, fleet_unit, job_id=None):
+def kit_options_for_machine_ids(db, machine_inventory_ids, job_id=None):
 
-    machine_type = _machine_type_for_unit(db, fleet_unit)
+    machine_types = machine_types_for_machine_ids(db, machine_inventory_ids)
 
-    pumps = compatible_pumps_for_machine_type(db, machine_type.id if machine_type else None)
+    pumps = compatible_pumps_for_machine_types(db, [mt.id for mt in machine_types])
 
     accessories = db.query(Accessory).order_by(Accessory.name).all()
 
     return {
-        "machine_type_id": machine_type.id if machine_type else None,
+        "machine_type_ids": [mt.id for mt in machine_types],
         "compatible_pumps": [pump_dict(p) for p in pumps],
         "accessories": [accessory_dict(a) for a in accessories],
-        "default_accessory_ids": _default_accessory_ids(db, machine_type, job_id),
+        "default_accessory_ids": _default_accessory_ids(db, machine_types, job_id),
     }
+
+
+def kit_options_for_fleet_unit(db, fleet_unit, job_id=None):
+
+    machine_ids = machine_ids_for_unit(db, fleet_unit.id) if fleet_unit.id else []
+
+    if not machine_ids and fleet_unit.machine_inventory_id:
+        machine_ids = [fleet_unit.machine_inventory_id]
+
+    return kit_options_for_machine_ids(db, machine_ids, job_id)
 
 
 # ====================================
 # VALIDATE
-# require_pump: a booking must name at least one pump when the machine
-# has compatible pumps at all (a pump-less machine such as the sonar
-# boat is never blocked). Business Masters edits don't require one.
+# require_pump: a booking must name at least one pump when at least
+# one machine in the bundle has compatible pumps at all (a unit made
+# up entirely of pump-less machines, e.g. the sonar boat, is never
+# blocked).
 # ====================================
 
-def validate_kit(db, fleet_unit, pump_ids, accessory_ids, require_pump=False):
+def validate_kit(db, machine_inventory_ids, pump_ids, accessory_ids, require_pump=False):
 
     pump_ids = list(dict.fromkeys(pump_ids or []))
     accessory_ids = list(dict.fromkeys(accessory_ids or []))
 
-    machine_type = _machine_type_for_unit(db, fleet_unit)
+    machine_types = machine_types_for_machine_ids(db, machine_inventory_ids)
 
-    allowed = {p.id for p in compatible_pumps_for_machine_type(db, machine_type.id if machine_type else None)}
+    allowed = {p.id for p in compatible_pumps_for_machine_types(db, [mt.id for mt in machine_types])}
 
     if pump_ids:
 
-        if machine_type is None:
+        if not machine_types:
             raise ValueError(
-                "This fleet unit's machine has no machine type assigned yet, so "
-                "compatible pumps can't be checked. Set its type in Machine Inventory first."
+                "None of this fleet unit's machines have a machine type assigned yet, "
+                "so compatible pumps can't be checked. Set machine types in Machine Inventory first."
             )
 
         bad = [pid for pid in pump_ids if pid not in allowed]
@@ -200,7 +285,7 @@ def validate_kit(db, fleet_unit, pump_ids, accessory_ids, require_pump=False):
         if bad:
             raise ValueError(
                 "Pump id(s) " + ", ".join(str(b) for b in bad) +
-                " are not compatible with this machine."
+                " are not compatible with any machine in this fleet unit."
             )
 
     elif require_pump and allowed:

@@ -16,7 +16,8 @@ from backend.utils.geocode import reverse_geocode
 from backend.repositories.fleet_kit_repository import (
     validate_kit,
     set_schedule_kit,
-    apply_kit_to_fleet_unit
+    apply_kit_to_fleet_unit,
+    machine_ids_for_unit
 )
 
 
@@ -62,10 +63,14 @@ def book_fleet_unit(
     if job is None:
         raise ValueError("Job not found.")
 
-    machine = (
-        db.query(MachineInventory)
-        .filter(MachineInventory.id == fleet_unit.machine_inventory_id)
-        .first()
+    # Phase 45 - every machine bundled onto this Fleet Unit (some for
+    # the job, some just for transport/support), not just one. Booking
+    # the unit books, and later releases, all of them together.
+    machine_ids = machine_ids_for_unit(db, fleet_unit_id)
+
+    machines = (
+        db.query(MachineInventory).filter(MachineInventory.id.in_(machine_ids)).all()
+        if machine_ids else []
     )
 
     crew = _crew_for_fleet_unit(db, fleet_unit_id)
@@ -89,12 +94,11 @@ def book_fleet_unit(
 
     queue_position = 1 if last_schedule is None else last_schedule.queue_position + 1
 
-    # Phase 44 - the pumps/accessories this job takes along. Validated
-    # before anything is written: pumps must be compatible with the
-    # machine, and at least one is required whenever the machine has
-    # any compatible pump at all.
+    # Phase 44/45 - the pumps/accessories this job takes along, checked
+    # against the whole machine bundle. At least one pump is required
+    # whenever any machine in the bundle has a compatible pump at all.
     pump_ids, accessory_ids = validate_kit(
-        db, fleet_unit, pump_ids, accessory_ids, require_pump=True
+        db, machine_ids, pump_ids, accessory_ids, require_pump=True
     )
 
     schedule = FleetSchedule(
@@ -124,11 +128,14 @@ def book_fleet_unit(
         # dequeue promoting it after the row ahead of it completes.
         # queue_position==1 plus the live MachineInventory/Personnel
         # state below is what actually marks "this is the current job."
+        # Every machine in the bundle moves together - a transport
+        # vehicle is exactly as allocated to this job as the machine
+        # doing the work.
 
-        if machine is not None:
-            machine.status = "ALLOCATED"
-            machine.current_job_id = job.id
-            machine.current_site = site_location
+        for one_machine in machines:
+            one_machine.status = "ALLOCATED"
+            one_machine.current_job_id = job.id
+            one_machine.current_site = site_location
 
         # Real reference chain (Phase 39) - a Personnel row's
         # current_invoice_id was declared on the model but never
@@ -145,8 +152,9 @@ def book_fleet_unit(
     db.commit()
     db.refresh(schedule)
 
-    if machine is not None:
-        machine.queue_count = (
+    if machines:
+
+        count = (
             db.query(FleetSchedule)
             .filter(
                 FleetSchedule.fleet_unit_id == fleet_unit_id,
@@ -154,6 +162,10 @@ def book_fleet_unit(
             )
             .count()
         )
+
+        for one_machine in machines:
+            one_machine.queue_count = count
+
         db.commit()
 
     return schedule
@@ -256,10 +268,10 @@ def update_schedule_kit(db, schedule_id, pump_ids, accessory_ids):
     if schedule.schedule_status not in ("QUEUED", "ACTIVE"):
         raise ValueError("Only a queued or active booking's kit can be edited.")
 
-    fleet_unit = db.query(FleetUnit).filter(FleetUnit.id == schedule.fleet_unit_id).first()
+    machine_ids = machine_ids_for_unit(db, schedule.fleet_unit_id)
 
     pump_ids, accessory_ids = validate_kit(
-        db, fleet_unit, pump_ids, accessory_ids, require_pump=True
+        db, machine_ids, pump_ids, accessory_ids, require_pump=True
     )
 
     set_schedule_kit(db, schedule.id, pump_ids, accessory_ids)
@@ -308,15 +320,10 @@ def cancel_fleet_schedule(db, schedule_id):
         if row.queue_position != index:
             row.queue_position = index
 
-    fleet_unit = db.query(FleetUnit).filter(FleetUnit.id == fleet_unit_id).first()
+    machine_ids = machine_ids_for_unit(db, fleet_unit_id)
 
-    if fleet_unit is not None:
-        machine = (
-            db.query(MachineInventory)
-            .filter(MachineInventory.id == fleet_unit.machine_inventory_id)
-            .first()
-        )
-        if machine is not None:
+    if machine_ids:
+        for machine in db.query(MachineInventory).filter(MachineInventory.id.in_(machine_ids)).all():
             machine.queue_count = len(remaining)
 
     db.commit()
@@ -357,11 +364,16 @@ def dequeue_fleet_schedules(db, execution):
         if fleet_unit is None:
             continue
 
-        machine = (
+        # Phase 45 - every machine bundled onto this Fleet Unit moves
+        # and releases together, not just one.
+        machine_ids = machine_ids_for_unit(db, fleet_unit_id)
+
+        machines = (
             db.query(MachineInventory)
-            .filter(MachineInventory.id == fleet_unit.machine_inventory_id)
+            .filter(MachineInventory.id.in_(machine_ids))
             .with_for_update()
-            .first()
+            .all()
+            if machine_ids else []
         )
 
         crew = _crew_for_fleet_unit(db, fleet_unit_id)
@@ -408,10 +420,10 @@ def dequeue_fleet_schedules(db, execution):
                 db, fleet_unit_id, next_schedule.id, only_if_present=True
             )
 
-            if machine is not None:
-                machine.status = "ALLOCATED"
-                machine.current_job_id = next_schedule.job_creation_id
-                machine.current_site = next_schedule.site_location
+            for one_machine in machines:
+                one_machine.status = "ALLOCATED"
+                one_machine.current_job_id = next_schedule.job_creation_id
+                one_machine.current_site = next_schedule.site_location
 
             promoted_invoice = db.query(Invoice).filter(
                 Invoice.job_creation_id == next_schedule.job_creation_id
@@ -425,9 +437,10 @@ def dequeue_fleet_schedules(db, execution):
 
         else:
 
-            if machine is not None:
-                machine.status = "AVAILABLE"
-                machine.current_job_id = None
+            for one_machine in machines:
+
+                one_machine.status = "AVAILABLE"
+                one_machine.current_job_id = None
 
                 # Genuinely idle - no next job to name a site after.
                 # Rather than clearing this to a blank/None (a real
@@ -437,19 +450,19 @@ def dequeue_fleet_schedules(db, execution):
                 # complete_execution_phase right before this call, to
                 # the execution's real source point) - same mechanism
                 # already used for the "in transit" position labels.
-                if machine.current_latitude is not None and machine.current_longitude is not None:
-                    place_name = reverse_geocode(machine.current_latitude, machine.current_longitude)
-                    machine.current_site = f"Available - {place_name}" if place_name else None
+                if one_machine.current_latitude is not None and one_machine.current_longitude is not None:
+                    place_name = reverse_geocode(one_machine.current_latitude, one_machine.current_longitude)
+                    one_machine.current_site = f"Available - {place_name}" if place_name else None
                 else:
-                    machine.current_site = None
+                    one_machine.current_site = None
 
             for person in crew:
                 person.availability_status = "AVAILABLE"
                 person.current_job_id = None
                 person.current_invoice_id = None
 
-        if machine is not None:
-            machine.queue_count = len(remaining)
+        for one_machine in machines:
+            one_machine.queue_count = len(remaining)
 
     db.commit()
 

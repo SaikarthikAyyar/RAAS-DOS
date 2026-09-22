@@ -2,7 +2,7 @@
 # IMPORTS
 # ====================================
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from backend.database.connection import get_db
@@ -24,7 +24,7 @@ from backend.services.fleet_unit_service import (
     delete_fleet_unit_request,
     list_all_machines_request,
     get_kit_options_request,
-    get_kit_options_for_machine_request
+    get_kit_options_for_machines_request
 )
 
 
@@ -42,8 +42,12 @@ def list_available_machines(db: Session = Depends(get_db)):
 
 
 @api.get("/fleet-units/support/kit-options", response_model=FleetUnitKitOptionsResponse)
-def get_kit_options_for_machine(machine_inventory_id: int, db: Session = Depends(get_db)):
-    return get_kit_options_for_machine_request(db, machine_inventory_id)
+def get_kit_options_for_machines(
+    machine_inventory_ids: list[int] = Query(...),
+    job_id: int | None = None,
+    db: Session = Depends(get_db)
+):
+    return get_kit_options_for_machines_request(db, machine_inventory_ids, job_id)
 
 
 @api.get("/fleet-units/{fleet_unit_id}/kit-options", response_model=FleetUnitKitOptionsResponse)

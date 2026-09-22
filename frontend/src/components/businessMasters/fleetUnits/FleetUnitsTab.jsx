@@ -6,7 +6,7 @@ import {
     createFleetUnit,
     updateFleetUnit,
     deleteFleetUnit,
-    getKitOptionsForMachine
+    getKitOptionsForMachines
 } from "../../../services/fleetUnitsService";
 
 import KitPicker from "../../shared/KitPicker";
@@ -75,6 +75,87 @@ function CrewCheckboxList({ options, selected, onChange }){
 
 
 // ====================================
+// MACHINE BUNDLE MULTI-SELECT (Phase 45)
+// A fleet unit can carry several machines together (e.g. a transport
+// vehicle alongside the actual job machine) - checking a machine adds
+// it to the bundle, the radio picks which one is PRIMARY (the machine
+// actually doing the job; the rest are SUPPORT).
+// ====================================
+
+function MachineBundlePicker({ machines, selectedIds, primaryId, onChange, onPrimaryChange }){
+
+    function toggle(id){
+
+        if(selectedIds.includes(id)){
+
+            const next = selectedIds.filter(v=>v!==id);
+            onChange(next);
+
+            // Losing the current primary - promote the first remaining one.
+            if(String(primaryId)===String(id)){
+                onPrimaryChange(next[0] || "");
+            }
+
+        }
+        else{
+
+            const next = [...selectedIds, id];
+            onChange(next);
+
+            if(!primaryId){
+                onPrimaryChange(id);
+            }
+
+        }
+
+    }
+
+    return(
+
+        <div className="bm-checkbox-list">
+
+            {
+                machines.length===0 ? (
+                    <span className="bm-muted">No machines available yet.</span>
+                ) : machines.map(m=>(
+
+                    <label key={m.id} style={{display:"flex", alignItems:"center", gap:8}}>
+
+                        <input
+                            type="checkbox"
+                            checked={selectedIds.includes(m.id)}
+                            onChange={()=>toggle(m.id)}
+                        />
+
+                        {m.machine_code} - {m.machine_name}
+
+                        {
+                            selectedIds.includes(m.id) && (
+                                <label style={{marginLeft:8, fontWeight:400}}>
+                                    <input
+                                        type="radio"
+                                        name="primary-machine"
+                                        checked={String(primaryId)===String(m.id)}
+                                        onChange={()=>onPrimaryChange(m.id)}
+                                    />
+                                    {" "}Primary
+                                </label>
+                            )
+                        }
+
+                    </label>
+
+                ))
+            }
+
+        </div>
+
+    );
+
+}
+
+
+// ====================================
 // ADD / EDIT MODAL
 // ====================================
 
@@ -82,13 +163,22 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
 
     const [fleetCode, setFleetCode] = useState(editing?.fleet_code || "");
     const [fleetName, setFleetName] = useState(editing?.fleet_name || "");
-    const [machineId, setMachineId] = useState(editing?.machine_inventory_id || "");
+
+    const [machineIds, setMachineIds] = useState(editing?.machines?.map(m=>m.id) || []);
+    const [primaryMachineId, setPrimaryMachineId] = useState(
+        editing?.machines?.find(m=>m.role==="PRIMARY")?.id
+            || editing?.machines?.[0]?.id
+            || editing?.machine_inventory_id
+            || ""
+    );
+
     const [active, setActive] = useState(editing ? editing.active : true);
     const [crewIds, setCrewIds] = useState(editing?.crew?.map(c=>c.id) || []);
 
-    // Pumps + accessories this unit is mobilised with (Phase 44). Pump
-    // choices depend on the picked machine's type, so options are
-    // re-fetched whenever the machine changes.
+    // Pumps + accessories this unit is mobilised with (Phase 44),
+    // aggregated across every machine in the bundle (Phase 45). Pump
+    // choices depend on the picked machines' types, so options are
+    // re-fetched whenever the bundle changes.
     const [kitOptions, setKitOptions] = useState(null);
     const [pumpIds, setPumpIds] = useState(editing?.pumps?.map(p=>p.id) || []);
     const [accessoryIds, setAccessoryIds] = useState(editing?.accessories?.map(a=>a.id) || []);
@@ -96,35 +186,37 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
-    // Hub isn't collected here at all - it's always the assigned
+    // Hub isn't collected here at all - it's always the PRIMARY
     // machine's own Machine Inventory home hub (resolved server-side,
     // shown read-only in the table below), not a separately-settable
-    // Fleet Unit field. Re-assign the machine here, or change that
-    // machine's own hub via the Machine Inventory tab, to change it.
-    const selectedMachine = machines.find(m=>String(m.id)===String(machineId));
+    // Fleet Unit field. Re-assign the primary machine here, or change
+    // that machine's own hub via the Machine Inventory tab, to change it.
+    const primaryMachine = machines.find(m=>String(m.id)===String(primaryMachineId));
+
+    const machineIdsKey = [...machineIds].sort((a,b)=>a-b).join(",");
 
     useEffect(()=>{
 
-        if(!machineId){
+        if(machineIds.length===0){
             setKitOptions(null);
             return;
         }
 
         let cancelled = false;
 
-        getKitOptionsForMachine(machineId)
+        getKitOptionsForMachines(machineIds)
             .then(options=>{
 
                 if(cancelled) return;
 
                 setKitOptions(options);
 
-                // A swapped machine may not accept the pumps already
+                // A swapped bundle may not accept the pumps already
                 // ticked - drop any that no longer fit.
                 const allowed = new Set(options.compatible_pumps.map(p=>p.id));
                 setPumpIds(prev=>prev.filter(id=>allowed.has(id)));
 
-                // A brand-new unit starts from the machine's standard
+                // A brand-new unit starts from the bundle's standard
                 // accessory set; an existing one keeps what it has.
                 if(!editing){
                     setAccessoryIds(options.default_accessory_ids || []);
@@ -138,7 +230,7 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
 
         return ()=>{ cancelled = true; };
 
-    }, [machineId]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [machineIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
     async function handleSubmit(){
 
@@ -147,8 +239,13 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
             return;
         }
 
-        if(!machineId){
-            setError("Pick a machine for this fleet unit.");
+        if(machineIds.length===0){
+            setError("Pick at least one machine for this fleet unit.");
+            return;
+        }
+
+        if(!primaryMachineId){
+            setError("Mark one machine as Primary.");
             return;
         }
 
@@ -160,7 +257,8 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
             await onSave({
                 fleet_code: fleetCode.trim(),
                 fleet_name: fleetName.trim(),
-                machine_inventory_id: Number(machineId),
+                machine_ids: machineIds.map(Number),
+                primary_machine_id: Number(primaryMachineId),
                 active,
                 crew_personnel_ids: crewIds,
                 pump_ids: pumpIds,
@@ -207,22 +305,21 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
                         />
                     </div>
 
-                    <div>
-                        <label>Machine</label>
-                        <select value={machineId} onChange={e=>setMachineId(e.target.value)}>
-                            <option value="">— Select a machine —</option>
-                            {machines.map(m=>(
-                                <option key={m.id} value={m.id}>
-                                    {m.machine_code} - {m.machine_name}
-                                </option>
-                            ))}
-                        </select>
+                    <div style={{gridColumn:"1 / -1"}}>
+                        <label>Machines (this unit's bundle - transport + job machines travel together)</label>
+                        <MachineBundlePicker
+                            machines={machines}
+                            selectedIds={machineIds}
+                            primaryId={primaryMachineId}
+                            onChange={setMachineIds}
+                            onPrimaryChange={setPrimaryMachineId}
+                        />
                     </div>
 
                     <div>
                         <label>Home hub</label>
                         <p className="bm-muted" style={{margin:"4px 0 0"}}>
-                            {selectedMachine ? (selectedMachine.hub_name || "No hub set on this machine yet") : "Pick a machine first"}
+                            {primaryMachine ? (primaryMachine.hub_name || "No hub set on this machine yet") : "Pick a primary machine first"}
                             {" — "}set via Machine Inventory, not here.
                         </p>
                     </div>
@@ -249,7 +346,7 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
 
                     <div style={{gridColumn:"1 / -1"}}>
                         {
-                            machineId ? (
+                            machineIds.length>0 ? (
                                 <KitPicker
                                     options={kitOptions}
                                     pumpIds={pumpIds}
@@ -258,7 +355,7 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
                                     onAccessoryIds={setAccessoryIds}
                                 />
                             ) : (
-                                <p className="bm-muted">Pick a machine to choose the pumps and accessories it is mobilised with.</p>
+                                <p className="bm-muted">Pick at least one machine to choose the pumps and accessories it is mobilised with.</p>
                             )
                         }
                         <p className="bm-muted" style={{marginTop:6}}>
@@ -419,7 +516,7 @@ export default function FleetUnitsTab(){
                             <tr>
                                 <th>Code</th>
                                 <th>Name</th>
-                                <th>Machine</th>
+                                <th>Machines</th>
                                 <th>Hub</th>
                                 <th>Current Location</th>
                                 <th>Crew</th>
@@ -437,7 +534,13 @@ export default function FleetUnitsTab(){
                                 <tr key={f.id}>
                                     <td>{f.fleet_code}</td>
                                     <td>{f.fleet_name}</td>
-                                    <td>{f.machine_code ? `${f.machine_code} - ${f.machine_name}` : "—"}</td>
+                                    <td>
+                                        {
+                                            f.machines?.length
+                                                ? f.machines.map(m=>`${m.machine_code}${m.role==="SUPPORT" ? " (support)" : ""}`).join(", ")
+                                                : (f.machine_code ? `${f.machine_code} - ${f.machine_name}` : "—")
+                                        }
+                                    </td>
                                     <td>{f.hub_name || "—"}</td>
                                     <td>{f.current_location || "—"}</td>
                                     <td>{f.crew?.length ? f.crew.map(c=>c.full_name).join(", ") : "—"}</td>

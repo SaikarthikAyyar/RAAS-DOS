@@ -323,12 +323,17 @@ export async function updateScheduleKit(scheduleId, payload){
 }
 
 
-// Same options, keyed by machine - for the Fleet Units modal, which
-// needs them before the unit exists / when the machine dropdown changes.
-export async function getKitOptionsForMachine(machineInventoryId){
+// Same options, aggregated across a bundle of machines (Phase 45) - for
+// the Fleet Units modal, which needs them before the unit exists / when
+// the machine multi-select changes. machineInventoryIds is an array.
+export async function getKitOptionsForMachines(machineInventoryIds, jobId){
+
+    const params = new URLSearchParams();
+    (machineInventoryIds || []).forEach(id => params.append("machine_inventory_ids", id));
+    if(jobId) params.append("job_id", jobId);
 
     const response = await fetch(
-        `${API}/fleet-units/support/kit-options?machine_inventory_id=${machineInventoryId}`
+        `${API}/fleet-units/support/kit-options?${params.toString()}`
     );
 
     const data = await response.json();

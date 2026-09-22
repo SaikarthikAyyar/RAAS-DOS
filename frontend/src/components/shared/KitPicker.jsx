@@ -72,7 +72,7 @@ export default function KitPicker({
         return <p className="bm-muted">Loading pumps and accessories...</p>;
     }
 
-    const noType = options.machine_type_id === null;
+    const noType = !options.machine_type_ids || options.machine_type_ids.length === 0;
 
     return(
 

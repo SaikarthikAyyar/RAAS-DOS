@@ -49,6 +49,40 @@ class FleetUnit(Base):
 
 
 # ====================================
+# FLEET UNIT MACHINES (Phase 45)
+# A Fleet Unit's real, current machine membership - one or more
+# machine_inventory rows, exactly one marked PRIMARY. Booking a Fleet
+# Unit books, moves and releases every one of these together (see
+# fleet_schedule_repository.py). fleet_units.machine_inventory_id
+# (kept, NOT NULL) always mirrors the PRIMARY row here.
+# ====================================
+
+class FleetUnitMachine(Base):
+
+    __tablename__ = "fleet_unit_machines"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    fleet_unit_id = Column(
+        Integer,
+        ForeignKey("fleet_units.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    machine_inventory_id = Column(
+        Integer,
+        ForeignKey("machine_inventory.id"),
+        nullable=False
+    )
+
+    role = Column(String(20), nullable=False, default="PRIMARY")
+
+    __table_args__ = (
+        UniqueConstraint("fleet_unit_id", "machine_inventory_id", name="uq_fleet_unit_machine"),
+    )
+
+
+# ====================================
 # FLEET UNIT PERSONNEL
 # The nominal crew bundled onto a Fleet Unit - booking the unit books
 # every one of these people together (Phase 33 design decision).

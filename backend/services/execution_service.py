@@ -51,6 +51,8 @@ from backend.models.fleet_unit import FleetUnit
 
 from backend.repositories.fleet_schedule_repository import dequeue_fleet_schedules
 
+from backend.repositories.fleet_kit_repository import machine_inventory_rows_for_unit
+
 from backend.utils.geo import haversine_km
 
 from backend.utils.geocode import reverse_geocode, forward_geocode, extract_hub_city
@@ -75,7 +77,14 @@ from backend.utils.enquiry_resolution import resolve_enquiry_by_job_creation_id
 # dequeue_execution_schedules/dequeue_fleet_schedules already use.
 # ====================================
 
-def _resolve_execution_machine(db, job_creation_id):
+def _resolve_execution_machines(db, job_creation_id):
+
+    # A Fleet Unit can bundle several machines together (Phase 45 -
+    # e.g. a transport vehicle alongside the actual job machine), all
+    # booked and moved as one - every one of them needs its position/
+    # deployment history kept in sync as the job progresses, not just
+    # a single "the machine". Returned PRIMARY-first so any caller that
+    # only wants one (a prefill) can just take the first entry.
 
     fleet_schedule = (
         db.query(FleetSchedule)
@@ -92,16 +101,12 @@ def _resolve_execution_machine(db, job_creation_id):
             .first()
         )
 
-        if fleet_unit and fleet_unit.machine_inventory_id:
+        if fleet_unit:
 
-            machine = (
-                db.query(MachineInventory)
-                .filter(MachineInventory.id == fleet_unit.machine_inventory_id)
-                .first()
-            )
+            machines = machine_inventory_rows_for_unit(db, fleet_unit)
 
-            if machine:
-                return machine
+            if machines:
+                return machines
 
     machine_schedule = (
         db.query(MachineSchedule)
@@ -112,13 +117,22 @@ def _resolve_execution_machine(db, job_creation_id):
 
     if machine_schedule:
 
-        return (
+        machine = (
             db.query(MachineInventory)
             .filter(MachineInventory.id == machine_schedule.machine_id)
             .first()
         )
 
-    return None
+        return [machine] if machine else []
+
+    return []
+
+
+def _resolve_primary_execution_machine(db, job_creation_id):
+
+    machines = _resolve_execution_machines(db, job_creation_id)
+
+    return machines[0] if machines else None
 
 
 # ====================================
@@ -420,7 +434,7 @@ def create_execution_request(
     # own flagged scope gap).
     # ====================================
 
-    machine = _resolve_execution_machine(db, job.id)
+    machine = _resolve_primary_execution_machine(db, job.id)
 
     if machine and machine.current_latitude is not None and machine.current_longitude is not None:
 
@@ -1012,7 +1026,7 @@ def _fill_missing_route_coordinates(
 
     if execution.source_latitude is None or execution.source_longitude is None:
 
-        machine = _resolve_execution_machine(db, execution.job_creation_id)
+        machine = _resolve_primary_execution_machine(db, execution.job_creation_id)
 
         if machine and machine.current_latitude is not None and machine.current_longitude is not None:
 
@@ -1348,14 +1362,11 @@ def update_execution_progress(
         and execution.longitude is not None
     ):
 
-        transit_machine = _resolve_execution_machine(
+        transit_machines = _resolve_execution_machines(
             db, execution.job_creation_id
         )
 
-        if transit_machine:
-
-            transit_machine.current_latitude = execution.latitude
-            transit_machine.current_longitude = execution.longitude
+        if transit_machines:
 
             direction = (
                 "to" if execution.current_phase == "PHASE_1" else "from"
@@ -1369,10 +1380,15 @@ def update_execution_progress(
                 else f"{execution.latitude}, {execution.longitude}"
             )
 
-            transit_machine.current_site = (
-                f"In transit {direction} {execution.site_location} "
-                f"- near {location_text}"
-            )
+            for transit_machine in transit_machines:
+
+                transit_machine.current_latitude = execution.latitude
+                transit_machine.current_longitude = execution.longitude
+
+                transit_machine.current_site = (
+                    f"In transit {direction} {execution.site_location} "
+                    f"- near {location_text}"
+                )
 
     # ====================================
     # AUTO PROGRESS CALCULATION
@@ -1635,7 +1651,7 @@ def start_execution_phase(
     # dequeue.
     # ====================================
 
-    route_machine = _resolve_execution_machine(db, execution.job_creation_id)
+    route_machines = _resolve_execution_machines(db, execution.job_creation_id)
 
     phase_start_time = datetime.utcnow()
 
@@ -1676,7 +1692,7 @@ def start_execution_phase(
         else:
             execution.phase_3_started_at = phase_start_time
 
-        if route_machine:
+        if route_machines:
 
             segment_type = "MOBILISATION_TRANSIT" if execution.current_phase == "PHASE_1" else "DEMOBILISATION_TRANSIT"
             transit_start_lat = execution.source_latitude if execution.current_phase == "PHASE_1" else execution.destination_latitude
@@ -1684,27 +1700,31 @@ def start_execution_phase(
             transit_end_lat = execution.destination_latitude if execution.current_phase == "PHASE_1" else execution.source_latitude
             transit_end_lng = execution.destination_longitude if execution.current_phase == "PHASE_1" else execution.source_longitude
 
-            open_deployment_segment(
-                db,
-                route_machine.id,
-                execution,
-                segment_type,
-                transit_start_lat,
-                transit_start_lng,
-                transit_end_lat,
-                transit_end_lng,
-                when=phase_start_time
-            )
+            for route_machine in route_machines:
+
+                open_deployment_segment(
+                    db,
+                    route_machine.id,
+                    execution,
+                    segment_type,
+                    transit_start_lat,
+                    transit_start_lng,
+                    transit_end_lat,
+                    transit_end_lng,
+                    when=phase_start_time
+                )
 
     elif execution.current_phase == "PHASE_2":
 
         execution.phase_2_started_at = phase_start_time
 
-        if route_machine and execution.destination_latitude is not None:
+        if route_machines and execution.destination_latitude is not None:
 
-            route_machine.current_latitude = execution.destination_latitude
-            route_machine.current_longitude = execution.destination_longitude
-            route_machine.current_site = execution.site_location
+            for route_machine in route_machines:
+
+                route_machine.current_latitude = execution.destination_latitude
+                route_machine.current_longitude = execution.destination_longitude
+                route_machine.current_site = execution.site_location
 
     # ====================================
     # START MACHINE SCHEDULE
@@ -1983,9 +2003,9 @@ def complete_execution_phase(
 
         if phase_just_completed == "PHASE_1":
 
-            arrival_machine = _resolve_execution_machine(db, execution.job_creation_id)
+            arrival_machines = _resolve_execution_machines(db, execution.job_creation_id)
 
-            if arrival_machine:
+            for arrival_machine in arrival_machines:
 
                 open_deployment_segment(
                     db,
@@ -2031,7 +2051,7 @@ def complete_execution_phase(
     # throughout dequeue_fleet_schedules.
     # ====================================
 
-    return_machine = _resolve_execution_machine(db, execution.job_creation_id)
+    return_machines = _resolve_execution_machines(db, execution.job_creation_id)
 
     # ====================================
     # DEPLOYMENT SEGMENT - RETURNED TO SOURCE (Phase 39)
@@ -2044,7 +2064,7 @@ def complete_execution_phase(
     # no special-casing "will a promotion happen" here.
     # ====================================
 
-    if return_machine:
+    for return_machine in return_machines:
 
         open_deployment_segment(
             db,
@@ -2072,10 +2092,12 @@ def complete_execution_phase(
         completed_invoice.collection_status = "Collected"
         completed_invoice.collected_date = date.today()
 
-    if return_machine and execution.source_latitude is not None:
+    if execution.source_latitude is not None:
 
-        return_machine.current_latitude = execution.source_latitude
-        return_machine.current_longitude = execution.source_longitude
+        for return_machine in return_machines:
+            return_machine.current_latitude = execution.source_latitude
+            return_machine.current_longitude = execution.source_longitude
+
         db.commit()
 
     affected_schedules = dequeue_execution_schedules(db, execution)

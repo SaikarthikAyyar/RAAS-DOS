@@ -215,6 +215,10 @@ def _forecast_data(db, weeks=13):
 
     for unit in units:
 
+        # A Fleet Unit can bundle several machines (Phase 45); the
+        # forecast/category grouping stays keyed off the PRIMARY one
+        # (the machine actually doing the job) - unit.machine_inventory_id
+        # always mirrors it, kept in sync on every save.
         machine_row = machine_inventory_by_id.get(unit.machine_inventory_id)
         category = _category_for_fleet_unit(db, unit, machine_row, machine_spec_by_code, machine_types_by_id)
 

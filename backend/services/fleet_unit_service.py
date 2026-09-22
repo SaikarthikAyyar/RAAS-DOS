@@ -12,7 +12,7 @@ from backend.repositories.fleet_unit_repository import (
     list_all_machines
 )
 
-from backend.repositories.fleet_kit_repository import kit_options_for_fleet_unit
+from backend.repositories.fleet_kit_repository import kit_options_for_fleet_unit, kit_options_for_machine_ids
 
 from backend.repositories.notification_repository import record_business_master_change
 
@@ -29,17 +29,12 @@ def list_fleet_units_request(db):
     return [build_fleet_unit_dict(db, u) for u in units]
 
 
-def get_kit_options_for_machine_request(db, machine_inventory_id):
+def get_kit_options_for_machines_request(db, machine_inventory_ids, job_id=None):
 
-    # Used by the Fleet Units modal, which needs the options for a
-    # machine BEFORE the unit exists (or when the machine dropdown
-    # changes). A transient, never-saved FleetUnit carries just the
-    # machine id - kit_options_for_fleet_unit only reads that.
-    from backend.models.fleet_unit import FleetUnit
-
-    return kit_options_for_fleet_unit(
-        db, FleetUnit(machine_inventory_id=machine_inventory_id)
-    )
+    # Used by the Fleet Units modal, which needs the aggregated options
+    # for a set of machines BEFORE the unit exists (or whenever the
+    # machine multi-select changes).
+    return kit_options_for_machine_ids(db, machine_inventory_ids, job_id)
 
 
 def get_kit_options_request(db, fleet_unit_id, job_id=None):
@@ -102,6 +97,19 @@ def _kit_label(items, pump=False):
 
 
 # ====================================
+# MACHINE BUNDLE LABEL (Phase 45) - "VARAHA-SCH-300-M1 (#12, PRIMARY),
+# TRK-004 (#31, SUPPORT)", so a change record names every machine in
+# the unit, its id and its role.
+# ====================================
+
+def _machines_label(machines):
+
+    return ", ".join(
+        f"{m['machine_code']} (#{m['id']}, {m['role']})" for m in machines
+    )
+
+
+# ====================================
 # CREATE / UPDATE / DELETE (33C)
 # ====================================
 
@@ -113,7 +121,7 @@ def create_fleet_unit_request(db, payload):
     changes = [
         {"field": "fleet_code", "before": None, "after": row.fleet_code},
         {"field": "fleet_name", "before": None, "after": row.fleet_name},
-        {"field": "machine", "before": None, "after": unit_dict["machine_code"]},
+        {"field": "machines", "before": None, "after": _machines_label(unit_dict["machines"])},
         {"field": "hub", "before": None, "after": unit_dict["hub_name"]}
     ]
 
@@ -166,16 +174,14 @@ def update_fleet_unit_request(db, fleet_unit_id, payload):
         if old_value != new_value:
             changes.append({"field": field, "before": old_value, "after": new_value})
 
-    machine_changed = (
-        "machine_inventory_id" in payload.model_fields_set
-        and payload.machine_inventory_id != before.machine_inventory_id
-    )
-
     row = update_fleet_unit(db, fleet_unit_id, payload)
     after_dict = build_fleet_unit_dict(db, row)
 
-    if machine_changed:
-        changes.append({"field": "machine", "before": before_dict["machine_code"], "after": after_dict["machine_code"]})
+    before_machines = _machines_label(before_dict["machines"])
+    after_machines = _machines_label(after_dict["machines"])
+
+    if before_machines != after_machines:
+        changes.append({"field": "machines", "before": before_machines or None, "after": after_machines or None})
 
     # Hub is derived from the assigned machine now (build_fleet_unit_dict),
     # not an independently-settable field - diff the resolved name
