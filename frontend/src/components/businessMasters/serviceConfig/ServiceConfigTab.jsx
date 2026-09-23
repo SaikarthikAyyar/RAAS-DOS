@@ -9,6 +9,9 @@ import {
 
 } from "../../../services/serviceConfigService";
 
+import { getMachines } from "../../../services/machinesService";
+import { getAccessories } from "../../../services/accessoriesService";
+
 import { useAuth } from "../../../contexts/AuthContext";
 
 import { useRemarkPrompt } from "../../../hooks/useRemarkPrompt";
@@ -19,16 +22,69 @@ import { formatApiError } from "../../../utils/apiError";
 
 
 // ====================================
+// SIMPLE CHECKBOX LIST
+// Shared shape for the two multi-selects below - same convention
+// already used for Fleet Unit crew/machine-bundle pickers.
+// ====================================
+
+function CheckboxList({ options, selected, onChange, emptyText, format }){
+
+    function toggle(id){
+
+        if(selected.includes(id)){
+            onChange(selected.filter(v=>v!==id));
+        }
+        else{
+            onChange([...selected, id]);
+        }
+
+    }
+
+    return(
+
+        <div className="bm-checkbox-list">
+
+            {
+                options.length===0 ? (
+                    <span className="bm-muted">{emptyText}</span>
+                ) : options.map(opt=>(
+
+                    <label key={opt.id}>
+
+                        <input
+                            type="checkbox"
+                            checked={selected.includes(opt.id)}
+                            onChange={()=>toggle(opt.id)}
+                        />
+
+                        {format(opt)}
+
+                    </label>
+
+                ))
+            }
+
+        </div>
+
+    );
+
+}
+
+
+// ====================================
 // ADD / EDIT MODAL
 // ====================================
 
-function ServiceConfigModal({ editing, onClose, onSave }){
+function ServiceConfigModal({ editing, machines, accessories, onClose, onSave }){
 
     const [code, setCode] = useState(editing?.code || "");
 
     const [name, setName] = useState(editing?.name || "");
 
     const [ratePerDay, setRatePerDay] = useState(editing?.rate_per_day ?? "");
+
+    const [machineIds, setMachineIds] = useState(editing?.machines?.map(m=>m.id) || []);
+    const [accessoryIds, setAccessoryIds] = useState(editing?.accessories?.map(a=>a.id) || []);
 
     const [saving, setSaving] = useState(false);
 
@@ -54,7 +110,9 @@ function ServiceConfigModal({ editing, onClose, onSave }){
 
                 code: code.trim(),
                 name: name.trim(),
-                rate_per_day: Number(ratePerDay)
+                rate_per_day: Number(ratePerDay),
+                machine_ids: machineIds,
+                accessory_ids: accessoryIds
 
             });
 
@@ -132,6 +190,28 @@ function ServiceConfigModal({ editing, onClose, onSave }){
 
                     </div>
 
+                    <div style={{gridColumn:"1 / -1"}}>
+                        <label>Machines under this configuration</label>
+                        <CheckboxList
+                            options={machines}
+                            selected={machineIds}
+                            onChange={setMachineIds}
+                            emptyText="No machines in Machine Specs yet."
+                            format={m=>`${m.code} - ${m.name}${m.active ? "" : " (inactive)"}`}
+                        />
+                    </div>
+
+                    <div style={{gridColumn:"1 / -1"}}>
+                        <label>Accessories under this configuration</label>
+                        <CheckboxList
+                            options={accessories}
+                            selected={accessoryIds}
+                            onChange={setAccessoryIds}
+                            emptyText="No accessories in the Accessories master yet."
+                            format={a=>a.name}
+                        />
+                    </div>
+
                 </div>
 
                 <div className="bm-modal-actions">
@@ -170,6 +250,8 @@ function ServiceConfigModal({ editing, onClose, onSave }){
 export default function ServiceConfigTab(){
 
     const [configs, setConfigs] = useState([]);
+    const [machines, setMachines] = useState([]);
+    const [accessories, setAccessories] = useState([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -215,6 +297,13 @@ export default function ServiceConfigTab(){
 
     useEffect(()=>{ load(); }, [load]);
 
+    useEffect(()=>{
+
+        getMachines().then(setMachines).catch(err=>console.error(err));
+        getAccessories().then(setAccessories).catch(err=>console.error(err));
+
+    }, []);
+
     async function handleSave(payload){
 
         const remark = await promptForRemark(editing ? "Updating this service configuration" : "Creating this service configuration");
@@ -229,6 +318,8 @@ export default function ServiceConfigTab(){
 
                 name: payload.name,
                 rate_per_day: payload.rate_per_day,
+                machine_ids: payload.machine_ids,
+                accessory_ids: payload.accessory_ids,
                 actor: buildActor(user),
                 remark
 
@@ -355,7 +446,7 @@ export default function ServiceConfigTab(){
                                         <td>
                                             {
                                                 c.machines?.length
-                                                    ? c.machines.map(m=>`${m.code}${m.active ? "" : " (inactive)"}`).join(", ")
+                                                    ? c.machines.map(m=>m.code).join(", ")
                                                     : "—"
                                             }
                                         </td>
@@ -427,6 +518,10 @@ export default function ServiceConfigTab(){
                     <ServiceConfigModal
 
                         editing={editing}
+
+                        machines={machines}
+
+                        accessories={accessories}
 
                         onClose={()=>{ setShowModal(false); setEditing(null); }}
 

@@ -17,6 +17,8 @@ class ServiceConfigurationCreate(BaseModel):
     code: str
     name: str
     rate_per_day: float
+    machine_ids: list[int] = []
+    accessory_ids: list[int] = []
     actor: ActorSchema
     remark: str
 
@@ -25,6 +27,8 @@ class ServiceConfigurationUpdate(BaseModel):
     code: Optional[str] = None
     name: Optional[str] = None
     rate_per_day: Optional[float] = None
+    machine_ids: Optional[list[int]] = None
+    accessory_ids: Optional[list[int]] = None
     actor: ActorSchema
     remark: str
 

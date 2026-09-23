@@ -2,6 +2,8 @@
 // IMPORTS
 // ====================================
 
+import { Inbox, Send, Users, ClipboardCheck, FileText, ShoppingCart } from "lucide-react";
+
 import "./Dashboard.css";
 
 
@@ -35,7 +37,9 @@ export default function DashboardStats({
 
             title:"Received Enquiries",
 
-            value:stats.received_count ?? 0
+            value:stats.received_count ?? 0,
+
+            icon:Inbox
 
         },
 
@@ -43,7 +47,9 @@ export default function DashboardStats({
 
             title:"Sent Enquiries",
 
-            value:stats.sent_count ?? 0
+            value:stats.sent_count ?? 0,
+
+            icon:Send
 
         },
 
@@ -51,7 +57,9 @@ export default function DashboardStats({
 
             title:"Customer Requests",
 
-            value:stats.customer_requests ?? 0
+            value:stats.customer_requests ?? 0,
+
+            icon:Users
 
         },
 
@@ -59,7 +67,9 @@ export default function DashboardStats({
 
             title:"Sales Surveys",
 
-            value:stats.survey_completed ?? 0
+            value:stats.survey_completed ?? 0,
+
+            icon:ClipboardCheck
 
         },
 
@@ -67,14 +77,18 @@ export default function DashboardStats({
 
             title:"Quotes",
 
-            value:stats.quote_created ?? 0
+            value:stats.quote_created ?? 0,
+
+            icon:FileText
 
         },
 
         {
             title:"Purchase Orders",
 
-            value:stats.quote_approved ?? 0
+            value:stats.quote_approved ?? 0,
+
+            icon:ShoppingCart
 
         }
 
@@ -97,6 +111,8 @@ export default function DashboardStats({
                             title={card.title}
 
                             value={card.value}
+
+                            icon={card.icon}
 
                         />
 
@@ -121,13 +137,17 @@ function StatCard({
 
     title,
 
-    value
+    value,
+
+    icon:Icon
 
 }){
 
     return(
 
         <div className="dashboard-stat-card">
+
+            {Icon && <span className="dashboard-stat-icon"><Icon size={20} strokeWidth={2.25} /></span>}
 
             <div className="dashboard-stat-value">
 

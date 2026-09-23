@@ -55,6 +55,7 @@ from backend.models.notification import Notification, NotificationChange, Notifi
 
 from backend.models.business_masters_pricing import (
     ServiceConfiguration,
+    ServiceConfigurationAccessory,
     DewateringMethod,
     Accessory,
     CommercialRules,

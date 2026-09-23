@@ -94,6 +94,7 @@
     padding:8px 12px;
     border-top:1px solid #edf1f5;
     vertical-align:middle;
+    transition:background var(--transition-fast);
 
 }
 
@@ -110,6 +111,7 @@
     background:#fff;
     z-index:1;
     min-width:170px;
+    transition:background var(--transition-fast);
 
 }
 

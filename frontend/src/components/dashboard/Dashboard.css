@@ -198,8 +198,8 @@
 
     transition:transform var(--transition-base), box-shadow var(--transition-base);
 
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
-
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 }
 
 .dashboard-stat-card:hover{
@@ -207,6 +207,29 @@
     transform:translateY(-2px);
 
     box-shadow:var(--shadow-hover);
+
+}
+
+.dashboard-stat-icon{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:44px;
+    height:44px;
+    margin-bottom:12px;
+    border-radius:12px;
+    background:#fff4ea;
+    color:var(--orange);
+    transition:transform var(--transition-base), background var(--transition-base);
+
+}
+
+.dashboard-stat-card:hover .dashboard-stat-icon{
+
+    transform:scale(1.1) rotate(-4deg);
+    background:var(--orange);
+    color:#fff;
 
 }
 
@@ -495,8 +518,8 @@ font-weight:700;
 
     transition:transform var(--transition-base), box-shadow var(--transition-base);
 
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
-
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 }
 
 .dashboard-summary-card:hover{
@@ -868,8 +891,8 @@ WORKFLOW TRACKER
 
     transition:transform var(--transition-base), box-shadow var(--transition-base);
 
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
-
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 }
 
 .workflow-card:hover{
@@ -1237,8 +1260,8 @@ WORKFLOW TRACKER
 
     transition:transform var(--transition-base), box-shadow var(--transition-base);
 
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
-
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 }
 
 .invoice-summary-card:hover{

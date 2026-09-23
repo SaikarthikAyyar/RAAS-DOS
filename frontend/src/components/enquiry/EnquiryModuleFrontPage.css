@@ -133,13 +133,27 @@
 
     font-weight:700;
 
-    transition:.2s;
+    transition:border-color .2s ease, color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
 
 }
 
 .enquiry-status-tab:hover{
 
-    background:#fafafa;
+    border-color:var(--enquiry-orange);
+
+    color:var(--enquiry-orange);
+
+    background:#fff7ed;
+
+    transform:translateY(-1px);
+
+    box-shadow:var(--shadow-sm);
+
+}
+
+.enquiry-status-tab:active{
+
+    transform:translateY(0) scale(.97);
 
 }
 
@@ -216,6 +230,10 @@
     padding:22px;
 
     box-shadow:0 5px 18px rgba(17,24,39,.06);
+
+    transition:transform var(--transition-base), box-shadow var(--transition-base);
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 
 }
 
@@ -908,6 +926,10 @@
 
     background:#f8fafc;
 
+    transform:translateY(-1px);
+
+    box-shadow:var(--shadow-sm);
+
 }
 
 .enquiry-new-button{
@@ -928,12 +950,22 @@
 
     font-weight:700;
 
-    transition:.2s;
+    transition:background .2s ease, transform .2s ease, box-shadow .2s ease;
 
 }
 
 .enquiry-new-button:hover{
 
     background:#df7415;
+
+    transform:translateY(-1px);
+
+    box-shadow:0 6px 16px rgba(245,130,32,.35);
+
+}
+
+.enquiry-new-button:active{
+
+    transform:translateY(0) scale(.97);
 
 }

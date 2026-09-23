@@ -1,3 +1,5 @@
+import { Briefcase, Receipt, Truck, Users } from "lucide-react";
+
 import "./Dashboard.css";
 
 export default function InvoiceStats({ stats }){
@@ -14,7 +16,9 @@ export default function InvoiceStats({ stats }){
 
             title:"Jobs",
 
-            value:stats.job_count ?? 0
+            value:stats.job_count ?? 0,
+
+            icon:Briefcase
 
         },
 
@@ -22,7 +26,9 @@ export default function InvoiceStats({ stats }){
 
             title:"Invoices",
 
-            value:stats.invoice_count ?? 0
+            value:stats.invoice_count ?? 0,
+
+            icon:Receipt
 
         },
 
@@ -30,7 +36,9 @@ export default function InvoiceStats({ stats }){
 
             title:"Machines Deployed",
 
-            value:stats.machine_count ?? 0
+            value:stats.machine_count ?? 0,
+
+            icon:Truck
 
         },
 
@@ -38,7 +46,9 @@ export default function InvoiceStats({ stats }){
 
             title:"Personnel Deployed",
 
-            value:stats.personnel_count ?? 0
+            value:stats.personnel_count ?? 0,
+
+            icon:Users
 
         }
 
@@ -50,31 +60,38 @@ export default function InvoiceStats({ stats }){
 
             {
 
-                cards.map((card,index)=>(
+                cards.map((card,index)=>{
 
-                    <div
+                    const Icon = card.icon;
 
-                        key={index}
+                    return(
 
-                        className="dashboard-stat-card"
+                        <div
 
-                    >
+                            key={index}
 
-                        <div className="dashboard-stat-value">
+                            className="dashboard-stat-card"
+                        >
 
-                            {card.value}
+                            <span className="dashboard-stat-icon"><Icon size={20} strokeWidth={2.25} /></span>
+
+                            <div className="dashboard-stat-value">
+
+                                {card.value}
+
+                            </div>
+
+                            <div className="dashboard-stat-title">
+
+                                {card.title}
+
+                            </div>
 
                         </div>
 
-                        <div className="dashboard-stat-title">
+                    );
 
-                            {card.title}
-
-                        </div>
-
-                    </div>
-
-                ))
+                })
 
             }
 

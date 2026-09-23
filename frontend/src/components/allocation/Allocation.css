@@ -56,8 +56,8 @@
 
     transition:transform var(--transition-base), box-shadow var(--transition-base);
 
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
-
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 }
 
 .allocation-card:hover{

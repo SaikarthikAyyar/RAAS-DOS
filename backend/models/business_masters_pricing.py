@@ -7,6 +7,8 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Numeric
 from sqlalchemy import DateTime
+from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint
 
 from sqlalchemy.sql import func
 
@@ -30,6 +32,26 @@ class ServiceConfiguration(Base):
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+# ====================================
+# SERVICE CONFIGURATION <-> ACCESSORY
+# Direct, admin-editable link - independent of any machine's own
+# accessories list (that stays as-is, still used for kit-picking).
+# ====================================
+
+class ServiceConfigurationAccessory(Base):
+
+    __tablename__ = "service_configuration_accessories"
+
+    __table_args__ = (
+        UniqueConstraint("service_configuration_id", "accessory_id", name="uq_service_configuration_accessory"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    service_configuration_id = Column(Integer, ForeignKey("service_configurations.id", ondelete="CASCADE"), nullable=False)
+    accessory_id = Column(Integer, ForeignKey("accessories.id", ondelete="CASCADE"), nullable=False)
 
 
 # ====================================

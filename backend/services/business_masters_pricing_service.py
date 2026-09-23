@@ -2,6 +2,9 @@
 # IMPORTS
 # ====================================
 
+from backend.models.machines_pumps import Machine
+from backend.models.business_masters_pricing import Accessory
+
 from backend.repositories.business_masters_pricing_repository import (
     list_service_configurations,
     get_service_configuration,
@@ -9,6 +12,10 @@ from backend.repositories.business_masters_pricing_repository import (
     update_service_configuration,
     delete_service_configuration,
     build_service_configuration_dict,
+    machine_ids_for_service_configuration,
+    accessory_ids_for_service_configuration,
+    set_service_configuration_machines,
+    set_service_configuration_accessories,
     list_dewatering_methods,
     get_dewatering_method,
     create_dewatering_method,
@@ -54,6 +61,30 @@ def _diff_fields(before_row, payload, field_names):
 
 
 # ====================================
+# MACHINE / ACCESSORY LABELS (for change records)
+# ====================================
+
+def _machine_codes_label(db, machine_ids):
+
+    if not machine_ids:
+        return ""
+
+    rows = db.query(Machine).filter(Machine.id.in_(machine_ids)).order_by(Machine.code).all()
+
+    return ", ".join(m.code for m in rows)
+
+
+def _accessory_names_label(db, accessory_ids):
+
+    if not accessory_ids:
+        return ""
+
+    rows = db.query(Accessory).filter(Accessory.id.in_(accessory_ids)).order_by(Accessory.name).all()
+
+    return ", ".join(a.name for a in rows)
+
+
+# ====================================
 # SERVICE CONFIGURATIONS
 # ====================================
 
@@ -65,6 +96,21 @@ def create_service_configuration_request(db, payload):
 
     row = create_service_configuration(db, payload)
 
+    set_service_configuration_machines(db, row, payload.machine_ids)
+    set_service_configuration_accessories(db, row.id, payload.accessory_ids)
+
+    changes = [
+        {"field": "code", "before": None, "after": row.code},
+        {"field": "name", "before": None, "after": row.name},
+        {"field": "rate_per_day", "before": None, "after": row.rate_per_day}
+    ]
+
+    if payload.machine_ids:
+        changes.append({"field": "machines", "before": None, "after": _machine_codes_label(db, payload.machine_ids)})
+
+    if payload.accessory_ids:
+        changes.append({"field": "accessories", "before": None, "after": _accessory_names_label(db, payload.accessory_ids)})
+
     record_business_master_change(
         db=db,
         module="Business Masters",
@@ -73,11 +119,7 @@ def create_service_configuration_request(db, payload):
         actor_name=payload.actor.name,
         actor_role=payload.actor.role,
         title=f"{payload.actor.name} created Service Configuration '{row.code}' in Business Masters",
-        changes=[
-            {"field": "code", "before": None, "after": row.code},
-            {"field": "name", "before": None, "after": row.name},
-            {"field": "rate_per_day", "before": None, "after": row.rate_per_day}
-        ],
+        changes=changes,
         remark=payload.remark
     )
 
@@ -95,7 +137,33 @@ def update_service_configuration_request(db, config_id, payload):
 
     changes = _diff_fields(before, payload, fields_sent)
 
+    machines_changed = "machine_ids" in payload.model_fields_set
+    accessories_changed = "accessory_ids" in payload.model_fields_set
+
+    before_machine_ids = machine_ids_for_service_configuration(db, before.code) if machines_changed else None
+    before_accessory_ids = accessory_ids_for_service_configuration(db, config_id) if accessories_changed else None
+
     row = update_service_configuration(db, config_id, payload)
+
+    # Machine reassignment uses the row's own (possibly just-renamed)
+    # code, matching how machines actually resolve to this config today.
+    if machines_changed:
+        set_service_configuration_machines(db, row, payload.machine_ids)
+
+    if accessories_changed:
+        set_service_configuration_accessories(db, config_id, payload.accessory_ids)
+
+    if machines_changed:
+        before_label = _machine_codes_label(db, before_machine_ids)
+        after_label = _machine_codes_label(db, payload.machine_ids)
+        if before_label != after_label:
+            changes.append({"field": "machines", "before": before_label or None, "after": after_label or None})
+
+    if accessories_changed:
+        before_label = _accessory_names_label(db, before_accessory_ids)
+        after_label = _accessory_names_label(db, payload.accessory_ids)
+        if before_label != after_label:
+            changes.append({"field": "accessories", "before": before_label or None, "after": after_label or None})
 
     if changes:
 

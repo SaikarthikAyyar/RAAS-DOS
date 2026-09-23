@@ -81,6 +81,8 @@
 .bm-tabs button:hover{
     border-color:var(--orange);
     color:var(--orange);
+    transform:translateY(-1px);
+    box-shadow:var(--shadow-sm);
 }
 
 .bm-tabs button:active{
@@ -140,7 +142,8 @@
        Business Masters tab renders, same treatment as Execution's
        .execution-card and the Enquiry Workspace's .survey-summary-card. */
     transition:transform var(--transition-base), box-shadow var(--transition-base);
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 }
 
 /* No transform on hover (and the mount fade above uses fill-mode
@@ -311,6 +314,7 @@
     border-bottom:1px solid var(--line);
     padding:8px 9px;
     vertical-align:top;
+    transition:background var(--transition-fast);
 }
 
 .bm-card th{
@@ -514,10 +518,18 @@
     font-weight:750;
     font-size:12px;
     color:#374151;
+    transition:transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
-.bm-btn:hover{
-    opacity:.85;
+.bm-btn:hover:not(:disabled){
+    transform:translateY(-1px);
+    box-shadow:var(--shadow-sm);
+    border-color:#d1d5db;
+}
+
+.bm-btn:active:not(:disabled){
+    transform:translateY(0) scale(.97);
+    box-shadow:none;
 }
 
 .bm-btn:disabled{
@@ -531,8 +543,18 @@
     color:#fff;
 }
 
+.bm-btn-primary:hover:not(:disabled){
+    background:#d96b0d;
+    border-color:#d96b0d;
+    box-shadow:0 6px 16px rgba(245,130,32,.3);
+}
+
 .bm-btn-ghost{
     background:#fff;
+}
+
+.bm-btn-ghost:hover:not(:disabled){
+    background:#f8fafc;
 }
 
 .bm-btn-xs{
@@ -547,7 +569,13 @@
     cursor:pointer;
     background:none;
     border:none;
+    transition:color var(--transition-fast);
     padding:0;
+}
+
+.bm-backlink:hover{
+    color:#d96b0d;
+    text-decoration:underline;
 }
 
 

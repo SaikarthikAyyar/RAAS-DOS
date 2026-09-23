@@ -48,6 +48,18 @@
     font-size:12px;
     font-weight:750;
     cursor:pointer;
+    transition:transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.ovw-btn-primary:hover:not(:disabled){
+    background:#d96b0d;
+    border-color:#d96b0d;
+    transform:translateY(-1px);
+    box-shadow:0 6px 16px rgba(245,130,32,.35);
+}
+
+.ovw-btn-primary:active:not(:disabled){
+    transform:translateY(0) scale(.97);
 }
 
 .ovw-btn-primary:disabled{
@@ -120,12 +132,32 @@
        renders these same classes directly and was missing both until
        this was moved here). */
     transition:transform var(--transition-base), box-shadow var(--transition-base);
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 }
 
 .ovw-kpi:hover{
     transform:translateY(-2px);
     box-shadow:var(--shadow-hover);
+}
+
+.ovw-kpi-icon{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:32px;
+    height:32px;
+    margin-bottom:8px;
+    border-radius:9px;
+    background:#fff4ea;
+    color:var(--orange);
+    transition:transform var(--transition-base), background var(--transition-base);
+}
+
+.ovw-kpi:hover .ovw-kpi-icon{
+    transform:scale(1.1) rotate(-4deg);
+    background:var(--orange);
+    color:#fff;
 }
 
 .ovw-kpi b{
@@ -149,7 +181,8 @@
     padding:16px;
     box-shadow:0 4px 14px rgba(17,24,39,.04);
     transition:transform var(--transition-base), box-shadow var(--transition-base);
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 }
 
 .ovw-card:hover{
@@ -200,6 +233,7 @@
     font-size:12.5px;
     vertical-align:top;
     color:var(--ink);
+    transition:background var(--transition-fast);
 }
 
 .ovw-table th{

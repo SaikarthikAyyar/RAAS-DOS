@@ -4,6 +4,7 @@
 
 from backend.models.business_masters_pricing import (
     ServiceConfiguration,
+    ServiceConfigurationAccessory,
     DewateringMethod,
     Accessory,
     CommercialRules,
@@ -25,12 +26,71 @@ def get_service_configuration(db, config_id):
     return db.query(ServiceConfiguration).filter(ServiceConfiguration.id == config_id).first()
 
 
-# Resolves what falls under a Service Configuration for display purposes
-# only: every Machine whose own service_configuration matches this
-# config's code, plus the union of accessory names those machines carry
-# (matched back to the real Accessory master where a name lines up,
-# falling back to a name-only entry otherwise - same dual-tolerant
-# posture already used by quote_engine.py's accessory-name resolution).
+def machine_ids_for_service_configuration(db, code):
+    return [
+        m.id for m in
+        db.query(Machine.id).filter(Machine.service_configuration == code).all()
+    ]
+
+
+def accessory_ids_for_service_configuration(db, config_id):
+    return [
+        row.accessory_id for row in
+        db.query(ServiceConfigurationAccessory)
+        .filter(ServiceConfigurationAccessory.service_configuration_id == config_id)
+        .all()
+    ]
+
+
+# Replace-all: every machine in machine_ids gets its own
+# service_configuration set to this config's code; any machine that
+# used to point here but isn't in the new list gets cleared. A machine
+# belongs to at most one Service Configuration (a plain string field
+# on Machine, not a join table), so reassigning here is the same
+# mechanism as editing it from the Machine Specs tab directly.
+def set_service_configuration_machines(db, config, machine_ids):
+
+    machine_ids = set(machine_ids or [])
+
+    currently_assigned = (
+        db.query(Machine)
+        .filter(Machine.service_configuration == config.code)
+        .all()
+    )
+
+    for machine in currently_assigned:
+        if machine.id not in machine_ids:
+            machine.service_configuration = None
+
+    if machine_ids:
+        for machine in db.query(Machine).filter(Machine.id.in_(machine_ids)).all():
+            machine.service_configuration = config.code
+
+    db.commit()
+
+
+# Replace-all: the join table is the direct source of truth for a
+# config's accessory set, independent of any specific machine's own
+# accessories list (unchanged, still used for kit-picking elsewhere).
+def set_service_configuration_accessories(db, config_id, accessory_ids):
+
+    db.query(ServiceConfigurationAccessory).filter(
+        ServiceConfigurationAccessory.service_configuration_id == config_id
+    ).delete()
+
+    for accessory_id in (accessory_ids or []):
+        db.add(ServiceConfigurationAccessory(
+            service_configuration_id=config_id,
+            accessory_id=accessory_id
+        ))
+
+    db.commit()
+
+
+# Resolves what falls under a Service Configuration for display: every
+# Machine whose own service_configuration matches this config's code,
+# plus the config's own directly-edited accessory set (the join table
+# above) - not derived from any machine's own accessories list.
 def build_service_configuration_dict(db, config):
 
     machines = (
@@ -40,17 +100,13 @@ def build_service_configuration_dict(db, config):
         .all()
     )
 
-    accessory_names = set()
-    for machine in machines:
-        for name in (machine.accessories or []):
-            accessory_names.add(name)
-
-    accessory_by_name = {}
-    if accessory_names:
-        accessory_by_name = {
-            a.name: a
-            for a in db.query(Accessory).filter(Accessory.name.in_(accessory_names)).all()
-        }
+    accessories = (
+        db.query(Accessory)
+        .join(ServiceConfigurationAccessory, ServiceConfigurationAccessory.accessory_id == Accessory.id)
+        .filter(ServiceConfigurationAccessory.service_configuration_id == config.id)
+        .order_by(Accessory.name)
+        .all()
+    )
 
     return {
         "id": config.id,
@@ -62,8 +118,8 @@ def build_service_configuration_dict(db, config):
             for m in machines
         ],
         "accessories": [
-            {"id": accessory_by_name[name].id if name in accessory_by_name else None, "name": name}
-            for name in sorted(accessory_names)
+            {"id": a.id, "name": a.name}
+            for a in accessories
         ]
     }
 
@@ -73,7 +129,9 @@ def build_service_configuration_dict(db, config):
 # the ORM constructor/setattr loop (which would otherwise choke on
 # unknown columns).
 def create_service_configuration(db, payload):
-    row = ServiceConfiguration(**payload.model_dump(exclude={"actor", "remark"}))
+    row = ServiceConfiguration(
+        **payload.model_dump(exclude={"actor", "remark", "machine_ids", "accessory_ids"})
+    )
     db.add(row)
     db.commit()
     db.refresh(row)
@@ -84,7 +142,9 @@ def update_service_configuration(db, config_id, payload):
     row = db.query(ServiceConfiguration).filter(ServiceConfiguration.id == config_id).first()
     if not row:
         return None
-    for field, value in payload.model_dump(exclude_unset=True, exclude={"actor", "remark"}).items():
+    for field, value in payload.model_dump(
+        exclude_unset=True, exclude={"actor", "remark", "machine_ids", "accessory_ids"}
+    ).items():
         setattr(row, field, value)
     db.commit()
     db.refresh(row)

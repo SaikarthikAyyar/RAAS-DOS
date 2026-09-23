@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { Receipt, IndianRupee, Wallet, Wrench, Truck } from "lucide-react";
+
 import "../components/dashboard/overview/DashboardOverview.css";
 import "../components/businessMasters/BusinessMasters.css";
 
@@ -40,11 +42,11 @@ export default function InvoiceDashboard(){
     }, []);
 
     const tiles = kpi ? [
-        { title: "Total PO Revenue", value: inr(kpi.total_po_revenue) },
-        { title: "Expected Invoice Revenue", value: inr(kpi.expected_invoice_revenue) },
-        { title: "Collected Invoice Revenue", value: inr(kpi.collected_invoice_revenue) },
-        { title: "Total Machines", value: kpi.total_machines },
-        { title: "Deployed Machines", value: kpi.deployed_machines }
+        { title: "Total PO Revenue", value: inr(kpi.total_po_revenue), icon: Receipt },
+        { title: "Expected Invoice Revenue", value: inr(kpi.expected_invoice_revenue), icon: IndianRupee },
+        { title: "Collected Invoice Revenue", value: inr(kpi.collected_invoice_revenue), icon: Wallet },
+        { title: "Total Machines", value: kpi.total_machines, icon: Wrench },
+        { title: "Deployed Machines", value: kpi.deployed_machines, icon: Truck }
     ] : [];
 
     return(
@@ -62,12 +64,21 @@ export default function InvoiceDashboard(){
                 <p className="bm-muted">Loading...</p>
             ) : (
                 <div className="ovw-grid-5">
-                    {tiles.map(tile=>(
-                        <div className="ovw-kpi" key={tile.title}>
-                            <b>{tile.value}</b>
-                            <span>{tile.title}</span>
-                        </div>
-                    ))}
+                    {tiles.map(tile=>{
+
+                        const Icon = tile.icon;
+
+                        return(
+
+                            <div className="ovw-kpi" key={tile.title}>
+                                <span className="ovw-kpi-icon"><Icon size={17} strokeWidth={2.25} /></span>
+                                <b>{tile.value}</b>
+                                <span>{tile.title}</span>
+                            </div>
+
+                        );
+
+                    })}
                 </div>
             )}
 

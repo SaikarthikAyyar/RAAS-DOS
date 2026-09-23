@@ -27,6 +27,10 @@ import { LookupListsProvider } from "./context/LookupListsContext";
 
 import { GuideProvider } from "./contexts/GuideContext";
 
+import { initScrollReveal } from "./utils/scrollReveal";
+
+initScrollReveal();
+
 createRoot(document.getElementById("root")).render(
 
 <React.StrictMode>

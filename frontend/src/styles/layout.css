@@ -46,6 +46,16 @@
 --transition-base:220ms ease;
 --transition-slow:320ms ease;
 
+/* Duration-only companion to --transition-slow, for use inside an
+   `animation:` shorthand specifically. --transition-slow bundles its
+   own timing-function ("320ms ease") for `transition:` consumers -
+   substituting it into `animation:name var(--transition-slow) ease-out
+   backwards` silently produces TWO timing-functions in one shorthand
+   (invalid CSS), which makes the whole declaration - including
+   animation-name - drop out entirely. Every ui-fade-in-up consumer
+   app-wide was hitting exactly this and never actually animating. */
+--anim-duration-slow:320ms;
+
 --shadow-sm:0 1px 3px rgba(17,24,39,.06);
 --shadow-md:0 6px 20px rgba(17,24,39,.08);
 --shadow-hover:0 10px 26px rgba(17,24,39,.12), 0 0 0 1px rgba(245,130,32,.25);
@@ -59,8 +69,72 @@
         animation-iteration-count:1 !important;
         transition-duration:.001ms !important;
         scroll-behavior:auto !important;
+        animation-play-state:running !important;
     }
 
+}
+
+/* ====================================
+   SCROLL-TRIGGERED REVEAL
+   Every "card"/"section" class across the app that plays
+   ui-reveal-slide used to auto-start the instant it mounted - a CSS
+   animation fires on paint regardless of scroll position, so anything
+   below the fold had already finished animating long before a user
+   ever scrolled to it, and just sat there static. Each of those
+   selectors now also carries animation-play-state:paused (holding at
+   the keyframe's "from" state, since fill-mode is "backwards") -
+   utils/scrollReveal.js's shared IntersectionObserver adds .ui-revealed
+   the first time an element actually enters the viewport, and this one
+   rule (not a per-selector copy) resumes whichever animation that
+   element already declared. If the observer never runs
+   (IntersectionObserver unsupported), the script's own fallback
+   reveals everything immediately - real content must never stay
+   permanently invisible.
+
+   --reveal-slide-x is set per element by scrollReveal.js, alternating
+   between a negative (from the left) and positive (from the right)
+   value as it scans down the page, so consecutive cards visibly
+   arrive from opposite sides rather than all sliding the same way.
+   It's a real inherited custom property, not just a per-card constant -
+   .ui-row-reveal below deliberately reads the SAME inherited value
+   (scaled down) from whichever card contains it, so a card's internal
+   rows continue arriving from the same side as the card itself.
+==================================== */
+
+.ui-revealed{
+    animation-play-state:running !important;
+}
+
+@keyframes ui-reveal-slide{
+    from{ opacity:0; transform:translateX(var(--reveal-slide-x, -90px)); }
+    to{ opacity:1; transform:translateX(0); }
+}
+
+/* ====================================
+   NESTED REVEAL - table rows inside a revealed card
+   A card taller than the viewport reveals as one unit the moment its
+   top edge scrolls into view - everything below its own fold was
+   already sitting there at full opacity, so scrolling further through
+   a long table produced no further motion. Every real table's <tr>
+   rows get this same scroll-triggered slide (scrollReveal.js adds the
+   marker class + observes each row individually), with a shorter
+   travel distance than a full card and a small per-row stagger so a
+   burst of rows entering at once cascades rather than popping in as
+   one flat block. Plain CSS transition, not the animation/paused
+   mechanism above - there's no var()-in-shorthand hazard to work
+   around here, so the simpler mechanism is enough.
+==================================== */
+
+.ui-row-reveal{
+    opacity:0;
+    transform:translateX(calc(var(--reveal-slide-x, -90px) * 0.5));
+    transition:opacity var(--transition-base), transform var(--transition-base);
+    transition-delay:var(--reveal-row-delay, 0ms);
+}
+
+.ui-row-reveal.ui-revealed{
+    opacity:1;
+    transform:translateX(0);
 }
 
 /* ====================================
@@ -82,16 +156,10 @@
 
 }
 
-@keyframes ui-fade-in-up{
-
-    from{ opacity:0; transform:translateY(6px); }
-    to{ opacity:1; transform:translateY(0); }
-
-}
-
 .ui-fade-in{
 
-    animation:ui-fade-in-up var(--transition-slow) ease-out backwards;
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
 
 }
 
@@ -148,6 +216,7 @@ overflow:hidden;
 
 flex:1;
 overflow-y:auto;
+overflow-x:hidden;
 padding:20px;
 
 }
