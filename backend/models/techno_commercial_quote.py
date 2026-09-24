@@ -260,6 +260,9 @@ class Quote(Base):
     setup_cost_min = Column(Float)
     setup_cost_max = Column(Float)
 
+    demobilisation_cost_min = Column(Float)
+    demobilisation_cost_max = Column(Float)
+
     execution_cost_min = Column(Float)
     execution_cost_max = Column(Float)
 

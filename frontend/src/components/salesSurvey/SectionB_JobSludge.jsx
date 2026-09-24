@@ -8,7 +8,6 @@ from "../shared/FormField";
 
 import LookupSelect from "../shared/LookupSelect";
 
-import { formatPhOptionLabel } from "../../data/phRanges";
 
 
 export default function SectionB_JobSludge({
@@ -35,7 +34,8 @@ const job = surveyData.job || {};
 // a pump-selection-context corrosiveness reading already wired into
 // the Customer 360 prefill) - this one describes the sludge material
 // itself. No separate pH Min/Max fields - the numeric range shows
-// directly in the dropdown's own option text (see phRanges.js).
+// directly in the dropdown's own option text (the "materialPh" list's
+// severity bands - Strongly/Mildly acidic ... Strongly alkaline).
 
 // Once the user has interacted with ANY field on the form (not just
 // this one), a still-empty compulsory field starts showing its error -
@@ -210,13 +210,12 @@ tooltip="Whether the material poses a chemical, flammability, or explosive hazar
 
 
 <LookupSelect
-listKey="ph"
+listKey="materialPh"
 label="pH / Corrosiveness (Material)*"
 value={job.material_ph_condition}
 section="job"
 field="material_ph_condition"
 updateSection={updateSection}
-formatOption={formatPhOptionLabel}
 onBlur={()=>touchField("job", "material_ph_condition")}
 error={fieldError("material_ph_condition")}
 errorMessage="pH / Corrosiveness (Material) is required."

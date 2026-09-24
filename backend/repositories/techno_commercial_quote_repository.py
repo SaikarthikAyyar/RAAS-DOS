@@ -274,6 +274,9 @@ def create_quote(
     quote.setup_cost_min = payload["setup_cost_min"]
     quote.setup_cost_max = payload["setup_cost_max"]
 
+    quote.demobilisation_cost_min = payload["demobilisation_cost_min"]
+    quote.demobilisation_cost_max = payload["demobilisation_cost_max"]
+
     quote.execution_cost_min = payload["execution_cost_min"]
     quote.execution_cost_max = payload["execution_cost_max"]
 

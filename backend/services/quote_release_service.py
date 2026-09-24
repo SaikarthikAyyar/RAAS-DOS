@@ -241,6 +241,7 @@ SAMPLE_ACCESSORIES_PLAN = [
 SAMPLE_QUOTE = SimpleNamespace(
     mobilisation_cost_min=175000, mobilisation_cost_max=175000,
     setup_cost_min=125000, setup_cost_max=125000,
+    demobilisation_cost_min=175000, demobilisation_cost_max=175000,
     execution_cost_min=375000, execution_cost_max=450000,
     pump_addon_cost_min=10000, pump_addon_cost_max=15000,
     documentation_buffer=15000,

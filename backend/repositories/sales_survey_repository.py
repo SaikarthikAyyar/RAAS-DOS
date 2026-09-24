@@ -20,6 +20,21 @@ logger = logging.getLogger(__name__)
 # CREATE SALES SURVEY
 # ====================================
 
+# Crane availability is a three-way answer on the form (Yes / No /
+# Unknown). Only "Yes" and "No" are real answers; anything else is
+# stored as NULL so the Ops Engine never reads "not known" as "no
+# crane" (which used to cost crane-dependent machines 15 points).
+def _crane_from_answer(answer):
+
+    if answer == "Yes":
+        return True
+
+    if answer == "No":
+        return False
+
+    return None
+
+
 def create_sales_survey(
 
         db,
@@ -232,7 +247,7 @@ def create_sales_survey(
 
         crane_available=
 
-        payload.crane_available=="Yes",
+        _crane_from_answer(payload.crane_available),
 
         access_support=
         payload.access_support,
@@ -596,7 +611,7 @@ def update_sales_survey(
 
     survey.scaffolding_needed = payload.scaffolding_needed == "Yes"
 
-    survey.crane_available = payload.crane_available == "Yes"
+    survey.crane_available = _crane_from_answer(payload.crane_available)
 
     survey.access_support = payload.access_support
 

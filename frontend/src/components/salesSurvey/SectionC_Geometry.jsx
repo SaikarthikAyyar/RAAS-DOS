@@ -264,7 +264,7 @@ tooltip="The expected rate at which material can be removed, in cubic metres per
 
 <FieldInput
 
-label="Opening Length/Dia (mm)"
+label="Opening Length/Dia (mm)*"
 
 value={geometry.opening_length}
 
@@ -277,6 +277,12 @@ unit="mm"
 type="number"
 
 updateSection={updateSection}
+
+onBlur={()=>touchField("geometry", "opening_length")}
+
+error={fieldError("opening_length")}
+
+errorMessage="Opening Length/Dia is required."
 
 tooltip="The length or diameter of the access opening, in millimetres."
 

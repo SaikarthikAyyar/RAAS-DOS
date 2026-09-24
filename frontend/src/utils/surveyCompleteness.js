@@ -51,6 +51,7 @@ export const REQUIRED_FIELD_KEYS = [
     "geometry.length_dia",
     "geometry.width",
     "geometry.sludge_depth",
+    "geometry.opening_length",
     "geometry.opening_width",
     "geometry.opening_height",
     "geometry.vertical_lift",

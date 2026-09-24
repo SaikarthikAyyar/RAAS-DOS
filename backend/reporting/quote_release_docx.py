@@ -438,6 +438,7 @@ def build_techno_commercial_summary_table(doc, quote):
         ("Mobilisation", quote.mobilisation_cost_min, quote.mobilisation_cost_max),
         ("Setup / Access", quote.setup_cost_min, quote.setup_cost_max),
         ("Execution (Machine)", quote.execution_cost_min, quote.execution_cost_max),
+        ("Demobilisation", quote.demobilisation_cost_min, quote.demobilisation_cost_max),
         ("Pump Addon", quote.pump_addon_cost_min, quote.pump_addon_cost_max),
         ("Documentation Buffer", quote.documentation_buffer, quote.documentation_buffer),
         ("Access Support Buffer", quote.access_support_buffer, quote.access_support_buffer),

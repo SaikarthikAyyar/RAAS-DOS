@@ -304,6 +304,7 @@ def create_quote_request(
 
         "mobilisation_cost_min", "mobilisation_cost_max",
         "setup_cost_min", "setup_cost_max",
+        "demobilisation_cost_min", "demobilisation_cost_max",
         "execution_cost_min", "execution_cost_max",
         "pump_addon_cost_min", "pump_addon_cost_max",
         "documentation_buffer",

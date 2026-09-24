@@ -415,13 +415,16 @@ def score_material(
 
     if is_survey_machine(machine):
 
-        if (
+        # No Material Category option mentions "survey", so a survey
+        # job is recognised by its JOB TYPE (e.g. "Bathymetric Survey
+        # / Pre-Survey / Post-Survey") as well as by material.
+        job_type = (
 
-            "survey"
+            engineering_inputs.get("job_type") or ""
 
-            in material
+        ).lower()
 
-        ):
+        if "survey" in material or "survey" in job_type:
 
             return 30
 
@@ -517,6 +520,15 @@ def score_job_type(
         if "survey" in job_type:
 
             return 25
+
+        return -999
+
+
+    # --------------------------------
+    # Survey-only job: cleaning machines cannot do it
+    # --------------------------------
+
+    if "survey" in job_type:
 
         return -999
 
@@ -618,6 +630,20 @@ TEMPERATURE_RANGE_C = {
 # dropdown's option text.
 PH_RANGE_BY_CONDITION = {
 
+    # Section B's "materialPh" bands - only the strong bands fall
+    # outside pH 4-10 and count as "extreme" below.
+    "Strongly acidic (pH < 4)": (1, 3),
+
+    "Mildly acidic (pH 4-6)": (4, 6),
+
+    "Neutral (pH 6-8)": (7, 7),
+
+    "Mildly alkaline (pH 8-10)": (8, 10),
+
+    "Strongly alkaline (pH > 10)": (11, 14),
+
+    # Legacy three-value labels (older surveys / Section E's pump
+    # field) - unchanged behaviour: any acid or alkaline was "extreme".
     "Acidic": (1, 6),
 
     "Low / Neutral": (7, 7),
@@ -696,11 +722,13 @@ def score_environment(
         score -= 15
 
 
+    # Older rows were saved with a double-encoded degree sign
+    # (U+00C2 U+00B0); normalise it so they still match the table.
     temperature_label = (
 
         engineering_inputs.get("temperature") or ""
 
-    ).strip().lower()
+    ).replace("Â°", "°").strip().lower()
 
     temperature_c = TEMPERATURE_RANGE_C.get(temperature_label)
 

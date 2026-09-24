@@ -490,7 +490,11 @@ def get_customer_survey_request(
 
             "crane_available":
 
-            "Yes" if survey.crane_available else "No",
+            (
+                "Yes" if survey.crane_available
+                else "No" if survey.crane_available is False
+                else "Unknown"
+            ),
 
             "opening_height":
 

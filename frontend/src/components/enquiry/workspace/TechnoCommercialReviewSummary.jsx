@@ -61,6 +61,7 @@ export default function TechnoCommercialReviewSummary({
         { label:"Mobilisation", min:quote.mobilisation_cost_min, max:quote.mobilisation_cost_max },
         { label:"Setup / Access", min:quote.setup_cost_min, max:quote.setup_cost_max },
         { label:"Execution (machine)", min:quote.execution_cost_min, max:quote.execution_cost_max },
+        { label:"Demobilisation", min:quote.demobilisation_cost_min, max:quote.demobilisation_cost_max },
         { label:"Pump Addon", min:quote.pump_addon_cost_min, max:quote.pump_addon_cost_max },
         { label:"Documentation Buffer", min:quote.documentation_buffer, max:quote.documentation_buffer },
         { label:"Access Support Buffer", min:quote.access_support_buffer, max:quote.access_support_buffer },

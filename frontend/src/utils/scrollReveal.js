@@ -50,11 +50,29 @@ const REVEAL_SELECTOR = [
     ".workflow-card",
     ".invoice-summary-card",
     ".enquiry-card",
+    ".ms-panel",
+    ".ms-chart",
+    ".ms-statbox",
+    ".ms-strip",
+    ".ms-ribbon",
+    ".ms-sch-head",
+    ".ms-machine-title",
     ".ui-fade-in"
 
 ].join(",");
 
-const ROW_SELECTOR = "table tbody tr";
+// Besides real table rows, the Machine Statistics dashboards' inner
+// tiles (gauges, ribbon cards, alerts, info rows, load bars) slide in
+// the same nested way, so a tall dashboard panel keeps animating as it
+// is scrolled through rather than revealing as one block.
+const ROW_SELECTOR = [
+    "table tbody tr",
+    ".ms-gauge",
+    ".ms-status-card",
+    ".ms-alert",
+    ".ms-inforow",
+    ".ms-load-row"
+].join(",");
 
 const SLIDE_DISTANCE_PX = 90;
 const ROW_STAGGER_MS = 40;

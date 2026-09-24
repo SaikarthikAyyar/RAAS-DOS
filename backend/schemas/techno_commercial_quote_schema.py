@@ -31,6 +31,9 @@ class QuoteCreateSchema(BaseModel):
     setup_cost_min: float | None = None
     setup_cost_max: float | None = None
 
+    demobilisation_cost_min: float | None = None
+    demobilisation_cost_max: float | None = None
+
     execution_cost_min: float | None = None
     execution_cost_max: float | None = None
 
@@ -111,6 +114,9 @@ class QuoteResponseSchema(
 
     setup_cost_min: float | None = None
     setup_cost_max: float | None = None
+
+    demobilisation_cost_min: float | None = None
+    demobilisation_cost_max: float | None = None
 
     execution_cost_min: float | None = None
     execution_cost_max: float | None = None

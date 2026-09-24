@@ -218,6 +218,18 @@ def build_commercial(
 
     )
 
+    # Demobilisation: the machine and crew travel back out exactly as
+    # they came in, so demobilisation days are taken as the SAME as
+    # mobilisation days (ops.demob_days is not used here) and priced
+    # at Commercial Rules' own demobilisation rate.
+    demobilisation_cost = (
+
+        ops.mobilisation_days *
+
+        float(rules.demob_rate)
+
+    )
+
     execution_cost = (
 
         ops.execution_days *
@@ -237,6 +249,8 @@ def build_commercial(
         mobilisation_cost +
 
         setup_cost +
+
+        demobilisation_cost +
 
         execution_cost +
 
@@ -305,6 +319,9 @@ def build_commercial(
 
         "setup_cost_min": setup_cost,
         "setup_cost_max": setup_cost,
+
+        "demobilisation_cost_min": demobilisation_cost,
+        "demobilisation_cost_max": demobilisation_cost,
 
         "execution_cost_min": execution_cost,
         "execution_cost_max": execution_cost,

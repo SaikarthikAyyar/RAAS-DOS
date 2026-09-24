@@ -58,6 +58,22 @@
     min-width:0;
 }
 
+/* Scroll-triggered slide-in (utils/scrollReveal.js): same paused
+   mount animation every card class in the app carries - the shared
+   observer adds .ui-revealed the first time the element is scrolled
+   into view. Inner tiles (gauges, ribbon cards, alerts...) use the
+   nested row transition registered in scrollReveal.js instead. */
+.ms-panel,
+.ms-chart,
+.ms-statbox,
+.ms-strip,
+.ms-ribbon,
+.ms-sch-head,
+.ms-machine-title{
+    animation:ui-reveal-slide var(--anim-duration-slow) ease-out backwards;
+    animation-play-state:paused;
+}
+
 /* ---------- shared panels ---------- */
 
 .ms-panel,

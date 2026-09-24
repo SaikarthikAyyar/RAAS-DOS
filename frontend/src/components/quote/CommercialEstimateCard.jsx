@@ -13,6 +13,7 @@ const MIN_MAX_FIELDS = [
     { label:"Mobilisation", min:"mobilisation_cost_min", max:"mobilisation_cost_max", tooltip:"Cost to transport equipment to and from the site." },
     { label:"Setup / Access", min:"setup_cost_min", max:"setup_cost_max", tooltip:"Cost to set up equipment and any access-support work on-site." },
     { label:"Execution (machine)", min:"execution_cost_min", max:"execution_cost_max", tooltip:"The machine's day-rate cost for the actual cleaning work." },
+    { label:"Demobilisation", min:"demobilisation_cost_min", max:"demobilisation_cost_max", tooltip:"Cost to demobilise the machine and crew from site - same days as mobilisation, at the Commercial Rules demobilisation rate." },
     { label:"Pump Addon", min:"pump_addon_cost_min", max:"pump_addon_cost_max", tooltip:"Additional cost for pump/hose accessories needed for this job." },
     { label:"Direct Cost Subtotal", min:"direct_cost_min", max:"direct_cost_max", tooltip:"The sum of mobilisation, setup, execution, and pump addon costs." },
     { label:"Overhead", min:"overhead_cost_min", max:"overhead_cost_max", tooltip:"A percentage markup covering indirect business costs." },
