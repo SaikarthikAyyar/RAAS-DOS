@@ -68,6 +68,7 @@ BUSINESS_MASTER_TABS = [
     ("bm-tab-customers", "Customers"),
     ("bm-tab-machines", "Machines / Fleet"),
     ("bm-tab-machineinventory", "Machine Inventory"),
+    ("bm-tab-machinestats", "Machine Statistics"),
     ("bm-tab-pumps", "Pump Master"),
     ("bm-tab-personnel", "Personnel"),
     ("bm-tab-accessories", "Accessories"),
@@ -118,6 +119,8 @@ MODULE_TASKS = {
         ("remove_machine_unit", "Remove machine unit"),
         ("export_current_tab", "Export current tab")
     ],
+
+    "bm-tab-machinestats": [],
 
     "bm-tab-pumps": [
         ("add_pump", "Add pump"),

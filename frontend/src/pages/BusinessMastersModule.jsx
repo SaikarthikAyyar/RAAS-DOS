@@ -31,6 +31,7 @@ import HubsTab from "../components/businessMasters/hubs/HubsTab";
 import FleetUnitsTab from "../components/businessMasters/fleetUnits/FleetUnitsTab";
 import MachinesTab from "../components/businessMasters/machines/MachinesTab";
 import MachineInventoryTab from "../components/businessMasters/machineInventory/MachineInventoryTab";
+import MachineStatisticsTab from "../components/businessMasters/machineStatistics/MachineStatisticsTab";
 import PumpsTab from "../components/businessMasters/pumps/PumpsTab";
 import PersonnelTab from "../components/businessMasters/personnel/PersonnelTab";
 import HumanResourcesTab from "../components/businessMasters/hr/HumanResourcesTab";
@@ -831,6 +832,10 @@ export default function BusinessMastersModule(){
                 ) : activeTab==="machineinventory" ? (
 
                     <MachineInventoryTab />
+
+                ) : activeTab==="machinestats" ? (
+
+                    <MachineStatisticsTab />
 
                 ) : activeTab==="pumps" ? (
 

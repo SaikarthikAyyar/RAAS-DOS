@@ -1,0 +1,101 @@
+/* RAAS-DOS palette for the Varaha 3D Machine Location panel.
+   Only the surrounding chrome (header, toolbar, side controls, readings)
+   is recoloured; the 3D scene itself (tank, water, robot) renders exactly
+   as it does in the Varaha dashboard. */
+
+.ms-tab .ml-panel{
+    --ml-cyan:#f58220;
+    --ml-muted:#6b7280;
+    background:#fff;
+    color:#1f2937;
+    border-color:#e5e7eb;
+}
+
+.ms-tab .ml-title-line h2{ color:#1f2937; }
+.ms-tab .ml-heading p{ color:#6b7280; }
+.ms-tab .ml-heading p span{ color:#cbd5e1; }
+.ms-tab .ml-pin{ color:#f58220; }
+
+.ms-tab .ml-status{ color:#6b7280; border-color:#e5e7eb; background:#fff; }
+.ms-tab .ml-status-live{ color:#16a34a; background:rgba(22,163,74,.1); border-color:rgba(22,163,74,.4); }
+.ms-tab .ml-status-stale{ color:#d97706; background:rgba(217,119,6,.1); border-color:rgba(217,119,6,.4); }
+
+.ms-tab .ml-bot-badge{ border-color:#e5e7eb; background:#fff; }
+.ms-tab .ml-bot-badge strong{ color:#f58220; }
+.ms-tab .ml-bot-badge > span{ color:#6b7280; }
+
+/* buttons in the light chrome (the ones over the 3D scene stay dark) */
+.ms-tab .ml-toolbar button,
+.ms-tab .ml-panel .ml-expand-note{
+    color:#374151;
+}
+
+.ms-tab .ml-toolbar button{
+    background:#fff;
+    border-color:#e5e7eb;
+}
+
+.ms-tab .ml-toolbar button:hover{
+    background:#fff7ed;
+    border-color:#f58220;
+    color:#f58220;
+}
+
+.ms-tab .ml-view-buttons button[aria-pressed=true]{
+    background:#12151c;
+    border-color:#12151c;
+    color:#fff;
+}
+
+.ms-tab .ml-zoom-buttons{ border-color:#e5e7eb; }
+.ms-tab .ml-zoom-buttons button{ background:transparent; border:0; }
+.ms-tab .ml-zoom-buttons output{ color:#f58220; }
+
+/* side controls / readings */
+.ms-tab .ml-sidebar{
+    background:#fafafa;
+    border-color:#e5e7eb;
+}
+
+.ms-tab .ml-panel h3{ color:#6b7280; }
+.ms-tab .ml-checkbox{ color:#1f2937; }
+.ms-tab .ml-check-box{ background:#fff; border-color:#cbd5e1; }
+.ms-tab .ml-checkbox input:checked + .ml-check-box{ background:#f58220; border-color:#f58220; color:#fff; }
+.ms-tab .ml-expand-note{ border-top-color:#e5e7eb; color:#6b7280; }
+
+.ms-tab .ml-readings{ border-top-color:#e5e7eb; }
+.ms-tab .ml-metric{ border-bottom-color:#e5e7eb; }
+.ms-tab .ml-metric > span{ color:#6b7280; }
+.ms-tab .ml-metric strong{ color:#1f2937; }
+.ms-tab .ml-muted{ color:#6b7280; }
+.ms-tab .ml-kv > div{ border-bottom-color:#e5e7eb; }
+.ms-tab .ml-kv dt{ color:#6b7280; }
+.ms-tab .ml-kv dd{ color:#1f2937; }
+.ms-tab .ml-kv .ml-link-live{ color:#16a34a; }
+.ms-tab .ml-kv .ml-link-stale{ color:#d97706; }
+.ms-tab .ml-kv .ml-link-offline{ color:#dc2626; }
+.ms-tab .ml-inspection-note{ border-top-color:#e5e7eb; color:#374151; }
+.ms-tab .ml-inspection-note > span{ color:#6b7280; }
+.ms-tab .ml-inspection-note i{ background:#f58220; }
+
+.ms-tab .ml-footer{ border-top-color:#e5e7eb; color:#6b7280; }
+.ms-tab .ml-footer i{ color:#cbd5e1; }
+
+.ms-tab .ml-expanded,
+.ms-tab .ml-panel:fullscreen{ background:#fff; }
+
+/* the 3D viewport frame follows the accent, scene stays as rendered */
+.ms-tab .ml-viewport{ border-color:#e5e7eb; }
+
+/* panel sizing inside the dashboard */
+.ms-loc-panel{ padding:0; border:0; background:transparent; box-shadow:none; }
+.ms-loc-panel .ms-location{ min-height:440px; }
+.ms-loc-panel .ml-panel{ min-height:440px; }
+
+/* text drawn on top of the dark 3D scene stays light */
+.ms-tab .ml-viewport{ color:#e9f3fc; }
+.ms-tab .ml-viewport .ml-metric > span{ color:#81adc7; }
+.ms-tab .ml-viewport .ml-metric strong{ color:#e9f3fc; }
+.ms-tab .ml-viewport h3{ color:#c5deed; }
+.ms-tab .ml-viewport button{ color:#a4c4dc; background:#081219d9; border-color:#29414e; }
+.ms-tab .ml-viewport button:hover{ background:#102932; border-color:#39aabe; color:#e9f3fc; }

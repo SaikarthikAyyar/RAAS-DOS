@@ -1,0 +1,1017 @@
+/* ====================================
+   MACHINE STATISTICS - Varaha-style telemetry dashboards
+   Same layout/structure as the Varaha IoT dashboard, drawn in the
+   RAAS-DOS palette (white cards, --orange accent, --ink text).
+==================================== */
+
+.ms-tab{
+    --ms-ink:#1f2937;
+    --ms-muted:#6b7280;
+    --ms-line:#e5e7eb;
+    --ms-orange:#f58220;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.ms-tab .bm-tabs button{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+}
+
+.ms-tab-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    flex:none;
+}
+
+.ms-machine-title{
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.ms-machine-title strong{
+    font-size:15px;
+    color:var(--ms-ink);
+}
+
+.ms-machine-title span{
+    font-size:12px;
+    color:var(--ms-muted);
+}
+
+.ms-machine-title em{
+    font-size:12px;
+    color:var(--ms-orange);
+    font-style:normal;
+    font-weight:700;
+}
+
+.ms-dash{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-width:0;
+}
+
+/* ---------- shared panels ---------- */
+
+.ms-panel,
+.ms-chart,
+.ms-statbox{
+    background:#fff;
+    border:1px solid var(--ms-line);
+    border-radius:6px;
+    padding:10px;
+    min-width:0;
+    box-shadow:0 1px 3px rgba(17,24,39,.04);
+}
+
+.ms-panel{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.ms-panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    border-bottom:1px solid var(--ms-line);
+    padding-bottom:6px;
+}
+
+.ms-panel-head h3,
+.ms-chart-title h3{
+    margin:0;
+    font-size:10.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ms-muted);
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+}
+
+.ms-panel-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.ms-tag{
+    font-family:monospace;
+    font-size:10px;
+    font-weight:800;
+    color:#16a34a;
+    background:rgba(22,163,74,.1);
+    border:1px solid rgba(22,163,74,.3);
+    padding:1px 6px;
+    border-radius:2px;
+}
+
+.ms-panel-key{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-family:monospace;
+    font-size:9px;
+    color:var(--ms-muted);
+}
+
+.ms-panel-key i{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    display:inline-block;
+}
+
+.ms-panel-key em{
+    color:#cbd5e1;
+    font-style:normal;
+}
+
+.ms-mono{
+    font-family:monospace;
+    font-size:10px;
+    font-weight:800;
+    color:var(--ms-ink);
+}
+
+.ms-mono small{
+    font-weight:400;
+    color:var(--ms-muted);
+}
+
+.ms-badge{
+    border:1px solid;
+    border-radius:2px;
+    padding:1px 6px;
+    font-family:monospace;
+    font-size:8.5px;
+    font-weight:800;
+    letter-spacing:.05em;
+    min-width:50px;
+    text-align:center;
+}
+
+/* ---------- 12-column dashboard grid ---------- */
+
+.ms-ribbon{
+    display:grid;
+    grid-template-columns:repeat(8, 1fr);
+    gap:6px;
+}
+
+.ms-row{
+    display:grid;
+    grid-template-columns:repeat(12, 1fr);
+    gap:10px;
+}
+
+.ms-span-7{ grid-column:span 7; }
+.ms-span-6{ grid-column:span 6; }
+.ms-span-5{ grid-column:span 5; }
+.ms-span-3{ grid-column:span 3; }
+
+.ms-tall{ min-height:340px; }
+.ms-short{ min-height:220px; min-width:0; }
+.ms-short > *{ height:100%; }
+
+/* ---------- status ribbon cards ---------- */
+
+.ms-status-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    background:#fff;
+    border:1px solid var(--ms-line);
+    border-radius:4px;
+    padding:4px 8px;
+    min-height:38px;
+    min-width:0;
+}
+
+.ms-status-left{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    min-width:0;
+    color:var(--ms-muted);
+}
+
+.ms-status-left > div{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+
+.ms-status-label{
+    font-size:7.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--ms-muted);
+    line-height:1.15;
+}
+
+.ms-status-sub{
+    font-family:monospace;
+    font-size:6.5px;
+    color:#9ca3af;
+}
+
+.ms-status-value{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    font-family:monospace;
+    font-size:11px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.ms-pulse{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    animation:ms-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes ms-blink{ 50%{ opacity:.25; } }
+
+/* ---------- actuators + gauges ---------- */
+
+.ms-actuators{
+    display:grid;
+    grid-template-rows:1fr 1fr;
+    gap:8px;
+    flex:1;
+}
+
+.ms-actuator{
+    border:1px solid var(--ms-line);
+    border-radius:4px;
+    background:#fafafa;
+    padding:6px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.ms-actuator-head{
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px solid var(--ms-line);
+    padding-bottom:3px;
+    font-family:monospace;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.04em;
+}
+
+.ms-actuator-head span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+}
+
+.ms-actuator-head em{
+    font-style:normal;
+    font-weight:400;
+    font-size:8px;
+    color:var(--ms-muted);
+}
+
+.ms-gauges{
+    display:grid;
+    gap:6px;
+    flex:1;
+}
+
+.ms-gauges.g4{ grid-template-columns:repeat(4, 1fr); }
+.ms-gauges.g2{ grid-template-columns:repeat(2, 1fr); }
+
+.ms-gauge{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    background:#fff;
+    border:1px solid var(--ms-line);
+    border-radius:4px;
+    padding:6px;
+    min-width:0;
+}
+
+.ms-gauge-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:4px;
+}
+
+.ms-gauge-label{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    min-width:0;
+}
+
+.ms-gauge-label h3{
+    margin:0;
+    font-size:9.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--ms-muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.ms-gauge-body svg{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:110px;
+}
+
+.ms-gauge-read{
+    display:flex;
+    justify-content:center;
+    align-items:baseline;
+    gap:5px;
+    border-top:1px solid var(--ms-line);
+    padding-top:3px;
+}
+
+.ms-gauge-read span{
+    font-family:monospace;
+    font-size:18px;
+    font-weight:800;
+    color:var(--ms-ink);
+}
+
+.ms-gauge-read small{
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    color:var(--ms-muted);
+}
+
+/* ---------- location ---------- */
+
+.ms-location{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    flex:1;
+    min-height:0;
+}
+
+.ms-map{
+    position:relative;
+    flex:1;
+    min-height:220px;
+    border:1px solid var(--ms-line);
+    border-radius:6px;
+    overflow:hidden;
+    background:#f3f4f6;
+}
+
+.ms-map-canvas{
+    position:absolute;
+    inset:0;
+    z-index:0;
+}
+
+.ms-map-canvas.dim{ opacity:.4; }
+
+.ms-map-title{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    z-index:400;
+    padding:8px 10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:monospace;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ms-orange);
+    background:linear-gradient(to bottom, rgba(255,255,255,.9), transparent);
+    pointer-events:none;
+}
+
+.ms-map-title i{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--ms-orange);
+    box-shadow:0 0 8px var(--ms-orange);
+}
+
+.ms-map-nofix{
+    position:absolute;
+    inset:0;
+    z-index:500;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    background:rgba(255,255,255,.65);
+    pointer-events:none;
+    text-align:center;
+}
+
+.ms-map-nofix strong{
+    color:#dc2626;
+    font-size:11px;
+    letter-spacing:.1em;
+    border:1px solid rgba(220,38,38,.35);
+    background:rgba(220,38,38,.08);
+    padding:6px 14px;
+    border-radius:6px;
+}
+
+.ms-map-nofix span{
+    font-family:monospace;
+    font-size:10px;
+    color:var(--ms-muted);
+}
+
+/* ---------- charts ---------- */
+
+.ms-chart{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    height:100%;
+    min-height:190px;
+    overflow:hidden;
+}
+
+.ms-chart-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    border-bottom:1px solid var(--ms-line);
+    padding-bottom:5px;
+    min-width:0;
+}
+
+.ms-chart-title{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    white-space:nowrap;
+}
+
+.ms-chart-title strong{
+    font-family:monospace;
+    font-size:13px;
+    color:var(--ms-ink);
+}
+
+.ms-chart-title span{
+    font-family:monospace;
+    font-size:9.5px;
+    color:var(--ms-muted);
+}
+
+.ms-legend{
+    display:flex;
+    gap:10px;
+    font-size:9px;
+    color:var(--ms-muted);
+    overflow:hidden;
+}
+
+.ms-legend span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    white-space:nowrap;
+}
+
+.ms-legend i{
+    width:8px;
+    height:8px;
+    border-radius:2px;
+    display:inline-block;
+}
+
+.ms-legend b{
+    font-family:monospace;
+    color:var(--ms-ink);
+}
+
+.ms-chart-plot{
+    position:relative;
+    flex:1;
+    min-height:120px;
+    margin-top:6px;
+}
+
+.ms-chart-plot svg{
+    display:block;
+    width:100%;
+    height:100%;
+}
+
+.ms-nodata{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    border:1px dashed var(--ms-line);
+    background:#f8fafc;
+    border-radius:4px;
+}
+
+.ms-nodata span{
+    font-family:monospace;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.08em;
+    color:var(--ms-muted);
+}
+
+.ms-nodata small{
+    font-family:monospace;
+    font-size:9px;
+    color:#9ca3af;
+}
+
+/* ---------- system load ---------- */
+
+.ms-load-body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    flex:1;
+}
+
+.ms-load-rows{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    width:100%;
+}
+
+.ms-load-row{
+    display:grid;
+    grid-template-columns:82px 1fr 32px;
+    align-items:center;
+    gap:6px;
+    font-size:8.5px;
+    font-weight:800;
+    color:var(--ms-muted);
+}
+
+.ms-load-row b{
+    font-family:monospace;
+    color:var(--ms-ink);
+    text-align:right;
+}
+
+.ms-load-bar{
+    height:5px;
+    background:#e5e7eb;
+    border-radius:3px;
+    overflow:hidden;
+}
+
+.ms-load-bar i{
+    display:block;
+    height:100%;
+}
+
+/* ---------- alerts ---------- */
+
+.ms-alert-list{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    overflow-y:auto;
+    max-height:140px;
+}
+
+.ms-alert-ok{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    height:52px;
+    border:1px solid rgba(22,163,74,.3);
+    background:rgba(22,163,74,.07);
+    color:#16a34a;
+    font-family:monospace;
+    font-size:10px;
+    font-weight:700;
+    border-radius:4px;
+}
+
+.ms-alert{
+    border:1px solid;
+    border-radius:3px;
+    padding:5px 6px;
+    background:#fff;
+}
+
+.ms-alert.critical{ border-color:rgba(220,38,38,.35); }
+.ms-alert.warning{ border-color:rgba(217,119,6,.35); }
+
+.ms-alert-top{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+}
+
+.ms-alert-top strong{
+    font-size:10.5px;
+    color:var(--ms-ink);
+    margin-left:4px;
+}
+
+.ms-alert-top p{
+    margin:2px 0 0;
+    font-size:9px;
+    color:var(--ms-muted);
+}
+
+.ms-alert-top b{
+    font-family:monospace;
+    font-size:9px;
+    color:#dc2626;
+    white-space:nowrap;
+}
+
+.ms-alert-sev{
+    font-family:monospace;
+    font-size:7px;
+    font-weight:800;
+    text-transform:uppercase;
+    border:1px solid currentColor;
+    border-radius:2px;
+    padding:0 4px;
+}
+
+.ms-alert.critical .ms-alert-sev{ color:#dc2626; }
+.ms-alert.warning .ms-alert-sev{ color:#d97706; }
+
+.ms-alert-foot{
+    display:flex;
+    justify-content:space-between;
+    border-top:1px solid var(--ms-line);
+    margin-top:3px;
+    padding-top:2px;
+    font-family:monospace;
+    font-size:7.5px;
+    color:var(--ms-muted);
+}
+
+/* ---------- footer strip ---------- */
+
+.ms-strip{
+    border:1px solid var(--ms-line);
+    border-radius:6px;
+    background:#fff;
+    overflow:hidden;
+}
+
+.ms-strip-top,
+.ms-strip-bottom{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:18px;
+    padding:6px 12px;
+    font-size:11px;
+    color:var(--ms-muted);
+}
+
+.ms-strip-top{
+    border-bottom:1px solid var(--ms-line);
+}
+
+.ms-strip-title{
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ms-orange);
+}
+
+.ms-strip b{
+    color:var(--ms-ink);
+    font-family:monospace;
+}
+
+.ms-strip-bottom{
+    font-family:monospace;
+    font-size:10px;
+    background:#fafafa;
+}
+
+.ms-strip-brand{
+    margin-left:auto;
+    font-size:9px;
+    letter-spacing:.06em;
+}
+
+/* ====================================
+   SCH TRUCK GPS DASHBOARD
+==================================== */
+
+.ms-sch-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    border-bottom:1px solid var(--ms-line);
+    padding-bottom:10px;
+}
+
+.ms-sch-id{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.ms-sch-pin{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    background:rgba(245,130,32,.1);
+    border:1px solid rgba(245,130,32,.4);
+}
+
+.ms-sch-id h1{
+    margin:0;
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:.12em;
+    color:var(--ms-ink);
+}
+
+.ms-sch-id p{
+    margin:2px 0 0;
+    font-family:monospace;
+    font-size:12px;
+    font-weight:800;
+    color:var(--ms-orange);
+    letter-spacing:.06em;
+}
+
+.ms-sch-health{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+}
+
+.ms-pills{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.ms-pill-dot{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:#fff;
+    border:1px solid var(--ms-line);
+    border-radius:4px;
+    padding:3px 10px;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.06em;
+}
+
+.ms-pill-dot i{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    display:inline-block;
+}
+
+.ms-sch-meta{
+    display:flex;
+    gap:16px;
+    font-family:monospace;
+    font-size:10px;
+    color:var(--ms-muted);
+}
+
+.ms-sch-meta b{ color:var(--ms-ink); }
+
+.ms-kpis{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.ms-statbox{
+    flex:1;
+    min-width:120px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.ms-statbox span{
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ms-muted);
+}
+
+.ms-statbox div{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+}
+
+.ms-statbox b{
+    font-family:monospace;
+    font-size:18px;
+    color:var(--ms-ink);
+}
+
+.ms-statbox small{
+    font-family:monospace;
+    font-size:10px;
+    color:var(--ms-muted);
+}
+
+.ms-sch-main{
+    display:grid;
+    grid-template-columns:7fr 3fr;
+    gap:12px;
+    min-height:420px;
+}
+
+.ms-sch-left{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    min-width:0;
+}
+
+.ms-sch-map{
+    flex:1;
+    display:flex;
+    min-height:320px;
+}
+
+.ms-sch-map .ms-map{ flex:1; }
+
+.ms-cap{
+    margin:0 0 10px;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--ms-orange);
+}
+
+.ms-movement-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+}
+
+.ms-movement-grid > div:not(:first-child){
+    border-left:1px solid var(--ms-line);
+    padding-left:20px;
+}
+
+.ms-movement-grid span{
+    display:block;
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ms-muted);
+    margin-bottom:3px;
+}
+
+.ms-movement-grid b{
+    font-family:monospace;
+    font-size:15px;
+    color:var(--ms-ink);
+}
+
+.ms-move-state{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.ms-move-state i{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    display:inline-block;
+}
+
+.ms-gpsinfo{ height:100%; }
+
+.ms-inforows{
+    display:flex;
+    flex-direction:column;
+    overflow-y:auto;
+}
+
+.ms-inforow{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0;
+    border-bottom:1px solid var(--ms-line);
+}
+
+.ms-inforow:last-child{ border-bottom:0; }
+
+.ms-inforow span{
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ms-muted);
+}
+
+.ms-inforow b{
+    font-family:monospace;
+    font-size:12px;
+    color:var(--ms-ink);
+}
+
+.ms-nogps{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:6px;
+    padding:20px 10px;
+}
+
+.ms-nogps span{ font-size:28px; color:#9ca3af; }
+.ms-nogps p{ margin:0; font-family:monospace; font-size:12px; color:var(--ms-muted); }
+.ms-nogps small{ font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#9ca3af; }
+
+.ms-trends3{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:12px;
+}
+
+.ms-trend-box{
+    height:200px;
+    min-width:0;
+}
+
+/* ---------- responsive ---------- */
+
+@media(max-width:1100px){
+
+    .ms-ribbon{ grid-template-columns:repeat(4, 1fr); }
+    .ms-row{ grid-template-columns:1fr; }
+    .ms-span-7, .ms-span-6, .ms-span-5, .ms-span-3{ grid-column:auto; }
+    .ms-sch-main{ grid-template-columns:1fr; }
+    .ms-trends3{ grid-template-columns:1fr; }
+
+}
+
+@media(max-width:768px){
+
+    .ms-ribbon{ grid-template-columns:repeat(2, 1fr); }
+    .ms-gauges.g4{ grid-template-columns:repeat(2, 1fr); }
+
+}
