@@ -1,35 +1,27 @@
 # ====================================
-# MACHINE TELEMETRY (read-only passthrough)
-# The Varaha IoT dashboard team owns machine telemetry - RAAS-DOS only
-# READS it from their API and never stores a copy (no duplicate data).
-# Nothing here is persisted: bots come from /api/fleet/bots, live
-# packets from /api/telemetry/live, matched to our Machine Inventory
-# units by model name + unit number.
+# MACHINE TELEMETRY (read side)
+# Serves what the RAAS-DOS screens show about each machine's sensors:
+# Machine Statistics, Machine Inventory, Fleet Units and Execution.
 #
-# Built to survive their changes: the machine list is whatever their
-# fleet registry returns, and sensor readings are read as an OPEN set of
-# keys from each packet's rawPayload - a new sensor shows up
-# automatically (under "Other" until it is labelled in METRIC_CATALOG).
+# Source of truth is the MQTT hub (services/mqtt_telemetry.py) - the
+# live packets received straight from the machines. While a machine is
+# offline (or after a backend restart) the last known reading persisted
+# on its inventory row (services/telemetry_sync.py) is served instead,
+# so "last seen" and the last values never disappear.
+#
+# Sensor readings are read as an OPEN set of keys, so a newly added
+# sensor appears automatically (under "Other" until it is labelled in
+# METRIC_CATALOG).
 # ====================================
 
-import os
-import re
-import time
 from datetime import datetime, timezone
 
-import requests
-
+from backend.models.execution import Execution
 from backend.models.machine_inventory import MachineInventory
+from backend.models.machine_telemetry_log import MachineTelemetryLog
 from backend.models.machines_pumps import Machine
-
-
-# Placeholder default = their Vercel deployment (currently an in-memory
-# snapshot, not the live feed). Override with VARAHA_API_BASE_URL once
-# the real backend URL is confirmed. VARAHA_API_TOKEN is sent as a
-# Bearer token only if set (their API has no auth today).
-DEFAULT_BASE_URL = "https://raas-dashboard-beta.vercel.app"
-REQUEST_TIMEOUT_SECONDS = 10
-CACHE_TTL_SECONDS = 3
+from backend.services.mqtt_telemetry import hub
+from backend.services.telemetry_sync import expected_bot_id, gps_from_packet
 
 LIVE_MAX_AGE_SECONDS = 15
 STALE_MAX_AGE_SECONDS = 30
@@ -67,172 +59,13 @@ METRIC_CATALOG = {
 
 GROUP_ORDER = ["Motion", "Power", "Process", "Location", "Orientation", "Other"]
 
-_cache = {"at": 0.0, "data": None}
-
-
-# ====================================
-# UPSTREAM FETCH
-# ====================================
-
-def _base_url():
-    return os.getenv("VARAHA_API_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
-
-
-def _get(path):
-    headers = {}
-    token = os.getenv("VARAHA_API_TOKEN")
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    response = requests.get(_base_url() + path, headers=headers, timeout=REQUEST_TIMEOUT_SECONDS)
-    response.raise_for_status()
-    return response.json()
-
-
-def _fetch_upstream():
-    now = time.time()
-    if _cache["data"] is not None and now - _cache["at"] < CACHE_TTL_SECONDS:
-        return _cache["data"]
-    bots = _get("/api/fleet/bots").get("data") or []
-    live = _get("/api/telemetry/live").get("data") or {}
-    data = {"bots": bots, "live": live}
-    _cache["at"] = now
-    _cache["data"] = data
-    return data
-
-
-# ====================================
-# MATCHING (inventory unit -> their bot)
-# ====================================
-
-def _norm(text):
-    return re.sub(r"[^A-Z0-9]", "", (text or "").upper())
-
-
-def _model_key(type_code):
-    # "VARAHA-SCH-300" -> "SCH-300"; their models drop the brand prefix.
-    return re.sub(r"^VARAHA-", "", (type_code or "").upper())
-
-
-def _unit_number(machine_code):
-    match = re.search(r"-M(\d+)$", machine_code or "")
-    return int(match.group(1)) if match else None
-
-
-def match_bot(unit, type_code, bots):
-    number = _unit_number(unit.machine_code)
-    if number is None:
-        return None
-    key = _model_key(type_code)
-
-    # 1) exact bot id, e.g. SCH-300 + M1 -> SCH-300-001
-    wanted = f"{key}-{number:03d}"
-    for bot in bots:
-        if (bot.get("id") or "").upper() == wanted:
-            return bot
-
-    # 2) same model name, Nth bot of that model (their ids may change)
-    same_model = sorted(
-        (b for b in bots if _norm(b.get("modelId")) == _norm(key)),
-        key=lambda b: b.get("id") or ""
-    )
-    if number <= len(same_model):
-        return same_model[number - 1]
-    return None
+HISTORY_LIMIT = 300
+LOG_FALLBACK_ROWS = 200
 
 
 # ====================================
 # SHAPING
 # ====================================
-
-def _parse_time(value):
-    try:
-        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-    except (ValueError, TypeError):
-        return None
-
-
-def _status(bot, packet):
-    if bot is None:
-        return "no_source", None
-    if not packet:
-        return "no_data", None
-    when = _parse_time(packet.get("timestamp"))
-    if when is None:
-        return "no_data", None
-    if when.tzinfo is None:
-        when = when.replace(tzinfo=timezone.utc)
-    age = max(0.0, (datetime.now(timezone.utc) - when).total_seconds())
-    if age <= LIVE_MAX_AGE_SECONDS:
-        return "live", age
-    if age <= STALE_MAX_AGE_SECONDS:
-        return "stale", age
-    return "offline", age
-
-
-def _build_metrics(packet):
-    raw = packet.get("rawPayload") if isinstance(packet.get("rawPayload"), dict) else packet
-    groups = {}
-    for key, value in raw.items():
-        if key in META_KEYS or value is None or isinstance(value, (dict, list)):
-            continue
-        label, unit, group = METRIC_CATALOG.get(key, (key.replace("_", " ").capitalize(), None, "Other"))
-        groups.setdefault(group, []).append({"key": key, "label": label, "unit": unit, "value": value})
-    return [{"group": g, "metrics": groups[g]} for g in GROUP_ORDER if g in groups]
-
-
-# ====================================
-# PUBLIC
-# ====================================
-
-def get_machine_statistics(db):
-    rows = (
-        db.query(MachineInventory, Machine)
-        .join(Machine, MachineInventory.machine_type_id == Machine.id)
-        .filter(Machine.active.is_(True), MachineInventory.status != "RETIRED")
-        .order_by(Machine.id, MachineInventory.machine_code)
-        .all()
-    )
-
-    upstream_error = None
-    bots, live = [], {}
-    try:
-        upstream = _fetch_upstream()
-        bots, live = upstream["bots"], upstream["live"]
-    except Exception as error:  # upstream down must never break RAAS-DOS
-        upstream_error = f"Telemetry API unavailable: {error.__class__.__name__}"
-
-    machines = []
-    for unit, machine_type in rows:
-        bot = match_bot(unit, machine_type.code, bots)
-        packet = live.get(bot["id"]) if bot else None
-        state, age = _status(bot, packet)
-        machines.append({
-            "id": unit.id,
-            "machine_code": unit.machine_code,
-            "machine_name": unit.machine_name,
-            "machine_type": machine_type.name,
-            "inventory_status": unit.status,
-            "current_site": unit.current_site,
-            "telemetry_status": state,
-            "bot_id": bot["id"] if bot else None,
-            "last_seen": packet.get("timestamp") if packet else None,
-            "age_seconds": age,
-            "metric_groups": _build_metrics(packet) if packet else [],
-        })
-
-    return {
-        "source": _base_url(),
-        "error": upstream_error,
-        "machines": machines,
-    }
-
-
-# ====================================
-# PER-MACHINE DETAIL (live values + history for the dashboard view)
-# ====================================
-
-HISTORY_LIMIT = 500
-
 
 def _flat_values(packet):
     raw = packet.get("rawPayload") if isinstance(packet.get("rawPayload"), dict) else packet
@@ -242,47 +75,186 @@ def _flat_values(packet):
     }
 
 
+def _build_metrics(packet):
+    groups = {}
+    for key, value in _flat_values(packet).items():
+        label, unit, group = METRIC_CATALOG.get(key, (key.replace("_", " ").capitalize(), None, "Other"))
+        groups.setdefault(group, []).append({"key": key, "label": label, "unit": unit, "value": value})
+    return [{"group": g, "metrics": groups[g]} for g in GROUP_ORDER if g in groups]
+
+
+def _iso(epoch):
+    return datetime.fromtimestamp(epoch, timezone.utc).isoformat() if epoch else None
+
+
+def _status(received_at):
+    """live / stale / offline from OUR receive time (or the persisted
+    last-known time); no_source when nothing was ever received."""
+
+    if received_at is None:
+        return "no_source", None
+
+    age = max(0.0, datetime.now(timezone.utc).timestamp() - received_at)
+
+    if age <= LIVE_MAX_AGE_SECONDS:
+        return "live", age
+    if age <= STALE_MAX_AGE_SECONDS:
+        return "stale", age
+    return "offline", age
+
+
+def _current_reading(unit, bot_id):
+    """(packet, received_at_epoch, from_hub) - live hub reading first,
+    the persisted last-known reading second, else (None, None, False)."""
+
+    entry = hub.get_latest(bot_id) if bot_id else None
+
+    if entry:
+        return entry["packet"], entry["received_at"], True
+
+    if unit.last_telemetry and unit.last_telemetry_at:
+        return unit.last_telemetry, unit.last_telemetry_at.timestamp(), False
+
+    return None, None, False
+
+
+def _machine_entry(unit, machine_type):
+
+    bot_id = unit.telemetry_bot_id or expected_bot_id(unit.machine_code, machine_type.code)
+    packet, received_at, live_source = _current_reading(unit, bot_id)
+    state, age = _status(received_at)
+
+    gps = gps_from_packet(packet) if packet else None
+
+    return {
+        "id": unit.id,
+        "machine_code": unit.machine_code,
+        "machine_name": unit.machine_name,
+        "machine_type": machine_type.name,
+        "inventory_status": unit.status,
+        "current_site": unit.current_site,
+        "telemetry_status": state,
+        "bot_id": bot_id if packet else None,
+        "last_seen": _iso(received_at),
+        "age_seconds": age,
+        "position": {"lat": gps["lat"], "lng": gps["lng"]} if gps else None,
+        "metric_groups": _build_metrics(packet) if packet else [],
+    }
+
+
+# ====================================
+# PUBLIC
+# ====================================
+
+def _active_units(db):
+    return (
+        db.query(MachineInventory, Machine)
+        .join(Machine, MachineInventory.machine_type_id == Machine.id)
+        .filter(Machine.active.is_(True), MachineInventory.status != "RETIRED")
+        .order_by(Machine.id, MachineInventory.machine_code)
+        .all()
+    )
+
+
+def get_machine_statistics(db):
+
+    status = hub.status()
+
+    return {
+        "source": "mqtt",
+        "mqtt": status,
+        "error": None if status["configured"] else "MQTT is not configured (set MQTT_HOST) - showing last known readings only.",
+        "machines": [_machine_entry(unit, machine_type) for unit, machine_type in _active_units(db)],
+    }
+
+
 def get_machine_detail(db, unit_id):
+
     row = (
         db.query(MachineInventory, Machine)
         .join(Machine, MachineInventory.machine_type_id == Machine.id)
         .filter(MachineInventory.id == unit_id)
         .first()
     )
+
     if not row:
         return None
+
     unit, machine_type = row
+    entry = _machine_entry(unit, machine_type)
+    bot_id = unit.telemetry_bot_id or expected_bot_id(unit.machine_code, machine_type.code)
+    packet, received_at, _ = _current_reading(unit, bot_id)
 
-    error = None
-    bot, packet, history = None, None, []
-    try:
-        upstream = _fetch_upstream()
-        bot = match_bot(unit, machine_type.code, upstream["bots"])
-        packet = upstream["live"].get(bot["id"]) if bot else None
-        if bot:
-            records = _get(f"/api/telemetry/history/{bot['id']}?limit={HISTORY_LIMIT}").get("data") or []
-            history = [
-                {"timestamp": r.get("timestamp"), "values": _flat_values(r)}
-                for r in records if r.get("timestamp")
-            ]
-    except Exception as exc:  # upstream down must never break RAAS-DOS
-        error = f"Telemetry API unavailable: {exc.__class__.__name__}"
+    history = [
+        {"timestamp": _iso(at), "values": _flat_values(p)}
+        for at, p in hub.get_history(bot_id, HISTORY_LIMIT)
+    ]
 
-    state, age = _status(bot, packet)
+    # After a restart the in-memory trail is short - lengthen it with the
+    # sampled log (only exists for time spent on a job).
+    if len(history) < 30:
+        log_rows = (
+            db.query(MachineTelemetryLog)
+            .filter(MachineTelemetryLog.machine_inventory_id == unit.id)
+            .order_by(MachineTelemetryLog.recorded_at.desc())
+            .limit(LOG_FALLBACK_ROWS)
+            .all()
+        )
+        first = history[0]["timestamp"] if history else None
+        older = [
+            {"timestamp": r.recorded_at.isoformat(), "values": _flat_values(r.payload)}
+            for r in reversed(log_rows)
+            if first is None or r.recorded_at.isoformat() < first
+        ]
+        history = older + history
+
     return {
-        "id": unit.id,
-        "machine_code": unit.machine_code,
-        "machine_name": unit.machine_name,
+        **{k: entry[k] for k in ("id", "machine_code", "machine_name", "machine_type", "inventory_status",
+                                 "current_site", "telemetry_status", "bot_id", "last_seen", "age_seconds")},
         "machine_type_code": machine_type.code,
-        "machine_type": machine_type.name,
-        "inventory_status": unit.status,
-        "current_site": unit.current_site,
-        "family": bot.get("familyId") if bot else None,
-        "bot_id": bot["id"] if bot else None,
-        "telemetry_status": state,
-        "age_seconds": age,
-        "last_seen": packet.get("timestamp") if packet else None,
+        "family": "SCH" if "SCH-" in (machine_type.code or "") else None,
         "values": _flat_values(packet) if packet else {},
         "history": history,
-        "error": error,
+        "mqtt": hub.status(),
+        "error": None,
+    }
+
+
+def get_execution_telemetry(db, execution_id):
+    """Sensor state of the machines working one execution, plus whether
+    the execution's own position is currently supplied by the machine."""
+
+    from backend.services.execution_service import _current_phase_status, _resolve_execution_machines
+
+    execution = db.query(Execution).filter(Execution.id == execution_id).first()
+
+    if execution is None:
+        return None
+
+    machines = _resolve_execution_machines(db, execution.job_creation_id)
+
+    items = []
+    for index, unit in enumerate(machines):
+        machine_type = db.query(Machine).filter(Machine.id == unit.machine_type_id).first()
+        if machine_type is None:
+            continue
+        entry = _machine_entry(unit, machine_type)
+        entry["role"] = "PRIMARY" if index == 0 else "SUPPORT"
+        items.append(entry)
+
+    primary = items[0] if items else None
+
+    return {
+        "execution_id": execution.id,
+        "current_phase": execution.current_phase,
+        "phase_status": _current_phase_status(execution),
+        "position_source": execution.last_update_source,
+        "device_position_active": bool(
+            execution.last_update_source == "DEVICE"
+            and primary is not None
+            and primary["telemetry_status"] in ("live", "stale")
+        ),
+        "primary_status": primary["telemetry_status"] if primary else "no_source",
+        "machines": items,
+        "mqtt": hub.status(),
     }

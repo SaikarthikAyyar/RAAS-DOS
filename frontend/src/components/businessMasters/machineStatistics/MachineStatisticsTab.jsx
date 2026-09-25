@@ -11,8 +11,8 @@ import SchGpsDashboard from "./SchGpsDashboard";
 import "./MachineStatistics.css";
 
 
-// How often the selected machine re-reads the Varaha IoT API through
-// our backend (the list of machines refreshes on the same beat).
+// How often the selected machine re-reads its live state from our
+// backend (the list of machines refreshes on the same beat).
 const REFRESH_MS = 5000;
 
 const DOT = {
@@ -39,12 +39,14 @@ export default function MachineStatisticsTab(){
     const [selectedId, setSelectedId] = useState(null);
     const [detail, setDetail] = useState(null);
     const [error, setError] = useState("");
+    const [mqtt, setMqtt] = useState(null);
 
     const loadList = useCallback(async()=>{
 
         try{
             const data = await getMachineTelemetry();
             setMachines(data.machines);
+            setMqtt(data.mqtt || null);
             setError(data.error || "");
             setSelectedId(current=>current ?? data.machines[0]?.id ?? null);
         }
@@ -112,8 +114,16 @@ export default function MachineStatisticsTab(){
                 <h3>Machine Statistics</h3>
 
                 <p className="bm-muted">
-                    Read-only. Live sensor data for each machine in Machine Inventory, shown the way the Varaha IoT dashboard shows it. Data is read from the telemetry API and never stored in RAAS-DOS.
+                    Read-only. Live sensor data for each machine in Machine Inventory, shown the way the Varaha IoT dashboard shows it. Readings arrive straight from the machines over MQTT; the last known reading is kept so it stays visible while a machine is offline.
                 </p>
+
+                {mqtt && (
+                    <p className="bm-muted" style={{fontSize:12}}>
+                        {mqtt.configured
+                            ? <>Live feed ({mqtt.mode === "api" ? "interim relay of the Varaha dashboard API - direct broker feed not connected yet" : "MQTT"}): {mqtt.connected ? "connected" : "connecting"} to {mqtt.host} · {mqtt.bots_seen} machine(s) reporting · {mqtt.packets_received.toLocaleString()} packets received{mqtt.last_error ? ` · ${mqtt.last_error}` : ""}</>
+                            : "Live feed: not configured (MQTT_HOST is not set) - showing last known readings only."}
+                    </p>
+                )}
 
                 {error && <p className="bm-muted">{error}</p>}
 
@@ -143,8 +153,8 @@ export default function MachineStatisticsTab(){
                     <div className="ms-machine-title">
                         <strong>{detail.machine_name}</strong>
                         <span>{detail.machine_code} · {detail.inventory_status}{detail.current_site ? ` · ${detail.current_site}` : ""}</span>
-                        {!detail.bot_id && <em>No matching machine in the telemetry system yet — readings will appear once it is registered.</em>}
-                        {detail.bot_id && !detail.last_seen && <em>Registered as {detail.bot_id}, but no readings have been received yet.</em>}
+                        {!detail.bot_id && <em>No readings have been received from this machine yet — they will appear as soon as it starts reporting.</em>}
+                        {detail.bot_id && !detail.last_seen && <em>Reporting as {detail.bot_id}, but no readings have been received yet.</em>}
                     </div>
 
                     {isSchMachine(detail) ? <SchGpsDashboard detail={detail} /> : <MachineDashboard detail={detail} />}

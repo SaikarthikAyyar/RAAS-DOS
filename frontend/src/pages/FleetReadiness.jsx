@@ -17,6 +17,10 @@ import { formatApiError } from "../utils/apiError";
 
 import { formatPumpList, formatAccessoryList } from "../utils/kitFormat";
 
+import { useMachineTelemetry } from "../hooks/useMachineTelemetry";
+
+import { FleetTelemetryCell } from "../components/shared/TelemetryPill";
+
 
 const MONTH_NAMES = [
     "January", "February", "March", "April", "May", "June",
@@ -152,6 +156,8 @@ function CalendarGrid({ year, month, dayMap, pendingAction, onDayClick }){
 // ====================================
 
 export default function FleetReadiness(){
+
+    const telemetry = useMachineTelemetry();
 
     const { user } = useAuth();
 
@@ -400,6 +406,7 @@ export default function FleetReadiness(){
                                             <th>Machine</th>
                                             <th>Hub</th>
                                             <th>Current Location</th>
+                                            <th>Telemetry</th>
                                             <th>Crew</th>
                                             <th>Pumps</th>
                                             <th>Accessories</th>
@@ -419,6 +426,7 @@ export default function FleetReadiness(){
                                                 </td>
                                                 <td>{f.hub_name || "-"}</td>
                                                 <td>{f.current_location || "-"}</td>
+                                                <td><FleetTelemetryCell machines={f.machines} byId={telemetry.byId} /></td>
                                                 <td>{f.crew?.length ? f.crew.map(c=>c.full_name).join(", ") : "-"}</td>
                                                 <td>{formatPumpList(f.pumps)}</td>
                                                 <td>{formatAccessoryList(f.accessories)}</td>

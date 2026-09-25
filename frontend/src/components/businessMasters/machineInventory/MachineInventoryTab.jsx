@@ -18,6 +18,10 @@ import { buildActor } from "../../../utils/actor";
 
 import { formatApiError } from "../../../utils/apiError";
 
+import { useMachineTelemetry } from "../../../hooks/useMachineTelemetry";
+
+import TelemetryPill from "../../shared/TelemetryPill";
+
 
 const STATUS_OPTIONS = ["AVAILABLE", "ALLOCATED", "MAINTENANCE", "RETIRED"];
 
@@ -189,6 +193,8 @@ function MachineInventoryModal({ editing, machineTypes, hubs, onClose, onSave })
 
 export default function MachineInventoryTab(){
 
+    const telemetry = useMachineTelemetry();
+
     const [inventory, setInventory] = useState([]);
     const [machineTypes, setMachineTypes] = useState([]);
     const [hubs, setHubs] = useState([]);
@@ -309,6 +315,7 @@ export default function MachineInventoryTab(){
                                 <th>Status</th>
                                 <th>Hub</th>
                                 <th>Current site</th>
+                                <th>Telemetry</th>
                                 <th>Queue</th>
                                 <th></th>
                             </tr>
@@ -327,6 +334,7 @@ export default function MachineInventoryTab(){
                                     <td>{row.status || "-"}</td>
                                     <td>{row.hub_name || "-"}</td>
                                     <td>{row.current_site || "-"}</td>
+                                    <td><TelemetryPill entry={telemetry.byId[row.id]} /></td>
                                     <td>{row.queue_count ?? 0}</td>
                                     <td>
 

@@ -10,6 +10,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Float
 from sqlalchemy import text
+from sqlalchemy.dialects.postgresql import JSONB
 
 from backend.database.tables import Base
 
@@ -127,6 +128,28 @@ class MachineInventory(Base):
     queue_count = Column(
         Integer,
         default=0
+    )
+
+    # ====================================
+    # LIVE SENSOR TELEMETRY (MQTT)
+    # Last known reading for this machine, kept so status / values
+    # survive a backend restart and stay visible while it is offline.
+    # Raw history is NOT stored here - see MachineTelemetryLog.
+    # ====================================
+
+    telemetry_bot_id = Column(
+        String(64),
+        nullable=True
+    )
+
+    last_telemetry_at = Column(
+        TIMESTAMP(timezone=True),
+        nullable=True
+    )
+
+    last_telemetry = Column(
+        JSONB,
+        nullable=True
     )
 
     remarks = Column(

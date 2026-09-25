@@ -11,3 +11,4 @@ openpyxl
 Pillow
 opencv-python
 requests
+paho-mqtt

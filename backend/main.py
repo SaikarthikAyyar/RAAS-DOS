@@ -136,6 +136,23 @@ from backend.database.init_db import create_tables
 app = FastAPI()
 
 
+# Machine sensor telemetry: subscribe to the MQTT broker (only when
+# MQTT_HOST is set) and let the hub's worker persist what job execution
+# needs. See services/mqtt_telemetry.py / telemetry_sync.py.
+@app.on_event("startup")
+def start_machine_telemetry():
+    from backend.services.mqtt_telemetry import hub
+    from backend.services.telemetry_sync import sync_batch
+    hub.start(on_batch=sync_batch)
+
+
+@app.on_event("shutdown")
+def stop_machine_telemetry():
+    from backend.services.mqtt_telemetry import hub
+    hub.stop()
+
+
+
 # ====================================
 # GLOBAL EXCEPTION HANDLERS
 # ====================================

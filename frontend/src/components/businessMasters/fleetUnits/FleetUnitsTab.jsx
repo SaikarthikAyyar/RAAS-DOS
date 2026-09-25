@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 
+import { useMachineTelemetry } from "../../../hooks/useMachineTelemetry";
+
+import { FleetTelemetryCell } from "../../shared/TelemetryPill";
+
 import {
     getFleetUnits,
     getAvailableMachines,
@@ -395,6 +399,8 @@ function FleetUnitModal({ editing, machines, allPersonnel, onClose, onSave }){
 
 export default function FleetUnitsTab(){
 
+    const telemetry = useMachineTelemetry();
+
     const [fleetUnits, setFleetUnits] = useState([]);
     const [machines, setMachines] = useState([]);
     const [allPersonnel, setAllPersonnel] = useState([]);
@@ -519,6 +525,7 @@ export default function FleetUnitsTab(){
                                 <th>Machines</th>
                                 <th>Hub</th>
                                 <th>Current Location</th>
+                                <th>Telemetry</th>
                                 <th>Crew</th>
                                 <th>Pumps</th>
                                 <th>Accessories</th>
@@ -543,6 +550,7 @@ export default function FleetUnitsTab(){
                                     </td>
                                     <td>{f.hub_name || "—"}</td>
                                     <td>{f.current_location || "—"}</td>
+                                    <td><FleetTelemetryCell machines={f.machines} byId={telemetry.byId} /></td>
                                     <td>{f.crew?.length ? f.crew.map(c=>c.full_name).join(", ") : "—"}</td>
                                     <td>{formatPumpList(f.pumps, "—")}</td>
                                     <td>{formatAccessoryList(f.accessories, "—")}</td>

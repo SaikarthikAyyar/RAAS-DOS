@@ -18,6 +18,7 @@ from "../services/executionService";
 
 
 import ExecutionSummary from "../components/execution/ExecutionSummary";
+import ExecutionTelemetryCard from "../components/execution/ExecutionTelemetryCard";
 
 import ExecutionControls from "../components/execution/ExecutionControls";
 
@@ -368,6 +369,8 @@ export default function Execution(){
             execution={execution}
 
         />
+
+        <ExecutionTelemetryCard execution={execution}/>
 
         {
 

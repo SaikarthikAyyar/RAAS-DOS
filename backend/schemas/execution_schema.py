@@ -144,6 +144,11 @@ class ExecutionProgressUpdateSchema(BaseModel):
 
     gps_timestamp: datetime | None = None
 
+    # Where this position came from: "OPS" (typed by staff, the default
+    # and what every existing caller means) or "DEVICE" (the machine's
+    # own GPS, pushed by services/telemetry_sync.py from MQTT).
+    update_source: str | None = None
+
     # eta_minutes and distance_travelled_km are deliberately NOT
     # accepted here - both are derived server-side from wherever
     # latitude/longitude (and speed, for ETA) land, exactly like

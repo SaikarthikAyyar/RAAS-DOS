@@ -1247,7 +1247,7 @@ def update_execution_progress(
         execution.gps_timestamp = payload.gps_timestamp
 
     if payload.latitude is not None or payload.longitude is not None:
-        execution.last_update_source = "OPS"
+        execution.last_update_source = payload.update_source or "OPS"
 
     # ====================================
     # DISTANCE + ETA - DERIVED FROM POSITION, NOT TYPED

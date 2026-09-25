@@ -61,7 +61,7 @@ export default function SchGpsDashboard({ detail }){
         : state === "stale" ? { label:"DEVICE STALE", color:COLORS.warn }
         : { label:"DEVICE OFFLINE", color:COLORS.crit };
 
-    const apiOk = !detail.error;
+    const apiOk = Boolean(detail.mqtt?.connected);
 
     const speedTrend = trend(h, ["speed"], 3.6);
     const headingTrend = trend(h, ["heading"]);
@@ -91,7 +91,7 @@ export default function SchGpsDashboard({ detail }){
                 <div className="ms-sch-health">
                     <div className="ms-pills">
                         <span className="ms-pill-dot" style={{ color:device.color }}><i style={{ background:device.color }} />{device.label}</span>
-                        <span className="ms-pill-dot" style={{ color:apiOk ? COLORS.orange : COLORS.crit }}><i style={{ background:apiOk ? COLORS.orange : COLORS.crit }} />{apiOk ? "TELEMETRY API CONNECTED" : "TELEMETRY API OFFLINE"}</span>
+                        <span className="ms-pill-dot" style={{ color:apiOk ? COLORS.orange : COLORS.crit }}><i style={{ background:apiOk ? COLORS.orange : COLORS.crit }} />{apiOk ? "MQTT CONNECTED" : "MQTT OFFLINE"}</span>
                     </div>
                     <div className="ms-sch-meta">
                         <span>LAST PACKET: <b>{formatAge(detail.age_seconds)}</b></span>

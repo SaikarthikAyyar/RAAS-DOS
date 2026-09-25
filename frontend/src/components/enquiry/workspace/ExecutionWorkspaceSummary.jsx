@@ -16,6 +16,7 @@ import { formatApiError } from "../../../utils/apiError";
 import { useAuth } from "../../../contexts/AuthContext";
 
 import ExecutionSummary from "../../execution/ExecutionSummary";
+import ExecutionTelemetryCard from "../../execution/ExecutionTelemetryCard";
 import ExecutionControls from "../../execution/ExecutionControls";
 import Phase1Mobilisation from "../../execution/Phase1Mobilisation";
 import Phase2Execution from "../../execution/Phase2Execution";
@@ -266,6 +267,8 @@ export default function ExecutionWorkspaceSummary({
         <div>
 
             <ExecutionSummary execution={execution}/>
+
+            <ExecutionTelemetryCard execution={execution}/>
 
             {execution.current_phase === "PHASE_1" && (
                 <Phase1Mobilisation execution={execution} refreshExecution={refreshExecution}/>

@@ -33,6 +33,7 @@ from backend.models.role_permissions import RolePermission
 from backend.models.ops_approval import OpsApproval
 
 from backend.models.machine_inventory import MachineInventory
+from backend.models.machine_telemetry_log import MachineTelemetryLog
 
 from backend.models.personnel import Personnel
 
