@@ -11,6 +11,10 @@ import SchGpsDashboard from "./SchGpsDashboard";
 import "./MachineStatistics.css";
 
 
+// Where the full Varaha IoT dashboard (all trends, history, alerts) lives.
+// Override per environment with VITE_VARAHA_DASHBOARD_URL.
+const VARAHA_DASHBOARD_URL = import.meta.env.VITE_VARAHA_DASHBOARD_URL || "https://raas-dashboard-beta.vercel.app";
+
 // How often the selected machine re-reads its live state from our
 // backend (the list of machines refreshes on the same beat).
 const REFRESH_MS = 5000;
@@ -155,6 +159,15 @@ export default function MachineStatisticsTab(){
                         <span>{detail.machine_code} · {detail.inventory_status}{detail.current_site ? ` · ${detail.current_site}` : ""}</span>
                         {!detail.bot_id && <em>No readings have been received from this machine yet — they will appear as soon as it starts reporting.</em>}
                         {detail.bot_id && !detail.last_seen && <em>Reporting as {detail.bot_id}, but no readings have been received yet.</em>}
+
+                        <a
+                            className="bm-btn bm-btn-primary ms-detail-link"
+                            href={VARAHA_DASHBOARD_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            View detailed statistics on RAAS dashboard ↗
+                        </a>
                     </div>
 
                     {isSchMachine(detail) ? <SchGpsDashboard detail={detail} /> : <MachineDashboard detail={detail} />}

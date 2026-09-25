@@ -4,7 +4,7 @@ import {
 } from "lucide-react";
 
 import {
-    COLORS, SemicircularGauge, StatusCard, TimeSeriesChart,
+    COLORS, SemicircularGauge, StatusCard,
     SystemLoadCard, AlertsCard, StatusStrip, LiveMap
 } from "./TelemetryWidgets";
 
@@ -16,7 +16,7 @@ import "./location3d/MachineLocation3D.light.css";
 
 import {
     THRESHOLDS as T, readValues, machineHealth, systemLoad,
-    buildAlerts, trend, gpsPath, toLocalPosition, toTrajectory
+    buildAlerts, gpsPath, toLocalPosition, toTrajectory
 } from "./machineTelemetry";
 
 
@@ -26,7 +26,7 @@ const HEALTH_TONE = { nominal:"emerald", warning:"amber", critical:"red", nodata
 
 
 // Default Varaha dashboard (used for every non-SCH machine): status
-// ribbon, actuator gauges, location, trends, system load and alerts.
+// ribbon, actuator gauges, location, system load and alerts.
 export default function MachineDashboard({ detail }){
 
     const r = readValues(detail.values);
@@ -46,22 +46,6 @@ export default function MachineDashboard({ detail }){
     const pumpRunning = r.pumpStatus === "RUNNING";
 
     const h = detail.history;
-
-    const tempSeries = [
-        { name:"Drive Temp", color:COLORS.ok, points:trend(h, ["motor_temp"]) },
-        { name:"Pump Temp", color:COLORS.slate, points:trend(h, ["pump_temp"]) }
-    ];
-
-    const rpmSeries = [
-        { name:"Left Motor RPM", color:COLORS.orange, points:trend(h, ["left_motor_rpm","motor_rpm"]) },
-        { name:"Right Motor RPM", color:COLORS.warn, points:trend(h, ["right_motor_rpm","motor_rpm"]) }
-    ];
-
-    const currentSeries = [
-        { name:"Drive Current", color:COLORS.orange, points:trend(h, ["motor_current","bus_current"]) },
-        { name:"Pump Current", color:COLORS.slate, points:trend(h, ["pump_current"]) }
-    ];
-
 
     const sourceLabel = state === "live" ? "LIVE" : state === "stale" ? "STALE" : state === "offline" ? "OFFLINE" : "NO DATA";
     const sourceColor = state === "live" ? COLORS.ok : state === "stale" ? COLORS.warn : state === "offline" ? COLORS.crit : COLORS.nodata;
@@ -147,16 +131,10 @@ export default function MachineDashboard({ detail }){
 
             </div>
 
-            {/* 3. TRENDS */}
+            {/* 3. SYSTEM LOAD + ALERTS */}
             <div className="ms-row">
-                <div className="ms-span-7 ms-short"><TimeSeriesChart title="Temperature Trend" unit="°C" series={tempSeries} /></div>
-                <div className="ms-span-5 ms-short"><TimeSeriesChart title="RPM Trend" unit="RPM" series={rpmSeries} /></div>
-            </div>
-
-            <div className="ms-row">
-                <div className="ms-span-6 ms-short"><TimeSeriesChart title="Current Trend" unit="A" series={currentSeries} /></div>
-                <div className="ms-span-3 ms-short"><SystemLoadCard load={load} /></div>
-                <div className="ms-span-3 ms-short"><AlertsCard alerts={alerts} /></div>
+                <div className="ms-span-6 ms-short"><SystemLoadCard load={load} /></div>
+                <div className="ms-span-6 ms-short"><AlertsCard alerts={alerts} /></div>
             </div>
 
             <StatusStrip detail={detail} sourceLabel={sourceLabel} sourceColor={sourceColor} records={h.length} />
