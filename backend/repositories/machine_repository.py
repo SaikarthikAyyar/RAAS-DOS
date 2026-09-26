@@ -4,6 +4,11 @@
 
 from backend.models.machines_pumps import Machine, Pump, MachinePumpCompatibility
 
+from backend.repositories.business_masters_pricing_repository import (
+    ensure_machine_in_primary_config,
+    service_configuration_codes_by_machine
+)
+
 
 # ====================================
 # COMPATIBLE PUMP CODES (derived, not a
@@ -90,6 +95,8 @@ def create_machine(db, payload):
         _set_compatible_pumps(db, row.id, payload.compatible_pump_ids)
         db.commit()
 
+    ensure_machine_in_primary_config(db, row)
+
     _attach_compatible_pump_codes(db, row)
 
     return row
@@ -115,6 +122,8 @@ def update_machine(db, machine_id, payload):
 
     db.commit()
     db.refresh(row)
+
+    ensure_machine_in_primary_config(db, row)
 
     _attach_compatible_pump_codes(db, row)
 
@@ -185,6 +194,8 @@ def list_active_machines_as_dicts(db):
 
     hubs_available_by_type = _hubs_available_by_machine_type_id(db)
 
+    configs_by_machine = service_configuration_codes_by_machine(db)
+
     machines = []
 
     for row in rows:
@@ -195,6 +206,7 @@ def list_active_machines_as_dicts(db):
             "code": row.code,
             "name": row.name,
             "service_configuration": row.service_configuration,
+            "service_configurations": configs_by_machine.get(row.id, []),
             "power_type": row.power_type,
             "minimum_width": float(row.minimum_width) if row.minimum_width is not None else 0,
             "minimum_height": float(row.minimum_height) if row.minimum_height is not None else 0,

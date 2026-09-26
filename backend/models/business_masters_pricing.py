@@ -55,6 +55,27 @@ class ServiceConfigurationAccessory(Base):
 
 
 # ====================================
+# MACHINE <-> SERVICE CONFIGURATION
+# A machine type can be part of several configurations.
+# machines.service_configuration stays the PRIMARY config (what the
+# Ops Engine reads); this table holds every config the machine is in.
+# ====================================
+
+class MachineServiceConfiguration(Base):
+
+    __tablename__ = "machine_service_configurations"
+
+    __table_args__ = (
+        UniqueConstraint("machine_id", "service_configuration_id", name="uq_machine_service_configuration"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    machine_id = Column(Integer, ForeignKey("machines.id", ondelete="CASCADE"), nullable=False)
+    service_configuration_id = Column(Integer, ForeignKey("service_configurations.id", ondelete="CASCADE"), nullable=False)
+
+
+# ====================================
 # DEWATERING METHOD
 # method_key matches what OpsSelection.dewatering_method_min/max store.
 # ====================================

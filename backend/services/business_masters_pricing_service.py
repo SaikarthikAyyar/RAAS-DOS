@@ -16,6 +16,7 @@ from backend.repositories.business_masters_pricing_repository import (
     accessory_ids_for_service_configuration,
     set_service_configuration_machines,
     set_service_configuration_accessories,
+    add_machine_accessories_to_config,
     list_dewatering_methods,
     get_dewatering_method,
     create_dewatering_method,
@@ -96,8 +97,9 @@ def create_service_configuration_request(db, payload):
 
     row = create_service_configuration(db, payload)
 
-    set_service_configuration_machines(db, row, payload.machine_ids)
+    added = set_service_configuration_machines(db, row, payload.machine_ids)
     set_service_configuration_accessories(db, row.id, payload.accessory_ids)
+    add_machine_accessories_to_config(db, row.id, added)
 
     changes = [
         {"field": "code", "before": None, "after": row.code},
@@ -108,8 +110,10 @@ def create_service_configuration_request(db, payload):
     if payload.machine_ids:
         changes.append({"field": "machines", "before": None, "after": _machine_codes_label(db, payload.machine_ids)})
 
-    if payload.accessory_ids:
-        changes.append({"field": "accessories", "before": None, "after": _accessory_names_label(db, payload.accessory_ids)})
+    final_accessory_ids = accessory_ids_for_service_configuration(db, row.id)
+
+    if final_accessory_ids:
+        changes.append({"field": "accessories", "before": None, "after": _accessory_names_label(db, final_accessory_ids)})
 
     record_business_master_change(
         db=db,
@@ -140,18 +144,30 @@ def update_service_configuration_request(db, config_id, payload):
     machines_changed = "machine_ids" in payload.model_fields_set
     accessories_changed = "accessory_ids" in payload.model_fields_set
 
-    before_machine_ids = machine_ids_for_service_configuration(db, before.code) if machines_changed else None
-    before_accessory_ids = accessory_ids_for_service_configuration(db, config_id) if accessories_changed else None
+    old_code = before.code
+
+    before_machine_ids = machine_ids_for_service_configuration(db, before.code)
+    before_accessory_ids = accessory_ids_for_service_configuration(db, config_id)
 
     row = update_service_configuration(db, config_id, payload)
 
-    # Machine reassignment uses the row's own (possibly just-renamed)
-    # code, matching how machines actually resolve to this config today.
+    # A renamed code must follow through to machines using it as their primary config.
+    if row.code != old_code:
+        db.query(Machine).filter(Machine.service_configuration == old_code).update(
+            {Machine.service_configuration: row.code}
+        )
+        db.commit()
+
+    added = []
+
     if machines_changed:
-        set_service_configuration_machines(db, row, payload.machine_ids)
+        added = set_service_configuration_machines(db, row, payload.machine_ids)
 
     if accessories_changed:
         set_service_configuration_accessories(db, config_id, payload.accessory_ids)
+
+    # A machine brought into this config brings its accessories with it.
+    add_machine_accessories_to_config(db, config_id, added)
 
     if machines_changed:
         before_label = _machine_codes_label(db, before_machine_ids)
@@ -159,11 +175,13 @@ def update_service_configuration_request(db, config_id, payload):
         if before_label != after_label:
             changes.append({"field": "machines", "before": before_label or None, "after": after_label or None})
 
-    if accessories_changed:
-        before_label = _accessory_names_label(db, before_accessory_ids)
-        after_label = _accessory_names_label(db, payload.accessory_ids)
-        if before_label != after_label:
-            changes.append({"field": "accessories", "before": before_label or None, "after": after_label or None})
+    after_accessory_ids = accessory_ids_for_service_configuration(db, config_id)
+
+    before_label = _accessory_names_label(db, before_accessory_ids)
+    after_label = _accessory_names_label(db, after_accessory_ids)
+
+    if before_label != after_label:
+        changes.append({"field": "accessories", "before": before_label or None, "after": after_label or None})
 
     if changes:
 

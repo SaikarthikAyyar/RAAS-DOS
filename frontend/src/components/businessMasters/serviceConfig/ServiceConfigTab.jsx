@@ -90,6 +90,35 @@ function ServiceConfigModal({ editing, machines, accessories, onClose, onSave })
 
     const [error, setError] = useState("");
 
+    // Only real, active machine types can be put into a configuration -
+    // legacy/inactive types (e.g. the old SCH V3) are not in inventory.
+    const selectableMachines = machines.filter(m=>m.active);
+
+    // A machine can sit in several configurations; ticking one here brings
+    // the accessories it carries along, so they are listed under this
+    // configuration too (they can still be unticked afterwards).
+    function handleMachinesChange(nextIds){
+
+        const added = nextIds.filter(id=>!machineIds.includes(id));
+
+        setMachineIds(nextIds);
+
+        if(!added.length) return;
+
+        const names = new Set();
+
+        selectableMachines
+            .filter(m=>added.includes(m.id))
+            .forEach(m=>(m.accessories || []).forEach(n=>names.add(n)));
+
+        const extra = accessories.filter(a=>names.has(a.name)).map(a=>a.id);
+
+        if(extra.length){
+            setAccessoryIds(current=>Array.from(new Set([...current, ...extra])));
+        }
+
+    }
+
     async function handleSubmit(){
 
         if(!code.trim() || !name.trim() || ratePerDay===""){
@@ -192,12 +221,15 @@ function ServiceConfigModal({ editing, machines, accessories, onClose, onSave })
 
                     <div style={{gridColumn:"1 / -1"}}>
                         <label>Machines under this configuration</label>
+                        <p className="bm-muted" style={{fontSize:11.5, margin:"2px 0 6px"}}>
+                            A machine can be part of more than one configuration - tick it here and in each other configuration it belongs to. Its accessories are added under this configuration automatically.
+                        </p>
                         <CheckboxList
-                            options={machines}
+                            options={selectableMachines}
                             selected={machineIds}
-                            onChange={setMachineIds}
-                            emptyText="No machines in Machine Specs yet."
-                            format={m=>`${m.code} - ${m.name}${m.active ? "" : " (inactive)"}`}
+                            onChange={handleMachinesChange}
+                            emptyText="No active machines in Machine Specs yet."
+                            format={m=>`${m.code} - ${m.name}`}
                         />
                     </div>
 
