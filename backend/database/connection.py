@@ -28,6 +28,10 @@ DATABASE_URL = os.getenv(
 # ENGINE
 # ====================================
 
+# SQLAlchemy 2.1+ defaults plain postgresql:// to psycopg (v3); we ship psycopg2.
+if DATABASE_URL and DATABASE_URL.startswith(("postgresql://", "postgres://")):
+    DATABASE_URL = "postgresql+psycopg2://" + DATABASE_URL.split("://", 1)[1]
+
 engine = create_engine(
 
     DATABASE_URL
